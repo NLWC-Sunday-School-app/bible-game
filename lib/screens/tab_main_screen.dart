@@ -2,6 +2,7 @@ import 'package:bible_game/screens/tabs/account.dart';
 import 'package:bible_game/screens/tabs/games.dart';
 import 'package:bible_game/screens/tabs/home.dart';
 import 'package:bible_game/screens/tabs/leaderboard.dart';
+import 'package:bible_game/widgets/custom_icons/my_flutter_app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -36,6 +37,16 @@ class _TabMainScreenState extends State<TabMainScreen> {
     }
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _setBottomTabPage();
+  }
+
+  _setBottomTabPage()async{
+
+  }
+
   void _selectPage(int index) {
     setState(() {
       _selectedPageIndex = index;
@@ -43,13 +54,15 @@ class _TabMainScreenState extends State<TabMainScreen> {
   }
 
   Widget get _bottomNavigationBar {
-    return Container(
-      height: 100.h,
+    return SizedBox(
+      height: 85.h,
         child: BottomNavigationBar(
           onTap: _selectPage,
           backgroundColor: Colors.white,
-          unselectedItemColor: const Color.fromRGBO(101, 119, 138, 1),
-          selectedItemColor: const Color.fromRGBO(48, 105, 164, 1),
+          unselectedItemColor: const Color.fromRGBO(169, 171, 173, 1),
+          unselectedLabelStyle:const TextStyle(fontWeight: FontWeight.w700),
+          selectedItemColor: const Color.fromRGBO(118, 99, 229, 1),
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
           currentIndex: _selectedPageIndex,
           type: BottomNavigationBarType.fixed,
           showUnselectedLabels: true,
@@ -61,17 +74,17 @@ class _TabMainScreenState extends State<TabMainScreen> {
             ),
             BottomNavigationBarItem(
               backgroundColor: Colors.white,
-              icon: Icon(Icons.category),
+              icon: Icon(MyFlutterApp.application),
               label: 'Games',
             ),
             BottomNavigationBarItem(
               backgroundColor: Colors.white,
-              icon: Icon(Icons.bar_chart),
+              icon: Icon(MyFlutterApp.trophy),
               label: 'Leaderboard',
             ),
             BottomNavigationBarItem(
               backgroundColor: Colors.white,
-              icon: Icon(Icons.account_circle_outlined),
+              icon: Icon(Icons.account_circle_rounded),
               label: 'Account',
             ),
           ],
@@ -81,6 +94,11 @@ class _TabMainScreenState extends State<TabMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+       body: _pages[_selectedPageIndex]['page'],
+       bottomNavigationBar: _bottomNavigationBar,
+    );
   }
 }
+
+

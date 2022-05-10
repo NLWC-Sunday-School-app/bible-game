@@ -1,5 +1,6 @@
 import 'package:bible_game/screens/authentication/signup.dart';
 import 'package:bible_game/widgets/onboarding/onboarding_body.dart';
+import 'package:bible_game/widgets/onboarding/onboarding_button.dart';
 import 'package:bible_game/widgets/onboarding/onboarding_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,8 +16,7 @@ class KnowScripturesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: const Color(0xFFFD9090),
           body: Stack(
@@ -47,14 +47,24 @@ class KnowScripturesScreen extends StatelessWidget {
                   ),
                 ),
               ),
-               OnboardingBody(
-                imageUrl: 'assets/images/mask_three.png',
-                buttonText: 'Get Started',
-                goToNextScreen: () => goToSignupScreen(context),
-              )
+               Container(
+                 margin: EdgeInsets.only(top: 260.h),
+                 child: OnboardingBody(
+                  imageUrl: 'assets/images/mask_three.png',
+                  buttonText: 'Get Started',
+                  goToNextScreen: () => goToSignupScreen(context),
+              ),
+               ),
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  margin: EdgeInsets.only(top: 600.h),
+                  child: OnboardingButton(buttonText: 'Get Started', goToNextScreen: () => goToSignupScreen(context),),
+                ),
+              ),
             ],
           ),
-        ));
+        );
   }
 }
 

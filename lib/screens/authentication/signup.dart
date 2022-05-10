@@ -1,4 +1,4 @@
-import 'package:bible_game/widgets/onboarding/onboarding_button.dart';
+import 'package:bible_game/widgets/onboarding/auth_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -145,7 +145,7 @@ class SignUpScreen extends StatelessWidget {
               Center(
                 child: Container(
                   margin: EdgeInsets.only(top: 550.h),
-                  child: OnboardingButton(
+                  child: AuthButton(
                     buttonText: 'GET STARTED',
                     goToNextScreen: () => goToLoginScreen(context),
                   ),

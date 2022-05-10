@@ -1,5 +1,6 @@
 import 'package:bible_game/screens/authentication/signup.dart';
-import 'package:bible_game/widgets/onboarding/onboarding_button.dart';
+import 'package:bible_game/screens/tab_main_screen.dart';
+import 'package:bible_game/widgets/onboarding/auth_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -11,14 +12,13 @@ class LoginScreen extends StatelessWidget {
     Navigator.of(context).pushNamed(SignUpScreen.routeName);
   }
 
-  void goToSignUpScreen(BuildContext context) {
-    Navigator.of(context).pushNamed(SignUpScreen.routeName);
+  void goToTabMainScreen(BuildContext context) {
+    Navigator.of(context).pushNamed(TabMainScreen.routeName);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: const Color(0xFF7663E5),
         body: SingleChildScrollView(
           child: Stack(
@@ -95,13 +95,13 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 350.h, left: 2.w),
+                margin: EdgeInsets.only(top: 350.h, left: 30.w),
                 child: Image.asset('assets/images/cloud_two.png'),
               ),
               Center(
                 child: Container(
                   margin: EdgeInsets.only(top: 400.h),
-                  child: OnboardingButton(
+                  child: AuthButton(
                     buttonText: 'SIGN IN',
                     goToNextScreen: () => goToLoginScreen(context),
                   ),
@@ -109,7 +109,7 @@ class LoginScreen extends StatelessWidget {
               ),
               Center(
                 child: InkWell(
-                  onTap: () => goToSignUpScreen(context),
+                  onTap: () => goToTabMainScreen(context),
                   child: Container(
                     margin: EdgeInsets.only(top: 500.h),
                     child: Text(
@@ -125,7 +125,6 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

@@ -83,6 +83,10 @@ flutter:
          - asset: assets/fonts/quicksand/static/Quicksand-Medium.ttf
          - asset: assets/fonts/quicksand/static/Quicksand-Regular.ttf
          - asset: assets/fonts/quicksand/static/Quicksand-SemiBold.ttf
+
+     -  family: MyFlutterApp
+        fonts:
+          - asset:  assets/fonts/custom_fonts/MyFlutterApp.ttf
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

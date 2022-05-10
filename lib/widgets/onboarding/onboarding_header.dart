@@ -30,7 +30,7 @@ class OnboardingHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 63.h,
+          height: 65.h,
         ),
         Text(
           'WORDGAME',

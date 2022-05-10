@@ -3,11 +3,14 @@ import 'package:bible_game/screens/authentication/signup.dart';
 import 'package:bible_game/screens/onboarding/know_scriptures.dart';
 import 'package:bible_game/screens/onboarding/meditate.dart';
 import 'package:bible_game/screens/onboarding/memorize.dart';
+import 'package:bible_game/screens/tab_main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
   runApp(const MyApp());
+
 }
 
 class MyApp extends StatelessWidget {
@@ -24,8 +27,7 @@ class MyApp extends StatelessWidget {
           title: 'Flutter Demo',
           theme: ThemeData(
             fontFamily:  'Quicksand',
-            primarySwatch: Colors.blue,
-            primaryColor: Colors.lightBlue[800],
+            primaryColor: const Color.fromRGBO(118, 99, 229, 1),
           ),
           home: const MemorizeScreen(),
           routes: {
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
             KnowScripturesScreen.routeName: (context) => const KnowScripturesScreen(),
             SignUpScreen.routeName: (context) =>  const SignUpScreen(),
             LoginScreen.routeName: (context) => const LoginScreen(),
-
+            TabMainScreen.routeName: (context) => const TabMainScreen()
           },
         ),
       ),

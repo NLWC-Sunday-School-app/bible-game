@@ -19,38 +19,32 @@ class OnboardingBody extends StatelessWidget {
     return Center(
       child: Stack(
         children: [
-          Container(
-            margin: EdgeInsets.only(top: 280.h),
-            child: Image.asset(
+          Image.asset(
               imageUrl,
+              fit: BoxFit.fitWidth,
               // height: 588.h,
               // width: 288.w,
             ),
-          ),
-          Positioned(
-            top: 650.h,
-            left: 20.w,
-            child: InkWell(
-              onTap: goToNextScreen,
-              child: Container(
-                padding: EdgeInsets.only(
-                  left: 96.w,
-                  right: 96.w,
-                  top: 16.h,
-                  bottom: 16.h,
-                ),
-                decoration: BoxDecoration(
-                    color: const Color(0xfff2f3f7),
-                    borderRadius: BorderRadius.circular(20.r)),
-                child: Text(
-                  buttonText,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, color: Color(0xFF362A7A)),
-                ),
-              ),
-            ),
-          )
+           // InkWell(
+           //    onTap: goToNextScreen,
+           //    child: Container(
+           //      padding: EdgeInsets.only(
+           //        left: 96.w,
+           //        right: 96.w,
+           //        top: 16.h,
+           //        bottom: 16.h,
+           //      ),
+           //      decoration: BoxDecoration(
+           //          color: const Color(0xfff2f3f7),
+           //          borderRadius: BorderRadius.circular(20.r)),
+           //      child: Text(
+           //        buttonText,
+           //        textAlign: TextAlign.center,
+           //        style: const TextStyle(
+           //            fontWeight: FontWeight.w700, color: Color(0xFF362A7A)),
+           //      ),
+           //    ),
+           //  ),
         ],
       ),
     );

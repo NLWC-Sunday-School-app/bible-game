@@ -27,7 +27,9 @@ class CircleDot extends StatelessWidget {
             text,
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              color: textColor
+              color: textColor,
+              fontSize: 18.sp
+
             ),
           )),
           decoration: BoxDecoration(
