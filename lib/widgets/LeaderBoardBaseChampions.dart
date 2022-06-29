@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LeaderBoardBaseChampions extends StatelessWidget {
+  final String badgeUrl;
+
   const LeaderBoardBaseChampions({
     Key? key,
+    required this.badgeUrl,
   }) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 60.h,),
+      margin: EdgeInsets.only(
+        top: 60.h,
+      ),
       child: Stack(
         children: [
           Container(
@@ -18,7 +23,9 @@ class LeaderBoardBaseChampions extends StatelessWidget {
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20.r), topRight: Radius.circular(20.r)),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.r),
+                  topRight: Radius.circular(20.r)),
             ),
             child: Column(
               children: [
@@ -60,7 +67,7 @@ class LeaderBoardBaseChampions extends StatelessWidget {
             ),
           ),
           Image.asset(
-            'assets/images/second_position_badge.png',
+            badgeUrl,
             width: 95.w,
           ),
         ],

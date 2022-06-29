@@ -1,8 +1,70 @@
+import 'package:bible_game/widgets/bottomSheetModal/AboutBottomModalSheet.dart';
+import 'package:bible_game/widgets/bottomSheetModal/AccountBottomModalSheet.dart';
+import 'package:bible_game/widgets/bottomSheetModal/BadgesBottomModalSheet.dart';
+import 'package:bible_game/widgets/bottomSheetModal/PreferenceBottomModalSheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TabAccountScreen extends StatelessWidget {
   const TabAccountScreen({Key? key}) : super(key: key);
+
+  void showBadgesBottomModalSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return const BadgesBottomModalSheet();
+      },
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.0.r),
+              topRight: Radius.circular(20.0.r))),
+    );
+  }
+
+  void showAboutBottomModalSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return const AboutBottomModalSheet();
+      },
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.0.r),
+              topRight: Radius.circular(20.0.r))),
+    );
+  }
+
+  void showAccountBottomModalSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return const AccountBottomModalSheet();
+      },
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.0.r),
+              topRight: Radius.circular(20.0.r))),
+    );
+  }
+
+  void showPreferencesBottomModalSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return const PreferenceBottomModalSheet();
+      },
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.0.r),
+              topRight: Radius.circular(20.0.r))),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -133,28 +195,31 @@ class TabAccountScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 8.0.w),
-                                child: const Icon(
-                                  Icons.bar_chart_rounded,
-                                  color: Color.fromRGBO(118, 99, 229, 1),
+                          InkWell(
+                            onTap: () => showBadgesBottomModalSheet(context),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(right: 8.0.w),
+                                  child: const Icon(
+                                    Icons.insert_chart,
+                                    color: Color.fromRGBO(118, 99, 229, 1),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'Badges',
-                                style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              const Spacer(),
-                              Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                size: 15.w,
-                                color: const Color.fromRGBO(154, 154, 154, 1),
-                              )
-                            ],
+                                Text(
+                                  'Badges',
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Spacer(),
+                                Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  size: 15.w,
+                                  color: const Color.fromRGBO(154, 154, 154, 1),
+                                )
+                              ],
+                            ),
                           ),
                           const Divider(),
                           Row(
@@ -219,52 +284,58 @@ class TabAccountScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 8.0.w),
-                                child: const Icon(
-                                  Icons.bar_chart_rounded,
-                                  color: Color.fromRGBO(118, 99, 229, 1),
+                          InkWell(
+                            onTap: () => showAccountBottomModalSheet(context),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(right: 8.0.w),
+                                  child: const Icon(
+                                    Icons.bar_chart_rounded,
+                                    color: Color.fromRGBO(118, 99, 229, 1),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'Accounts',
-                                style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              const Spacer(),
-                              Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                size: 15.w,
-                                color: const Color.fromRGBO(154, 154, 154, 1),
-                              )
-                            ],
+                                Text(
+                                  'Accounts',
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Spacer(),
+                                Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  size: 15.w,
+                                  color: const Color.fromRGBO(154, 154, 154, 1),
+                                )
+                              ],
+                            ),
                           ),
                           const Divider(),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 8.0.w),
-                                child: const Icon(
-                                  Icons.settings,
-                                  color: Color.fromRGBO(118, 99, 229, 1),
+                          InkWell(
+                            onTap: () => showPreferencesBottomModalSheet(context),
+                            child: Row(
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.only(right: 8.0.w),
+                                    child: const Icon(
+                                      Icons.settings,
+                                      color: Color.fromRGBO(118, 99, 229, 1),
+                                    ),
+                                  ),
+                                Text(
+                                  'Preferences',
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600),
                                 ),
-                              ),
-                              Text(
-                                'Preferences',
-                                style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              const Spacer(),
-                              Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                size: 15.w,
-                                color: const Color.fromRGBO(154, 154, 154, 1),
-                              )
-                            ],
+                                const Spacer(),
+                                Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  size: 15.w,
+                                  color: const Color.fromRGBO(154, 154, 154, 1),
+                                )
+                              ],
+                            ),
                           ),
                           const Divider(),
                           Row(
@@ -329,28 +400,31 @@ class TabAccountScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 8.0.w),
-                                child: const Icon(
-                                  Icons.info,
-                                  color: Color.fromRGBO(118, 99, 229, 1),
+                          InkWell(
+                            onTap: () => showAboutBottomModalSheet(context),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(right: 8.0.w),
+                                  child: const Icon(
+                                    Icons.info,
+                                    color: Color.fromRGBO(118, 99, 229, 1),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'About',
-                                style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              const Spacer(),
-                              Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                size: 15.w,
-                                color: const Color.fromRGBO(154, 154, 154, 1),
-                              )
-                            ],
+                                Text(
+                                  'About',
+                                  style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Spacer(),
+                                Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  size: 15.w,
+                                  color: const Color.fromRGBO(154, 154, 154, 1),
+                                )
+                              ],
+                            ),
                           ),
                           const Divider(),
                           Row(
@@ -432,10 +506,8 @@ class TabAccountScreen extends StatelessWidget {
                     height: 30.h,
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(
-                     horizontal: 81.w,
-                      vertical: 16.h
-                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 81.w, vertical: 16.h),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,
@@ -467,3 +539,4 @@ class TabAccountScreen extends StatelessWidget {
     );
   }
 }
+

@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OnboardingButton extends StatelessWidget {
   const OnboardingButton({
-    Key? key, required this.buttonText, required this.goToNextScreen,
+    Key? key,
+    required this.buttonText,
+    required this.goToNextScreen,
   }) : super(key: key);
 
   final String buttonText;
@@ -23,7 +25,7 @@ class OnboardingButton extends StatelessWidget {
         decoration: BoxDecoration(
             color: const Color(0xfff2f3f7),
             borderRadius: BorderRadius.circular(20.r)),
-        child:  Text(
+        child: Text(
           buttonText,
           textAlign: TextAlign.center,
           style: const TextStyle(

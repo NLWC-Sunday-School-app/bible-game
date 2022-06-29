@@ -97,9 +97,9 @@ class TabLeaderBoardScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
-                  LeaderBoardBaseChampions(),
+                  LeaderBoardBaseChampions(badgeUrl: 'assets/images/second_position_badge.png',),
                   LeaderBoardChampion(),
-                  LeaderBoardBaseChampions()
+                  LeaderBoardBaseChampions(badgeUrl: 'assets/images/third_position_badge.png',),
                 ],
               ),
             ),

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 
 class TabHomeScreen extends StatelessWidget {
   const TabHomeScreen({Key? key}) : super(key: key);
@@ -17,16 +16,6 @@ class TabHomeScreen extends StatelessWidget {
   void goToPilgrimProgressHomeScreen(BuildContext context) {
     Navigator.of(context).pushNamed(PilgrimProgressHomeScreen.routeName);
   }
-  String greeting() {
-    var hour = DateTime.now().hour;
-    if (hour < 12) {
-      return 'Good Morning,';
-    }
-    if (hour < 17) {
-      return 'Good Afternoon,';
-    }
-    return 'Good Evening,';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,19 +26,9 @@ class TabHomeScreen extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.only(
-                bottom: 40.h,
-                left: 22.w,
-              ),
-              width: double.infinity,
+                  left: 21.w, right: 0.w, bottom: 40.h, top: 10.h),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color.fromRGBO(110, 91, 220, 1),
-                    Color.fromRGBO(60, 46, 144, 1),
-                  ],
-                ),
+                color: const Color.fromRGBO(118, 99, 229, 1),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30.r),
                   bottomRight: Radius.circular(30.r),
@@ -60,9 +39,9 @@ class TabHomeScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Text(
-                        greeting(),
-                        style: const TextStyle(fontSize: 15, color: Colors.white),
+                      const Text(
+                        'Good Morning',
+                        style: TextStyle(fontSize: 15, color: Colors.white),
                       ),
                       SizedBox(
                         height: 10.h,
@@ -81,16 +60,7 @@ class TabHomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 50.h, right: 22.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SvgPicture.asset('assets/images/badge.svg', width: 60.w),
-                ],
-              ),
-            ),
-            Container(
+            Padding(
               padding: EdgeInsets.only(left: 22.w, right: 22.w),
               child: Column(
                 children: [
@@ -108,8 +78,8 @@ class TabHomeScreen extends StatelessWidget {
                         BoxShadow(
                             color: Color.fromRGBO(118, 99, 229, 1),
                             offset: Offset(0, 25),
-                            blurRadius: 0,
-                            spreadRadius: -15)
+                            blurRadius: 1,
+                            spreadRadius: -14)
                       ],
                     ),
                     child: Column(
@@ -148,8 +118,8 @@ class TabHomeScreen extends StatelessWidget {
                         BoxShadow(
                             color: Color.fromRGBO(118, 99, 229, 1),
                             offset: Offset(0, 25),
-                            blurRadius: 0,
-                            spreadRadius: -15)
+                            blurRadius: 1,
+                            spreadRadius: -14)
                       ],
                     ),
                     child: Row(
@@ -226,9 +196,7 @@ class TabHomeScreen extends StatelessWidget {
                         ),
                         Flexible(
                           child: ClipRRect(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(30.r),
-                                bottom: Radius.circular(30.r)),
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(30.r), bottom: Radius.circular(30.r)),
                             child: SvgPicture.asset(
                               'assets/images/bible_image.svg',
                               width: 256.w,
@@ -250,7 +218,7 @@ class TabHomeScreen extends StatelessWidget {
                         BoxShadow(
                             color: Color.fromRGBO(118, 99, 229, 1),
                             offset: Offset(0, 25),
-                            blurRadius: 0,
+                            blurRadius: 1,
                             spreadRadius: -14)
                       ],
                     ),
@@ -329,10 +297,8 @@ class TabHomeScreen extends StatelessWidget {
                           ),
                         ),
                         Flexible(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(30.r),
-                                bottom: Radius.circular(30.r)),
+                          child:  ClipRRect(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(30.r), bottom: Radius.circular(30.r)),
                             child: SvgPicture.asset(
                               'assets/images/pilgrim_progress.svg',
                               width: 179.w,
@@ -359,43 +325,27 @@ class TabHomeScreen extends StatelessWidget {
                   SizedBox(
                     height: 15.h,
                   ),
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      aspectRatio: 16 / 9,
-                      viewportFraction: 1,
-                      autoPlay: true,
-                      autoPlayInterval: const Duration(seconds: 3),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      enlargeCenterPage: true,
+                  Container(
+                    padding: EdgeInsets.only(top: 25.w, bottom: 25.w),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30.r),
                     ),
-                    items: [1, 2, 3].map((i) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                            padding: EdgeInsets.only(top: 25.w, bottom: 25.w, left: 20.w, right: 20.w),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(30.r),
-                            ),
-                            child: Column(
-                              children: [
-                                Image.asset(
-                                  'assets/images/gift_image.png',
-                                ),
-                                Text(
-                                  'Ads',
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          'assets/images/gift_image.png',
+                        ),
+                        Text(
+                          'Ads',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 30.h,

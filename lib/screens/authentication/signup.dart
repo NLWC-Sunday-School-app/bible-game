@@ -68,7 +68,7 @@ class SignUpScreen extends StatelessWidget {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            hintText: 'Enter Your ',
+                            hintText: 'Name',
                           ),
                         ),
                         SizedBox(
@@ -85,7 +85,7 @@ class SignUpScreen extends StatelessWidget {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  hintText: 'Enter Your ',
+                                  hintText: 'Nationality',
                                 ),
                               ),
                             ),
@@ -100,7 +100,7 @@ class SignUpScreen extends StatelessWidget {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  hintText: 'Enter Your ',
+                                  hintText: 'Phone Number',
                                 ),
                               ),
                             ),
@@ -116,7 +116,7 @@ class SignUpScreen extends StatelessWidget {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            hintText: 'Enter Your ',
+                            hintText: 'Email Address',
                           ),
                         ),
                         SizedBox(
@@ -129,7 +129,7 @@ class SignUpScreen extends StatelessWidget {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            hintText: 'Enter Your ',
+                            hintText: 'Password',
                           ),
                         ),
                       ],
@@ -152,7 +152,7 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
               Center(
-                child: InkWell(
+                child: GestureDetector(
                   onTap: () => goToLoginScreen(context),
                   child: Container(
                     margin: EdgeInsets.only(top: 650.h),
