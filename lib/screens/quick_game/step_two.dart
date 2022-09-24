@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/widgets/game_button.dart';
 import 'package:bible_game/widgets/quick_game/difficulty_level_meter.dart';
 import 'package:bible_game/widgets/quick_game_modal.dart';
@@ -23,6 +24,8 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
   showDialogModal() {
     Get.dialog(
       const QuickGameModal(),
+      barrierDismissible: false,
+      barrierColor: Color.fromRGBO(30, 30, 30, 0.9)
     );
   }
 
@@ -106,7 +109,7 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                       SizedBox(
                         width: 50.h,
                       ),
-                      const Text(
+                      const AutoSizeText(
                         'Start Quick Game in \n2 easy steps',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -126,15 +129,15 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
             ),
             Container(
               margin: EdgeInsets.only(top: 260.h),
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
               child: Column(
                 children: [
-                  Align(
-                    child: Text(
+                  const Align(
+                    child: AutoSizeText(
                       'Choose a difficulty level.',
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        color: const Color.fromRGBO(91, 73, 191, 1),
+                        fontSize: 14,
+                        color: Color.fromRGBO(91, 73, 191, 1),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -63,13 +63,13 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(
                           height: 28.h,
                         ),
-                        TextField(
+                        const TextField(
+                          keyboardType: TextInputType.emailAddress,
                           style:
-                              const TextStyle(height: 0.8, color: Colors.black),
+                              TextStyle(height: 0.8, color: Colors.black),
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+
+                            labelText: 'Email Address',
                             hintText: 'Email Address ',
                           ),
                         ),
@@ -80,12 +80,15 @@ class LoginScreen extends StatelessWidget {
                           height: 13.h,
                         ),
                         TextField(
+                          keyboardType: TextInputType.text,
+                          obscureText: true,
                           style:
                               const TextStyle(height: 0.8, color: Colors.black),
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
+                            labelText: 'Password',
                             hintText: 'Password ',
                           ),
                         ),
@@ -108,7 +111,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               Center(
-                child: InkWell(
+                child: GestureDetector(
                   onTap: () => goToTabMainScreen(context),
                   child: Container(
                     margin: EdgeInsets.only(top: 500.h),

@@ -159,7 +159,7 @@ class QuickGameStepOneScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    height: 80.h,
+                    height: 30.h,
                   ),
                   GestureDetector(
                     onTap: () => goToQuickGameStepTwoScreen(context),
@@ -168,7 +168,7 @@ class QuickGameStepOneScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    height: 30.h,
+                    height: 20.h,
                   ),
                 ],
               ),

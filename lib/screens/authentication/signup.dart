@@ -15,8 +15,7 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return  Scaffold(
         backgroundColor: const Color(0xFF7663E5),
         body: SingleChildScrollView(
           child: Stack(
@@ -68,6 +67,7 @@ class SignUpScreen extends StatelessWidget {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
+                            labelText: 'Name',
                             hintText: 'Name',
                           ),
                         ),
@@ -85,6 +85,7 @@ class SignUpScreen extends StatelessWidget {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
+                                  labelText: 'Nationality',
                                   hintText: 'Nationality',
                                 ),
                               ),
@@ -94,12 +95,14 @@ class SignUpScreen extends StatelessWidget {
                             ),
                             Expanded(
                               child: TextField(
+                                keyboardType: TextInputType.phone,
                                 style: const TextStyle(
                                     height: 0.8, color: Colors.black),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
+                                  labelText: 'Phone Number',
                                   hintText: 'Phone Number',
                                 ),
                               ),
@@ -110,12 +113,14 @@ class SignUpScreen extends StatelessWidget {
                           height: 13.h,
                         ),
                         TextField(
+                          keyboardType: TextInputType.emailAddress,
                           style:
                               const TextStyle(height: 0.8, color: Colors.black),
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
+                            labelText: 'Email Address',
                             hintText: 'Email Address',
                           ),
                         ),
@@ -123,12 +128,14 @@ class SignUpScreen extends StatelessWidget {
                           height: 13.h,
                         ),
                         TextField(
+                          obscureText: true,
                           style:
                               const TextStyle(height: 0.8, color: Colors.black),
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
+                            labelText: 'Password',
                             hintText: 'Password',
                           ),
                         ),
@@ -169,7 +176,6 @@ class SignUpScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

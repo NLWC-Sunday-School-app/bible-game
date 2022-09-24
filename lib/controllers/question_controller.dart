@@ -9,15 +9,10 @@ class QuestionController extends GetxController
   late AnimationController _animationController;
   late AnimationController _blinkingAnimationController;
   late Animation _animation;
-
   AnimationController get blinkingController => _blinkingAnimationController;
-
   Animation get animation => _animation;
-
   PageController? _pageController;
-
   PageController? get pageController => _pageController;
-
   final List<Question> _questions = questionsData
       .map(
         (question) => Question(
@@ -52,6 +47,7 @@ class QuestionController extends GetxController
 
   @override
   void onInit() {
+    super.onInit();
     _blinkingAnimationController =
         AnimationController(vsync: this, duration: const Duration(seconds: 1));
     _blinkingAnimationController.repeat(reverse: true);

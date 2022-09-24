@@ -1,4 +1,5 @@
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/screens/question_screen.dart';
 import 'package:bible_game/widgets/game_button.dart';
 import 'package:flutter/material.dart';
@@ -40,17 +41,15 @@ class QuickGameModal extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Text(
+              child: const AutoSizeText(
                 'Preparing your questions...',
                 style: TextStyle(
-                  fontSize: 15.sp,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-            Container(
-              child: const Text(''),
-            ),
+            const Text(''),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -74,7 +73,7 @@ class QuickGameModal extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: const Color.fromRGBO(118, 99, 229, 1),
                         borderRadius: BorderRadius.all(Radius.circular(12.r))),
-                    child: Text(
+                    child: AutoSizeText(
                       'Quick Tips',
                       style: TextStyle(
                         color: Colors.white,
@@ -104,14 +103,14 @@ class QuickGameModal extends StatelessWidget {
                           ),
                           child: const Align(
                             alignment: Alignment.center,
-                            child: Text(
+                            child: AutoSizeText(
                               '1',
                               style: TextStyle(fontWeight: FontWeight.w700),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                        Text(
+                        AutoSizeText(
                           'Get all the questions right to get \n bonus points',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
@@ -142,18 +141,18 @@ class QuickGameModal extends StatelessWidget {
                           ),
                           child: const Align(
                             alignment: Alignment.center,
-                            child: Text(
+                            child: AutoSizeText(
                               '2',
                               style: TextStyle(fontWeight: FontWeight.w700),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                        Text(
+                        const AutoSizeText(
                           'Missing any question reduces \nyour point ',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 12.sp,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -180,18 +179,18 @@ class QuickGameModal extends StatelessWidget {
                           ),
                           child: const Align(
                             alignment: Alignment.center,
-                            child: Text(
+                            child: AutoSizeText(
                               '3',
                               style: TextStyle(fontWeight: FontWeight.w700),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                        Text(
+                        const AutoSizeText(
                           'Speed is an extra advantage',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 12.sp,
+                            fontSize: 12,
                           ),
                         ),
                         Container(

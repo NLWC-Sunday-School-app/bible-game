@@ -55,7 +55,6 @@ class _TabMainScreenState extends State<TabMainScreen> {
 
   Widget get _bottomNavigationBar {
     return SizedBox(
-      height: 85.h,
         child: BottomNavigationBar(
           onTap: _selectPage,
           backgroundColor: Colors.white,

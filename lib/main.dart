@@ -33,6 +33,17 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             fontFamily:  'Quicksand',
             primaryColor: const Color.fromRGBO(118, 99, 229, 1),
+            inputDecorationTheme:  InputDecorationTheme(
+              floatingLabelStyle: const TextStyle(color: Color.fromRGBO(118, 99, 229, 1), fontWeight: FontWeight.w500),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(color: Color.fromRGBO(118, 99, 229, 1),)
+              ),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(color: Color.fromRGBO(118, 99, 229, 1), width: 1.5)
+              ),
+            ),
           ),
           home: const MemorizeScreen(),
           routes: {

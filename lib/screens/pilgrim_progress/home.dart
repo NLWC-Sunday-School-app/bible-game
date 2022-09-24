@@ -1,7 +1,19 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
+import 'package:bible_game/screens/pilgrim_progress/babe/question_screen.dart';
+import 'package:bible_game/screens/pilgrim_progress/charity/question_screen.dart';
+import 'package:bible_game/screens/pilgrim_progress/elder/question_screen.dart';
+import 'package:bible_game/screens/pilgrim_progress/father/question_screen.dart';
+import 'package:bible_game/screens/pilgrim_progress/widgets/PligrimProgressLevelMenu.dart';
+import 'package:bible_game/screens/pilgrim_progress/young_believer/question_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+
+import '../../widgets/game_button.dart';
+import 'child/question_screen.dart';
 
 class PilgrimProgressHomeScreen extends StatelessWidget {
   const PilgrimProgressHomeScreen({Key? key}) : super(key: key);
@@ -9,257 +21,288 @@ class PilgrimProgressHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PilgrimProgressController _pilgrimProgressController =
+        Get.put(PilgrimProgressController());
     return Scaffold(
       backgroundColor: const Color.fromRGBO(54, 42, 122, 1),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Row(
+      body: SizedBox(
+        child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+                maxHeight: constraints.maxHeight,
+                maxWidth: constraints.maxWidth),
+            child: Column(
               children: [
-                GestureDetector(
-                  onTap: () => {Navigator.pop(context)},
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 22.0.w, top: 30.h),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_back_ios_new,
-                          size: 15.w,
-                          color: Colors.white,
+                SizedBox(
+                  height: constraints.maxHeight * 0.15,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => {Navigator.pop(context)},
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 22.0, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.arrow_back_ios_new,
+                                size: 15.w,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                width: 10.w,
+                              ),
+                              const AutoSizeText(
+                                'Back home',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(
-                          width: 10.w,
-                        ),
-                        const Text(
-                          'Back home',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const Spacer(),
+                      Image.asset(
+                        'assets/images/pilgrim_progress_cloud.png',
+                        width: 200.w,
+                      ),
+                    ],
                   ),
                 ),
-                const Spacer(),
-                Image.asset(
-                  'assets/images/pilgrim_progress_cloud.png',
-                  width: 200.w,
+                buildPilgrimProgressInfoCard(),
+                SizedBox(
+                  height: constraints.maxHeight * 0.05,
                 ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 22.0.w),
-              child: Container(
-                margin: EdgeInsets.only(top: 100.h),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18.r),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Stack(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 23.0.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Pilgrim Progress',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w700,
-                              color: const Color.fromRGBO(124, 110, 203, 1),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 8.h,
-                          ),
-                          Text(
-                            'Make a journey through the bible',
-                            style: TextStyle(
-                                fontSize: 10.sp, fontWeight: FontWeight.w500),
-                          ),
-                          Text(
-                            'learning deeper when you progress',
-                            style: TextStyle(
-                                fontSize: 10.sp, fontWeight: FontWeight.w500),
-                          ),
-                          SizedBox(
-                            height: 14.h,
-                          ),
-                        ],
+                    Positioned(
+                      top: 280,
+                      child: Image.asset(
+                        'assets/images/pilgrim_left_cloud.png',
+                        width: 180.w,
                       ),
                     ),
-                    Flexible(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(18.r),
-                            bottom: Radius.circular(18.r)),
-                        child: SvgPicture.asset(
-                          'assets/images/pilgrim_progress.svg',
-                          width: 150.w,
-                          fit: BoxFit.cover,
+                    Positioned(
+                      top: 150,
+                      right: 0,
+                      child: Image.asset(
+                        'assets/images/pilgrim_right_cloud.png',
+                        width: 180.w,
+                      ),
+                    ),
+                    SizedBox(
+                      child: Obx(
+                        () => Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => {
+                                    if (!_pilgrimProgressController
+                                        .babeLevelIsLocked.value)
+                                      {
+                                        Get.to(() => const BabeQuestionScreen(),
+                                            transition:
+                                                Transition.rightToLeftWithFade)
+                                      }
+                                  },
+                                  child: PilgrimProgressLevelMenu(
+                                    menuImage:
+                                        'assets/images/pilgrim_levels/babe.png',
+                                    menuNumber: '01',
+                                    menuLabel: 'Babe',
+                                    isLocked: _pilgrimProgressController
+                                        .babeLevelIsLocked.value,
+                                    menuProgressValue:
+                                        _pilgrimProgressController
+                                            .babeProgressLevelValue.value,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => {
+                                    if (!_pilgrimProgressController
+                                        .childLevelIsLocked.value)
+                                      {
+                                        Get.to(
+                                            () => const ChildQuestionScreen(),
+                                            transition:
+                                                Transition.rightToLeftWithFade)
+                                      }
+                                  },
+                                  child: PilgrimProgressLevelMenu(
+                                    menuImage: _pilgrimProgressController
+                                            .childLevelIsLocked.value
+                                        ? 'assets/images/pilgrim_levels/child_locked.png'
+                                        : 'assets/images/pilgrim_levels/child.png',
+                                    menuNumber: '02',
+                                    menuLabel: 'Child',
+                                    isLocked: _pilgrimProgressController
+                                        .childLevelIsLocked.value,
+                                    menuProgressValue:
+                                        _pilgrimProgressController
+                                            .childProgressLevelValue.value,
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: constraints.maxHeight * 0.03,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                GestureDetector(
+                                  onTap: ()=>{
+                                    if(!_pilgrimProgressController.youngBelieversLevelIsLocked.value) {
+                                      Get.to(() => const YoungBelieverQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                    }
+                                  },
+                                  child: PilgrimProgressLevelMenu(
+                                    menuImage: _pilgrimProgressController
+                                            .youngBelieversLevelIsLocked.value
+                                        ? 'assets/images/pilgrim_levels/young_believer_locked.png'
+                                        : 'assets/images/pilgrim_levels/young_believer.png',
+                                    menuNumber: '03',
+                                    menuLabel: 'Young Believer',
+                                    isLocked: _pilgrimProgressController
+                                        .youngBelieversLevelIsLocked.value,
+                                    menuProgressValue: _pilgrimProgressController
+                                        .youngBelieverProgressLevelValue.value,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: ()=>{
+                                    if(!_pilgrimProgressController.charityLevelIsLocked.value) {
+                                      Get.to(() => const CharityQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                    }
+                                  },
+                                  child: PilgrimProgressLevelMenu(
+                                    menuImage: _pilgrimProgressController
+                                            .charityLevelIsLocked.value
+                                        ? 'assets/images/pilgrim_levels/charity_locked.png'
+                                        : 'assets/images/pilgrim_levels/charity.png',
+                                    menuNumber: '04',
+                                    menuLabel: 'Charity',
+                                    isLocked: _pilgrimProgressController
+                                        .charityLevelIsLocked.value,
+                                    menuProgressValue: _pilgrimProgressController
+                                        .charityProgressLevelValue.value,
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: constraints.maxHeight * 0.03,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                GestureDetector(
+                                  onTap: ()=>{
+                                    if(!_pilgrimProgressController.fatherLevelIsLocked.value) {
+                                      Get.to(() => const FatherQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                    }
+                                  },
+                                  child: PilgrimProgressLevelMenu(
+                                    menuImage: _pilgrimProgressController
+                                            .fatherLevelIsLocked.value
+                                        ? 'assets/images/pilgrim_levels/father_locked.png'
+                                        : 'assets/images/pilgrim_levels/father.png',
+                                    menuNumber: '05',
+                                    menuLabel: 'Father',
+                                    isLocked: _pilgrimProgressController
+                                        .fatherLevelIsLocked.value,
+                                    menuProgressValue: _pilgrimProgressController
+                                        .fatherProgressLevelValue.value,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: ()=>{
+                                    if(!_pilgrimProgressController.elderLevelIsLocked.value) {
+                                      Get.to(() => const ElderQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                    }
+                                  },
+                                  child: PilgrimProgressLevelMenu(
+                                    menuImage: _pilgrimProgressController
+                                            .elderLevelIsLocked.value
+                                        ? 'assets/images/pilgrim_levels/elder_locked.png'
+                                        : 'assets/images/pilgrim_levels/elder.png',
+                                    menuNumber: '06',
+                                    menuLabel: 'Elder',
+                                    isLocked: _pilgrimProgressController
+                                        .elderLevelIsLocked.value,
+                                    menuProgressValue: _pilgrimProgressController
+                                        .elderProgressLevelValue.value,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                margin: EdgeInsets.only(top: 400.h),
-                child: Image.asset(
-                  'assets/images/pilgrim_right_cloud.png',
-                  width: 180.w,
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                margin: EdgeInsets.only(top: 530.h),
-                child: Image.asset(
-                  'assets/images/pilgrim_left_cloud.png',
-                  width: 180.w,
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 250.h),
+          );
+        }),
+      ),
+    );
+  }
+
+  Padding buildPilgrimProgressInfoCard() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 22.0.w),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18.r),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 23.0.w),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Image.asset(
-                            'assets/images/baby_level.png',
-                            width: 150.w,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 40.0.w, bottom: 10.h),
-                            child: Text(
-                              'Babe',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15.sp
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/child.png',
-                            width: 150.w,
-                          ),
-                           Padding(
-                              padding: EdgeInsets.only(left: 40.0.w, bottom: 10.h),
-                              child: Text(
-                                'Child',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15.sp
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
+                  const AutoSizeText(
+                    'Pilgrim Progress',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color.fromRGBO(124, 110, 203, 1),
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        children: [
-                          Image.asset(
-                            'assets/images/locked_young_believer.png',
-                            width: 150.w,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 40.0.w, bottom: 10.h),
-                            child: Text(
-                              'Young believer',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15.sp
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Image.asset(
-                            'assets/images/locked_charity.png',
-                            width: 150.w,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 40.0.w, bottom: 10.h),
-                            child: Text(
-                              'Charity',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15.sp
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  SizedBox(
+                    height: 8.h,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Image.asset(
-                            'assets/images/locked_father.png',
-                            width: 150.w,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 40.0.w, bottom: 10.h),
-                            child: Text(
-                              'Father',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15.sp
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Image.asset(
-                            'assets/images/locked_elder.png',
-                            width: 150.w,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 40.0.w, bottom: 10.h),
-                            child: Text(
-                              'Elder',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15.sp
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  AutoSizeText(
+                    'Make a journey through the bible',
+                    style:
+                        TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w500),
+                  ),
+                  AutoSizeText(
+                    'learning deeper when you progress',
+                    style:
+                        TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 14.h,
                   ),
                 ],
+              ),
+            ),
+            Flexible(
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(18.r), bottom: Radius.circular(18.r)),
+                child: SvgPicture.asset(
+                  'assets/images/pilgrim_progress.svg',
+                  width: 150.w,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ],

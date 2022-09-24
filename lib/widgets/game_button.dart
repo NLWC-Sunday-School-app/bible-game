@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -24,7 +25,7 @@ class GameButton extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(12.r),
       ),
-      child:  Text(
+      child:  AutoSizeText(
         buttonText,
         style: TextStyle(
           fontWeight: FontWeight.w700,

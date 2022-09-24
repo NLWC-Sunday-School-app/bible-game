@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/screens/pilgrim_progress/home.dart';
 import 'package:bible_game/screens/quick_game/step_one.dart';
 import 'package:bible_game/widgets/onboarding/auth_button.dart';
@@ -36,6 +37,7 @@ class TabHomeScreen extends StatelessWidget {
         child: Stack(
           children: [
             Container(
+              margin: const EdgeInsets.only(top: 30),
               padding: EdgeInsets.only(
                 bottom: 40.h,
                 left: 22.w,
@@ -67,8 +69,8 @@ class TabHomeScreen extends StatelessWidget {
                       SizedBox(
                         height: 10.h,
                       ),
-                      const Text(
-                        'Olarenwaju',
+                      const  AutoSizeText(
+                        'Oluwatobi',
                         style: TextStyle(
                             fontSize: 22,
                             color: Colors.white,
@@ -77,7 +79,7 @@ class TabHomeScreen extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
-                  Image.asset('assets/images/cloud.png'),
+                  Image.asset('assets/images/cloud.png', scale: 1.5,)
                 ],
               ),
             ),
@@ -121,8 +123,8 @@ class TabHomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                               color: const Color.fromRGBO(52, 42, 122, 1)),
                         ),
-                        Text(
-                          '1560',
+                        AutoSizeText(
+                          '144000',
                           style: TextStyle(
                               fontSize: 65.sp, fontWeight: FontWeight.w700),
                         ),
@@ -372,7 +374,7 @@ class TabHomeScreen extends StatelessWidget {
                       return Builder(
                         builder: (BuildContext context) {
                           return Container(
-                            padding: EdgeInsets.only(top: 25.w, bottom: 25.w, left: 20.w, right: 20.w),
+                            padding: EdgeInsets.only(top: 25.w, bottom: 18.w, left: 20.w, right: 20.w),
                             width: double.infinity,
                             decoration: BoxDecoration(
                               color: Colors.white,
