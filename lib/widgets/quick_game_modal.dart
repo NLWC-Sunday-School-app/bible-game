@@ -1,21 +1,17 @@
-
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bible_game/screens/question_screen.dart';
+import 'package:bible_game/controllers/quick_game_controller.dart';
+import 'package:bible_game/screens/quick_game/question_screen.dart';
 import 'package:bible_game/widgets/game_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class QuickGameModal extends StatelessWidget {
   const QuickGameModal({Key? key}) : super(key: key);
 
-
-  goToQuestionScreen(BuildContext context){
-    Navigator.pop(context);
-    Navigator.of(context).pushNamed(QuestionScreen.routeName);
-  }
-
   @override
   Widget build(BuildContext context) {
+    QuickGameController quickGameController = Get.put(QuickGameController());
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -41,11 +37,13 @@ class QuickGameModal extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const AutoSizeText(
-                'Preparing your questions...',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+              child:  Obx(
+                () => AutoSizeText(
+                  quickGameController.modalTitle.value,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
@@ -206,8 +204,13 @@ class QuickGameModal extends StatelessWidget {
                     height: 38.h,
                   ),
                   GestureDetector(
-                    onTap: () => goToQuestionScreen(context),
-                    child: const GameButton(buttonText: 'PLAY NOW'),
+                    onTap: () {
+                      if(quickGameController.gameIsReady.value){
+                        Get.off(() => const QuickGameQuestionScreen());
+                      }
+
+                    },
+                    child: Obx(()=> GameButton(buttonText: 'PLAY NOW', buttonActive: quickGameController.gameIsReady.value,)),
                   ),
                   SizedBox(
                     height: 20.h,

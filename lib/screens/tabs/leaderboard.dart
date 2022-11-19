@@ -8,8 +8,8 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../widgets/LeaderBoardCard.dart';
 
-class TabLeaderBoardScreen extends StatelessWidget {
-  const TabLeaderBoardScreen({Key? key}) : super(key: key);
+class LeaderBoardScreen extends StatelessWidget {
+  const LeaderBoardScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,19 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
-import 'package:bible_game/screens/pilgrim_progress/babe/question_screen.dart';
-import 'package:bible_game/screens/pilgrim_progress/charity/question_screen.dart';
-import 'package:bible_game/screens/pilgrim_progress/elder/question_screen.dart';
-import 'package:bible_game/screens/pilgrim_progress/father/question_screen.dart';
+import 'package:bible_game/screens/pilgrim_progress/pilgrim_progress_question_screen.dart';
 import 'package:bible_game/screens/pilgrim_progress/widgets/PligrimProgressLevelMenu.dart';
-import 'package:bible_game/screens/pilgrim_progress/young_believer/question_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
-import '../../widgets/game_button.dart';
-import 'child/question_screen.dart';
 
 class PilgrimProgressHomeScreen extends StatelessWidget {
   const PilgrimProgressHomeScreen({Key? key}) : super(key: key);
@@ -98,12 +92,8 @@ class PilgrimProgressHomeScreen extends StatelessWidget {
                               children: [
                                 GestureDetector(
                                   onTap: () => {
-                                    if (!_pilgrimProgressController
-                                        .babeLevelIsLocked.value)
-                                      {
-                                        Get.to(() => const BabeQuestionScreen(),
-                                            transition:
-                                                Transition.rightToLeftWithFade)
+                                    if (!_pilgrimProgressController.babeLevelIsLocked.value){
+                                       _pilgrimProgressController.setSelectedLevel('babe')
                                       }
                                   },
                                   child: PilgrimProgressLevelMenu(
@@ -120,13 +110,8 @@ class PilgrimProgressHomeScreen extends StatelessWidget {
                                 ),
                                 GestureDetector(
                                   onTap: () => {
-                                    if (!_pilgrimProgressController
-                                        .childLevelIsLocked.value)
-                                      {
-                                        Get.to(
-                                            () => const ChildQuestionScreen(),
-                                            transition:
-                                                Transition.rightToLeftWithFade)
+                                    if (!_pilgrimProgressController.childLevelIsLocked.value){
+                                      _pilgrimProgressController.setSelectedLevel('child')
                                       }
                                   },
                                   child: PilgrimProgressLevelMenu(
@@ -154,7 +139,7 @@ class PilgrimProgressHomeScreen extends StatelessWidget {
                                 GestureDetector(
                                   onTap: ()=>{
                                     if(!_pilgrimProgressController.youngBelieversLevelIsLocked.value) {
-                                      Get.to(() => const YoungBelieverQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                      _pilgrimProgressController.setSelectedLevel('young believer')
                                     }
                                   },
                                   child: PilgrimProgressLevelMenu(
@@ -173,7 +158,7 @@ class PilgrimProgressHomeScreen extends StatelessWidget {
                                 GestureDetector(
                                   onTap: ()=>{
                                     if(!_pilgrimProgressController.charityLevelIsLocked.value) {
-                                      Get.to(() => const CharityQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                      _pilgrimProgressController.setSelectedLevel('charity')
                                     }
                                   },
                                   child: PilgrimProgressLevelMenu(
@@ -200,7 +185,7 @@ class PilgrimProgressHomeScreen extends StatelessWidget {
                                 GestureDetector(
                                   onTap: ()=>{
                                     if(!_pilgrimProgressController.fatherLevelIsLocked.value) {
-                                      Get.to(() => const FatherQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                      _pilgrimProgressController.setSelectedLevel('father')
                                     }
                                   },
                                   child: PilgrimProgressLevelMenu(
@@ -219,7 +204,7 @@ class PilgrimProgressHomeScreen extends StatelessWidget {
                                 GestureDetector(
                                   onTap: ()=>{
                                     if(!_pilgrimProgressController.elderLevelIsLocked.value) {
-                                      Get.to(() => const ElderQuestionScreen(), transition:Transition.rightToLeftWithFade )
+                                      _pilgrimProgressController.setSelectedLevel('elder')
                                     }
                                   },
                                   child: PilgrimProgressLevelMenu(

@@ -1,10 +1,9 @@
 import 'package:bible_game/screens/tabs/account.dart';
 import 'package:bible_game/screens/tabs/games.dart';
 import 'package:bible_game/screens/tabs/home.dart';
-import 'package:bible_game/screens/tabs/leaderboard.dart';
+import 'package:bible_game/screens/tabs/leaderboard_menu.dart';
 import 'package:bible_game/widgets/custom_icons/my_flutter_app_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TabMainScreen extends StatefulWidget {
   static const routeName = '/tab-main-screen';
@@ -28,7 +27,7 @@ class _TabMainScreenState extends State<TabMainScreen> {
       'title': 'Games',
     },
     {
-      'page': const TabLeaderBoardScreen(),
+      'page': const TabLeaderBoardMenuScreen(),
       'title': 'Leaderboard',
     },
     {

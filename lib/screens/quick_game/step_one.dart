@@ -1,3 +1,4 @@
+import 'package:bible_game/controllers/topic_pill_controller.dart';
 import 'package:bible_game/screens/quick_game/step_two.dart';
 import 'package:bible_game/widgets/TopicPill.dart';
 import 'package:bible_game/widgets/game_button.dart';
@@ -17,12 +18,9 @@ class QuickGameStepOneScreen extends StatelessWidget {
     );
   }
 
-  void goToQuickGameStepTwoScreen(BuildContext context) {
-    Navigator.of(context).pushNamed(QuickGameStepTwoScreen.routeName);
-  }
-
   @override
   Widget build(BuildContext context) {
+    TopicPillController topicPillController = Get.put(TopicPillController());
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -91,7 +89,8 @@ class QuickGameStepOneScreen extends StatelessWidget {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: MediaQuery. of(context).size.height * 0.32),
+              margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.32),
               padding: EdgeInsets.symmetric(horizontal: 22.w),
               child: Column(
                 children: [
@@ -109,62 +108,26 @@ class QuickGameStepOneScreen extends StatelessWidget {
                   Wrap(
                     spacing: 10.0,
                     runSpacing: 15.0,
-                    children: const [
-                      TopicPill(topic: 'Faith'),
-                      TopicPill(
-                        topic: 'Brotherly Love',
+                    children: List.generate(
+                      topicPillController.topics.length,
+                      (index) => TopicPill(
+                        topic: topicPillController.topics[index].topic,
+                        id: topicPillController.topics[index].id,
+
                       ),
-                      TopicPill(
-                        topic: 'Hope',
-                      ),
-                      TopicPill(
-                        topic: 'Love',
-                      ),
-                      TopicPill(
-                        topic: 'Holiness',
-                      ),
-                      TopicPill(
-                        topic: 'Long suffering',
-                      ),
-                      TopicPill(
-                        topic: 'Humility',
-                      ),
-                      TopicPill(
-                        topic: 'Patience',
-                      ),
-                      TopicPill(
-                        topic: 'Healing',
-                      ),
-                      TopicPill(
-                        topic: 'Mercy',
-                      ),
-                      TopicPill(
-                        topic: 'Gospel',
-                      ),
-                      TopicPill(
-                        topic: 'Peace',
-                      ),
-                      TopicPill(
-                        topic: 'Goodness',
-                      ),
-                      TopicPill(
-                        topic: 'Faithfulness',
-                      ),
-                      TopicPill(
-                        topic: 'Gentleness',
-                      ),
-                      TopicPill(
-                        topic: 'Self-Control',
-                      ),
-                    ],
+                    ),
                   ),
                   SizedBox(
                     height: 30.h,
                   ),
-                  GestureDetector(
-                    onTap: () => goToQuickGameStepTwoScreen(context),
-                    child: const GameButton(
-                      buttonText: 'CONTINUE',
+                  Center(
+                    child: GestureDetector(
+                      onTap: () =>
+                          topicPillController.goToQuickGameStepTwoScreen(),
+                      child: const GameButton(
+                        buttonText: 'CONTINUE',
+                        buttonActive: true,
+                      ),
                     ),
                   ),
                   SizedBox(

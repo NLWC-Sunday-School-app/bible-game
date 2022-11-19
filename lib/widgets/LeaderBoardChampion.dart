@@ -31,7 +31,7 @@ class LeaderBoardChampion extends StatelessWidget {
                 height: 15.h,
               ),
               Text(
-                'Adekoya \nJesutofunmi',
+                'Ademola \nAkogun',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12.sp,

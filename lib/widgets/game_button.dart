@@ -4,10 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GameButton extends StatelessWidget {
   const GameButton({
-    Key? key, required this.buttonText,
+    Key? key, required this.buttonText, required this.buttonActive,
   }) : super(key: key);
 
   final String buttonText;
+  final bool buttonActive;
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +16,15 @@ class GameButton extends StatelessWidget {
       padding:
       EdgeInsets.symmetric(horizontal: 81.w, vertical: 16.h),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient:  LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color.fromRGBO(224, 153, 16, 1),
-            Color.fromRGBO(254, 193, 75, 1),
+          colors: !buttonActive ? [
+            const Color.fromRGBO(224, 153, 16, 1).withOpacity(0.4),
+            const Color.fromRGBO(254, 193, 75, 1).withOpacity(0.4),
+          ] : [
+            const Color.fromRGBO(224, 153, 16, 1),
+            const Color.fromRGBO(254, 193, 75, 1),
           ],
         ),
         borderRadius: BorderRadius.circular(12.r),

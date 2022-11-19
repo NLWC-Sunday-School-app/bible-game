@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -39,12 +40,13 @@ class LeaderBoardBaseChampions extends StatelessWidget {
                 SizedBox(
                   height: 5.h,
                 ),
-                Text(
-                  'Blackwood \nJackson Jnr',
+                AutoSizeText(
+                  'Tobi \nEgbayelo',
                   style: TextStyle(
                     fontSize: 9.sp,
                     fontWeight: FontWeight.w700,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(
                   height: 15.h,
