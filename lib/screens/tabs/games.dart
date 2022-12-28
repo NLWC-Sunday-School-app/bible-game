@@ -15,14 +15,7 @@ class TabGamesScreen extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 25.h),
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color.fromRGBO(110, 91, 220, 1),
-                    Color.fromRGBO(60, 46, 144, 1),
-                  ],
-                ),
+                color:  const Color(0xFF32B1F2),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30.r),
                   bottomRight: Radius.circular(30.r),
@@ -43,7 +36,8 @@ class TabGamesScreen extends StatelessWidget {
               child: Text(
                 'Games',
                 style: TextStyle(
-                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Neuland',
+                    letterSpacing: 1,
                     fontSize: 20.sp,
                     color: Colors.white),
               ),

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AuthButton extends StatelessWidget {
-  const AuthButton({Key? key, required this.buttonText, required this.goToNextScreen}) : super(key: key);
+  const AuthButton({Key? key, required this.buttonText, required this.goToNextScreen, required this.isLoading}) : super(key: key);
 
   final String buttonText;
+  final bool isLoading;
   final VoidCallback goToNextScreen;
 
 
@@ -14,6 +15,7 @@ class AuthButton extends StatelessWidget {
     return InkWell(
       onTap: goToNextScreen,
       child: Container(
+        width: 250,
         padding: EdgeInsets.only(
           left: 66.w,
           right: 66.w,
@@ -30,7 +32,15 @@ class AuthButton extends StatelessWidget {
               ],
             ),
             borderRadius: BorderRadius.circular(20.r)),
-        child:  Text(
+        child: isLoading ? const Center(
+          child: SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              )),
+        ) : Text(
           buttonText,
           textAlign: TextAlign.center,
           style: const TextStyle(

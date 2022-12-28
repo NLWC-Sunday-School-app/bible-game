@@ -1,7 +1,10 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/controllers/leaderboard_controller.dart';
 import 'package:bible_game/screens/tabs/leaderboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 class LeaderBoardMenuCard extends StatelessWidget {
   final String levelImage;
   final String levelLabel;
@@ -10,11 +13,38 @@ class LeaderBoardMenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final player = AudioPlayer();
+    LeaderboardController leaderboardController = Get.put(LeaderboardController());
     return  GestureDetector(
-      onTap: (){
-        Get.to(const LeaderBoardScreen(),
+      onTap: () async{
+        player.setAsset('assets/audios/select_tab.mp3');
+        player.play();
+        Get.dialog(Dialog(
+          backgroundColor: Colors.transparent,
+
+          child: Center(
+            child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const AutoSizeText(
+                  'Loading...',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                )),
+          ),
+        ));
+      await leaderboardController.setLeaderboardData(levelNumber);
+      Get.back();
+        await Get.to(
+            () => const LeaderBoardScreen(),
           duration: const Duration(milliseconds: 1000),
-          transition: Transition.fadeIn
+          transition: Transition.downToUp,
+          arguments: levelLabel
         );
       },
       child: Padding(
@@ -37,7 +67,7 @@ class LeaderBoardMenuCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(30.0),
                       child: AutoSizeText(
-                        levelNumber,
+                        '$levelNumber.',
                         style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w600,

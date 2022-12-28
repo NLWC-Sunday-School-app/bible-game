@@ -1,3 +1,4 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/quick_game_controller.dart';
 import 'package:bible_game/widgets/game_button.dart';
@@ -7,57 +8,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 
-class QuickGameStepTwoScreen extends StatelessWidget {
+class QuickGameStepTwoScreen extends StatefulWidget {
   const QuickGameStepTwoScreen({Key? key}) : super(key: key);
   static String routeName = "/quick-game-step-two-screen";
 
-//   @override
-//   State<QuickGameStepTwoScreen> createState() => _QuickGameStepTwoScreenState();
-// }
-//
-// class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
-//   bool _normalIsActive = true;
-//   bool _intermediateIsActive = false;
-//   bool _hardIsActive = false;
-//
-//
-//   showDialogModal() {
-//     Get.dialog(
-//       const QuickGameModal(),
-//       barrierDismissible: false,
-//       barrierColor: const Color.fromRGBO(30, 30, 30, 0.9)
-//     );
-//   }
-//
-//   void selectNormalLevel() {
-//     setState(() {
-//       _normalIsActive = true;
-//       _intermediateIsActive = false;
-//       _hardIsActive = false;
-//     });
-//   }
-//
-//   void selectIntermediateLevel() {
-//     setState(() {
-//       _normalIsActive = false;
-//       _intermediateIsActive = true;
-//       _hardIsActive = false;
-//     });
-//   }
-//
-//   void selectHardLevel() {
-//     setState(() {
-//       _normalIsActive = false;
-//       _intermediateIsActive = false;
-//       _hardIsActive = true;
-//     });
-//   }
+  @override
+  State<QuickGameStepTwoScreen> createState() => _QuickGameStepTwoScreenState();
+}
 
+class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
+  QuickGameController quickGameController = Get.put(QuickGameController());
+  final player = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
-    QuickGameController quickGameController = Get.put(QuickGameController());
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -65,17 +31,10 @@ class QuickGameStepTwoScreen extends StatelessWidget {
             () => Stack(
             children: [
               Container(
-                padding: EdgeInsets.only(bottom: 80.h),
+                padding: EdgeInsets.only(bottom: Get.height < 680 ? 60.h : 80.h),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.fromRGBO(110, 91, 220, 1),
-                      Color.fromRGBO(60, 46, 144, 1),
-                    ],
-                  ),
+                  color: const Color(0xFF548CD7),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.r),
                     bottomRight: Radius.circular(30.r),
@@ -98,23 +57,29 @@ class QuickGameStepTwoScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         GestureDetector(
-                          onTap: () => {Navigator.pop(context)},
+                          onTap: () => {
+                            player.setAsset('assets/audios/click.mp3'),
+                            player.play(),
+                            Get.back()
+                          },
                           child: Icon(
                             Icons.arrow_back_ios_new,
-                            size: 15.w,
+                            size: 24.w,
                             color: Colors.white,
                           ),
                         ),
                         SizedBox(
-                          width: 50.h,
+                          width: 20.h,
                         ),
                         const AutoSizeText(
                           'Start Quick Game in \n2 easy steps',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 22,
+                              letterSpacing: 1,
                               color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                              fontFamily: 'Neuland'
+                             ),
                         ),
                       ],
                     ),
@@ -185,7 +150,11 @@ class QuickGameStepTwoScreen extends StatelessWidget {
                       height: 200.h,
                     ),
                     GestureDetector(
-                      onTap: () => quickGameController.startGame(),
+                      onTap: () => {
+                        player.setAsset('assets/audios/click.mp3'),
+                        player.play(),
+                        quickGameController.startGame()
+                      },
                       child: const GameButton(
                         buttonText: 'START GAME',
                         buttonActive: true,

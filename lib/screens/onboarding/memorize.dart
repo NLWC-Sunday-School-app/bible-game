@@ -12,7 +12,7 @@ class MemorizeScreen extends StatelessWidget {
   static String routeName = "/memorize-screen";
 
   void goToMeditateScreen(BuildContext context) {
-    Navigator.of(context).pushNamed(MeditateScreen.routeName);
+    Get.off(() => const MeditateScreen());
   }
 
   @override

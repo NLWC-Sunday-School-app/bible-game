@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "242806293668",
+    "project_id": "bible-game-e2616",
+    "storage_bucket": "bible-game-e2616.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242806293668:android:5a420c4b9569dd3df0d231",
+        "android_client_info": {
+          "package_name": "com.nlwc.bible.game"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "242806293668-qh1o5db6qievge5nrqeelrpcukp8vud4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeqJWCCx5SP5l56CYtk-Duu3f00-rl-zM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242806293668-qh1o5db6qievge5nrqeelrpcukp8vud4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

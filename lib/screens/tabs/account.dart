@@ -1,9 +1,15 @@
+import 'package:bible_game/controllers/auth_controller.dart';
+import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/widgets/bottomSheetModal/AboutBottomModalSheet.dart';
 import 'package:bible_game/widgets/bottomSheetModal/AccountBottomModalSheet.dart';
 import 'package:bible_game/widgets/bottomSheetModal/BadgesBottomModalSheet.dart';
 import 'package:bible_game/widgets/bottomSheetModal/PreferenceBottomModalSheet.dart';
+import 'package:bible_game/widgets/onboarding/auth_button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_storage/get_storage.dart';
 
 class TabAccountScreen extends StatelessWidget {
   const TabAccountScreen({Key? key}) : super(key: key);
@@ -68,6 +74,9 @@ class TabAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UserController userController = Get.put(UserController());
+    AuthController authController = Get.put(AuthController());
+    PilgrimProgressController pilgrimProgressController = Get.put(PilgrimProgressController());
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -141,27 +150,34 @@ class TabAccountScreen extends StatelessWidget {
                               Padding(
                                 padding: EdgeInsets.only(
                                     right: 15.0.w, left: 10.0.w),
-                                child: Image.asset(
-                                  'assets/images/avatar_one.png',
+                                child: userController.myUser['profileUrl'].toString() != 'null' ? Obx(
+                                  () => Image.network(
+                                    userController.myUser['profileUrl'].toString(),
+                                    width: 45.w,
+                                  ),
+                                ) : Image.network(
+                                  'https://res.cloudinary.com/dj5ud4y41/image/upload/v1670062222/403017_avatar_default_head_person_unknown_icon_zvhkjx.png',
                                   width: 45.w,
-                                ),
+                                ) ,
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Adekoya Jesutofunmi',
-                                    style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    'Young Believer',
-                                    style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                ],
+                              Obx(
+                                () => Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                userController.myUser['name'].toString() != 'null' ? userController.myUser['name'].toString() : 'Beloved',
+                                      style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    Text(
+                                        userController.myUser['rank'].toString() != 'null' ? userController.myUser['rank'].toString().capitalizeFirst! : 'Babe',
+                                      style: TextStyle(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
                               ),
                               const Spacer(),
                               Icon(Icons.arrow_forward_ios_outlined,
@@ -505,27 +521,12 @@ class TabAccountScreen extends StatelessWidget {
                   SizedBox(
                     height: 30.h,
                   ),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 81.w, vertical: 16.h),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color.fromRGBO(224, 153, 16, 1),
-                          Color.fromRGBO(254, 193, 75, 1),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: const Text(
-                      'LOG OUT',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFFFFFFF),
-                      ),
-                    ),
+                  Obx(
+                      () => AuthButton(buttonText: 'LOG OUT', goToNextScreen: ()=>{
+                      authController.logoutUser(),
+                      Get.delete<PilgrimProgressController>(),
+                        GetStorage().erase(),
+                    }, isLoading: authController.isLoadingLogout.value),
                   ),
                   SizedBox(
                     height: 30.h,

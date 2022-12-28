@@ -9,7 +9,7 @@ class TabLeaderBoardMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: const Color(0xFF548CD7),
       body: SizedBox(
         child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
@@ -37,25 +37,26 @@ class TabLeaderBoardMenuScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                           fontFamily: 'Neuland',
+                            letterSpacing: 1
                           ),
                         ),
                         SizedBox(height: constraints.maxHeight * 0.04),
                         const AutoSizeText(
                           'Choose a level',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             color: Colors.white,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SizedBox(height: constraints.maxHeight * 0.05),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/babe.png', levelLabel: 'Babe', levelNumber: '1.',),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/child.png', levelLabel: 'Child', levelNumber: '2.',),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/young_believer.png', levelLabel: 'Young Believer', levelNumber: '3.',),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/charity.png', levelLabel: 'Charity', levelNumber: '4.',),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/father.png', levelLabel: 'Father', levelNumber: '5.',),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/elder.png', levelLabel: 'Elder', levelNumber: '6.',)
+                        SizedBox(height: constraints.maxHeight * 0.03),
+                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/babe.png', levelLabel: 'Babe', levelNumber: '1',),
+                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/child.png', levelLabel: 'Child', levelNumber: '2',),
+                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/young_believer.png', levelLabel: 'Young Believer', levelNumber: '3',),
+                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/charity.png', levelLabel: 'Charity', levelNumber: '4',),
+                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/father.png', levelLabel: 'Father', levelNumber: '5',),
+                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/elder.png', levelLabel: 'Elder', levelNumber: '6',)
 
                       ],
                     ),

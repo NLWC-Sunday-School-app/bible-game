@@ -1,3 +1,4 @@
+import 'package:animated_digit/animated_digit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,7 +15,7 @@ class QuestionPoints extends StatelessWidget {
   Widget build(BuildContext context) {
     PilgrimProgressQuestionController _questionController = Get.put(PilgrimProgressQuestionController());
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 45.w),
+      padding: EdgeInsets.symmetric(horizontal: 45.w, vertical: 15.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
@@ -31,9 +32,6 @@ class QuestionPoints extends StatelessWidget {
       ),
       child: Column(
         children: [
-          SizedBox(
-            height: 5.h,
-          ),
           Text(
             'Points',
             style: TextStyle(
@@ -42,14 +40,17 @@ class QuestionPoints extends StatelessWidget {
                 color: const Color.fromRGBO(229, 150, 75, 1)),
           ),
           Obx(
-              () => AutoSizeText(
-              _questionController.pointsGained.value.toString(),
-              style: TextStyle(
-                  fontSize: 34.sp,
-                  fontWeight: FontWeight.w500,
-                  color: const Color.fromRGBO(229, 150, 75, 1)),
+                () =>
+            // only show
+            AnimatedDigitWidget(
+              value: _questionController.pointsGained.value,
+              textStyle: TextStyle(
+                fontSize: 25.sp,
+                fontFamily: 'Neuland',
+                color: const Color.fromRGBO(229, 150, 75, 1),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

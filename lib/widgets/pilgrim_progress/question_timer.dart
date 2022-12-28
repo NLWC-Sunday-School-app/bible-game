@@ -13,7 +13,7 @@ class QuestionTimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 25.w),
+      padding: EdgeInsets.symmetric(horizontal: 25.w,  vertical: 15.h),
       width: 150.w,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -51,16 +51,18 @@ class QuestionTimer extends StatelessWidget {
                 child: AutoSizeText(
                   "00:${(controller.animation.value * controller.durationPerQuestion).round() < 10 ? '0' : ''}${(controller.animation.value * controller.durationPerQuestion).round()}",
                   style: TextStyle(
-                      fontSize: 34.sp,
-                      fontWeight: FontWeight.w500,
-                      color: const Color.fromRGBO(131, 8, 8, 1)),
+                      fontSize: 25.sp,
+                      fontFamily: 'Neuland',
+                      letterSpacing: 1,
+                      color: Colors.red),
                 ),
               ):
               AutoSizeText(
                 "00:${(controller.animation.value * controller.durationPerQuestion).round() < 10 ? '0' : ''}${(controller.animation.value * controller.durationPerQuestion).round()}",
                 style: TextStyle(
-                    fontSize: 34.sp,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 25.sp,
+                    fontFamily: 'Neuland',
+                    letterSpacing: 1,
                     color: const Color.fromRGBO(118, 99, 229, 1)),
               ),
             ],

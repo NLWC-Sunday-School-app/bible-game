@@ -1,17 +1,27 @@
-import 'package:bible_game/controllers/topic_pill_controller.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:bible_game/controllers/tags_pill_controller.dart';
 import 'package:bible_game/screens/quick_game/step_two.dart';
-import 'package:bible_game/widgets/TopicPill.dart';
 import 'package:bible_game/widgets/game_button.dart';
 import 'package:bible_game/widgets/quick_game_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 
-class QuickGameStepOneScreen extends StatelessWidget {
+import '../../widgets/TagPill.dart';
+
+class QuickGameStepOneScreen extends StatefulWidget {
   const QuickGameStepOneScreen({Key? key}) : super(key: key);
   static String routeName = "/quick-game-step-one-screen";
 
+  @override
+  State<QuickGameStepOneScreen> createState() => _QuickGameStepOneScreenState();
+}
+
+class _QuickGameStepOneScreenState extends State<QuickGameStepOneScreen> {
+  final player = AudioPlayer();
+  TagsPillController tagsPillController = Get.put(TagsPillController());
   showDialogModal() {
     Get.dialog(
       const QuickGameModal(),
@@ -20,24 +30,17 @@ class QuickGameStepOneScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TopicPillController topicPillController = Get.put(TopicPillController());
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Stack(
           children: [
             Container(
-              padding: EdgeInsets.only(bottom: 80.h),
+              padding: EdgeInsets.only(bottom: Get.height < 680 ? 60.h : 80.h),
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color.fromRGBO(110, 91, 220, 1),
-                    Color.fromRGBO(60, 46, 144, 1),
-                  ],
-                ),
+                color: const Color(0xFF548CD7),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30.r),
                   bottomRight: Radius.circular(30.r),
@@ -60,23 +63,29 @@ class QuickGameStepOneScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
-                        onTap: () => {Navigator.pop(context)},
+                        onTap: () => {
+                          player.setAsset('assets/audios/click.mp3'),
+                          player.play(),
+                          Get.back()
+                        },
                         child: Icon(
                           Icons.arrow_back_ios_new,
-                          size: 15.w,
+                          size: 24.w,
                           color: Colors.white,
                         ),
                       ),
                       SizedBox(
-                        width: 50.h,
+                        width: 20.h,
                       ),
                       const Text(
                         'Start Quick Game in \n2 easy steps',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 22,
+                            letterSpacing: 1,
+                            fontFamily: 'Neuland',
                             color: Colors.white,
-                            fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ],
                   ),
@@ -93,9 +102,12 @@ class QuickGameStepOneScreen extends StatelessWidget {
                   top: MediaQuery.of(context).size.height * 0.32),
               padding: EdgeInsets.symmetric(horizontal: 22.w),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'Select 1 or more topic(s) of interest.',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: const Color.fromRGBO(91, 73, 191, 1),
@@ -105,28 +117,41 @@ class QuickGameStepOneScreen extends StatelessWidget {
                   SizedBox(
                     height: 20.h,
                   ),
-                  Wrap(
-                    spacing: 10.0,
-                    runSpacing: 15.0,
-                    children: List.generate(
-                      topicPillController.topics.length,
-                      (index) => TopicPill(
-                        topic: topicPillController.topics[index].topic,
-                        id: topicPillController.topics[index].id,
+                  Center(
+                    child: Obx (
+                      () => tagsPillController.isLoading.value ? Container(
+                          margin: const EdgeInsets.only(top: 100),
+                          child: const CircularProgressIndicator(
+                            color: Colors.deepPurple,
+                          )) : Wrap(
+                        spacing: 10.0,
+                        runSpacing: 15.0,
+                        children: List.generate(
+                          tagsPillController.tagList.length,
+                          (index) => TagPill(
+                            tag: tagsPillController.tagList[index].tag,
+                            id: tagsPillController.tagList[index].id,
 
+                          ),
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(
                     height: 30.h,
                   ),
-                  Center(
-                    child: GestureDetector(
-                      onTap: () =>
-                          topicPillController.goToQuickGameStepTwoScreen(),
-                      child: const GameButton(
-                        buttonText: 'CONTINUE',
-                        buttonActive: true,
+                  Obx(
+                      () => tagsPillController.isLoading.value ? const SizedBox() : Center(
+                      child: GestureDetector(
+                        onTap: () => {
+                          player.setAsset('assets/audios/click.mp3'),
+                          player.play(),
+                          tagsPillController.goToQuickGameStepTwoScreen()
+                        },
+                        child: const GameButton(
+                          buttonText: 'CONTINUE',
+                          buttonActive: true,
+                        ),
                       ),
                     ),
                   ),
@@ -140,5 +165,11 @@ class QuickGameStepOneScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    player.dispose();
   }
 }

@@ -2,13 +2,17 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 class LeaderBoardBaseChampions extends StatelessWidget {
-  final String badgeUrl;
+  final String playerName;
+  final int playerPoint;
+  final String avatarUrl;
+  final int playerPosition;
 
   const LeaderBoardBaseChampions({
     Key? key,
-    required this.badgeUrl,
+    required this.playerName, required this.playerPoint, required this.avatarUrl, required this.playerPosition,
   }) : super(key: key);
 
   @override
@@ -33,20 +37,23 @@ class LeaderBoardBaseChampions extends StatelessWidget {
                 SizedBox(
                   height: 10.h,
                 ),
-                Image.asset(
-                  'assets/images/avatar_one.png',
+                SvgPicture.network(
+                  avatarUrl,
                   width: 47.w,
                 ),
                 SizedBox(
                   height: 5.h,
                 ),
-                AutoSizeText(
-                  'Tobi \nEgbayelo',
-                  style: TextStyle(
-                    fontSize: 9.sp,
-                    fontWeight: FontWeight.w700,
+                SizedBox(
+                  width: 60,
+                  child: AutoSizeText(
+                    playerName,
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 SizedBox(
                   height: 15.h,
@@ -58,7 +65,7 @@ class LeaderBoardBaseChampions extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15.r),
                   ),
                   child: Text(
-                    '7300 PTS',
+                    '$playerPoint PTS',
                     style: TextStyle(
                       fontSize: 10.sp,
                       color: Colors.white,
@@ -68,9 +75,15 @@ class LeaderBoardBaseChampions extends StatelessWidget {
               ],
             ),
           ),
-          Image.asset(
-            badgeUrl,
-            width: 95.w,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset(
+                'assets/images/leaderboard_badge.png',
+                width: Get.width >= 600 ? 75.w : 95.w,
+              ),
+              Text(playerPosition.toString(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),),
+            ],
           ),
         ],
       ),

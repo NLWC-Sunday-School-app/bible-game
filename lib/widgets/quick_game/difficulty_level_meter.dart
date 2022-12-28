@@ -1,5 +1,5 @@
-import 'dart:ffi';
 
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,9 +54,9 @@ class DifficultyLevelMeter extends StatelessWidget {
           ],
         ),
        isActive ? Container(
-          margin: EdgeInsets.only(top: 60.h, left: 40.h),
+          margin: EdgeInsets.only(top: Get.height < 680 ? 70.h : 60.h, left: Get.height < 680 ? 50.h : 40.h),
           child: SvgPicture.asset(checkerImage),
-        ): SizedBox(),
+        ): const SizedBox(),
       ],
     );
   }

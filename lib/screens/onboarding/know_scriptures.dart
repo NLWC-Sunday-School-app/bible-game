@@ -3,6 +3,7 @@ import 'package:bible_game/widgets/onboarding/onboarding_body.dart';
 import 'package:bible_game/widgets/onboarding/onboarding_button.dart';
 import 'package:bible_game/widgets/onboarding/onboarding_header.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 
@@ -11,7 +12,8 @@ class KnowScripturesScreen extends StatelessWidget {
   static String routeName = "/know-scriptures-screen";
 
   void goToSignupScreen(BuildContext context){
-    Navigator.of(context).pushNamed(SignUpScreen.routeName);
+    Get.offAll(() => const SignUpScreen());
+     print('jiv');
   }
 
   @override

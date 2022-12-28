@@ -1,10 +1,18 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 class LeaderBoardChampion extends StatelessWidget {
   const LeaderBoardChampion({
-    Key? key,
+    Key? key, required this.avatarUrl, required this.playerPoint, required this.playerName, required this.playerPosition,
   }) : super(key: key);
+
+  final String avatarUrl;
+  final int playerPoint;
+  final String playerName;
+  final int playerPosition;
 
 
   @override
@@ -23,19 +31,22 @@ class LeaderBoardChampion extends StatelessWidget {
               SizedBox(
                 height: 20.h,
               ),
-              Image.asset(
-                'assets/images/avatar_two.png',
+              SvgPicture.network(
+                avatarUrl,
                 width: 58.w,
               ),
               SizedBox(
                 height: 15.h,
               ),
-              Text(
-                'Ademola \nAkogun',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
+              SizedBox(
+                width: 70,
+                child: AutoSizeText(
+                  playerName,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               SizedBox(
@@ -48,7 +59,7 @@ class LeaderBoardChampion extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15.r),
                 ),
                 child: Text(
-                  '7500 PTS',
+                  '$playerPoint PTS',
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Colors.white,
@@ -58,9 +69,15 @@ class LeaderBoardChampion extends StatelessWidget {
             ],
           ),
         ),
-        Image.asset(
-          'assets/images/first_position_badge.png',
-          width: 116.w,
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.asset(
+              'assets/images/leaderboard_badge_two.png',
+              width: Get.width >= 600 ? 80.w : 100.w,
+            ),
+            Text(playerPosition.toString(), style: TextStyle(fontSize: 27.sp, fontWeight: FontWeight.w700, color: Colors.white),)
+          ],
         ),
       ],
     );

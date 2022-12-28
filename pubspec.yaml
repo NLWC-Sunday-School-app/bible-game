@@ -40,6 +40,37 @@ dependencies:
   carousel_slider: ^4.1.1
   assets_audio_player: ^3.0.5
   confetti: ^0.7.0
+  http: ^0.13.5
+  country_picker: ^2.0.17
+  country_code_picker: ^2.0.2
+  firebase_core: ^2.0.0
+  awesome_notifications: ^0.7.4+1
+  awesome_notifications_fcm: ^0.7.4+1
+  flutter_native_splash: ^2.2.16
+  shimmer: ^2.0.0
+  show_up_animation: ^2.0.0
+  percent_indicator: ^4.2.2
+  animated_text_kit: ^4.2.2
+  animated_digit: ^3.2.1
+  flutter_launcher_icons: ^0.11.0
+  fluttertoast: ^8.1.2
+  just_audio: ^0.9.30
+  connectivity_plus: ^2.3.8
+  internet_connection_checker: ^0.0.1+4
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icons/app_icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#FECF75"
+  image: "assets/images/bible_game_text.png"
+  android: true
+  ios: true
+
 
 
 dev_dependencies:
@@ -71,6 +102,9 @@ flutter:
      - assets/audios/
      - assets/images/quick_game/
      - assets/images/leaderboard/
+     - assets/images/ads/
+     - assets/images/icons/
+     - assets/images/badges/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -93,6 +127,9 @@ flutter:
          - asset: assets/fonts/quicksand/static/Quicksand-Regular.ttf
          - asset: assets/fonts/quicksand/static/Quicksand-SemiBold.ttf
 
+     - family: Neuland
+       fonts:
+         - asset: assets/fonts/neuland/Neuland.ttf
      -  family: MyFlutterApp
         fonts:
           - asset:  assets/fonts/custom_fonts/MyFlutterApp.ttf

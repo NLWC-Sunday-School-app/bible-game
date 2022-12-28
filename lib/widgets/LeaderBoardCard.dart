@@ -2,12 +2,18 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LeaderBoardCard extends StatelessWidget {
-  final String leaderBoardPosition;
+  final int playerPosition;
+  final String playerName;
+  final int playerPoint;
+  final int playerId;
+  final String avatarUrl;
+
   const LeaderBoardCard({
-    Key? key,
-    required this.leaderBoardPosition
+    Key? key, required this.playerPosition, required this.playerName, required this.playerPoint, required this.playerId, required this.avatarUrl,
+
   }) : super(key: key);
 
 
@@ -41,8 +47,8 @@ class LeaderBoardCard extends StatelessWidget {
                   children: [
                     Container(
                       margin: EdgeInsets.only(right: 8.w, left: 50.w),
-                      child: Image.asset(
-                        'assets/images/avatar_one.png',
+                      child: SvgPicture.network(
+                        avatarUrl,
                         width: 34.w,
                       ),
                     ),
@@ -50,14 +56,14 @@ class LeaderBoardCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Blackwood Jackson Jnr',
+                          playerName,
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
-                          '@Young Believer',
+                          'Beloved of the Lord',
                           style: TextStyle(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.w500),
@@ -73,14 +79,14 @@ class LeaderBoardCard extends StatelessWidget {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children:  [
                           Text(
-                            '6543',
-                            style: TextStyle(
+                            playerPoint.toString(),
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                                 color: Color.fromRGBO(123, 123, 123, 1)),
                           ),
-                          Text('Pts'),
+                          const Text('Pts'),
                         ],
                       ),
                     )
@@ -107,7 +113,7 @@ class LeaderBoardCard extends StatelessWidget {
                 child: Wrap(
                   children: [
                     Text(
-                      leaderBoardPosition,
+                      playerPosition.toString(),
                       style: TextStyle(
                         fontSize: 18.sp,
                         color: Colors.white,

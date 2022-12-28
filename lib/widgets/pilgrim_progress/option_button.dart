@@ -42,7 +42,7 @@ class OptionButton extends StatelessWidget {
             onTap: selectOption,
             child: Container(
               padding: EdgeInsets.only(
-                  left: 25.w, right: 25.w, top: 15.h, bottom: 15.h),
+                  left: 25.w, right: 25.w, top: 20.h, bottom: 20.h),
               margin: EdgeInsets.only(bottom: 15.h),
               width: double.infinity,
               decoration: BoxDecoration(
