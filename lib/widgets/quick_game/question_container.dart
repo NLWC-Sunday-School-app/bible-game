@@ -43,10 +43,17 @@ class _QuestionContainerState extends State<QuestionContainer> {
       alignment: Alignment.topCenter,
       children: [
         Container(
-          height: Get.height < 680 ? 280 : (Get.height > 680 && Get.height < 800) ? 350 : 400,
+          height:  Get.width >= 500 ? 350.h : Get.height >= 800 ? 350.h : 350.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFF548CD7),
+            gradient:  const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors:  [
+                Color.fromRGBO(84, 140, 215, 1),
+                Color.fromRGBO(50, 177,242, 1),
+              ],
+            ),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(30.r),
               bottomRight: Radius.circular(30.r),
@@ -126,7 +133,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 60.h),
+                margin: EdgeInsets.only(top: 50.h),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(

@@ -89,9 +89,9 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                     padding: EdgeInsets.symmetric(horizontal: 45.0.w),
                     child: SizedBox(
                       child: TextFormField(
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.text,
                         style: TextStyle(
-                            height: 1.5.sp, color: const Color(0xFF104387),
+                            height: 1.5.sp, color: const Color(0xFF104387),fontSize: 12.sp
                         ),
                         decoration: InputDecoration(
                           filled: true,
@@ -128,7 +128,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                       child: TextFormField(
                         keyboardType: TextInputType.emailAddress,
                         style: TextStyle(
-                            height: 1.5.h, color: const Color(0xFF104387)),
+                            height: 1.5.h, color: const Color(0xFF104387), fontSize: 12.sp),
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFD4DDDF),
@@ -164,7 +164,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                       child: TextFormField(
                         obscureText: isToggle,
                         style: TextStyle(
-                            height: 1.5.h, color: const Color(0xFF104387)),
+                            height: 1.5.h, color: const Color(0xFF104387), fontSize: 12.sp),
                         keyboardType: TextInputType.visiblePassword,
                         decoration: InputDecoration(
                           filled: true,
@@ -205,7 +205,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                     ),
                   ),
                   SizedBox(
-                    height: Get.height <= 670 ? 15 : 20,
+                    height: Get.height <= 670 ? 15.h : 20.h,
                   ),
                   GestureDetector(
                     onTap: () => {
@@ -216,18 +216,18 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           () => Container(
                         width: 200.w,
                         padding: EdgeInsets.symmetric(
-                            vertical: Get.height <= 670 ? 10 : 15),
+                            vertical: Get.height <= 670 ? 10.h : 15.h),
                         decoration: BoxDecoration(
                             color: const Color(0xFF548CD7),
                             border: Border.all(color: const Color(0xFF548CD7)),
                             borderRadius:
                             const BorderRadius.all(Radius.circular(40))),
                         child: authController.isLoadingRegistration.isTrue
-                            ? const Center(
+                            ? Center(
                           child: SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
+                              height: 20.w,
+                              width: 20.w,
+                              child: const CircularProgressIndicator(
                                 strokeWidth: 2,
                                 color: Color(0xFFFFFFFF),
                               )),

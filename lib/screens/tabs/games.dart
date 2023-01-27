@@ -1,11 +1,16 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:get/get.dart';
+import '../../widgets/modals/nativity_info.dart';
 
 class TabGamesScreen extends StatelessWidget {
   const TabGamesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final player = AudioPlayer();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -15,7 +20,7 @@ class TabGamesScreen extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 25.h),
               width: double.infinity,
               decoration: BoxDecoration(
-                color:  const Color(0xFF32B1F2),
+                color: const Color(0xFF32B1F2),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30.r),
                   bottomRight: Radius.circular(30.r),
@@ -34,7 +39,7 @@ class TabGamesScreen extends StatelessWidget {
               alignment: Alignment.center,
               margin: EdgeInsets.only(top: 80.h),
               child: Text(
-                'Games',
+                'Live Challenge',
                 style: TextStyle(
                     fontFamily: 'Neuland',
                     letterSpacing: 1,
@@ -43,52 +48,131 @@ class TabGamesScreen extends StatelessWidget {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 120.h, bottom: 20.h),
-              child: Padding(
-                padding: EdgeInsets.only(left: 31.0.w, right: 31.w),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const ScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemBuilder: (context, i) => Center(
-                    child: Container(
-                        padding: EdgeInsets.only(top: 25.w, bottom: 25.w),
-                        width: 151.w,
-                        height: 169.h,
+                padding: EdgeInsets.symmetric(horizontal: 15.0.w),
+                margin: EdgeInsets.only(
+                  top: 220.h,
+                ),
+                child: Column(
+                  children: [
+                    Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF97D3FF),
                           borderRadius: BorderRadius.circular(15.r),
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
-                              color: const Color.fromRGBO(152, 152, 152, 1).withOpacity(0.2),
-                              spreadRadius: 3,
-                              blurRadius: 4,
-                              offset: const Offset(0, 3), // changes position of shadow
-                            ),
+                                color: Color(0xFFFEC14B),
+                                offset: Offset(0, 15),
+                                blurRadius: 0,
+                                spreadRadius: -10)
                           ],
                         ),
-                    ),
-                  ),
-                  itemCount: 8,
-                ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              margin: EdgeInsets.only(top: 250.h),
-              child: Text(
-                'Coming \nsoon',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 34.sp,
-                    ),
-              ),
-            ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 23.0.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 10.h,
+                                  ),
+                                  Image.asset(
+                                    'assets/images/global.png',
+                                    height: 25,
+                                  ),
+                                  SizedBox(
+                                    height: 15.h,
+                                  ),
+                                  AutoSizeText(
+                                    'NATIVITY STORY',
+                                    style: TextStyle(
+                                      letterSpacing: 0.5,
+                                      fontSize: 20.sp,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Neuland',
+                                      color: const Color.fromRGBO(
+                                          124, 110, 203, 1),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 8.h,
+                                  ),
+                                  Text(
+                                    'How well do you know the',
+                                    style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  Text(
+                                    'Nativity story? Test yourself.',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(
+                                    height: 14.h,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => {
+                                      player
+                                          .setAsset('assets/audios/click.mp3'),
+                                      player.play(),
+                                     // Get.dialog(const NativityInfo(), barrierDismissible: true)
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 21.w,
+                                        right: 21.w,
+                                        top: 10.h,
+                                        bottom: 10.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            const Color.fromRGBO(110, 91, 220, 1).withOpacity(0.2),
+                                            const Color.fromRGBO(60, 46, 144, 1).withOpacity(0.4),
+                                          ],
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                      ),
+                                      child: Text(
+                                        'NOT LIVE',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12.sp,
+                                          color: const Color(0xFFFFFFFF),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 16.h,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Flexible(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(15.r),
+                                    bottom: Radius.circular(15.r)),
+                                child: Image.asset(
+                                  'assets/images/baby_jesus.png',
+                                  width: Get.width >= 600 ? 120.w : 150.w,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )),
+                  ],
+                )),
           ],
         ),
       ),

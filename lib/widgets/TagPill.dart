@@ -27,7 +27,9 @@ class _TagPillState extends State<TagPill> {
   final player = AudioPlayer();
 
   togglePillColor(id) {
-    if (_tagsPillController.selectedPill.isEmpty || _tagsPillController.selectedPill.length < 4 || _tagsPillController.selectedPill.contains(id)) {
+    if (_tagsPillController.selectedPill.isEmpty ||
+        _tagsPillController.selectedPill.length < 4 ||
+        _tagsPillController.selectedPill.contains(id)) {
       if (pillIsSelected) {
         setState(() => pillIsSelected = false);
         _tagsPillController.selectedPill.remove(id);
@@ -37,10 +39,10 @@ class _TagPillState extends State<TagPill> {
       }
     } else {
       Get.snackbar('Oops', 'You cannot select more than 4 topics',
-          messageText: const Text(
+          messageText: Text(
             'You cannot select more than 4 topics',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
@@ -76,30 +78,29 @@ class _TagPillState extends State<TagPill> {
           height: 45.h,
           decoration: BoxDecoration(
             color: pillIsSelected
-                ? const Color.fromRGBO(118, 99, 229, 1)
-                : const Color.fromRGBO(226, 221, 254, 1),
+                ? const Color(0xFF4075BB)
+                : const Color(0xFFCFEDFD),
             borderRadius: BorderRadius.all(Radius.circular(20.r)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              pillIsSelected
-                  ? const Icon(
-                      Icons.check_circle,
-                      color: Color.fromRGBO(248, 229, 255, 1),
-                    )
-                  : const SizedBox(),
+              // pillIsSelected
+              //     ? const Icon(
+              //         Icons.check_circle,
+              //         color: Color.fromRGBO(248, 229, 255, 1),
+              //       )
+              //     : const SizedBox(),
               Padding(
                 padding: EdgeInsets.only(left: 5.w),
                 child: Text(
                   widget.tag,
                   style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                      color: pillIsSelected
-                          ? const Color.fromRGBO(255, 255, 255, 1)
-                          : const Color.fromRGBO(48, 35, 124, 1)),
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: pillIsSelected ? Colors.white : Colors.black,
+                  ),
                 ),
               ),
             ],

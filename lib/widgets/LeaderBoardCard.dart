@@ -52,22 +52,17 @@ class LeaderBoardCard extends StatelessWidget {
                         width: 34.w,
                       ),
                     ),
+                    SizedBox(width: 10.w,),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           playerName,
                           style: TextStyle(
-                            fontSize: 13.sp,
+                            fontSize: 15.sp,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        Text(
-                          'Beloved of the Lord',
-                          style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w500),
-                        )
                       ],
                     ),
                     const Spacer(),
@@ -82,11 +77,12 @@ class LeaderBoardCard extends StatelessWidget {
                         children:  [
                           Text(
                             playerPoint.toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: Color.fromRGBO(123, 123, 123, 1)),
+                                fontSize: 11.sp
+                                ),
                           ),
-                          const Text('Pts'),
+                          Text('Pts', style: TextStyle(fontSize: 10.sp),),
                         ],
                       ),
                     )
@@ -121,7 +117,7 @@ class LeaderBoardCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'th',
+                    (playerPosition == 2) ? 'nd' :  (playerPosition ==  1) ? 'st' : (playerPosition == 3) ? 'rd' : 'th',
                       style: TextStyle(
                           fontSize: 9.sp,
                           color: Colors.white,

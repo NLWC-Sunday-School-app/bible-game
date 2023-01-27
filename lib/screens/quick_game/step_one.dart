@@ -2,7 +2,7 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:bible_game/controllers/tags_pill_controller.dart';
 import 'package:bible_game/screens/quick_game/step_two.dart';
 import 'package:bible_game/widgets/game_button.dart';
-import 'package:bible_game/widgets/quick_game_modal.dart';
+import 'package:bible_game/widgets/modals/quick_game_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -40,19 +40,21 @@ class _QuickGameStepOneScreenState extends State<QuickGameStepOneScreen> {
               padding: EdgeInsets.only(bottom: Get.height < 680 ? 60.h : 80.h),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFF548CD7),
+                color: const Color(0xFF32B1F2),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30.r),
                   bottomRight: Radius.circular(30.r),
                 ),
               ),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Image.asset(
-                  'assets/images/cloud.png',
-                  width: 200.w,
-                ),
+              child:  Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Image.asset(
+                      'assets/images/cloud.png',
+                    ),
+                ],
               ),
+
             ),
             Container(
               margin: EdgeInsets.only(top: 75.h),
@@ -77,11 +79,11 @@ class _QuickGameStepOneScreenState extends State<QuickGameStepOneScreen> {
                       SizedBox(
                         width: 20.h,
                       ),
-                      const Text(
+                       Text(
                         'Start Quick Game in \n2 easy steps',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 22.sp,
                             letterSpacing: 1,
                             fontFamily: 'Neuland',
                             color: Colors.white,
@@ -98,20 +100,18 @@ class _QuickGameStepOneScreenState extends State<QuickGameStepOneScreen> {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.32),
+              margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.35),
               padding: EdgeInsets.symmetric(horizontal: 22.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Select 1 or more topic(s) of interest.',
+                    'You can select up to 4 topics of interest.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,
-                      color: const Color.fromRGBO(91, 73, 191, 1),
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   SizedBox(
@@ -120,10 +120,8 @@ class _QuickGameStepOneScreenState extends State<QuickGameStepOneScreen> {
                   Center(
                     child: Obx (
                       () => tagsPillController.isLoading.value ? Container(
-                          margin: const EdgeInsets.only(top: 100),
-                          child: const CircularProgressIndicator(
-                            color: Colors.deepPurple,
-                          )) : Wrap(
+                          margin: EdgeInsets.only(top: 100.h),
+                          child: Image.asset('assets/images/icons/loader.gif'),) : Wrap(
                         spacing: 10.0,
                         runSpacing: 15.0,
                         children: List.generate(

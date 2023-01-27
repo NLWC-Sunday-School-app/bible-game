@@ -48,8 +48,8 @@ class LeaderBoardBaseChampions extends StatelessWidget {
                   width: 60,
                   child: AutoSizeText(
                     playerName,
-                    style: const TextStyle(
-                      fontSize: 9,
+                    style: TextStyle(
+                      fontSize: 9.sp,
                       fontWeight: FontWeight.w700,
                     ),
                     textAlign: TextAlign.center,
@@ -82,7 +82,7 @@ class LeaderBoardBaseChampions extends StatelessWidget {
                 'assets/images/leaderboard_badge.png',
                 width: Get.width >= 600 ? 75.w : 95.w,
               ),
-              Text(playerPosition.toString(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),),
+              Text(playerPosition.toString(), style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700, color: Colors.white),),
             ],
           ),
         ],

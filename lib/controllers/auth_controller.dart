@@ -2,6 +2,7 @@ import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/authentication/login.dart';
 import 'package:bible_game/screens/tabs/tab_main_screen.dart';
+import 'package:bible_game/widgets/modals/login_successful.dart';
 import 'package:bible_game/widgets/modals/success_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../services/auth_service.dart';
+import '../services/user_service.dart';
 import 'awesome_notification_controller.dart';
 
 class AuthController extends GetxController {
@@ -17,10 +19,14 @@ class AuthController extends GetxController {
   var countryCode = '234'.obs;
   var phoneNumber = ''.obs;
   var emailAddress = ''.obs;
+  var updatedName = ''.obs;
+  var updatedPassword = ''.obs;
+  var updatedEmailAddress = ''.obs;
   var password = ''.obs;
   var isLoadingRegistration = false.obs;
   var isLoadingLogin = false.obs;
   var isLoadingLogout = false.obs;
+  var isLoadingUpdate = false.obs;
   var loginEmail = ''.obs;
   var loginPassword = ''.obs;
   var token = ''.obs;
@@ -30,13 +36,14 @@ class AuthController extends GetxController {
   registerUser() async {
     isLoadingRegistration(true);
     try {
-      var fcmToken =
-          await AwesomeNotificationController.getFirebaseMessagingToken();
+      // var fcmToken = await AwesomeNotificationController.getFirebaseMessagingToken();
+      var fcmToken = 'jfkhkfhkgkjksjkdjgkjsjgshri84843947949389959459039';
       var status = await AuthService.registerUser(
           username.value, emailAddress.value, password.value, fcmToken);
       if (status == 200) {
         await AuthService.loginUser(emailAddress.value, password.value);
         box.write('userLoggedIn', true);
+        box.write('password', password.value);
         isLoggedIn(true);
         isLoadingRegistration(false);
         Get.back();
@@ -87,8 +94,10 @@ class AuthController extends GetxController {
       if (status == 200) {
         isLoadingLogin(false);
         box.write('userLoggedIn', true);
+        box.write('password', loginPassword.value);
         isLoggedIn(true);
         Get.back();
+        Get.dialog(const LoginSuccessfulModal());
       } else if (status == 400) {
         isLoadingLogin(false);
         Get.snackbar(
@@ -124,6 +133,18 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       isLoadingLogin(false);
+    }
+  }
+
+  updateUserProfile(id)async{
+    isLoadingUpdate(true);
+    try{
+     await UserService.updateProfile(id, updatedName);
+     await UserService.getUserData();
+     isLoadingUpdate(false);
+     Get.back();
+    }catch(e){
+      isLoadingUpdate(false);
     }
   }
 

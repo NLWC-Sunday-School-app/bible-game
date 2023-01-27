@@ -8,7 +8,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/question.dart';
 import '../services/game_service.dart';
-import '../widgets/quick_game_modal.dart';
+import '../widgets/modals/quick_game_modal.dart';
 
 class QuickGameController extends GetxController {
 
@@ -91,7 +91,7 @@ class QuickGameController extends GetxController {
   setGameSettings(){
     var gameSettings = box.read('game_settings');
     durationPerQuestion = int.parse(gameSettings['normal_game_speed']);
-    pointsPerQuestion = int.parse(gameSettings['base_score_quick_game']);
+    pointsPerQuestion = int.parse(gameSettings['base_score_pilgrim_progress']);
     fullBonusLowerRange = (0.8 * durationPerQuestion).toInt() ;
     partialBonusLowerRange = (0.6 * durationPerQuestion).toInt() ;
     partialBonusPoint = (0.4 * pointsPerQuestion).toInt();

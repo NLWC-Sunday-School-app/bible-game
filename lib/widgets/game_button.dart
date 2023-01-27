@@ -20,11 +20,11 @@ class GameButton extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: !buttonActive ? [
-            const Color.fromRGBO(224, 153, 16, 1).withOpacity(0.4),
-            const Color.fromRGBO(254, 193, 75, 1).withOpacity(0.4),
+            const Color.fromRGBO(84, 140, 215, 1).withOpacity(0.4),
+            const Color.fromRGBO(85, 139, 214, 1).withOpacity(0.4),
           ] : [
-            const Color.fromRGBO(224, 153, 16, 1),
-            const Color.fromRGBO(254, 193, 75, 1),
+            const Color.fromRGBO(84, 140, 215, 1),
+            const Color.fromRGBO(85, 139, 214, 1),
           ],
         ),
         borderRadius: BorderRadius.circular(12.r),
@@ -32,7 +32,8 @@ class GameButton extends StatelessWidget {
       child:  AutoSizeText(
         buttonText,
         style: TextStyle(
-          fontWeight: FontWeight.w700,
+          fontFamily: 'neuland',
+          fontWeight: FontWeight.w400,
           fontSize: 14.sp,
           color: const Color(0xFFFFFFFF),
         ),

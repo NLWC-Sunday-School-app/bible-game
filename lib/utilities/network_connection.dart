@@ -4,6 +4,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
+import '../widgets/modals/network_modal.dart';
+
 class NetworkConnection extends GetxController {
   final ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
@@ -16,27 +18,19 @@ class NetworkConnection extends GetxController {
         .listen((ConnectivityResult result) async {
       if (result != ConnectivityResult.none) {
         isDeviceConnected = await InternetConnectionChecker().hasConnection;
+        print(isDeviceConnected);
         if (!isDeviceConnected) {
-          Get.snackbar(
-            'No internet connection',
-            'Check your network',
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 3),
-            snackPosition: SnackPosition.BOTTOM
-          );
+          Get.dialog(const NoNetworkModal(), barrierDismissible: false);
         }
       } else {
-        // Get.snackbar(
-        //     'No internet connection',
-        //     'Check your network',
-        //     backgroundColor: Colors.red,
-        //     colorText: Colors.white,
-        //     duration: const Duration(seconds: 3),
-        //     snackPosition: SnackPosition.BOTTOM
-        // );
+        //Get.dialog(const NoNetworkModal(), barrierDismissible: false);
       }
     });
+  }
+
+ Future<bool> hasInternetConnection() async{
+    bool result = await InternetConnectionChecker().hasConnection;
+     return result;
   }
 
 }

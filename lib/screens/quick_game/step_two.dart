@@ -3,7 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/quick_game_controller.dart';
 import 'package:bible_game/widgets/game_button.dart';
 import 'package:bible_game/widgets/quick_game/difficulty_level_meter.dart';
-import 'package:bible_game/widgets/quick_game_modal.dart';
+import 'package:bible_game/widgets/modals/quick_game_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -34,19 +34,22 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                 padding: EdgeInsets.only(bottom: Get.height < 680 ? 60.h : 80.h),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF548CD7),
+                  color: const Color(0xFF32B1F2),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.r),
                     bottomRight: Radius.circular(30.r),
                   ),
                 ),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: Image.asset(
-                    'assets/images/cloud.png',
-                    width: 200.w,
-                  ),
+                child:  Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Image.asset(
+                        'assets/images/cloud.png',
+
+                      ),
+                  ],
                 ),
+
               ),
               Container(
                 margin: EdgeInsets.only(top: 75.h),
@@ -71,11 +74,11 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                         SizedBox(
                           width: 20.h,
                         ),
-                        const AutoSizeText(
+                        AutoSizeText(
                           'Start Quick Game in \n2 easy steps',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 22,
+                              fontSize: 22.sp,
                               letterSpacing: 1,
                               color: Colors.white,
                               fontFamily: 'Neuland'
@@ -96,11 +99,11 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 8.w),
                 child: Column(
                   children: [
-                    const Align(
+                    Align(
                       child: AutoSizeText(
                         'Choose a difficulty level.',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           color: Color.fromRGBO(91, 73, 191, 1),
                           fontWeight: FontWeight.w600,
                         ),

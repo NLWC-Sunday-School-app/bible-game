@@ -7,12 +7,15 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../controllers/user_controller.dart';
+
 class AuthModal extends StatelessWidget {
   const AuthModal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final player = AudioPlayer();
+    UserController _userController = Get.put(UserController());
     return Dialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
         backgroundColor: Colors.transparent,
@@ -115,7 +118,7 @@ class AuthModal extends StatelessWidget {
                       width: 200.w,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(
-                          color: const Color(0xFF548CD7),
+                          color: const Color(0xFF548BD5),
                           border: Border.all(color: const Color(0xFF548CD7)),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(40))),
@@ -129,7 +132,24 @@ class AuthModal extends StatelessWidget {
                             fontSize: 14.sp),
                       ),
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 10,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Obx(
+                          () => IconButton(
+                          iconSize: 50,
+                          onPressed: () =>
+                              _userController.toggleMusic(),
+                          icon: _userController.musicIsOff.value
+                              ? Image.asset(
+                            'assets/images/icons/music_off.png',
+                          )
+                              : Image.asset(
+                            'assets/images/icons/music_on.png',
+                          )),
+                    ),
+                  ),
                 ],
               ),
             ),

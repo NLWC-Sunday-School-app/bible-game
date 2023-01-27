@@ -17,7 +17,25 @@ class LeaderboardController extends GetxController{
     var isLoggedIn = box.read('userLoggedIn') ?? false;
     try {
       isLoading(true);
+      leaderboardData.value = <Leaderboard>[].obs;
+      leaderboardFormattedData.value = <Leaderboard>[].obs;
       var leaderboardList = isLoggedIn ? await GameService.getGameLeaderBoard(id) : await GameService.getGameLeaderBoardWithoutToken(id);
+      leaderboardData.value = leaderboardList;
+      leaderboardFormattedData.value = List.from(leaderboardList);
+      leaderboardFormattedData.removeRange(0, 3);
+      print(leaderboardFormattedData.length);
+      isLoading(false);
+    } catch (e) {
+      print(e);
+      isLoading(false);
+    }
+  }
+
+  setNativityLeaderboardData() async {
+    var isLoggedIn = box.read('userLoggedIn') ?? false;
+    try {
+      isLoading(true);
+      var leaderboardList = await GameService.getNativityGameLeaderBoard();
       leaderboardData.value = leaderboardList;
       leaderboardFormattedData.value = List.from(leaderboardList);
       leaderboardFormattedData.removeRange(0, 3);

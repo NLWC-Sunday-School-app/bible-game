@@ -1,11 +1,19 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/auth_controller.dart';
+import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/pilgrim_progress/home.dart';
+import 'package:bible_game/screens/pilgrim_progress/new_level.dart';
+import 'package:bible_game/screens/pilgrim_progress/retry_level.dart';
 import 'package:bible_game/screens/quick_game/step_one.dart';
 import 'package:bible_game/widgets/ads_card.dart';
 import 'package:bible_game/widgets/modals/auth_modal.dart';
+import 'package:bible_game/widgets/modals/badge_info.dart';
+import 'package:bible_game/widgets/modals/nativity_info.dart';
+import 'package:bible_game/widgets/modals/nativity_loader.dart';
+import 'package:bible_game/widgets/modals/no_badge_info.dart';
+import 'package:bible_game/widgets/modals/pilgrim_progress_welcome_modal.dart';
 import 'package:bible_game/widgets/modals/settings_modal.dart';
 import 'package:bible_game/widgets/shimmer/ads_shimmer.dart';
 import 'package:get/get.dart';
@@ -18,6 +26,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../widgets/modals/welcome_modal.dart';
+
 class TabHomeScreen extends StatefulWidget {
   const TabHomeScreen({Key? key}) : super(key: key);
 
@@ -29,6 +39,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   GetStorage box = GetStorage();
   final UserController _userController = Get.put(UserController());
   final AuthController _authController = Get.put(AuthController());
+  PilgrimProgressController pilgrimProgressController = Get.put(PilgrimProgressController());
   final assetsAudioPlayer = AssetsAudioPlayer();
   final player = AudioPlayer();
 
@@ -43,6 +54,8 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   void goToQuickGameScreen(BuildContext context) {
     Get.to(() => const QuickGameStepOneScreen(),
         transition: Transition.downToUp);
+    // Get.to(const RetryLevelScreen());
+
   }
 
   void goToPilgrimProgressHomeScreen(BuildContext context) {
@@ -60,9 +73,140 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
     return 'Good Evening,';
   }
 
+  String getBadgeUrl() {
+    var rank = _userController.myUser['rank'];
+    if (rank == 'babe') {
+      return 'assets/images/badges/babe_badge.png';
+    }
+    if (rank == 'child') {
+      return 'assets/images/badges/child_badge.png';
+    }
+    if (rank == 'young believer') {
+      return 'assets/images/badges/yb_badge.png';
+    }
+    if (rank == 'charity') {
+      return 'assets/images/badges/charity_badge.png';
+    }
+    if (rank == 'father') {
+      return 'assets/images/badges/father_badge.png';
+    }
+    if (rank == 'elder') {
+      return 'assets/images/badges/elder_badge.png';
+    }
+    return 'assets/images/badges/default_badge.png';
+  }
+
+  displayBadgeInfo() {
+    var rank = _userController.myUser['rank'];
+    switch (rank) {
+      case 'babe':
+        {
+          Get.dialog(
+              Obx(
+                  ()=> BadgeInfo(
+            modalLayoutUrl: 'assets/images/babe_layout.png',
+            badgeUrl: 'assets/images/badges/babe_badge.png',
+            badgeName: 'BABE BADGE!',
+            badgeNameColor: 0xFF5D42C8,
+            pointsBgColor: 0xFFE2DAFF,
+            badgeTotalPoint:pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+            badgePointGained: pilgrimProgressController.totalPointsGainedInBabe.value,
+            badgeSubText:
+                  'Such a good start! Keep playing \nto grow through the ranks. \nChild badge in view!',
+          ),
+              ));
+          break;
+        }
+      case 'child': {
+        Get.dialog(
+            Obx(
+                ()=> BadgeInfo(
+          modalLayoutUrl: 'assets/images/child_layout.png',
+          badgeUrl: 'assets/images/badges/child_badge.png',
+          badgeName: 'CHILD BADGE!',
+          badgeNameColor: 0xFFC75523,
+          pointsBgColor: 0xFFFDE3CA,
+          badgeTotalPoint:pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgePointGained: pilgrimProgressController.totalPointsGainedInChild.value,
+          badgeSubText:
+          'Having a child badge means the \nmore you play the closer to \nbecoming a young believer!',
+        ),
+            ));
+        break;
+      }
+      case 'young believer': {
+        Get.dialog(
+            Obx(
+                () => BadgeInfo(
+          modalLayoutUrl: 'assets/images/yb_layout.png',
+          badgeUrl: 'assets/images/badges/yb_badge.png',
+          badgeName: 'YOUNG BELIEVER\n BADGE!',
+          badgeNameColor: 0xFF8999A8,
+          pointsBgColor: 0xFF9EB7CD,
+          badgeTotalPoint: pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgePointGained: pilgrimProgressController.totalPointsGainedInYb.value,
+          badgeSubText:
+          'The next badge is for Charity! \nDo not relent now, there is \nreward round the corner!',
+        ),
+            ));
+        break;
+      }
+      case 'charity': {
+        Get.dialog(
+            Obx(
+                () => BadgeInfo(
+          modalLayoutUrl: 'assets/images/charity_layout.png',
+          badgeUrl: 'assets/images/badges/charity_badge.png',
+          badgeName: 'CHARITY BADGE!',
+          badgeNameColor: 0xFFC88008,
+          pointsBgColor: 0xFFFFF44B,
+          badgeTotalPoint: pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgePointGained: pilgrimProgressController.totalPointsGainedInCharity.value,
+          badgeSubText:
+          'A milestone! Keep playing \nto grow through the ranks. \nFather badge in view!',
+        ),
+            ));
+        break;
+      }
+      case 'father': {
+        Get.dialog(
+            Obx(
+                ()=> BadgeInfo(
+          modalLayoutUrl: 'assets/images/father_layout.png',
+          badgeUrl: 'assets/images/badges/father_badge.png',
+          badgeName: 'FATHER BADGE!',
+          badgeNameColor: 0xFF4174E7,
+          pointsBgColor: 0xFFDFEEFF,
+          badgeTotalPoint:pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgePointGained: pilgrimProgressController.totalPointsGainedInFather.value,
+          badgeSubText:
+          'You’ve come a long way to \nget here, play more games \nto become an Elder!',
+        ),
+            ));
+        break;
+      }
+      case 'elder': {
+        Get.dialog(
+            Obx(
+                () => BadgeInfo(
+          modalLayoutUrl: 'assets/images/elder_layout.png',
+          badgeUrl: 'assets/images/badges/elder_badge.png',
+          badgeName: 'ELDER BADGE!',
+          badgeNameColor: 0xFF3F4060,
+          pointsBgColor: 0xFFFED806,
+          badgeTotalPoint:pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgePointGained: pilgrimProgressController.totalPointsGainedInElder.value,
+          badgeSubText:
+          'You have gotten to the height!\n Keep playing to unlock new \ntests!',
+        ),
+            ));
+        break;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: const Color(0xFF548CD7),
@@ -96,19 +240,21 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                     ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
+                          padding: EdgeInsets.only(left: 25.0.w),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 greeting(),
-                                style:TextStyle(
-                                    fontSize: Get.width >= 600 ? 18 : 15,
-                                    color: Colors.white),
+                                style: TextStyle(
+                                    fontSize: 15.sp,
+                                    color: Colors.white,
+                                  fontWeight: FontWeight.w600
+                                ),
                               ),
                               SizedBox(
                                 height: 10.h,
@@ -120,17 +266,17 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                           () => AutoSizeText(
                                             (_userController.myUser['name'] ??
                                                 'Beloved'),
-                                            style: const TextStyle(
-                                                fontSize: 24,
+                                            style: TextStyle(
+                                                fontSize: 24.sp,
                                                 color: Colors.white,
                                                 fontFamily: 'Neuland',
                                                 fontWeight: FontWeight.w400),
                                           ),
                                         )
-                                      : const AutoSizeText(
-                                          'BELOVED',
+                                      : AutoSizeText(
+                                          'Beloved',
                                           style: TextStyle(
-                                              fontSize: 24,
+                                              fontSize: 24.sp,
                                               color: Colors.white,
                                               fontFamily: 'Neuland',
                                               fontWeight: FontWeight.w400),
@@ -141,36 +287,67 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                           ),
                         ),
 
-                        Image.asset(
-                          'assets/images/badges/default_badge.png',
-                          width: 45,
-                        ),
-                        Obx(
-                          () => IconButton(
-                            iconSize: 50,
-                            onPressed: () => {
-                             player.setAsset('assets/audios/click.mp3'),
-                             player.play(),
-                              _authController.isLoggedIn.isTrue
-                                  ? Get.dialog(
-                                  const SettingsModal(),
+                        Padding(
+                          padding: EdgeInsets.only(right: 8.0.w),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Obx(
+                                () => IconButton(
+                                  iconSize: 45.w,
+                                  onPressed: () {
+                                    player.setAsset('assets/audios/click.mp3');
+                                    player.play();
+                                    _authController.isLoggedIn.isTrue
+                                        ? displayBadgeInfo()
+                                        : Get.dialog(const NoBadgeInfo(),
+                                            barrierDismissible: false);
+                                  },
+                                  icon: SizedBox(
+                                    child: _authController.isLoggedIn.isTrue
+                                        ? Image.asset(getBadgeUrl())
+                                        : Image.asset(
+                                            'assets/images/badges/default_badge.png',
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10.w,
+                              ),
+                              Obx(
+                                () => IconButton(
+                                  iconSize: 45.w,
+                                  onPressed: () => {
+                                    player.setAsset('assets/audios/click.mp3'),
+                                    player.play(),
+                                    _authController.isLoggedIn.isTrue
+                                        ? Get.dialog(const SettingsModal(),
+                                            barrierDismissible: false)
+                                        : Get.dialog(const AuthModal(),
+                                            barrierDismissible: false)
+                                  },
+                                  icon: _authController.isLoggedIn.isTrue
+                                      ? Obx(
+                                          () => SvgPicture.network(
+                                            'https://api.multiavatar.com/${_userController.myUser['id']}.svg',
+                                          ),
+                                        )
+                                      : Image.asset(
+                                          'assets/images/icons/user_profile.png',
+                                        ),
+                                ),
                               )
-                                  : Get.dialog(const AuthModal(),
-                              )
-                            },
-                            icon: _authController.isLoggedIn.isTrue
-                                ? Obx(() => SvgPicture.network(
-                                      'https://api.multiavatar.com/${_userController.myUser['id']}.svg ',
-                                    ),
-                                  ) : Image.asset('assets/images/icons/user_profile.png',),
+                            ],
                           ),
-                        )
-                        // const Spacer(),
+                        ), // const Spacer(),
                       ],
                     ),
                   ],
                 ),
               ),
+
               Container(
                 padding: EdgeInsets.only(left: 22.w, right: 22.w),
                 child: Column(
@@ -198,38 +375,36 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                           Text(
                             'Your High Score',
                             style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w700,
                                 color: const Color.fromRGBO(52, 42, 122, 1)),
                           ),
-                        Obx(
-                            ()=> SizedBox(
-                                child: _authController.isLoggedIn.isTrue
-                                    ? Obx(
-                                        () => AutoSizeText(
-                                          _userController.myUser['highScore'] != null
-                                              ? _userController.myUser['highScore']
-                                                  .toString()
-                                              : '0',
-                                          style: TextStyle(
-                                              fontSize: 65.sp,
-                                              fontFamily: 'Neuland',
-                                              color: const Color(0xFF7563DF),
-                                              fontWeight: FontWeight.w800),
-                                        ),
-                                      )
-                                    : Obx(
-                                       () => AutoSizeText(
-                                          _userController.tempPlayerPoint.value.toString(),
-                                          style: TextStyle(
-                                              fontSize: 65.sp,
-                                              fontFamily: 'Neuland',
-                                              color: const Color(0xFF7563DF),
-                                              fontWeight: FontWeight.w800),
-                                        ),
+                          Obx(
+                            () => SizedBox(
+                              child: _authController.isLoggedIn.isTrue
+                                  ? Obx(
+                                      () => AutoSizeText(
+                                        _userController.myUser['highScore'].toString(),
+                                        style: TextStyle(
+                                            fontSize: 60.sp,
+                                            fontFamily: 'Neuland',
+                                            color: const Color(0xFF7563DF),
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    )
+                                  : Obx(
+                                      () => AutoSizeText(
+                                        _userController.tempPlayerPoint.value
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontSize: 60.sp,
+                                            fontFamily: 'Neuland',
+                                            color: const Color(0xFF7563DF),
+                                            fontWeight: FontWeight.w400),
+                                      ),
                                     ),
-                              ),
-                        ),
+                            ),
+                          ),
                           Text(
                             'Play more games, earn more points',
                             style: TextStyle(
@@ -241,127 +416,6 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                         ],
                       ),
                     ),
-                    gameSettings['is_campaign_active'] == 'true'
-                        ? SizedBox(
-                            height: 25.h,
-                          )
-                        : const SizedBox(),
-                    gameSettings['is_campaign_active'] == 'true'
-                        ? Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15.r),
-                              boxShadow: const [
-                                BoxShadow(
-                                    color: Color(0xFFFEC14B),
-                                    offset: Offset(0, 15),
-                                    blurRadius: 0,
-                                    spreadRadius: -10)
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(left: 23.0.w),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        height: 10.h,
-                                      ),
-                                      Image.asset(
-                                        'assets/images/global.png',
-                                        height: 25,
-                                      ),
-                                      SizedBox(
-                                        height: 15.h,
-                                      ),
-                                      const AutoSizeText(
-                                        'NATIVITY STORY',
-                                        style: TextStyle(
-                                          letterSpacing: 0.5,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w400,
-                                          fontFamily: 'Neuland',
-                                          color:
-                                              Color.fromRGBO(124, 110, 203, 1),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 8.h,
-                                      ),
-                                      Text(
-                                        'How well do you know the',
-                                        style: TextStyle(
-                                            fontSize: 10.sp,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Text(
-                                        'Nativity story? Test yourself.',
-                                        style: TextStyle(
-                                            fontSize: 10.sp,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      SizedBox(
-                                        height: 14.h,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () => {
-                                          player.setAsset('assets/audios/click.mp3'),
-                                          player.play(),
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.only(
-                                            left: 21.w,
-                                            right: 21.w,
-                                            top: 10.h,
-                                            bottom: 10.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            gradient: const LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                              colors: [
-                                                Color.fromRGBO(110, 91, 220, 1),
-                                                Color.fromRGBO(60, 46, 144, 1),
-                                              ],
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12.r),
-                                          ),
-                                          child: const Text(
-                                            'NOT LIVE',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                              color: Color(0xFFFFFFFF),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 16.h,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Flexible(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(15.r),
-                                        bottom: Radius.circular(15.r)),
-                                    child: Image.asset(
-                                      'assets/images/baby_jesus.png',
-                                      width: Get.width >= 600 ? 120.w : 226.w,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : const SizedBox(),
                     SizedBox(
                       height: 25.h,
                     ),
@@ -371,10 +425,11 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                         borderRadius: BorderRadius.circular(15.r),
                         boxShadow: const [
                           BoxShadow(
-                              color: Color(0xFFFEC14B),
+                              color: Color(0xFF80B708),
                               offset: Offset(0, 15),
                               blurRadius: 0,
-                              spreadRadius: -10)
+                              spreadRadius: -10
+                          )
                         ],
                       ),
                       child: Row(
@@ -388,14 +443,14 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                 SizedBox(
                                   height: 21.h,
                                 ),
-                                const AutoSizeText(
+                                AutoSizeText(
                                   'Quick Game',
                                   style: TextStyle(
                                     letterSpacing: 0.5,
-                                    fontSize: 20,
+                                    fontSize: 20.sp,
                                     fontWeight: FontWeight.w400,
                                     fontFamily: 'Neuland',
-                                    color: Color.fromRGBO(124, 110, 203, 1),
+                                    color: const Color.fromRGBO(124, 110, 203, 1),
                                   ),
                                 ),
                                 SizedBox(
@@ -430,21 +485,18 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                       bottom: 10.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Color.fromRGBO(110, 91, 220, 1),
-                                          Color.fromRGBO(60, 46, 144, 1),
-                                        ],
+                                      image: const DecorationImage(
+                                        image: AssetImage('assets/images/home_button_bg.png'),
+                                        fit: BoxFit.fill,
                                       ),
                                       borderRadius: BorderRadius.circular(12.r),
                                     ),
-                                    child: const Text(
-                                      'PLAY NOW',
+                                    child: Text(
+                                      'PLAY',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
-                                        color: Color(0xFFFFFFFF),
+                                        fontSize: 12.sp,
+                                        color: const Color(0xFFFFFFFF),
                                       ),
                                     ),
                                   ),
@@ -463,7 +515,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                               child: SvgPicture.asset(
                                 'assets/images/bible_image.svg',
                                 width: 256.w,
-                                fit: BoxFit.cover,
+                                fit: BoxFit. cover,
                               ),
                             ),
                           ),
@@ -479,10 +531,11 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                         borderRadius: BorderRadius.circular(15.r),
                         boxShadow: const [
                           BoxShadow(
-                              color: Color(0xFFFEC14B),
+                              color: Color(0xFF97D3FF),
                               offset: Offset(0, 15),
                               blurRadius: 0,
-                              spreadRadius: -10)
+                              spreadRadius: -10
+                          )
                         ],
                       ),
                       child: Row(
@@ -498,14 +551,14 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                 SizedBox(
                                   height: 21.h,
                                 ),
-                                const AutoSizeText(
+                                AutoSizeText(
                                   'Pilgrim Progress',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 20.sp,
                                     letterSpacing: 1,
                                     fontFamily: 'Neuland',
                                     fontWeight: FontWeight.w400,
-                                    color: Color.fromRGBO(124, 110, 203, 1),
+                                    color: const Color.fromRGBO(124, 110, 203, 1),
                                   ),
                                 ),
                                 SizedBox(
@@ -530,7 +583,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                   onTap: () => {
                                     player.setAsset('assets/audios/click.mp3'),
                                     player.play(),
-                                    goToPilgrimProgressHomeScreen(context)
+                                    goToPilgrimProgressHomeScreen(context),
                                   },
                                   child: Container(
                                       padding: EdgeInsets.only(
@@ -540,22 +593,19 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                         bottom: 10.h,
                                       ),
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            Color.fromRGBO(110, 91, 220, 1),
-                                            Color.fromRGBO(60, 46, 144, 1),
-                                          ],
+                                        image: const DecorationImage(
+                                          image: AssetImage('assets/images/home_button_bg.png'),
+                                          fit: BoxFit.fill,
                                         ),
                                         borderRadius:
                                             BorderRadius.circular(12.r),
                                       ),
-                                      child: const Text(
-                                        'PLAY NOW',
+                                      child: Text(
+                                        'PLAY',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFFFFFFFF),
+                                          fontSize: 12.sp,
+                                          color: const Color(0xFFFFFFFF),
                                         ),
                                       )),
                                 ),
@@ -583,7 +633,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                     SizedBox(
                       height: 38.h,
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.center,
                       child: Text(
                         'Updates for you',
@@ -591,7 +641,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                             fontWeight: FontWeight.w400,
                             letterSpacing: 1,
                             fontFamily: 'Neuland',
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             color: Colors.white),
                       ),
                     ),
@@ -632,5 +682,10 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
             ],
           ),
         ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 }

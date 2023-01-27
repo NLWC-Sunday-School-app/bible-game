@@ -46,9 +46,10 @@ class DifficultyLevelMeter extends StatelessWidget {
             ),
             Text(
               difficultyLevel,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Color.fromRGBO(91, 73, 191, 1),
+                color: const Color(0xFF323B63),
+                fontSize: 14.sp
               ),
             )
           ],

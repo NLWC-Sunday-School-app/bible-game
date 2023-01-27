@@ -2,9 +2,14 @@ import 'package:bible_game/controllers/auth_controller.dart';
 import 'package:bible_game/screens/tabs/tab_main_screen.dart';
 import 'package:bible_game/services/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:get/get.dart';
+
+import '../../utilities/network_connection.dart';
+import '../../widgets/modals/network_modal.dart';
+import '../../widgets/modals/welcome_modal.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -22,6 +27,28 @@ class SplashScreen extends StatelessWidget {
       await UserService.getUserPilgrimProgress();
       print(GetStorage().read('user_token'));
   }
+  }
+
+  displayWelcomeModal(){
+    var firstTime = GetStorage().read('first_time') ?? true;
+    print(firstTime);
+    if(!firstTime){
+      Get.dialog(const WelcomeModal());
+      GetStorage().write('first_time', false);
+    }
+  }
+
+  checkNetworkConnection() async{
+    NetworkConnection networkConnection = Get.put(NetworkConnection());
+    if(await networkConnection.hasInternetConnection() == true){
+      await UserService.getUserGameSettings();
+      await setLoggedInState();
+      await getUserData();
+     await Get.offAll(() => const TabMainScreen(), transition: Transition.leftToRight);
+    }else{
+      Get.dialog(const NoNetworkModal(), barrierDismissible: false);
+    }
+
   }
 
   @override
@@ -44,17 +71,14 @@ class SplashScreen extends StatelessWidget {
             margin: EdgeInsets.only(top: Get.height < 750 ? 450 : 500),
             padding: const EdgeInsets.symmetric(horizontal: 70),
             child: LinearPercentIndicator(
-              lineHeight: 15.0,
+              lineHeight: 15.h,
               percent: 1,
               animation: true,
-              animationDuration: 4500,
+              animationDuration: 2500,
               barRadius: const Radius.circular(10),
               progressColor: const Color(0xFFFECF75),
-              onAnimationEnd: () async =>{
-                await UserService.getUserGameSettings(),
-                await setLoggedInState(),
-               await getUserData(),
-               await Get.offAll(() => const TabMainScreen(), transition: Transition.leftToRight)
+              onAnimationEnd: () =>{
+                 checkNetworkConnection()
               }
             ),
           ),

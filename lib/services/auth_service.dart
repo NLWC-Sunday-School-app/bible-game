@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bible_game/services/base_url_service.dart';
+import 'package:bible_game/services/game_service.dart';
 import 'package:bible_game/services/user_service.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -30,8 +31,32 @@ class AuthService {
           if(response.statusCode == 200){
             final data = json.decode(response.body) as Map<String, dynamic>;
             await box.write('user_token', data['token']);
+            print(data['token']);
+            var isTempLoggedIn = GetStorage().read('isTempLoggedIn') ?? false ;
             await UserService.getUserDataByToken( data['token']);
-            await UserService.getUserPilgrimProgressByToken(data['token']);
+            if(isTempLoggedIn){
+               var userData = GetStorage().read('user_data');
+               var gameData = GetStorage().read('tempProgressData');
+               var userId = userData['id'];
+               await GameService.sendGameDataByToken(
+                 gameData['gameMode'],
+                 gameData['totalScore'],
+                 gameData['baseScore'],
+                 gameData['bonusScore'],
+                 gameData['averageTimeSpent'],
+                 gameData['playerRank'],
+                 gameData['noOfCorrectAnswers'],
+                 userId,
+                 gameData['userProgress'],
+                  gameData['numberOfRounds'],
+                 data['token'],
+               );
+               await UserService.getUserPilgrimProgressByToken(data['token']);
+               print(GetStorage().read('user_data'));
+               print(userId);
+            }else{
+              await UserService.getUserPilgrimProgressByToken(data['token']);
+            }
             return 200;
           }else if(response.statusCode == 400){
              return 400;
@@ -48,5 +73,6 @@ class AuthService {
            return 400;
         }
      }
+
 
 }

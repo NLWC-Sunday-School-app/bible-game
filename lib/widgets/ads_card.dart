@@ -35,9 +35,9 @@ class AdsCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             child: AutoSizeText(
-              Get.width.toString(),
+              title,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
             ),
           )
         ],

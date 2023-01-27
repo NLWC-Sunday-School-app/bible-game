@@ -7,11 +7,13 @@ import 'package:bible_game/screens/quick_game/question_screen.dart';
 import 'package:bible_game/screens/quick_game/step_one.dart';
 import 'package:bible_game/screens/quick_game/step_two.dart';
 import 'package:bible_game/screens/tabs/tab_main_screen.dart';
+import 'package:bible_game/widgets/modals/welcome_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:just_audio/just_audio.dart';
 import '../utilities/network_connection.dart';
 import 'authentication/login.dart';
@@ -36,8 +38,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     playBackgroundMusic();
     networkConnection.onConnectivityChanged();
+    checkInternet();
     print(AwesomeNotificationController.getFirebaseMessagingToken());
   }
 
@@ -50,10 +54,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
  playBackgroundMusic() async{
-   await userController.player.setAsset('assets/audios/background_music.mp3');
-   await userController.player.setVolume(0.1);
-   await userController.player.setLoopMode(LoopMode.all);
-   await userController.player.play();
+   // var pauseMusic = box.read('pauseMusic') ?? true ;
+      await userController.player.setAsset('assets/audios/background_music.mp3');
+      await userController.player.setVolume(0.1);
+      await userController.player.setLoopMode(LoopMode.all);
+      await userController.player.play();
+
+
+ }
+
+
+ checkInternet() async{
+   bool result = await InternetConnectionChecker().hasConnection;
+   if(result == true) {
+     print('YAY! Free cute dog pics!');
+   } else {
+     print('No internet :( Reason:');
+   }
  }
 
 
@@ -96,6 +113,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
+        userController.player.play();
         break;
       case AppLifecycleState.paused:
          userController.player.stop();

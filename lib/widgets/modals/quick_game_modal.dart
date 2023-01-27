@@ -23,7 +23,8 @@ class QuickGameModal extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 15.h),
+              width: Get.width >= 500 ? 450.w : 300.w,
+              padding: EdgeInsets.symmetric(vertical: 20.h),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15.r),
@@ -40,8 +41,9 @@ class QuickGameModal extends StatelessWidget {
               child:  Obx(
                 () => AutoSizeText(
                   quickGameController.modalTitle.value,
-                  style: const TextStyle(
-                    fontSize: 15,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -49,6 +51,7 @@ class QuickGameModal extends StatelessWidget {
             ),
             const Text(''),
             Container(
+              width: Get.width >= 500 ? 450.w : 300.w,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -99,11 +102,11 @@ class QuickGameModal extends StatelessWidget {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Align(
+                          child: Align(
                             alignment: Alignment.center,
                             child: AutoSizeText(
                               '1',
-                              style: TextStyle(fontWeight: FontWeight.w700),
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.sp),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -119,7 +122,7 @@ class QuickGameModal extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    height: 12.h,
+                    height: 15.h,
                   ),
                   Container(
                     padding:
@@ -137,27 +140,27 @@ class QuickGameModal extends StatelessWidget {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Align(
+                          child: Align(
                             alignment: Alignment.center,
                             child: AutoSizeText(
                               '2',
-                              style: TextStyle(fontWeight: FontWeight.w700),
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.sp),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                        const AutoSizeText(
+                        AutoSizeText(
                           'Missing any question reduces \nyour point ',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 12,
+                            fontSize: 12.sp,
                           ),
                         ),
                       ],
                     ),
                   ),
                   SizedBox(
-                    height: 12.h,
+                    height: 15.h,
                   ),
                   Container(
                     padding:
@@ -175,20 +178,20 @@ class QuickGameModal extends StatelessWidget {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Align(
+                          child: Align(
                             alignment: Alignment.center,
                             child: AutoSizeText(
                               '3',
-                              style: TextStyle(fontWeight: FontWeight.w700),
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.sp),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                        const AutoSizeText(
+                        AutoSizeText(
                           'Speed is an extra advantage',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 12,
+                            fontSize: 12.sp,
                           ),
                         ),
                         Container(

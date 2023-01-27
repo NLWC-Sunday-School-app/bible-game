@@ -3,13 +3,15 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/leaderboard_controller.dart';
 import 'package:bible_game/screens/tabs/leaderboard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 class LeaderBoardMenuCard extends StatelessWidget {
   final String levelImage;
   final String levelLabel;
   final String levelNumber;
-  const LeaderBoardMenuCard({Key? key, required this.levelImage, required this.levelLabel, required this.levelNumber}) : super(key: key);
+  final bool isNativity;
+  const LeaderBoardMenuCard({Key? key, required this.levelImage, required this.levelLabel, required this.levelNumber, required this.isNativity}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,6 @@ class LeaderBoardMenuCard extends StatelessWidget {
         player.play();
         Get.dialog(Dialog(
           backgroundColor: Colors.transparent,
-
           child: Center(
             child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
@@ -29,16 +30,16 @@ class LeaderBoardMenuCard extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const AutoSizeText(
+                child: AutoSizeText(
                   'Loading...',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w700,
                   ),
                 )),
           ),
         ));
-      await leaderboardController.setLeaderboardData(levelNumber);
+      isNativity ? await leaderboardController.setNativityLeaderboardData() : await leaderboardController.setLeaderboardData(levelNumber);
       Get.back();
         await Get.to(
             () => const LeaderBoardScreen(),
@@ -68,16 +69,16 @@ class LeaderBoardMenuCard extends StatelessWidget {
                       padding: const EdgeInsets.all(30.0),
                       child: AutoSizeText(
                         '$levelNumber.',
-                        style: const TextStyle(
-                            fontSize: 28,
+                        style: TextStyle(
+                            fontSize: 28.sp,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF2E1F85)),
+                            color: const Color(0xFF2E1F85)),
                       ),
                     )),
                 AutoSizeText(
                   levelLabel,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -86,12 +87,12 @@ class LeaderBoardMenuCard extends StatelessWidget {
                   margin:  const EdgeInsets.only(right: 10.0),
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFFA0B560), width: 4)
+                      border: Border.all(color: const Color(0xFF97D3FF), width: 4)
                   ),
 
                   child: Image.asset(
                     levelImage,
-                    width: 60,
+                    width: 60.w,
                   ),
                 ),
 

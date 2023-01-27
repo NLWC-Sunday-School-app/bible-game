@@ -61,13 +61,13 @@ class LeaderBoardScreen extends StatelessWidget {
                             fontSize: 20.sp,
                             color: Colors.white),
                       ),
-                      const AutoSizeText(
+                      AutoSizeText(
                         'Leaderboard',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontFamily: 'Neuland',
                             letterSpacing: 1,
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             color: Colors.white),
                       ),
                     ],
@@ -114,33 +114,35 @@ class LeaderBoardScreen extends StatelessWidget {
                 top: 200.h,
               ),
               padding: EdgeInsets.only(left: 25.w, right: 25.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  leaderboardController.leaderboardData.length >= 2 ? Obx(
-                  () => LeaderBoardBaseChampions(
-                      playerName: leaderboardController.leaderboardData[1].playerName,
-                      playerPoint: leaderboardController.leaderboardData[1].playerScore,
-                      avatarUrl: 'https://api.multiavatar.com/88.svg',
-                      playerPosition: leaderboardController.leaderboardData[1].playerPosition,
-                    ),
-                  ): const SizedBox(),
-                  leaderboardController.leaderboardData.isNotEmpty ? Obx( ()=> LeaderBoardChampion(
-                      playerName: leaderboardController.leaderboardData[0].playerName,
-                      playerPoint: leaderboardController.leaderboardData[0].playerScore,
-                      avatarUrl:  'https://api.multiavatar.com/${leaderboardController.leaderboardData[0].playerId}.svg',
-                      playerPosition: leaderboardController.leaderboardData[0].playerPosition,
-                    ),
-                  ): const SizedBox(),
-                  leaderboardController.leaderboardData.length >= 3 ? Obx(
+              child: Obx(
+              ()=> Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    leaderboardController.leaderboardData.length >= 2 ? Obx(
                     () => LeaderBoardBaseChampions(
-                      playerName:  leaderboardController.leaderboardData[0].playerName,
-                      playerPoint: leaderboardController.leaderboardData[2].playerScore,
-                      avatarUrl: 'https://api.multiavatar.com/${leaderboardController.leaderboardData[2].playerId}.svg',
-                      playerPosition: leaderboardController.leaderboardData[2].playerPosition,
-                    ),
-                  ): const SizedBox(),
-                ],
+                        playerName: leaderboardController.leaderboardData[1].playerName,
+                        playerPoint: leaderboardController.leaderboardData[1].playerScore,
+                        avatarUrl: 'https://api.multiavatar.com/${leaderboardController.leaderboardData[1].playerId}.svg',
+                        playerPosition: leaderboardController.leaderboardData[1].playerPosition,
+                      ),
+                    ): const SizedBox(),
+                    leaderboardController.leaderboardData.isNotEmpty ? Obx( ()=> LeaderBoardChampion(
+                        playerName: leaderboardController.leaderboardData[0].playerName,
+                        playerPoint: leaderboardController.leaderboardData[0].playerScore,
+                        avatarUrl:  'https://api.multiavatar.com/${leaderboardController.leaderboardData[0].playerId}.svg',
+                        playerPosition: leaderboardController.leaderboardData[0].playerPosition,
+                      ),
+                    ): const SizedBox(),
+                    leaderboardController.leaderboardData.length >= 3 ? Obx(
+                      () => LeaderBoardBaseChampions(
+                        playerName:  leaderboardController.leaderboardData[2].playerName,
+                        playerPoint: leaderboardController.leaderboardData[2].playerScore,
+                        avatarUrl: 'https://api.multiavatar.com/${leaderboardController.leaderboardData[2].playerId}.svg',
+                        playerPosition: leaderboardController.leaderboardData[2].playerPosition,
+                      ),
+                    ): const SizedBox(),
+                  ],
+                ),
               ),
             ),
             leaderboardController.leaderboardData.length > 3 ? Container(
@@ -157,8 +159,11 @@ class LeaderBoardScreen extends StatelessWidget {
             ): const SizedBox(),
 
            leaderboardController.leaderboardData.isEmpty ? Container(
-              margin: EdgeInsets.only(top: 500.h, left: 100),
+             // color: Colors.red,
+              width: double.infinity,
+              margin: EdgeInsets.only(top: 300.h),
               child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset('assets/images/icons/empty_leaderboard_icon.png', width: 50,),
                   const SizedBox(height: 20,),

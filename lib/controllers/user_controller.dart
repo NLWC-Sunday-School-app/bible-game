@@ -13,31 +13,49 @@ class UserController extends GetxController {
   final tempPlayerPoint = 0.obs;
   final adsData = <Ads>[].obs;
   var isLoaded = false.obs;
+  var musicIsOff = false.obs;
   var soundIsOff = false.obs;
   var notificationIsOff = false.obs;
   GetStorage box = GetStorage();
   final player = AudioPlayer();
   final player2 = AudioPlayer();
+  final player3 = AudioPlayer();
 
+
+  toggleMusic(){
+
+    if(soundIsOff.isFalse){
+      player2.setAsset('assets/audios/click.mp3');
+      player2.play();
+    }
+    musicIsOff.value = !musicIsOff.value;
+    if(musicIsOff.isTrue){
+      player.pause();
+      box.write('pauseMusic', true);
+    }else{
+      player.play();
+      box.write('pauseMusic', false);
+    }
+  }
 
   toggleSound(){
     player2.setAsset('assets/audios/click.mp3');
     player2.play();
     soundIsOff.value = !soundIsOff.value;
-    if(soundIsOff.isTrue){
-      player.pause();
-    }else{
-      player.play();
-    }
   }
 
   @override
   void dispose() {
     super.dispose();
+    player.dispose();
     player2.dispose();
   }
 
   toggleNotification(){
+    if(soundIsOff.isFalse){
+      player2.setAsset('assets/audios/click.mp3');
+      player2.play();
+    }
       notificationIsOff.value = !notificationIsOff.value;
   }
 

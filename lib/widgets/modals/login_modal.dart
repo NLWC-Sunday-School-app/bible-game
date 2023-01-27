@@ -97,7 +97,7 @@ class _LoginModalState extends State<LoginModal> {
                         child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
-                              height: 1.5.h, color: const Color(0xFF104387)),
+                              height: 1.5.h, color: const Color(0xFF104387), fontSize: 12.sp),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: const Color(0xFFD4DDDF),
@@ -186,8 +186,9 @@ class _LoginModalState extends State<LoginModal> {
                       },
                       child: Obx(
                         () => Container(
+                          width: 250.w,
                           padding: EdgeInsets.symmetric(
-                              vertical: 20.h, horizontal: 70.w),
+                              vertical: 20.h,),
                           decoration: BoxDecoration(
                               color: const Color(0xFFE8F8FF),
                               border:
@@ -197,7 +198,7 @@ class _LoginModalState extends State<LoginModal> {
                           child: authController.isLoadingLogin.isTrue
                               ? Center(
                                   child: SizedBox(
-                                      height: 20.h,
+                                      height: 20.w,
                                       width: 20.w,
                                       child: const CircularProgressIndicator(
                                         strokeWidth: 2,
