@@ -1,3 +1,4 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -27,8 +28,8 @@ class BadgeInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = AudioPlayer();
     var formatter = NumberFormat('#,##,###');
+    UserController _userController = Get.put(UserController());
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       backgroundColor: Colors.transparent,
@@ -48,8 +49,7 @@ class BadgeInfo extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () => {
-                  player.setAsset('assets/audios/click.mp3'),
-                  player.play(),
+                  _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                   Get.back()
                 },
                 child: Padding(

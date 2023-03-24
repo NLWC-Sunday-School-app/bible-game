@@ -42,6 +42,7 @@ class QuickGamesQuestionController extends GetxController
   String get correctAnswer => _correctAnswer;
   late String selectedAnswer;
   final RxInt _questionNumber = 1.obs;
+  final RxInt _questionAnswered = 0.obs;
 
   RxInt get questionNumber => _questionNumber;
   var numOfCorrectAnswers = 0.obs;
@@ -87,28 +88,16 @@ class QuickGamesQuestionController extends GetxController
     _questionNumber.value = index + 1;
   }
 
-  // void allocateBonusPoint(answeredTime) {
-  //   if (answeredTime >= quickGameController.fullBonusLowerRange ||
-  //       answeredTime <= quickGameController.durationPerQuestion) {
-  //     bonusPoint += quickGameController.pointsPerQuestion;
-  //   } else if (answeredTime >= quickGameController.partialBonusLowerRange ||
-  //       answeredTime < quickGameController.fullBonusLowerRange) {
-  //     bonusPoint += quickGameController.partialBonusPoint.toInt();
-  //   } else {}
-  // }
 
   void checkAnswer(Question question, String answerSelected) {
     _isAnswered = true;
     _correctAnswer = question.answer;
     selectedAnswer = answerSelected;
-    print(quickGameController.pointsPerQuestion);
     var halfOfTotalPointPerQuestion = quickGameController.pointsPerQuestion / 2;
     var answeredTime = (animation.value * durationPerQuestion).round();
     totalTimeSpent += durationPerQuestion - (animation.value * durationPerQuestion).round();
     if (_correctAnswer == selectedAnswer) {
-      player.setAsset('assets/audios/success.mp3');
-      player.setVolume(0.4);
-      player.play();
+      userController.soundIsOff.isFalse ? userController.playCorrectAnswerSound() : null;
       confettiController.play();
       numOfCorrectAnswers++;
       dynamic timeBonusPoint = ((answeredTime/durationPerQuestion) * halfOfTotalPointPerQuestion);
@@ -116,8 +105,7 @@ class QuickGamesQuestionController extends GetxController
       totalBonusPointsGained.value = (totalBonusPointsGained.value + timeBonusPoint).round();
 
     }else{
-      player.setAsset('assets/audios/wrong_answer.wav');
-      player.play();
+      userController.soundIsOff.isFalse ? userController.playWrongAnswerSound() : null;
       confettiController.stop();
     }
     animationController.stop();
@@ -166,7 +154,8 @@ class QuickGamesQuestionController extends GetxController
   }
 
   void goToNextQuestion() async {
-    if (_questionNumber.value != _questions.length) {
+    _questionAnswered.value++;
+    if (_questionAnswered.value != _questions.length) {
       _isAnswered = false;
       _pageController?.nextPage(
         duration: const Duration(milliseconds: 250),
@@ -187,8 +176,7 @@ class QuickGamesQuestionController extends GetxController
           averageTimeSpent:
               (totalTimeSpent.value ~/ questions.length).toString(),
           onTap: () async => {
-            player.setAsset('assets/audios/click.mp3'),
-            player.play(),
+            userController.soundIsOff.isFalse ? userController.playGameSound() : null,
             Get.delete<QuickGamesQuestionController>(),
             Get.delete<QuickGameController>(),
             Get.delete<LeaderboardController>(),

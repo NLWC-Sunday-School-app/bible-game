@@ -29,6 +29,13 @@
             {
               "client_id": "242806293668-qh1o5db6qievge5nrqeelrpcukp8vud4.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "242806293668-kthsbqf9g782mlgso7kb3dq2g17ua5ek.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nlwc.bible.game"
+              }
             }
           ]
         }

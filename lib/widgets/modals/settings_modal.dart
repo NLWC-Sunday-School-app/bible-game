@@ -45,10 +45,7 @@ class _SettingsModalState extends State<SettingsModal> {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      if(_userController.soundIsOff.isFalse){
-                        player.setAsset('assets/audios/click.mp3'),
-                        player.play(),
-                      },
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                       Get.back()
                     },
                     child: Padding(
@@ -96,10 +93,7 @@ class _SettingsModalState extends State<SettingsModal> {
                   ),
                   GestureDetector(
                     onTap: (){
-                      if(_userController.soundIsOff.isFalse){
-                        player.setAsset('assets/audios/click.mp3');
-                      player.play();
-                      }
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null;
                       Get.back();
                       Get.dialog(const EditProfileModal(),);
                     },
@@ -132,7 +126,11 @@ class _SettingsModalState extends State<SettingsModal> {
                           child: Obx(
                             () => IconButton(
                               iconSize: 50,
-                              onPressed: () => _userController.toggleSound(),
+                              onPressed: () =>{
+                                _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                                _userController.toggleGameSound(),
+                              },
+
                               icon: _userController.soundIsOff.value
                                   ? Image.asset(
                                       'assets/images/icons/volume_down.png',
@@ -148,8 +146,10 @@ class _SettingsModalState extends State<SettingsModal> {
                           child: Obx(
                             () => IconButton(
                                 iconSize: 50,
-                                onPressed: () =>
-                                    _userController.toggleMusic(),
+                                onPressed: () =>{
+                                  _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                                  _userController.toggleGameMusic(),
+                                },
                                 icon: _userController.musicIsOff.value
                                     ? Image.asset(
                                         'assets/images/icons/music_off.png',
@@ -164,8 +164,11 @@ class _SettingsModalState extends State<SettingsModal> {
                           child: Obx(
                             () => IconButton(
                                 iconSize: 50,
-                                onPressed: () =>
-                                    _userController.toggleNotification(),
+                                onPressed: () =>{
+                                  _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                                  _userController.toggleNotification(),
+                                },
+
                                 icon: _userController.notificationIsOff.value
                                     ? Image.asset(
                                         'assets/images/icons/notification_off.png',
@@ -183,10 +186,7 @@ class _SettingsModalState extends State<SettingsModal> {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      if(_userController.soundIsOff.isFalse){
-                        player.setAsset('assets/audios/click.mp3'),
-                        player.play(),
-                      },
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                       Get.back(),
                       Get.dialog(const LogoutModal()),
                     },

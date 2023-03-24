@@ -1,5 +1,5 @@
 
-import 'package:bible_game/controllers/nativity_question_controller.dart';
+import 'package:bible_game/controllers/global_question_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
@@ -17,8 +17,8 @@ class OptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<NativityQuestionController>(
-        init: NativityQuestionController(),
+    return GetBuilder<GlobalQuestionController>(
+        init: GlobalQuestionController(),
         builder: (controller) {
           Color getTheRightColor() {
             if (controller.isAnswered) {

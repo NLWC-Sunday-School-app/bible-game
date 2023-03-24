@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/pilgrim_progress/pilgrim_progress_question_screen.dart';
 import 'package:bible_game/screens/pilgrim_progress/widgets/PligrimProgressLevelMenu.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../widgets/modals/pilgrim_progress_welcome_modal.dart';
@@ -26,11 +28,21 @@ class PilgrimProgressHomeScreen extends StatefulWidget {
 }
 
 class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
+  final PilgrimProgressController pilgrimProgressController = Get.put(PilgrimProgressController());
+  final UserController userController = Get.put(UserController());
+
+  getUpdatedGameData(){
+    Timer(const Duration(seconds: 0), () {
+      pilgrimProgressController.setPilgrimData();
+    });
+
+  }
+
   displayPilgrimProgressWelcomeModal() {
     var firstTime = GetStorage().read('pilgrim_progress_first_time') ?? true;
 
     if (firstTime) {
-      Timer(const Duration(seconds: 3), () {
+      Timer(const Duration(seconds: 1), () {
         Get.dialog(const PilgrimProgressWelcomeModal());
       });
       GetStorage().write('pilgrim_progress_first_time', false);
@@ -39,9 +51,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final PilgrimProgressController _pilgrimProgressController =
-        Get.put(PilgrimProgressController());
-    final player = AudioPlayer();
+    var formatter = NumberFormat('#,##,###');
     return Scaffold(
       backgroundColor: const Color(0xFF548CD7),
       body: SizedBox(
@@ -84,8 +94,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                           children: [
                             GestureDetector(
                               onTap: () => {
-                                player.setAsset('assets/audios/click.mp3'),
-                                player.play(),
+                                userController.soundIsOff.isFalse ? userController.playGameSound() : null,
                                 Get.back()
                               },
                               child: Icon(
@@ -131,44 +140,46 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 15.0.w),
                     margin: EdgeInsets.only(top: 250.h),
-                    child: Obx(
-                      () => Column(
+                    child: Column(
                         children: [
-                          PilgrimProgressLevelMenu(
-                            menuImage: 'assets/images/pilgrim_levels/babe.png',
-                            menuNumber: '',
-                            textSpan: RichText(
-                                text: TextSpan(
-                                    text:
-                                        'Begin your bible adventure! Get up \nto',
-                                    style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
-                                    children: const <TextSpan>[
-                                  TextSpan(
-                                      text: ' 15,000points',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600)),
-                                  TextSpan(
-                                    text: ' to finish this level.',
-                                  ),
-                                ])),
-                            menuLabel: 'Babe',
-                            totalPointsGained: _pilgrimProgressController
-                                .totalPointsGainedInBabe.value,
-                            totalPointsAvailable: _pilgrimProgressController
-                                .totalPointsAvailableInBabe.value,
-                            isLocked: _pilgrimProgressController
-                                .babeLevelIsLocked.isTrue,
-                            menuProgressValue: _pilgrimProgressController
-                                .babeProgressLevelValue.value,
-                            boxShadowColor: 0xFFE4E0DD,
-                            onTap: () => {
-                              if (_pilgrimProgressController
-                                  .babeLevelIsLocked.isFalse)
-                                {
-                                  _pilgrimProgressController
-                                      .setSelectedLevel('babe')
-                                }
-                            },
+                          Obx(
+                            () => PilgrimProgressLevelMenu(
+                              menuImage: 'assets/images/pilgrim_levels/babe.png',
+                              menuNumber: '',
+                              textSpan: RichText(
+                                  text: TextSpan(
+                                      text:
+                                          'Begin your bible adventure! Get up \nto',
+                                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
+                                      children: <TextSpan>[
+                                    TextSpan(
+                                        text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600)),
+                                    const TextSpan(
+                                      text: ' to finish this level.',
+                                    ),
+                                  ])),
+                              menuLabel: 'Babe',
+                              totalPointsGained: pilgrimProgressController
+                                  .totalPointsGainedInBabe.value,
+                              totalPointsAvailable: pilgrimProgressController
+                                  .totalPointsAvailableInBabe.value,
+                              isLocked: pilgrimProgressController
+                                  .babeLevelIsLocked.isTrue,
+                              menuProgressValue: pilgrimProgressController
+                                  .babeProgressLevelValue.value,
+                              boxShadowColor: 0xFFE4E0DD,
+                              onTap: () => {
+                                userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                                if (pilgrimProgressController
+                                    .babeLevelIsLocked.isFalse)
+                                  {
+                                    pilgrimProgressController
+                                        .setSelectedLevel('babe')
+                                  }
+                              },
+                            ),
                           ),
                           PilgrimProgressLevelMenu(
                             menuImage: 'assets/images/pilgrim_levels/child.png',
@@ -178,30 +189,31 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     text:
                                         'Go further in your journey! Get up \nto',
                                     style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D),fontFamily: 'QuickSand', height: 1.5),
-                                    children: const <TextSpan>[
+                                    children: <TextSpan>[
                                   TextSpan(
-                                      text: ' 15,000points',
-                                      style: TextStyle(
+                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
-                                  TextSpan(
+                                  const TextSpan(
                                     text: ' to grow from here.',
                                   ),
                                 ])),
                             menuLabel: 'Child',
-                            totalPointsGained: _pilgrimProgressController
+                            totalPointsGained: pilgrimProgressController
                                 .totalPointsGainedInChild.value,
-                            totalPointsAvailable: _pilgrimProgressController
+                            totalPointsAvailable: pilgrimProgressController
                                 .totalPointsAvailableInChild.value,
-                            isLocked: _pilgrimProgressController
+                            isLocked: pilgrimProgressController
                                 .childLevelIsLocked.isTrue,
-                            menuProgressValue: _pilgrimProgressController
+                            menuProgressValue: pilgrimProgressController
                                 .childProgressLevelValue.value,
                             boxShadowColor: 0xFFFCCB90,
                             onTap: () => {
-                              if (_pilgrimProgressController
+                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                              if (pilgrimProgressController
                                   .childLevelIsLocked.isFalse)
                                 {
-                                  _pilgrimProgressController
+                                  pilgrimProgressController
                                       .setSelectedLevel('child')
                                 }
                             },
@@ -215,30 +227,31 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     text:
                                         'You are growing! Almost there! Get \n',
                                     style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
-                                    children: const <TextSpan>[
+                                    children: <TextSpan>[
                                   TextSpan(
-                                      text: '15,000points',
-                                      style: TextStyle(
+                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
-                                  TextSpan(
+                                  const TextSpan(
                                     text: ' to get to charity.',
                                   ),
                                 ])),
                             menuLabel: 'young believer',
-                            totalPointsGained: _pilgrimProgressController
+                            totalPointsGained: pilgrimProgressController
                                 .totalPointsGainedInYb.value,
-                            totalPointsAvailable: _pilgrimProgressController
+                            totalPointsAvailable: pilgrimProgressController
                                 .totalPointsAvailableInYb.value,
-                            isLocked: _pilgrimProgressController
+                            isLocked: pilgrimProgressController
                                 .youngBelieversLevelIsLocked.isTrue,
-                            menuProgressValue: _pilgrimProgressController
+                            menuProgressValue: pilgrimProgressController
                                 .youngBelieverProgressLevelValue.value,
                             boxShadowColor: 0xFFC7DAE1,
                             onTap: () => {
-                              if (_pilgrimProgressController
+                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                              if (pilgrimProgressController
                                   .youngBelieversLevelIsLocked.isFalse)
                                 {
-                                  _pilgrimProgressController
+                                  pilgrimProgressController
                                       .setSelectedLevel('young believer')
                                 }
                             },
@@ -252,30 +265,31 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     text:
                                         'Charity is round the corner! Get up \nto',
                                     style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
-                                    children: const <TextSpan>[
+                                    children: <TextSpan>[
                                   TextSpan(
-                                      text: ' 15,000points',
-                                      style: TextStyle(
+                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
-                                  TextSpan(
+                                  const TextSpan(
                                     text: ' to get to Father.',
                                   ),
                                 ])),
                             menuLabel: 'charity',
-                            totalPointsGained: _pilgrimProgressController
+                            totalPointsGained: pilgrimProgressController
                                 .totalPointsGainedInCharity.value,
-                            totalPointsAvailable: _pilgrimProgressController
+                            totalPointsAvailable: pilgrimProgressController
                                 .totalPointsAvailableInCharity.value,
-                            isLocked: _pilgrimProgressController
+                            isLocked: pilgrimProgressController
                                 .charityLevelIsLocked.isTrue,
-                            menuProgressValue: _pilgrimProgressController
+                            menuProgressValue: pilgrimProgressController
                                 .charityProgressLevelValue.value,
                             boxShadowColor: 0xFF92D6EE,
                             onTap: () => {
-                              if (_pilgrimProgressController
+                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                              if (pilgrimProgressController
                                   .charityLevelIsLocked.isFalse)
                                 {
-                                  _pilgrimProgressController
+                                  pilgrimProgressController
                                       .setSelectedLevel('charity')
                                 }
                             },
@@ -289,30 +303,31 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     text:
                                         'Grown beyond this world! Get up to \n',
                                     style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
-                                    children: const <TextSpan>[
+                                    children: <TextSpan>[
                                   TextSpan(
-                                      text: '15,000points',
-                                      style: TextStyle(
+                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
-                                  TextSpan(
+                                  const TextSpan(
                                     text: ' to become an Elder.',
                                   ),
                                 ])),
                             menuLabel: 'father',
-                            totalPointsGained: _pilgrimProgressController
+                            totalPointsGained: pilgrimProgressController
                                 .totalPointsGainedInFather.value,
-                            totalPointsAvailable: _pilgrimProgressController
+                            totalPointsAvailable: pilgrimProgressController
                                 .totalPointsAvailableInFather.value,
-                            isLocked: _pilgrimProgressController
+                            isLocked: pilgrimProgressController
                                 .fatherLevelIsLocked.isTrue,
-                            menuProgressValue: _pilgrimProgressController
+                            menuProgressValue: pilgrimProgressController
                                 .fatherProgressLevelValue.value,
                             boxShadowColor: 0xFFF9ACBB,
                             onTap: () => {
-                              if (_pilgrimProgressController
+                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                              if (pilgrimProgressController
                                   .fatherLevelIsLocked.isFalse)
                                 {
-                                  _pilgrimProgressController
+                                  pilgrimProgressController
                                       .setSelectedLevel('father')
                                 }
                             },
@@ -330,192 +345,29 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                   ),
                                 ])),
                             menuLabel: 'elder',
-                            totalPointsGained: _pilgrimProgressController
+                            totalPointsGained: pilgrimProgressController
                                 .totalPointsGainedInElder.value,
-                            totalPointsAvailable: _pilgrimProgressController
+                            totalPointsAvailable: pilgrimProgressController
                                 .totalPointsAvailableInFather.value,
-                            isLocked: _pilgrimProgressController
+                            isLocked: pilgrimProgressController
                                 .elderLevelIsLocked.isTrue,
-                            menuProgressValue: _pilgrimProgressController
+                            menuProgressValue: pilgrimProgressController
                                 .elderProgressLevelValue.value,
                             boxShadowColor: 0xFFA2EAE0,
                             onTap: () => {
-                              if (_pilgrimProgressController
+                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                              if (pilgrimProgressController
                                   .elderLevelIsLocked.isFalse)
                                 {
-                                  _pilgrimProgressController
+                                  pilgrimProgressController
                                       .setSelectedLevel('elder')
                                 }
                             },
                           ),
                         ],
                       ),
-                    ),
-                  ),
 
-                  // Stack(
-                  //   children: [
-                  //     Positioned(
-                  //       top: 280.h,
-                  //       child: Image.asset(
-                  //         'assets/images/pilgrim_left_cloud.png',
-                  //         width: 180.w,
-                  //       ),
-                  //     ),
-                  //     Positioned(
-                  //       top: 150.h,
-                  //       right: 0,
-                  //       child: Image.asset(
-                  //         'assets/images/pilgrim_right_cloud.png',
-                  //         width: 180.w,
-                  //       ),
-                  //     ),
-                  //     SizedBox(
-                  //       child: Obx(
-                  //         () => Column(
-                  //           children: [
-                  //             Row(
-                  //               mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  //               children: [
-                  //                 GestureDetector(
-                  //                   onTap: () => {
-                  //                     if (_pilgrimProgressController.babeLevelIsLocked.isFalse){
-                  //                        _pilgrimProgressController.setSelectedLevel('babe')
-                  //                       }
-                  //                   },
-                  //                   child: PilgrimProgressLevelMenu(
-                  //                     menuImage:
-                  //                         'assets/images/pilgrim_levels/babe.png',
-                  //                     menuNumber: '01',
-                  //                     menuLabel: 'Babe',
-                  //                     isLocked: _pilgrimProgressController
-                  //                         .babeLevelIsLocked.value,
-                  //                     menuProgressValue:
-                  //                         _pilgrimProgressController
-                  //                             .babeProgressLevelValue.value,
-                  //                   ),
-                  //                 ),
-                  //                 GestureDetector(
-                  //                   onTap: () => {
-                  //                     if (_pilgrimProgressController.childLevelIsLocked.isFalse){
-                  //                       _pilgrimProgressController.setSelectedLevel('child')
-                  //                       }
-                  //                   },
-                  //                   child: PilgrimProgressLevelMenu(
-                  //                     menuImage: _pilgrimProgressController
-                  //                             .childLevelIsLocked.isTrue
-                  //                         ? 'assets/images/pilgrim_levels/child_locked.png'
-                  //                         : 'assets/images/pilgrim_levels/child.png',
-                  //                     menuNumber: '02',
-                  //                     menuLabel: 'Child',
-                  //                     isLocked: _pilgrimProgressController
-                  //                         .childLevelIsLocked.isTrue,
-                  //                     menuProgressValue:
-                  //                         _pilgrimProgressController
-                  //                             .childProgressLevelValue.value,
-                  //                   ),
-                  //                 )
-                  //               ],
-                  //             ),
-                  //             SizedBox(
-                  //               height: constraints.maxHeight * 0.03,
-                  //             ),
-                  //             Row(
-                  //               mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  //               children: [
-                  //                 GestureDetector(
-                  //                   onTap: ()=>{
-                  //                     if(_pilgrimProgressController.youngBelieversLevelIsLocked.isFalse) {
-                  //                       _pilgrimProgressController.setSelectedLevel('young believer')
-                  //                     }
-                  //                   },
-                  //                   child: PilgrimProgressLevelMenu(
-                  //                     menuImage: _pilgrimProgressController
-                  //                             .youngBelieversLevelIsLocked.isTrue
-                  //                         ? 'assets/images/pilgrim_levels/young_believer_locked.png'
-                  //                         : 'assets/images/pilgrim_levels/young_believer.png',
-                  //                     menuNumber: '03',
-                  //                     menuLabel: 'Young Believer',
-                  //                     isLocked: _pilgrimProgressController
-                  //                         .youngBelieversLevelIsLocked.isTrue,
-                  //                     menuProgressValue: _pilgrimProgressController
-                  //                         .youngBelieverProgressLevelValue.value,
-                  //                   ),
-                  //                 ),
-                  //                 GestureDetector(
-                  //                   onTap: ()=>{
-                  //                     if(_pilgrimProgressController.charityLevelIsLocked.isFalse) {
-                  //                       _pilgrimProgressController.setSelectedLevel('charity')
-                  //                     }
-                  //                   },
-                  //                   child: PilgrimProgressLevelMenu(
-                  //                     menuImage: _pilgrimProgressController
-                  //                             .charityLevelIsLocked.isTrue
-                  //                         ? 'assets/images/pilgrim_levels/charity_locked.png'
-                  //                         : 'assets/images/pilgrim_levels/charity.png',
-                  //                     menuNumber: '04',
-                  //                     menuLabel: 'Charity',
-                  //                     isLocked: _pilgrimProgressController
-                  //                         .charityLevelIsLocked.isTrue ,
-                  //                     menuProgressValue: _pilgrimProgressController
-                  //                         .charityProgressLevelValue.value,
-                  //                   ),
-                  //                 )
-                  //               ],
-                  //             ),
-                  //             SizedBox(
-                  //               height: constraints.maxHeight * 0.03,
-                  //             ),
-                  //             Row(
-                  //               mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  //               children: [
-                  //                 GestureDetector(
-                  //                   onTap: ()=>{
-                  //                     if(_pilgrimProgressController.fatherLevelIsLocked.isFalse) {
-                  //                       _pilgrimProgressController.setSelectedLevel('father')
-                  //                     }
-                  //                   },
-                  //                   child: PilgrimProgressLevelMenu(
-                  //                     menuImage: _pilgrimProgressController
-                  //                             .fatherLevelIsLocked.isTrue
-                  //                         ? 'assets/images/pilgrim_levels/father_locked.png'
-                  //                         : 'assets/images/pilgrim_levels/father.png',
-                  //                     menuNumber: '05',
-                  //                     menuLabel: 'Father',
-                  //                     isLocked: _pilgrimProgressController
-                  //                         .fatherLevelIsLocked.isTrue,
-                  //                     menuProgressValue: _pilgrimProgressController
-                  //                         .fatherProgressLevelValue.value,
-                  //                   ),
-                  //                 ),
-                  //                 GestureDetector(
-                  //                   onTap: ()=>{
-                  //                     if(_pilgrimProgressController.elderLevelIsLocked.isFalse) {
-                  //                       _pilgrimProgressController.setSelectedLevel('elder')
-                  //                     }
-                  //                   },
-                  //                   child: PilgrimProgressLevelMenu(
-                  //                     menuImage: _pilgrimProgressController
-                  //                             .elderLevelIsLocked.isTrue
-                  //                         ? 'assets/images/pilgrim_levels/elder_locked.png'
-                  //                         : 'assets/images/pilgrim_levels/elder.png',
-                  //                     menuNumber: '06',
-                  //                     menuLabel: 'Elder',
-                  //                     isLocked: _pilgrimProgressController
-                  //                         .elderLevelIsLocked.isTrue,
-                  //                     menuProgressValue: _pilgrimProgressController
-                  //                         .elderProgressLevelValue.value,
-                  //                   ),
-                  //                 )
-                  //               ],
-                  //             ),
-                  //             const SizedBox(height: 20,)
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
+                  ),
                 ],
               ),
             ),
@@ -589,5 +441,6 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
   void initState() {
     super.initState();
     displayPilgrimProgressWelcomeModal();
+    getUpdatedGameData();
   }
 }

@@ -8,17 +8,18 @@ import 'package:get_storage/get_storage.dart';
 import 'controllers/awesome_notification_controller.dart';
 
 void main() async{
-  AwesomeNotifications().initialize('resource://drawable/background', [
+  AwesomeNotifications().initialize('resource://drawable/notification_icon', [
     NotificationChannel(
-      channelKey: 'notifications',
-      channelName: 'Notifications',
+      channelKey: 'game notifications',
+      channelName: 'Game Notifications',
       channelDescription: 'Notification channel for notification',
       channelShowBadge: true,
       importance: NotificationImportance.Max,
     ),
   ]);
   await GetStorage.init();
-  //await AwesomeNotificationController.initializeRemoteNotifications(debug: false);
+  await AwesomeNotificationController.initializeRemoteNotifications(debug: false);
+  AwesomeNotifications().requestPermissionToSendNotifications(channelKey: 'game notifications');
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

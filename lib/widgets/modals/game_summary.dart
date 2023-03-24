@@ -1,5 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bible_game/controllers/nativity_question_controller.dart';
+import 'package:bible_game/controllers/global_question_controller.dart';
 import 'package:bible_game/controllers/pilgrim_progress_question_controller.dart';
 import 'package:bible_game/controllers/quick_game_question_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
@@ -7,6 +7,7 @@ import 'package:bible_game/screens/quick_game/step_one.dart';
 import 'package:bible_game/screens/tabs/tab_main_screen.dart';
 import 'package:bible_game/services/user_service.dart';
 import 'package:bible_game/widgets/game_summary_action_button.dart';
+import 'package:bible_game/widgets/modals/pilgrim_progress_leaderboard_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -20,15 +21,15 @@ import '../custom_icons/my_flutter_app_icons.dart';
 import 'leaderboard_modal.dart';
 
 class GameSummaryModal extends StatelessWidget {
-  const GameSummaryModal(
-      {Key? key,
-      required this.pointsGained,
-      required this.questionsGotten,
-      required this.onTap,
-      required this.bonusPointsGained,
-      required this.averageTimeSpent, required this.isQuickGame,
-      })
-      : super(key: key);
+  const GameSummaryModal({
+    Key? key,
+    required this.pointsGained,
+    required this.questionsGotten,
+    required this.onTap,
+    required this.bonusPointsGained,
+    required this.averageTimeSpent,
+    required this.isQuickGame,
+  }) : super(key: key);
 
   final String pointsGained;
   final String questionsGotten;
@@ -39,7 +40,6 @@ class GameSummaryModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = AudioPlayer();
     UserController userController = Get.put(UserController());
     final TabsController tabsController = Get.put(TabsController());
     return Dialog(
@@ -47,14 +47,22 @@ class GameSummaryModal extends StatelessWidget {
       backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         child: SizedBox(
-            height: Get.width >= 500 ? 700.h : Get.height >= 800 ? 600.h : 650.h,
+            height: Get.width >= 500
+                ? 700.h
+                : Get.height >= 800
+                    ? 600.h
+                    : 650.h,
             width: Get.width >= 500 ? 500.h : 500.h,
             child: Stack(
               children: [
                 Column(
                   children: [
                     SizedBox(
-                      height: Get.width >= 500 ? 550.h : Get.height >= 800 ? 450.h : 480.h,
+                      height: Get.width >= 500
+                          ? 550.h
+                          : Get.height >= 800
+                              ? 450.h
+                              : 480.h,
                       child: Container(
                         decoration: const BoxDecoration(
                           image: DecorationImage(
@@ -181,14 +189,23 @@ class GameSummaryModal extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      height: Get.width >= 500 ? 20.h : Get.height >= 800 ? 15.h : 22.h,
+                      height: Get.width >= 500
+                          ? 20.h
+                          : Get.height >= 800
+                              ? 15.h
+                              : 22.h,
                     ),
-                  // isQuickGame ? const SizedBox() : const LeaderBoardModal()
-                    const LeaderBoardModal()
+                    isQuickGame ? const SizedBox() : const LeaderBoardModal()
+                    // const LeaderBoardModal()
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.only(top:  Get.width >= 500 ? 450.h : Get.height >= 800 ? 380.h : 400.h),
+                  margin: EdgeInsets.only(
+                      top: Get.width >= 500
+                          ? 450.h
+                          : Get.height >= 800
+                              ? 380.h
+                              : 400.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -210,13 +227,12 @@ class GameSummaryModal extends StatelessWidget {
                         size: 20.w,
                         shapeColor: const Color(0xFF4075BB),
                         onTap: () async => {
-                          if(userController.soundIsOff.isFalse){
-                            player.setAsset('assets/audios/click.mp3'),
-                            player.play(),
-                          },
+                          userController.soundIsOff.isFalse
+                              ? userController.playGameSound()
+                              : null,
                           Get.delete<PilgrimProgressQuestionController>(),
                           Get.delete<QuickGamesQuestionController>(),
-                          Get.delete<NativityQuestionController>(),
+                          Get.delete<GlobalQuestionController>(),
                           Get.delete<LeaderboardController>(),
                           await userController.getUserData(),
                           GetStorage().write('isTempLoggedIn', false),
@@ -231,13 +247,26 @@ class GameSummaryModal extends StatelessWidget {
                         ),
                         size: 15.w,
                         shapeColor: const Color(0XFFFDC049),
-                        onTap: () => {
-                          if(userController.soundIsOff.isFalse){
-                            player.setAsset('assets/audios/click.mp3'),
-                            player.play(),
-                          },
-                          tabsController.selectPage(2),
-                          Get.offAll(()=> const TabMainScreen()),
+                        onTap: () async => {
+                          userController.soundIsOff.isFalse
+                              ? userController.playGameSound()
+                              : null,
+                          await userController.getUserData(),
+                          GetStorage().write('isTempLoggedIn', false),
+                          if (isQuickGame)
+                            {
+                              tabsController.selectPage(2),
+                              Get.offAll(() => const TabMainScreen(),
+                                  transition: Transition.fadeIn)
+                            }
+                          else
+                            {
+                              Future.delayed(Duration.zero, () {
+                                Get.bottomSheet(
+                                    const PilgrimProgressLeaderboardModal(),
+                                    isScrollControlled: true);
+                              })
+                            }
                         },
                       ),
                     ],

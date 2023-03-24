@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:new_version/new_version.dart';
 import '../utilities/network_connection.dart';
 import 'authentication/login.dart';
 import 'authentication/signup.dart';
@@ -42,6 +43,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     playBackgroundMusic();
     networkConnection.onConnectivityChanged();
     checkInternet();
+    checkForUpdateAppVersion();
     print(AwesomeNotificationController.getFirebaseMessagingToken());
   }
 
@@ -53,14 +55,35 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
- playBackgroundMusic() async{
-   // var pauseMusic = box.read('pauseMusic') ?? true ;
-      await userController.player.setAsset('assets/audios/background_music.mp3');
-      await userController.player.setVolume(0.1);
-      await userController.player.setLoopMode(LoopMode.all);
-      await userController.player.play();
+  checkForUpdateAppVersion() async{
+    final newVersion = NewVersion();
+    newVersion.showAlertIfNecessary(context: context);
 
+    final status = await newVersion.getVersionStatus();
+    if(status != null){
+      newVersion.showUpdateDialog(
+        context: context,
+        versionStatus: status,
+        dialogTitle: 'Update Available',
+        dialogText: 'A new version of Bible Game is available.\n Please update the app to continue.',
+        allowDismissal: false,
+        updateButtonText: 'Update'
+      );
+    }
+  }
 
+ playBackgroundMusic(){
+      var pauseMusic = box.read('pauseGameMusic') ?? false;
+      if(pauseMusic == false){
+        userController.player.play();
+      }
+ }
+
+ playGameSound(){
+   var pauseGameSound = box.read('pauseGameSound') ?? false;
+   if(pauseGameSound == false){
+     userController.player2.play();
+   }
  }
 
 
@@ -113,7 +136,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
-        userController.player.play();
+        var pauseMusic = box.read('pauseGameMusic') ?? false;
+        if(pauseMusic == false){
+          userController.player.play();
+        }
         break;
       case AppLifecycleState.paused:
          userController.player.stop();

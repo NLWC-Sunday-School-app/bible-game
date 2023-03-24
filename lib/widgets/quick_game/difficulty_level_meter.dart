@@ -27,8 +27,8 @@ class DifficultyLevelMeter extends StatelessWidget {
         Column(
           children: [
             SizedBox(
-              height: 11,
-              width: 11,
+              height: 11.w,
+              width: 11.w,
               child: isActive ? Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -39,7 +39,7 @@ class DifficultyLevelMeter extends StatelessWidget {
             SizedBox(
               height: 8.h,
             ),
-             SvgPicture.asset(difficultyImage),
+             Get.width > 900 ? SvgPicture.asset(difficultyImage, width: 70.w,) : SvgPicture.asset(difficultyImage,),
 
             SizedBox(
               height: 5.h,
@@ -55,8 +55,8 @@ class DifficultyLevelMeter extends StatelessWidget {
           ],
         ),
        isActive ? Container(
-          margin: EdgeInsets.only(top: Get.height < 680 ? 70.h : 60.h, left: Get.height < 680 ? 50.h : 40.h),
-          child: SvgPicture.asset(checkerImage),
+          margin: Get.width > 900 ? EdgeInsets.only(top: 70.h, left: 80) : EdgeInsets.only(top: Get.height < 680 ? 70.h : 60.h, left: Get.height < 680 ? 50.h : 40.h),
+          child: Get.width > 900 ? SvgPicture.asset(checkerImage, width: 50.w) : SvgPicture.asset(checkerImage,),
         ): const SizedBox(),
       ],
     );

@@ -1,14 +1,16 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/models/question.dart';
-import 'package:bible_game/widgets/nativity/question_points.dart';
-import 'package:bible_game/widgets/nativity/question_timer.dart';
+import 'package:bible_game/widgets/global/question_points.dart';
+import 'package:bible_game/widgets/global/question_timer.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import '../../controllers/nativity_question_controller.dart';
+import '../../controllers/global_question_controller.dart';
+import '../modals/quit_modal.dart';
 import 'option_button.dart';
 
 class QuestionContainer extends StatefulWidget {
@@ -24,7 +26,8 @@ class QuestionContainer extends StatefulWidget {
 }
 
 class _QuestionContainerState extends State<QuestionContainer> {
-  final NativityQuestionController _questionController = Get.put(NativityQuestionController());
+  final GlobalQuestionController _questionController = Get.put(GlobalQuestionController());
+  UserController userController = Get.put(UserController());
   final player = AudioPlayer();
   bool isClicked = false;
 
@@ -75,15 +78,57 @@ class _QuestionContainerState extends State<QuestionContainer> {
             Container(
               margin: EdgeInsets.only(top: 45.h),
               child: Obx(
-                () => Center(
-                  child: Text(
-                    "Question ${_questionController.questionNumber.value} of ${_questionController.questions.length}",
-                    style: TextStyle(
-                        fontFamily: 'Neuland',
-                        letterSpacing: 1,
-                        fontSize: 16.sp,
-                        color: Colors.white),
-                  ),
+                    () => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 20.0.w),
+                      child: GestureDetector(
+                        onTap: () => {
+                          userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                          Get.dialog(const QuitModal(), barrierDismissible: false,)
+                        },
+                        child: Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 24.w,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Question ${_questionController.questionNumber.value} of ${_questionController.questions.length}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: 'Neuland',
+                            letterSpacing: 1,
+                            fontSize: 16.sp,
+                            color: Colors.white),
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: (){
+                        userController.soundIsOff.isFalse ? userController.playGameSound() : null;
+                        _questionController.goToNextQuestion();
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 20.w),
+                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25.r)
+                        ),
+                        child: Text('Skip', style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF459DE3)
+                        ),),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
@@ -104,12 +149,10 @@ class _QuestionContainerState extends State<QuestionContainer> {
             ),
             Padding(
               padding: EdgeInsets.only(left: 22.w, right: 45.w),
-              child: AutoSizeText(
+              child: Text(
                 '"${widget.question.question}"',
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: Get.height > 900 ? 22 : 18,
+                  fontSize: Get.height > 900 ? 16.sp : 14.sp,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
@@ -143,8 +186,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
                           selectOption: () =>
                           {
                             if(isClicked == false){
-                              player.setAsset('assets/audios/click.mp3'),
-                              player.play(),
+                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
                               _questionController.checkAnswer(widget.question, widget.question.options[index])
                             },
                              setState(() {

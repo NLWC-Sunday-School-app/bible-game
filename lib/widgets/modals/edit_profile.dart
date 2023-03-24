@@ -19,7 +19,7 @@ class _EditProfileState extends State<EditProfileModal> {
   final GlobalKey<FormState> _updateFormKey = GlobalKey<FormState>();
   UserController userController = Get.put(UserController());
   AuthController authController = Get.put(AuthController());
-  final player = AudioPlayer();
+
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -73,8 +73,7 @@ class _EditProfileState extends State<EditProfileModal> {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      player.setAsset('assets/audios/click.mp3'),
-                      player.play(),
+                      userController.soundIsOff.isFalse ? userController.playGameSound() : null,
                       Get.back()
                     },
                     child: Padding(
@@ -151,6 +150,7 @@ class _EditProfileState extends State<EditProfileModal> {
 
                   GestureDetector(
                     onTap: () => {
+                      userController.soundIsOff.isFalse ? userController.playGameSound() : null,
                       if (_updateFormKey.currentState!.validate())
                         authController.updateUserProfile(userController.myUser['id'])
                     },

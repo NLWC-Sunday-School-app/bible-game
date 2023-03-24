@@ -1,3 +1,4 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/widgets/modals/create_profile_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,14 +12,29 @@ import '../../controllers/pilgrim_progress_question_controller.dart';
 import '../../controllers/quick_game_question_controller.dart';
 import '../../screens/tabs/tab_main_screen.dart';
 
-class LeaderBoardModal extends StatelessWidget {
+class LeaderBoardModal extends StatefulWidget {
   const LeaderBoardModal({Key? key}) : super(key: key);
 
   @override
+  State<LeaderBoardModal> createState() => _LeaderBoardModalState();
+}
+
+class _LeaderBoardModalState extends State<LeaderBoardModal> {
+  LeaderboardController leaderboardController = Get.put(LeaderboardController());
+  late bool isLoggedIn;
+  UserController userController = Get.put(UserController());
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      isLoggedIn = GetStorage().read('userLoggedIn') ?? false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    LeaderboardController leaderboardController = Get.put(LeaderboardController());
-    var isLoggedIn = GetStorage().read('userLoggedIn') ?? false;
-    final player = AudioPlayer();
+
     return  isLoggedIn ? Obx(
       () => SizedBox(
         height: Get.width >= 500 ? 130.h : Get.height >= 800 ? 100.h : 120.h,
@@ -199,8 +215,7 @@ class LeaderBoardModal extends StatelessWidget {
              SizedBox(height: 20.h,),
              GestureDetector(
                onTap: () =>{
-                 player.setAsset('assets/audios/click.mp3'),
-                 player.play(),
+                 userController.soundIsOff.isFalse ? userController.playGameSound() : null,
                  Get.delete<PilgrimProgressQuestionController>(),
                  Get.delete<QuickGamesQuestionController>(),
                  Get.delete<LeaderboardController>(),
@@ -229,4 +244,6 @@ class LeaderBoardModal extends StatelessWidget {
       ),
     );
   }
+
+
 }

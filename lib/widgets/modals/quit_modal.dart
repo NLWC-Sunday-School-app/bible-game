@@ -2,17 +2,20 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import '../../controllers/user_controller.dart';
 class QuitModal extends StatelessWidget {
   const QuitModal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    UserController userController = Get.put(UserController());
     return Dialog(
       backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         child: SizedBox(
-          height: 450,
-          width: 350,
+          height: 450.h,
+          width: 350.w,
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -38,7 +41,10 @@ class QuitModal extends StatelessWidget {
                 ),
                 const SizedBox(height: 40,),
                 GestureDetector(
-                  onTap: () =>  Get.back(result: false),
+                  onTap: () => {
+                    userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                    Get.back(result: false)
+                  },
                   child: Container(
                     width: 200.w,
                     padding: const EdgeInsets.symmetric(vertical: 15),
@@ -60,6 +66,7 @@ class QuitModal extends StatelessWidget {
                 const SizedBox(height: 20,),
                 GestureDetector(
                   onTap: () => {
+                    userController.soundIsOff.isFalse ? userController.playGameSound() : null,
                     Get.back(result: true),
                     Get.back(result: true),
                     Get.back(result: true)

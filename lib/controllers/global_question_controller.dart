@@ -14,11 +14,11 @@ import '../screens/quick_game/step_one.dart';
 import '../screens/quick_game/step_two.dart';
 import '../screens/tabs/tab_main_screen.dart';
 import '../widgets/modals/game_summary.dart';
-import 'nativity_game_controller.dart';
+import 'global_game_controller.dart';
 
-class NativityQuestionController extends GetxController
+class GlobalQuestionController extends GetxController
     with SingleGetTickerProviderMixin {
-  NativityGameController quickGameController = Get.put(NativityGameController());
+  GlobalGameController globalGameController = Get.put(GlobalGameController());
   UserController userController = Get.put(UserController());
   AuthController authController = Get.put(AuthController());
   final confettiController = ConfettiController();
@@ -40,6 +40,7 @@ class NativityQuestionController extends GetxController
   String get correctAnswer => _correctAnswer;
   late String selectedAnswer;
   final RxInt _questionNumber = 1.obs;
+  final RxInt _questionAnswered = 0.obs;
 
   RxInt get questionNumber => _questionNumber;
   var numOfCorrectAnswers = 0.obs;
@@ -52,8 +53,8 @@ class NativityQuestionController extends GetxController
   @override
   void onInit() {
     super.onInit();
-    _questions = quickGameController.gameQuestions;
-    durationPerQuestion = quickGameController.durationPerQuestion;
+    _questions = globalGameController.gameQuestions;
+    durationPerQuestion = globalGameController.durationPerQuestion;
     _pageController = PageController();
     animationController = AnimationController(
         duration: Duration(seconds: durationPerQuestion), vsync: this);
@@ -86,22 +87,23 @@ class NativityQuestionController extends GetxController
     _isAnswered = true;
     _correctAnswer = question.answer;
     selectedAnswer = answerSelected;
-    var halfOfTotalPointPerQuestion = quickGameController.pointsPerQuestion / 2;
+    var halfOfTotalPointPerQuestion = globalGameController.pointsPerQuestion / 2;
     var answeredTime = (animation.value * durationPerQuestion).round();
     totalTimeSpent +=
         durationPerQuestion - (animation.value * durationPerQuestion).round();
     if (_correctAnswer == selectedAnswer) {
-      player.setAsset('assets/audios/success.mp3');
-      player.setVolume(0.4);
-      player.play();
+      userController.soundIsOff.isFalse ? userController
+          .playCorrectAnswerSound() : null;
       confettiController.play();
       numOfCorrectAnswers++;
-      dynamic timeBonusPoint = ((answeredTime/durationPerQuestion) * halfOfTotalPointPerQuestion);
-      pointsGained.value = pointsGained.value + (halfOfTotalPointPerQuestion + timeBonusPoint).round();
-      totalBonusPointsGained.value = (totalBonusPointsGained.value + timeBonusPoint).round();
-
-      player.setAsset('assets/audios/wrong_answer.wav');
-      player.play();
+      dynamic timeBonusPoint = ((answeredTime / durationPerQuestion) *
+          halfOfTotalPointPerQuestion);
+      pointsGained.value = pointsGained.value +
+          (halfOfTotalPointPerQuestion + timeBonusPoint).round();
+      totalBonusPointsGained.value =
+          (totalBonusPointsGained.value + timeBonusPoint).round();
+    } else {
+      userController.soundIsOff.isFalse ? userController.playWrongAnswerSound() : null;
       confettiController.stop();
     }
     animationController.stop();
@@ -119,7 +121,7 @@ class NativityQuestionController extends GetxController
 
   sendGameData(averageTimeSpent) async {
     var response = await GameService.sendGameData(
-        'CAMPAIGN_NATIVITY',
+        globalGameController.gameType.value,
         pointsGained.value,
         pointsGained.value,
         bonusPoint.value,
@@ -137,7 +139,7 @@ class NativityQuestionController extends GetxController
       userController.tempPlayerPoint.value = pointsGained.value;
     }
     var tempQuickGameData = {
-      'gameMode': 'CAMPAIGN_NATIVITY',
+      'gameMode': globalGameController.gameType.value,
       'totalScore': pointsGained.value,
       'baseScore': pointsGained.value,
       'bonusScore': bonusPoint.value,
@@ -150,7 +152,8 @@ class NativityQuestionController extends GetxController
   }
 
   void goToNextQuestion() async {
-    if (_questionNumber.value != _questions.length) {
+    _questionAnswered.value++;
+    if (_questionAnswered.value != _questions.length) {
       _isAnswered = false;
       _pageController?.nextPage(
         duration: const Duration(milliseconds: 250),
@@ -162,6 +165,7 @@ class NativityQuestionController extends GetxController
     } else {
       animationController.stop();
       confettiController.stop();
+      GetStorage().write('PLAYED_${globalGameController.gameType.value}', true);
       Get.dialog(
         GameSummaryModal(
           isQuickGame: false,
@@ -171,15 +175,13 @@ class NativityQuestionController extends GetxController
           averageTimeSpent:
           (totalTimeSpent.value ~/ questions.length).toString(),
           onTap: () => {
-            player.setAsset('assets/audios/click.mp3'),
-            player.play(),
-            Get.delete<NativityQuestionController>(),
-            Get.delete<NativityGameController>(),
+            userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+            Get.delete<GlobalQuestionController>(),
+            Get.delete<GlobalGameController>(),
             Get.back(),
             GetStorage().write('isTempLoggedIn', false),
             Get.offAll(() => const TabMainScreen(),
                 transition: Transition.fadeIn)
-
           },
         ),
         barrierDismissible: false,

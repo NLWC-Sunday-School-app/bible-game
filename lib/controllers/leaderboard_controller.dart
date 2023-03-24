@@ -23,7 +23,6 @@ class LeaderboardController extends GetxController{
       leaderboardData.value = leaderboardList;
       leaderboardFormattedData.value = List.from(leaderboardList);
       leaderboardFormattedData.removeRange(0, 3);
-      print(leaderboardFormattedData.length);
       isLoading(false);
     } catch (e) {
       print(e);
@@ -31,15 +30,14 @@ class LeaderboardController extends GetxController{
     }
   }
 
-  setNativityLeaderboardData() async {
+  setFourScripturesLeaderboardData() async {
     var isLoggedIn = box.read('userLoggedIn') ?? false;
     try {
       isLoading(true);
-      var leaderboardList = await GameService.getNativityGameLeaderBoard();
+      var leaderboardList = await GameService. getFourScriptureGameLeaderBoard('FOUR_SCRIPTURES');
       leaderboardData.value = leaderboardList;
       leaderboardFormattedData.value = List.from(leaderboardList);
       leaderboardFormattedData.removeRange(0, 3);
-      print(leaderboardFormattedData.length);
       isLoading(false);
     } catch (e) {
       print(e);

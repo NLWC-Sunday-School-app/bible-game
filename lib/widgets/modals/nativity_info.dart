@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/nativity_game_controller.dart';
+import '../../controllers/global_game_controller.dart';
 
 class NativityInfo extends StatelessWidget {
   const NativityInfo({Key? key}) : super(key: key);
@@ -37,7 +37,7 @@ class NativityInfo extends StatelessWidget {
               ),
               SizedBox(height: 20.h,),
               Text(
-                'The nativity story',
+                'The global story',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 24.sp,

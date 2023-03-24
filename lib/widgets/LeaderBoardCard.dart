@@ -103,7 +103,7 @@ class LeaderBoardCard extends StatelessWidget {
                   bottom: 45.h,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color.fromRGBO(91, 74, 191, 1),
+                  color: const Color(0xFF1D4781),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Wrap(

@@ -8,9 +8,10 @@ import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/question.dart';
 import '../services/game_service.dart';
+import '../widgets/modals/global_game_modal.dart';
 import '../widgets/modals/quick_game_modal.dart';
 
-class NativityGameController extends GetxController {
+class GlobalGameController extends GetxController {
 
   var normalIsActive = true.obs;
   var intermediateIsActive = false.obs;
@@ -23,6 +24,7 @@ class NativityGameController extends GetxController {
   var fullBonusLowerRange = 0;
   var partialBonusLowerRange = 0;
   var partialBonusPoint = 0;
+  var gameType = ''.obs;
   UserController userController = Get.put(UserController());
   TagsPillController tagsPillController = Get.put(TagsPillController());
   GetStorage box = GetStorage();
@@ -61,9 +63,12 @@ class NativityGameController extends GetxController {
     durationPerQuestion =  int.parse(box.read('game_settings')['hard_game_speed']);
   }
 
-  prepareQuestions() async {
+  prepareQuestions(campaignType) async {
+    showDialogModal();
+    gameType.value = campaignType;
     try{
-      gameQuestions.value =  await GameService.getGameQuestions('CAMPAIGN_NATIVITY', 'babe' , null);
+      gameQuestions.value =  await GameService.getGameQuestions(campaignType, 'babe' , null);
+      modalTitle.value = 'All set to go 🥳😃';
       gameIsReady(true);
     } catch(e) {
       print(e);
@@ -74,14 +79,13 @@ class NativityGameController extends GetxController {
 
 
   startGame() {
-    player.setAsset('assets/audios/click.mp3');
-    player.play();
-    prepareQuestions();
+   // prepareQuestions();
   }
 
   showDialogModal() {
-    Get.dialog(const QuickGameModal(),
-        barrierDismissible: false,
+    Get.dialog(const GlobalGameModal(),
+        // barrierDismissible: false,
+
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.9));
   }
   setGameSettings(){

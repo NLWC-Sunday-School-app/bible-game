@@ -58,7 +58,7 @@ class TabLeaderBoardMenuScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: constraints.maxHeight * 0.03),
-                        gameSettings['is_campaign_active'] == 'true'  && _authController.isLoggedIn.isTrue ?  const LeaderBoardMenuCard(levelImage:'assets/images/baby_jesus.png',levelLabel: 'Nativity', levelNumber: '*', isNativity: true,) : const SizedBox(),
+                        const LeaderBoardMenuCard(levelImage:'assets/images/blue_bible.png',levelLabel: '4 Scriptures', levelNumber: '*', isNativity: true,),
                         const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/babe.png', levelLabel: 'Babe', levelNumber: '1', isNativity: false,),
                         const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/child.png', levelLabel: 'Child', levelNumber: '2', isNativity: false,),
                         const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/young_believer.png', levelLabel: 'Young Believer', levelNumber: '3', isNativity: false,),

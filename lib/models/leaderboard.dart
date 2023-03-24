@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 List<Leaderboard> leaderBoardFromJson(String str) => List<Leaderboard>.from(json.decode(str).map((x) => Leaderboard.fromJson(x)));
+List<Leaderboard> leaderBoardFromDataJson(String str) => List<Leaderboard>.from(json.decode(str)['data'].map((x) => Leaderboard.fromJson(x)));
 
 
 class Leaderboard{

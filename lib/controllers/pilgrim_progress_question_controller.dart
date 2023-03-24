@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:bible_game/controllers/leaderboard_controller.dart';
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
@@ -103,15 +101,12 @@ class PilgrimProgressQuestionController extends GetxController
     _isAnswered = true;
     _correctAnswer = question.answer;
     selectedAnswer = answerSelected;
-    _questionAnswered.value++;
     var halfOfTotalPointPerQuestion = pilgrimProgressController.pointsPerQuestion / 2;
     var answeredTime = (animation.value * durationPerQuestion).round();
     totalTimeSpent +=
         durationPerQuestion - (animation.value * durationPerQuestion).round();
     if (_correctAnswer == selectedAnswer) {
-      player.setAsset('assets/audios/success.mp3');
-      player.setVolume(0.4);
-      player.play();
+      userController.soundIsOff.isFalse ? userController.playCorrectAnswerSound() : null;
       confettiController.play();
       numOfCorrectAnswers++;
       dynamic timeBonusPoint = ((answeredTime/durationPerQuestion) * halfOfTotalPointPerQuestion);
@@ -119,8 +114,7 @@ class PilgrimProgressQuestionController extends GetxController
       totalBonusPointsGained.value = (totalBonusPointsGained.value + timeBonusPoint).round();
 
     } else {
-      player.setAsset('assets/audios/wrong_answer.wav');
-      player.play();
+      userController.soundIsOff.isFalse ? userController.playWrongAnswerSound() : null;
       confettiController.stop();
     }
     animationController.stop();
@@ -139,7 +133,7 @@ class PilgrimProgressQuestionController extends GetxController
           userController.myUser['rank'] == 'babe' ? pilgrimProgressController.noOfRoundsLeftInBabe.value-- : null;
           var score = pointsGained / int.parse(userController.userGameSettings['total_points_available_pilgrim_progress']);
           pilgrimProgressController.babeProgressLevelValue.value += score;
-          pilgrimProgressController.babeProgressLevelValue.value >= 1.0 || pointsGained.value >= 3200 ?  pilgrimProgressController.childLevelIsLocked.value = false : pilgrimProgressController.childLevelIsLocked.value = true;
+          pilgrimProgressController.babeProgressLevelValue.value >= 1.0 || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value ?  pilgrimProgressController.childLevelIsLocked.value = false : pilgrimProgressController.childLevelIsLocked.value = true;
           await GameService.sendGameData(
             'PILGRIM_PROGRESS',
             pointsGained.value,
@@ -149,8 +143,8 @@ class PilgrimProgressQuestionController extends GetxController
             'babe',
             numOfCorrectAnswers.value,
             userController.myUser['id'],
-            pilgrimProgressController.noOfRoundsLeftInBabe.value >= 1 ? pilgrimProgressController.babeProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.babeProgressLevelValue.value.toStringAsFixed(5) : (pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ?  pilgrimProgressController.babeProgressLevelValue.value.toStringAsFixed(5) :  0,
-            pilgrimProgressController.noOfRoundsLeftInBabe.value >= 1 && userController.myUser['rank'] == 'babe' && !(pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ? pilgrimProgressController.noOfRoundsLeftInBabe.value : 5
+            pilgrimProgressController.noOfRoundsLeftInBabe.value >= 1 ? pilgrimProgressController.babeProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.babeProgressLevelValue.value.toStringAsFixed(5) : (pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ?  pilgrimProgressController.babeProgressLevelValue.value.toStringAsFixed(5) :  0,
+            pilgrimProgressController.noOfRoundsLeftInBabe.value >= 1 && userController.myUser['rank'] == 'babe' && !(pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInBabe.value : 5
           );
           await leaderboardController.setLeaderboardData(1);
           if(pilgrimProgressController.noOfRoundsLeftInBabe.value < 1){
@@ -158,7 +152,7 @@ class PilgrimProgressQuestionController extends GetxController
               Get.to(() => const RetryLevelScreen());
             });
           }
-          if(userController.myUser['rank'] == 'babe' && (pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200)){
+          if(userController.myUser['rank'] == 'babe' && (pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value)){
             await UserService.updatePlayerRank(userController.myUser['id'], 'child');
             await displayUnlockedNewLevelScreen('child', 'assets/images/badges/child_badge.png');
           }
@@ -167,7 +161,7 @@ class PilgrimProgressQuestionController extends GetxController
           userController.myUser['rank'] == 'child' ? pilgrimProgressController.noOfRoundsLeftInChild.value-- : null;
           var score = pointsGained / int.parse(userController.userGameSettings['total_points_available_pilgrim_progress']);
           pilgrimProgressController.childProgressLevelValue.value += score;
-          pilgrimProgressController.childProgressLevelValue.value >= 1.0 || pointsGained.value >= 3200 ? pilgrimProgressController.youngBelieversLevelIsLocked.value = false : pilgrimProgressController.youngBelieversLevelIsLocked.value = true;
+          pilgrimProgressController.childProgressLevelValue.value >= 1.0 || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value ? pilgrimProgressController.youngBelieversLevelIsLocked.value = false : pilgrimProgressController.youngBelieversLevelIsLocked.value = true;
            GameService.sendGameData(
               'PILGRIM_PROGRESS',
               pointsGained.value,
@@ -177,8 +171,8 @@ class PilgrimProgressQuestionController extends GetxController
               'child',
               numOfCorrectAnswers.value,
               userController.myUser['id'],
-             pilgrimProgressController.noOfRoundsLeftInChild.value >= 1 ? pilgrimProgressController.childProgressLevelValue.value >= 1 ? 1.0 : pilgrimProgressController.childProgressLevelValue.value.toStringAsFixed(5) : (pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ? pilgrimProgressController.childProgressLevelValue.value.toStringAsFixed(5) : 0,
-             pilgrimProgressController.noOfRoundsLeftInChild.value >= 1 && userController.myUser['rank'] == 'child' && !(pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ? pilgrimProgressController.noOfRoundsLeftInChild.value : 5
+             pilgrimProgressController.noOfRoundsLeftInChild.value >= 1 ? pilgrimProgressController.childProgressLevelValue.value >= 1 ? 1.0 : pilgrimProgressController.childProgressLevelValue.value.toStringAsFixed(5) : (pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.childProgressLevelValue.value.toStringAsFixed(5) : 0,
+             pilgrimProgressController.noOfRoundsLeftInChild.value >= 1 && userController.myUser['rank'] == 'child' && !(pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInChild.value : 5
 
            );
           await leaderboardController.setLeaderboardData(2);
@@ -187,7 +181,7 @@ class PilgrimProgressQuestionController extends GetxController
               Get.to(() => const RetryLevelScreen());
             });
           }
-          if(userController.myUser['rank'] == 'child' && (pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200)){
+          if(userController.myUser['rank'] == 'child' && (pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value)){
             await UserService.updatePlayerRank(userController.myUser['id'], 'young believer');
             await displayUnlockedNewLevelScreen('young believer', 'assets/images/badges/yb_badge.png');
           }
@@ -197,7 +191,7 @@ class PilgrimProgressQuestionController extends GetxController
           userController.myUser['rank'] == 'young believer' ? pilgrimProgressController.noOfRoundsLeftInYb.value-- : null;
           var score = pointsGained / int.parse(userController.userGameSettings['total_points_available_pilgrim_progress']);
           pilgrimProgressController.youngBelieverProgressLevelValue.value += score;
-          pilgrimProgressController.youngBelieverProgressLevelValue.value >=  1.0 || pointsGained.value >= 3200 ? pilgrimProgressController.charityLevelIsLocked.value = false : pilgrimProgressController.charityLevelIsLocked.value = true;
+          pilgrimProgressController.youngBelieverProgressLevelValue.value >=  1.0 || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value ? pilgrimProgressController.charityLevelIsLocked.value = false : pilgrimProgressController.charityLevelIsLocked.value = true;
           await GameService.sendGameData(
               'PILGRIM_PROGRESS',
               pointsGained.value,
@@ -207,8 +201,8 @@ class PilgrimProgressQuestionController extends GetxController
               'young believer',
               numOfCorrectAnswers.value,
               userController.myUser['id'],
-              pilgrimProgressController.noOfRoundsLeftInYb.value >= 1 ? pilgrimProgressController.youngBelieverProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.youngBelieverProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInYb.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= 3200) ? pilgrimProgressController.youngBelieverProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInYb.value >= 1 && userController.myUser['rank'] == 'young believer' && !(pilgrimProgressController.totalPointsGainedInYb.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ? pilgrimProgressController.noOfRoundsLeftInYb.value : 5
+              pilgrimProgressController.noOfRoundsLeftInYb.value >= 1 ? pilgrimProgressController.youngBelieverProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.youngBelieverProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInYb.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.youngBelieverProgressLevelValue.value.toStringAsFixed(5) : 0 ,
+              pilgrimProgressController.noOfRoundsLeftInYb.value >= 1 && userController.myUser['rank'] == 'young believer' && !(pilgrimProgressController.totalPointsGainedInYb.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInYb.value : 5
           );
           await leaderboardController.setLeaderboardData(3);
           if(pilgrimProgressController.noOfRoundsLeftInYb.value < 1){
@@ -216,7 +210,7 @@ class PilgrimProgressQuestionController extends GetxController
               Get.to(() => const RetryLevelScreen());
             });
           }
-          if(userController.myUser['rank'] == 'young believer' && (pilgrimProgressController.totalPointsGainedInYb.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= 3200)){
+          if(userController.myUser['rank'] == 'young believer' && (pilgrimProgressController.totalPointsGainedInYb.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value)){
             await UserService.updatePlayerRank(userController.myUser['id'], 'charity');
             await displayUnlockedNewLevelScreen('charity', 'assets/images/badges/charity_badge.png');
           }
@@ -226,7 +220,7 @@ class PilgrimProgressQuestionController extends GetxController
           userController.myUser['rank'] == 'charity' ? pilgrimProgressController.noOfRoundsLeftInCharity.value-- : null;
           var score = pointsGained / int.parse(userController.userGameSettings['total_points_available_pilgrim_progress']);
           pilgrimProgressController.charityProgressLevelValue.value += score;
-          pilgrimProgressController.charityProgressLevelValue.value >= 1.0 || pointsGained.value >= 3200 ? pilgrimProgressController.fatherLevelIsLocked.value = false : pilgrimProgressController.fatherLevelIsLocked.value = true;
+          pilgrimProgressController.charityProgressLevelValue.value >= 1.0 || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value ? pilgrimProgressController.fatherLevelIsLocked.value = false : pilgrimProgressController.fatherLevelIsLocked.value = true;
           await GameService.sendGameData(
               'PILGRIM_PROGRESS',
               pointsGained.value,
@@ -236,8 +230,8 @@ class PilgrimProgressQuestionController extends GetxController
               'charity',
               numOfCorrectAnswers.value,
               userController.myUser['id'],
-              pilgrimProgressController.noOfRoundsLeftInCharity.value >= 1 ? pilgrimProgressController.charityProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.charityProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= 3200) ? pilgrimProgressController.charityProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInCharity.value >= 1 && userController.myUser['rank'] == 'charity' && !(pilgrimProgressController.totalPointsGainedInCharity.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ? pilgrimProgressController.noOfRoundsLeftInCharity.value : 5
+              pilgrimProgressController.noOfRoundsLeftInCharity.value >= 1 ? pilgrimProgressController.charityProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.charityProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.charityProgressLevelValue.value.toStringAsFixed(5) : 0 ,
+              pilgrimProgressController.noOfRoundsLeftInCharity.value >= 1 && userController.myUser['rank'] == 'charity' && !(pilgrimProgressController.totalPointsGainedInCharity.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInCharity.value : 5
 
           );
           await leaderboardController.setLeaderboardData(4);
@@ -251,7 +245,7 @@ class PilgrimProgressQuestionController extends GetxController
               Get.to(() => const RetryLevelScreen());
             });
           }
-          if(userController.myUser['rank'] == 'charity' && (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200)){
+          if(userController.myUser['rank'] == 'charity' && (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value)){
             await UserService.updatePlayerRank(userController.myUser['id'], 'father');
             await displayUnlockedNewLevelScreen('father', 'assets/images/badges/father_badge.png');
           }
@@ -260,7 +254,7 @@ class PilgrimProgressQuestionController extends GetxController
           userController.myUser['rank'] == 'father' ? pilgrimProgressController.noOfRoundsLeftInFather.value-- : null;
           var score = pointsGained / int.parse(userController.userGameSettings['total_points_available_pilgrim_progress']);
           pilgrimProgressController.fatherProgressLevelValue.value += score;
-          pilgrimProgressController.fatherProgressLevelValue.value >= 1.0 || pointsGained.value >= 3200 ? pilgrimProgressController.elderLevelIsLocked.value = false : pilgrimProgressController.elderLevelIsLocked.value = true;
+          pilgrimProgressController.fatherProgressLevelValue.value >= 1.0 || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value ? pilgrimProgressController.elderLevelIsLocked.value = false : pilgrimProgressController.elderLevelIsLocked.value = true;
           await GameService.sendGameData(
               'PILGRIM_PROGRESS',
               pointsGained.value,
@@ -270,8 +264,8 @@ class PilgrimProgressQuestionController extends GetxController
               'father',
               numOfCorrectAnswers.value,
               userController.myUser['id'],
-              pilgrimProgressController.noOfRoundsLeftInFather.value >= 1 ? pilgrimProgressController.fatherProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.fatherProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= 3200) ? pilgrimProgressController.fatherProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInFather.value >= 1 && userController.myUser['rank'] == 'father' && !(pilgrimProgressController.totalPointsGainedInFather.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ? pilgrimProgressController.noOfRoundsLeftInFather.value : 5
+              pilgrimProgressController.noOfRoundsLeftInFather.value >= 1 ? pilgrimProgressController.fatherProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.fatherProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.fatherProgressLevelValue.value.toStringAsFixed(5) : 0 ,
+              pilgrimProgressController.noOfRoundsLeftInFather.value >= 1 && userController.myUser['rank'] == 'father' && !(pilgrimProgressController.totalPointsGainedInFather.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInFather.value : 5
           );
           await leaderboardController.setLeaderboardData(5);
           if(pilgrimProgressController.noOfRoundsLeftInFather.value < 1){
@@ -279,7 +273,7 @@ class PilgrimProgressQuestionController extends GetxController
               Get.to(() => const RetryLevelScreen());
             });
           }
-          if(userController.myUser['rank'] == 'father' && (pilgrimProgressController.totalPointsGainedInFather.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= 3200)){
+          if(userController.myUser['rank'] == 'father' && (pilgrimProgressController.totalPointsGainedInFather.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value)){
             await UserService.updatePlayerRank(userController.myUser['id'], 'elder');
             await displayUnlockedNewLevelScreen('elder', 'assets/images/badges/elder_badge.png');
           }
@@ -298,8 +292,8 @@ class PilgrimProgressQuestionController extends GetxController
               'elder',
               numOfCorrectAnswers.value,
               userController.myUser['id'],
-              pilgrimProgressController.noOfRoundsLeftInElder.value >= 1 ? pilgrimProgressController.elderProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.elderProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= 3200) ? pilgrimProgressController.elderProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInElder.value >= 1 && userController.myUser['rank'] == 'elder' && !(pilgrimProgressController.totalPointsGainedInElder.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= 3200) ? pilgrimProgressController.noOfRoundsLeftInElder.value : 5
+              pilgrimProgressController.noOfRoundsLeftInElder.value >= 1 ? pilgrimProgressController.elderProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.elderProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.elderProgressLevelValue.value.toStringAsFixed(5) : 0 ,
+              pilgrimProgressController.noOfRoundsLeftInElder.value >= 1 && userController.myUser['rank'] == 'elder' && !(pilgrimProgressController.totalPointsGainedInElder.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInElder.value : 5
           );
           await leaderboardController.setLeaderboardData(6);
           break;
@@ -327,6 +321,7 @@ class PilgrimProgressQuestionController extends GetxController
 
 
   void goToNextQuestion() {
+    _questionAnswered.value++;
     if (_questionAnswered.value != _questions.length) {
       _isAnswered = false;
       _pageController?.nextPage(
@@ -348,8 +343,7 @@ class PilgrimProgressQuestionController extends GetxController
           averageTimeSpent:
           (totalTimeSpent.value ~/ questions.length).toString(),
           onTap: () async => {
-            player.setAsset('assets/audios/click.mp3'),
-            player.play(),
+            userController.soundIsOff.isFalse ? userController.playGameSound() : null,
             resetGame(),
             Get.delete<PilgrimProgressQuestionController>(),
             Get.delete<LeaderboardController>(),

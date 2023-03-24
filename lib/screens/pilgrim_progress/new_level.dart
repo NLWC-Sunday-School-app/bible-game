@@ -21,7 +21,7 @@ class _NewLevelScreenState extends State<NewLevelScreen> {
   @override
   void initState() {
     confettiController.play();
-    _userController.toggleMusic();
+    _userController.toggleGameMusic();
     _player.setAsset('assets/audios/next_level.wav');
     _player.play();
 
@@ -108,7 +108,7 @@ class _NewLevelScreenState extends State<NewLevelScreen> {
               ),
               GestureDetector(
                 onTap: () =>  {
-                  _userController.toggleMusic(),
+                  _userController.toggleGameMusic(),
                   Get.back()
                 },
                 child: Text(

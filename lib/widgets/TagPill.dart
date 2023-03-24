@@ -1,4 +1,5 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -26,7 +27,7 @@ class _TagPillState extends State<TagPill> {
   final TagsPillController _tagsPillController = Get.put(TagsPillController());
   final player = AudioPlayer();
 
-  togglePillColor(id) {
+  togglePillColor(id){
     if (_tagsPillController.selectedPill.isEmpty ||
         _tagsPillController.selectedPill.length < 4 ||
         _tagsPillController.selectedPill.contains(id)) {
@@ -61,50 +62,44 @@ class _TagPillState extends State<TagPill> {
   @override
   Widget build(BuildContext context) {
     final assetsAudioPlayer = AssetsAudioPlayer();
+    UserController userController = Get.put(UserController());
     return GestureDetector(
       onTap: () => {
+      if(userController.soundIsOff.isFalse){
         player.setAsset('assets/audios/select_tag.mp3'),
         player.play(),
+        player.setVolume(0.5)
+      },
         togglePillColor(widget.tag)
       },
       child: ShowUpAnimation(
         delayStart: const Duration(milliseconds: 100),
-        animationDuration: const Duration(milliseconds: 1000),
+        animationDuration: const Duration(milliseconds: 500),
         curve: Curves.easeOutSine,
         direction: Direction.horizontal,
         offset: 0.5,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-          height: 45.h,
+          height: 90.w,
+          width: 90.w,
           decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(width: 2, color: const Color(0xFF548BD5).withOpacity(0.3)),
             color: pillIsSelected
-                ? const Color(0xFF4075BB)
-                : const Color(0xFFCFEDFD),
-            borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                ? const Color(0xFF558CD7)
+                : const Color(0xFFE0EDFF),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // pillIsSelected
-              //     ? const Icon(
-              //         Icons.check_circle,
-              //         color: Color.fromRGBO(248, 229, 255, 1),
-              //       )
-              //     : const SizedBox(),
-              Padding(
-                padding: EdgeInsets.only(left: 5.w),
-                child: Text(
-                  widget.tag,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: pillIsSelected ? Colors.white : Colors.black,
-                  ),
+          child: Center(
+            child: Text(
+                widget.tag,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: pillIsSelected ? Colors.white : Colors.black,
                 ),
               ),
-            ],
           ),
+
         ),
       ),
     );

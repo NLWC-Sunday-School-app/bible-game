@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 
-import '../../controllers/nativity_question_controller.dart';
+import '../../controllers/global_question_controller.dart';
 import '../../controllers/quick_game_question_controller.dart';
 
 class QuestionTimer extends StatelessWidget {
@@ -30,8 +30,8 @@ class QuestionTimer extends StatelessWidget {
           )
         ],
       ),
-      child: GetBuilder<NativityQuestionController>(
-        init: NativityQuestionController(),
+      child: GetBuilder<GlobalQuestionController>(
+        init: GlobalQuestionController(),
         builder: (controller) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,

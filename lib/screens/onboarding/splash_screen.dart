@@ -25,13 +25,11 @@ class SplashScreen extends StatelessWidget {
     if(authController.isLoggedIn.isTrue){
       await UserService.getUserData();
       await UserService.getUserPilgrimProgress();
-      print(GetStorage().read('user_token'));
   }
   }
 
   displayWelcomeModal(){
     var firstTime = GetStorage().read('first_time') ?? true;
-    print(firstTime);
     if(!firstTime){
       Get.dialog(const WelcomeModal());
       GetStorage().write('first_time', false);
@@ -54,8 +52,8 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GetStorage box = GetStorage();
-    // var isLoggedIn = box.read('userLoggedIn') ?? false;
-    // AuthController authController = Get.put(AuthController());
+    var isLoggedIn = box.read('userLoggedIn') ?? false;
+    AuthController authController = Get.put(AuthController());
     return Stack(
       children: [
         Container(

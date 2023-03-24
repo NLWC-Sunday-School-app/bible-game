@@ -36,8 +36,7 @@ class AuthController extends GetxController {
   registerUser() async {
     isLoadingRegistration(true);
     try {
-      // var fcmToken = await AwesomeNotificationController.getFirebaseMessagingToken();
-      var fcmToken = 'jfkhkfhkgkjksjkdjgkjsjgshri84843947949389959459039';
+      var fcmToken = await AwesomeNotificationController.getFirebaseMessagingToken();
       var status = await AuthService.registerUser(
           username.value, emailAddress.value, password.value, fcmToken);
       if (status == 200) {
@@ -68,10 +67,10 @@ class AuthController extends GetxController {
         isLoadingRegistration(false);
         Get.snackbar(
             'Error',
-            'Error',
-            messageText: const Text(
-              'Error',
-              style: TextStyle(
+            status,
+            messageText: Text(
+                status,
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
@@ -90,7 +89,7 @@ class AuthController extends GetxController {
     isLoadingLogin(true);
     try {
       var status =
-          await AuthService.loginUser(loginEmail.value, loginPassword.value);
+      await AuthService.loginUser(loginEmail.value, loginPassword.value);
       if (status == 200) {
         isLoadingLogin(false);
         box.write('userLoggedIn', true);
@@ -155,7 +154,7 @@ class AuthController extends GetxController {
       if (status == 200) {
         await box.write('userLoggedIn', false);
         await Get.delete<PilgrimProgressController>();
-       // await Get.delete<UserController>();
+        await box.remove('user_token');
         isLoggedIn(false);
         isLoadingLogout(false);
         Get.back();

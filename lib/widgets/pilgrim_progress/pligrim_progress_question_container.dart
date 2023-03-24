@@ -1,6 +1,7 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/pilgrim_progress_question_controller.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/models/question.dart';
 import 'package:bible_game/widgets/pilgrim_progress/question_points.dart';
 import 'package:bible_game/widgets/pilgrim_progress/question_timer.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import '../game_button.dart';
+import '../modals/quit_modal.dart';
 import '../pilgrim_progress/option_button.dart';
 
 class PilgrimProgressQuestionContainer extends StatefulWidget {
@@ -21,30 +23,37 @@ class PilgrimProgressQuestionContainer extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<PilgrimProgressQuestionContainer> createState() => _PilgrimProgressQuestionContainerState();
+  State<PilgrimProgressQuestionContainer> createState() =>
+      _PilgrimProgressQuestionContainerState();
 }
 
-class _PilgrimProgressQuestionContainerState extends State<PilgrimProgressQuestionContainer> {
-  PilgrimProgressQuestionController pilgrimProgressQuestionController = Get.put(PilgrimProgressQuestionController());
+class _PilgrimProgressQuestionContainerState
+    extends State<PilgrimProgressQuestionContainer> {
+  PilgrimProgressQuestionController pilgrimProgressQuestionController =
+      Get.put(PilgrimProgressQuestionController());
+  UserController userController = Get.put(UserController());
   final player = AudioPlayer();
   bool isClicked = false;
 
   @override
   Widget build(BuildContext context) {
-
     return Stack(
       alignment: Alignment.topCenter,
       children: [
         Container(
-          height:  Get.width >= 500 ? 350.h : Get.height >= 800 ? 350.h : 350.h,
+          height: Get.width >= 500
+              ? 350.h
+              : Get.height >= 800
+                  ? 350.h
+                  : 350.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient:  const LinearGradient(
+            gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors:  [
+              colors: [
                 Color.fromRGBO(84, 140, 215, 1),
-                Color.fromRGBO(50, 177,242, 1),
+                Color.fromRGBO(50, 177, 242, 1),
               ],
             ),
             borderRadius: BorderRadius.only(
@@ -65,23 +74,78 @@ class _PilgrimProgressQuestionContainerState extends State<PilgrimProgressQuesti
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10,),
+            const SizedBox(
+              height: 10,
+            ),
             Container(
               margin: EdgeInsets.only(top: 45.h),
               child: Obx(
-                () => Center(
-                  child: Text(
-                    "Question ${pilgrimProgressQuestionController.questionNumber.value} of ${pilgrimProgressQuestionController.questions.length}",
-                    style: TextStyle(
-                        fontFamily: 'Neuland',
-                        letterSpacing: 1,
-                        fontSize: 16.sp,
-                        color: Colors.white),
-                  ),
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 20.0.w),
+                      child: GestureDetector(
+                        onTap: () => {
+                          userController.soundIsOff.isFalse
+                              ? userController.playGameSound()
+                              : null,
+                          Get.dialog(
+                            const QuitModal(),
+                            barrierDismissible: false,
+                          )
+                        },
+                        child: Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 24.w,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Question ${pilgrimProgressQuestionController.questionNumber.value} of ${pilgrimProgressQuestionController.questions.length}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: 'Neuland',
+                            letterSpacing: 1,
+                            fontSize: 16.sp,
+                            color: Colors.white),
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        userController.soundIsOff.isFalse
+                            ? userController.playGameSound()
+                            : null;
+                        pilgrimProgressQuestionController.goToNextQuestion();
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 20.w),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.w, vertical: 5.h),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25.r)),
+                        child: Text(
+                          'Skip',
+                          style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF459DE3)),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
-            SizedBox(height: Get.height < 680 ? 30 : 40 ,),
+            SizedBox(
+              height: Get.height < 680 ? 30 : 40,
+            ),
             Padding(
               padding: EdgeInsets.only(left: 22.w, right: 45.w),
               child: Text(
@@ -89,8 +153,7 @@ class _PilgrimProgressQuestionContainerState extends State<PilgrimProgressQuesti
                 style: TextStyle(
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
-                    fontSize: Get.height > 900 ? 16.sp : 14.sp
-                ),
+                    fontSize: Get.height > 900 ? 16.sp : 14.sp),
               ),
             ),
             SizedBox(
@@ -100,16 +163,13 @@ class _PilgrimProgressQuestionContainerState extends State<PilgrimProgressQuesti
               padding: EdgeInsets.only(left: 22.w, right: 45.w),
               child: Text(
                 '"${widget.question.question}"',
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: Get.height > 900 ? 22.sp : 18.sp,
+                  fontSize: Get.height > 900 ? 16.sp : 14.sp,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
               ),
             ),
-
           ],
         ),
         Container(
@@ -131,20 +191,22 @@ class _PilgrimProgressQuestionContainerState extends State<PilgrimProgressQuesti
                     children: [
                       ...List.generate(
                         widget.question.options.length,
-                            (index) => OptionButton(
-                          bibleVerse: widget.question.options[index],
-                          selectOption: () =>
-                          {
-                          if(isClicked == false){
-                            player.setAsset('assets/audios/click.mp3'),
-                            player.play(),
-                            pilgrimProgressQuestionController.checkAnswer(widget.question, widget.question.options[index]),
-                          },
-                            setState(() {
-                              isClicked = true;
-                            }),
-                          }
-                            ),
+                        (index) => OptionButton(
+                            bibleVerse: widget.question.options[index],
+                            selectOption: () => {
+                                  if (isClicked == false)
+                                    {
+                                      userController.soundIsOff.isFalse
+                                          ? userController.playGameSound()
+                                          : null,
+                                      pilgrimProgressQuestionController
+                                          .checkAnswer(widget.question,
+                                              widget.question.options[index]),
+                                    },
+                                  setState(() {
+                                    isClicked = true;
+                                  }),
+                                }),
                       ),
                       SizedBox(
                         height: 30.h,
@@ -157,7 +219,8 @@ class _PilgrimProgressQuestionContainerState extends State<PilgrimProgressQuesti
           ),
         ),
         ConfettiWidget(
-          confettiController: pilgrimProgressQuestionController.confettiController,
+          confettiController:
+              pilgrimProgressQuestionController.confettiController,
           shouldLoop: false,
           blastDirectionality: BlastDirectionality.explosive,
         ),

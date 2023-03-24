@@ -3,7 +3,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../controllers/nativity_question_controller.dart';
+import '../../controllers/global_question_controller.dart';
 import '../../controllers/quick_game_question_controller.dart';
 import 'package:get/get.dart';
 
@@ -14,7 +14,7 @@ class QuestionPoints extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NativityQuestionController _questionController = Get.put(NativityQuestionController());
+    GlobalQuestionController _questionController = Get.put(GlobalQuestionController());
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 45.w, vertical: 15.h),
       decoration: BoxDecoration(

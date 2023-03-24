@@ -29,8 +29,7 @@ class QuickGameController extends GetxController {
   final player = AudioPlayer();
 
   void selectNormalLevel() {
-    player.setAsset('assets/audios/click.mp3');
-    player.play();
+    userController.soundIsOff.isFalse ? userController.playGameSound() : null;
     normalIsActive(true);
     intermediateIsActive(false);
     hardIsActive(false);
@@ -38,8 +37,7 @@ class QuickGameController extends GetxController {
   }
 
   void selectIntermediateLevel() {
-    player.setAsset('assets/audios/click.mp3');
-    player.play();
+    userController.soundIsOff.isFalse ? userController.playGameSound() : null;
     normalIsActive(false);
     intermediateIsActive(true);
     hardIsActive(false);
@@ -53,8 +51,7 @@ class QuickGameController extends GetxController {
   }
 
   void selectHardLevel() {
-    player.setAsset('assets/audios/click.mp3');
-    player.play();
+    userController.soundIsOff.isFalse ? userController.playGameSound() : null;
     normalIsActive(false);
     intermediateIsActive(false);
     hardIsActive(true);
@@ -75,10 +72,8 @@ class QuickGameController extends GetxController {
 
    }
 
-
   startGame() {
-    player.setAsset('assets/audios/click.mp3');
-    player.play();
+    userController.soundIsOff.isFalse ? userController.playGameSound() : null;
     showDialogModal();
     prepareQuestions();
   }
@@ -88,6 +83,7 @@ class QuickGameController extends GetxController {
         barrierDismissible: false,
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.9));
   }
+
   setGameSettings(){
     var gameSettings = box.read('game_settings');
     durationPerQuestion = int.parse(gameSettings['normal_game_speed']);

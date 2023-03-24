@@ -10,7 +10,9 @@ import 'package:just_audio/just_audio.dart';
 import '../../controllers/user_controller.dart';
 
 class AuthModal extends StatelessWidget {
-  const AuthModal({Key? key}) : super(key: key);
+  const AuthModal({Key? key, required this.title, required this.text}) : super(key: key);
+  final String title;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class AuthModal extends StatelessWidget {
         backgroundColor: Colors.transparent,
         child: SingleChildScrollView(
           child: SizedBox(
-            height: Get.width >= 500 ? 500.h : 450.h,
+            height: Get.width >= 500 ? 500.h : 550.h,
             width: Get.width >= 500? 500.h : 400.h,
             child: Container(
               decoration: const BoxDecoration(
@@ -37,8 +39,7 @@ class AuthModal extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      player.setAsset('assets/audios/click.mp3'),
-                      player.play(),
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                       Get.back()
                     },
                     child: Padding(
@@ -52,7 +53,7 @@ class AuthModal extends StatelessWidget {
                     ),
                   ),
                   AutoSizeText(
-                   'YOUR PROFILE',
+                   title,
                     style: TextStyle(
                         fontFamily: 'Neuland',
                         fontSize: 24.sp,
@@ -62,7 +63,7 @@ class AuthModal extends StatelessWidget {
                     height: 10.h,
                   ),
                   AutoSizeText(
-                    'Sign in to your profile to save \n& continue your game play.',
+                    text,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,
@@ -74,8 +75,7 @@ class AuthModal extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      player.setAsset('assets/audios/click.mp3'),
-                      player.play(),
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                       Get.back(),
                       Get.dialog(
                         const LoginModal(),
@@ -106,8 +106,7 @@ class AuthModal extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      player.setAsset('assets/audios/click.mp3'),
-                      player.play(),
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                       Get.back(),
                       Get.dialog(
                         const CreateProfileModal(),
@@ -134,21 +133,65 @@ class AuthModal extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10,),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Obx(
-                          () => IconButton(
-                          iconSize: 50,
-                          onPressed: () =>
-                              _userController.toggleMusic(),
-                          icon: _userController.musicIsOff.value
-                              ? Image.asset(
-                            'assets/images/icons/music_off.png',
-                          )
-                              : Image.asset(
-                            'assets/images/icons/music_on.png',
-                          )),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Obx(
+                              () => IconButton(
+                              iconSize: 50,
+                              onPressed: () =>
+                              {
+                                _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                                _userController.toggleGameSound()
+                              },
+                              icon: _userController.soundIsOff.isTrue
+                                  ? Image.asset(
+                                'assets/images/icons/volume_down.png',
+                              )
+                                  : Image.asset(
+                                'assets/images/icons/volume_up.png',
+                              )),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Obx(
+                              () => IconButton(
+                              iconSize: 50,
+                              onPressed: () =>{
+                                _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                                _userController.toggleGameMusic(),
+                              },
+                              icon: _userController.musicIsOff.isTrue
+                                  ? Image.asset(
+                                'assets/images/icons/music_off.png',
+                              )
+                                  : Image.asset(
+                                'assets/images/icons/music_on.png',
+                              )),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Obx(
+                              () => IconButton(
+                              iconSize: 50,
+                              onPressed: () =>{
+                                _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                                _userController.toggleNotification(),
+                              },
+                              icon: _userController.notificationIsOff.isTrue
+                                  ? Image.asset(
+                                'assets/images/icons/notification_off.png',
+                              )
+                                  : Image.asset(
+                                'assets/images/icons/notification.png',
+                              )),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

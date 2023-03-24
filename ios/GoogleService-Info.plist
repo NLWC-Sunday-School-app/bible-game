@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>242806293668-kthsbqf9g782mlgso7kb3dq2g17ua5ek.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.242806293668-kthsbqf9g782mlgso7kb3dq2g17ua5ek</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCD9KzwRO8_YuItQedG9QPbtN1Ok_4gCnE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>242806293668</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.nlwc.bible.game</string>
+	<key>PROJECT_ID</key>
+	<string>bible-game-e2616</string>
+	<key>STORAGE_BUCKET</key>
+	<string>bible-game-e2616.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:242806293668:ios:499a549bb6be3934f0d231</string>
+</dict>
+</plist>

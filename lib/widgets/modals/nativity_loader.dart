@@ -1,5 +1,5 @@
-import 'package:bible_game/controllers/nativity_game_controller.dart';
-import 'package:bible_game/screens/nativity/question_screen.dart';
+import 'package:bible_game/controllers/global_game_controller.dart';
+import 'package:bible_game/screens/global/question_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,8 +12,8 @@ class NativityLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final player = AudioPlayer();
-    NativityGameController nativityGameController =
-        Get.put(NativityGameController());
+    GlobalGameController nativityGameController =
+        Get.put(GlobalGameController());
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 15.w),
       backgroundColor: Colors.transparent,
@@ -72,7 +72,7 @@ class NativityLoader extends StatelessWidget {
                         onTap: () => {
                           player.setAsset('assets/audios/click.mp3'),
                           player.play(),
-                          Get.off(() => const NativityQuestionScreen())
+                          Get.off(() => const GlobalQuestionScreen())
                         },
                         child: Container(
                           width: 200.w,

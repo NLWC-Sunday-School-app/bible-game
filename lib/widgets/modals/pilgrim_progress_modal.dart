@@ -1,8 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../screens/pilgrim_progress/pilgrim_progress_question_screen.dart';
 import '../game_button.dart';
 
@@ -15,6 +17,8 @@ class PilgrimProgressModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     PilgrimProgressController pilgrimProgressController = Get.put(PilgrimProgressController());
+    UserController userController = Get.put(UserController());
+    var formatter = NumberFormat('#,##,###');
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -78,34 +82,7 @@ class PilgrimProgressModal extends StatelessWidget {
                     noOfRoundLeft == 5 ? SizedBox(
                       height: 15.h,
                     ) : const SizedBox(),
-                   noOfRoundLeft == 5 ? Container(
-                      padding: EdgeInsets.only(left: 15.w, top: 12.h, bottom: 12.h),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFFF8E193),
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(12.r))),
-                      child: Row(
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                              text: 'Get ',
-                              style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), height: 1.5),
-                              children: <TextSpan>[
-                                TextSpan(text: '3,200 points', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
-                                TextSpan(text: ' in one game \nplay to unlock new level!', style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D)),)
-                              ]
-                            ),
-                          ),
-                          const Spacer(),
-                          Image.asset('assets/images/icons/blue_star.png', width: 60,)
-
-                        ],
-                      ),
-                    ): const SizedBox(),
-                    noOfRoundLeft < 5 ? SizedBox(
-                      height: 12.h,
-                    ): const SizedBox() ,
-                   noOfRoundLeft < 5 ? Container(
+                    noOfRoundLeft < 5 ? Container(
                       padding: EdgeInsets.only(left: 15.w, top: 12.h, bottom: 12.h),
                       decoration: BoxDecoration(
                           color: const Color(0xFFE7E2FF),
@@ -129,6 +106,37 @@ class PilgrimProgressModal extends StatelessWidget {
                         ],
                       ),
                     ) : const SizedBox(),
+                    noOfRoundLeft < 5 ? SizedBox(
+                      height: 12.h,
+                    ): const SizedBox() ,
+                    Container(
+                      padding: EdgeInsets.only(left: 15.w, top: 12.h, bottom: 12.h),
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFF8E193),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(12.r))),
+                      child: Row(
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              text: 'Get ',
+                              style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), height: 1.5),
+                              children: <TextSpan>[
+                                TextSpan(text: '${formatter.format(pilgrimProgressController.passOnFirstTrialScore.value)} points', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
+                                TextSpan(text: ' in one game \nplay to unlock new level!', style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D)),)
+                              ]
+                            ),
+                          ),
+                          const Spacer(),
+                          Image.asset('assets/images/icons/blue_star.png', width: 60,)
+
+                        ],
+                      ),
+                    ),
+                    noOfRoundLeft < 5 ? SizedBox(
+                      height: 12.h,
+                    ): const SizedBox() ,
+
                     SizedBox(
                       height: 12.h,
                     ),
@@ -145,7 +153,7 @@ class PilgrimProgressModal extends StatelessWidget {
                                 text: 'Or Get ',
                                 style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), height: 1.5),
                                 children: <TextSpan>[
-                                  TextSpan(text: '15,000 points', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
+                                  TextSpan(text: '${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
                                   TextSpan(text: ' in five \ntrials to unlock new level!', style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D)),)
                                 ]
                             ),
@@ -212,6 +220,7 @@ class PilgrimProgressModal extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
+                        userController.soundIsOff.isFalse ? userController.playGameSound() : null;
                         if (pilgrimProgressController.gameIsReady.isTrue) {
                           Get.back();
                           Get.to(() => const PilgrimProgressQuestionScreen(),

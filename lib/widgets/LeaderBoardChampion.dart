@@ -21,7 +21,7 @@ class LeaderBoardChampion extends StatelessWidget {
       children: [
         Container(
           margin: EdgeInsets.only(top: 40.h),
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18.w),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(topLeft: Radius.circular(30.r), topRight: Radius.circular(30.r)),
@@ -39,7 +39,7 @@ class LeaderBoardChampion extends StatelessWidget {
                 height: 15.h,
               ),
               SizedBox(
-                width: 70,
+                width: 70.w,
                 child: AutoSizeText(
                   playerName,
                   textAlign: TextAlign.center,
@@ -69,15 +69,18 @@ class LeaderBoardChampion extends StatelessWidget {
             ],
           ),
         ),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Image.asset(
-              'assets/images/leaderboard_badge_two.png',
-              width: Get.width >= 600 ? 80.w : 100.w,
-            ),
-            Text(playerPosition.toString(), style: TextStyle(fontSize: 27.sp, fontWeight: FontWeight.w700, color: Colors.white),)
-          ],
+        Padding(
+          padding: EdgeInsets.only(left: Get.width > 900 ? 10.w : 0),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset(
+                'assets/images/leaderboard_badge_two.png',
+                width: Get.width >= 600 ? 80.w : 100.w,
+              ),
+              Text(playerPosition.toString(), style: TextStyle(fontSize: 27.sp, fontWeight: FontWeight.w700, color: Colors.white),)
+            ],
+          ),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/quick_game_controller.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/widgets/game_button.dart';
 import 'package:bible_game/widgets/quick_game/difficulty_level_meter.dart';
 import 'package:bible_game/widgets/modals/quick_game_modal.dart';
@@ -20,6 +21,7 @@ class QuickGameStepTwoScreen extends StatefulWidget {
 
 class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
   QuickGameController quickGameController = Get.put(QuickGameController());
+  UserController userController = Get.put(UserController());
   final player = AudioPlayer();
 
   @override
@@ -28,10 +30,10 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Obx(
-            () => Stack(
+          () => Stack(
             children: [
               Container(
-                padding: EdgeInsets.only(bottom: Get.height < 680 ? 60.h : 80.h),
+                padding: Get.width > 900 ? EdgeInsets.only(bottom: 120.h) : EdgeInsets.only(bottom: Get.height < 680 ? 60.h : 80.h),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xFF32B1F2),
@@ -40,16 +42,14 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                     bottomRight: Radius.circular(30.r),
                   ),
                 ),
-                child:  Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Image.asset(
-                        'assets/images/cloud.png',
-
-                      ),
+                      'assets/images/cloud.png',
+                    ),
                   ],
                 ),
-
               ),
               Container(
                 margin: EdgeInsets.only(top: 75.h),
@@ -61,8 +61,9 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                       children: [
                         GestureDetector(
                           onTap: () => {
-                            player.setAsset('assets/audios/click.mp3'),
-                            player.play(),
+                            userController.soundIsOff.isFalse
+                                ? userController.playGameSound()
+                                : null,
                             Get.back()
                           },
                           child: Icon(
@@ -81,8 +82,7 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                               fontSize: 22.sp,
                               letterSpacing: 1,
                               color: Colors.white,
-                              fontFamily: 'Neuland'
-                             ),
+                              fontFamily: 'Neuland'),
                         ),
                       ],
                     ),
@@ -99,12 +99,15 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 8.w),
                 child: Column(
                   children: [
+                    SizedBox(
+                      height: Get.height > 900 ? 20.h : 30.h,
+                    ),
                     Align(
                       child: AutoSizeText(
                         'Choose a difficulty level.',
                         style: TextStyle(
                           fontSize: 14.sp,
-                          color: Color.fromRGBO(91, 73, 191, 1),
+                          color: const Color.fromRGBO(91, 73, 191, 1),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -123,7 +126,8 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                             dotColor: const Color.fromRGBO(155, 201, 14, 1),
                             isActive: quickGameController.normalIsActive.value,
                             difficultyLevel: 'Normal',
-                            checkerImage: 'assets/images/quick_game/green_circle_check.svg',
+                            checkerImage:
+                                'assets/images/quick_game/green_circle_check.svg',
                           ),
                         ),
                         GestureDetector(
@@ -132,30 +136,32 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                             difficultyImage:
                                 'assets/images/quick_game/intermediate_speed.svg',
                             dotColor: const Color.fromRGBO(237, 195, 86, 1),
-                            isActive: quickGameController.intermediateIsActive.value,
+                            isActive:
+                                quickGameController.intermediateIsActive.value,
                             difficultyLevel: 'Intermediate',
-                            checkerImage: 'assets/images/quick_game/orange_circle_check.svg',
+                            checkerImage:
+                                'assets/images/quick_game/orange_circle_check.svg',
                           ),
                         ),
                         GestureDetector(
                           onTap: quickGameController.selectHardLevel,
                           child: DifficultyLevelMeter(
-                            difficultyImage: 'assets/images/quick_game/hard_speed.svg',
+                            difficultyImage:
+                                'assets/images/quick_game/hard_speed.svg',
                             dotColor: const Color.fromRGBO(211, 98, 93, 1),
                             isActive: quickGameController.hardIsActive.value,
                             difficultyLevel: 'Hard',
-                            checkerImage: 'assets/images/quick_game/wine_circle_check.svg',
+                            checkerImage:
+                                'assets/images/quick_game/wine_circle_check.svg',
                           ),
                         ),
                       ],
                     ),
                     SizedBox(
-                      height: 200.h,
+                      height: 150.h,
                     ),
                     GestureDetector(
                       onTap: () => {
-                        player.setAsset('assets/audios/click.mp3'),
-                        player.play(),
                         quickGameController.startGame()
                       },
                       child: const GameButton(

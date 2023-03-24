@@ -1,6 +1,7 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/leaderboard_controller.dart';
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/tabs/leaderboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,10 +18,14 @@ class LeaderBoardMenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final player = AudioPlayer();
     LeaderboardController leaderboardController = Get.put(LeaderboardController());
+    UserController userController = Get.put(UserController());
     return  GestureDetector(
       onTap: () async{
-        player.setAsset('assets/audios/select_tab.mp3');
-        player.play();
+        if(userController.soundIsOff.isFalse){
+          player.setAsset('assets/audios/select_tab.mp3');
+          player.play();
+          player.setVolume(0.5);
+        }
         Get.dialog(Dialog(
           backgroundColor: Colors.transparent,
           child: Center(
@@ -39,11 +44,11 @@ class LeaderBoardMenuCard extends StatelessWidget {
                 )),
           ),
         ));
-      isNativity ? await leaderboardController.setNativityLeaderboardData() : await leaderboardController.setLeaderboardData(levelNumber);
-      Get.back();
+        isNativity ? await leaderboardController.setFourScripturesLeaderboardData() : await leaderboardController.setLeaderboardData(levelNumber);
+       Get.back();
         await Get.to(
             () => const LeaderBoardScreen(),
-          duration: const Duration(milliseconds: 1000),
+          duration: const Duration(milliseconds: 500),
           transition: Transition.downToUp,
           arguments: levelLabel
         );
