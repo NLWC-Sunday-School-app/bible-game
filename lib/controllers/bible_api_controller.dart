@@ -626,12 +626,21 @@ class BibleApiController extends GetxController {
       bookId = getBookId(book);
       getBibleVerse(bookId, chapter, verse);
     } else {
-      book = splittedText[0];
-      var formattedVerseAndChapter = splittedText[1].split(':');
-      chapter = formattedVerseAndChapter[0];
-      verse = formattedVerseAndChapter[1];
-      bookId = getBookId(book);
-      getBibleVerse(bookId, chapter, verse);
+      if(splittedText[0] == 'Song'){
+        book = splittedText[0] + ' ' + splittedText[1] + ' ' + splittedText[2];
+        var formattedVerseAndChapter = splittedText[3].split(':');
+        chapter = formattedVerseAndChapter[0];
+        verse = formattedVerseAndChapter[1];
+        bookId = getBookId(book);
+        getBibleVerse(bookId, chapter, verse);
+      } else {
+        book = splittedText[0];
+        var formattedVerseAndChapter = splittedText[1].split(':');
+        chapter = formattedVerseAndChapter[0];
+        verse = formattedVerseAndChapter[1];
+        bookId = getBookId(book);
+        getBibleVerse(bookId, chapter, verse);
+      }
     }
   }
 
