@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+
+import '../../controllers/user_controller.dart';
 class LoginSuccessfulModal extends StatelessWidget {
   const LoginSuccessfulModal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final player = AudioPlayer();
+    UserController _userController = Get.put(UserController());
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       backgroundColor: Colors.transparent,
@@ -32,8 +34,7 @@ class LoginSuccessfulModal extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () => {
-                    player.setAsset('assets/audios/click.mp3'),
-                    player.play(),
+                    _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                     Get.back()
                   },
                   child: Padding(

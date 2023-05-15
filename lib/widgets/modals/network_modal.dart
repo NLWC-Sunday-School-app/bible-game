@@ -12,6 +12,7 @@ class NoNetworkModal extends StatelessWidget {
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       backgroundColor: Colors.transparent,
+      elevation: 0.0,
       child: SizedBox(
          height: 280.h,
         // width: 350.h,
@@ -27,7 +28,7 @@ class NoNetworkModal extends StatelessWidget {
                 height: 20.h,
               ),
               Text(
-                'Connection Error${Get.height}',
+                'Connection Error',
                 style: TextStyle(
                     fontSize: 20.sp,
                     color: Colors.white,

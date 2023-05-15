@@ -111,7 +111,8 @@ class PilgrimProgressLevelMenu extends StatelessWidget {
                           horizontal: 25, vertical: 15),
                       decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage(!isLocked
+                            image: AssetImage(
+                                !isLocked
                                 ? 'assets/images/pilgrim_levels/pg_progress_bg.png'
                                 : 'assets/images/pilgrim_levels/pg_button_inactive_bg.png'),
                             fit: BoxFit.fill,
@@ -137,6 +138,7 @@ class PilgrimProgressLevelMenu extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 fontSize: 12.sp),
                           ),
+                          // Text('$isLocked')
                         ],
                       ),
                     ),

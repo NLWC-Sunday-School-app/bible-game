@@ -70,8 +70,8 @@ class _LeaderBoardModalState extends State<LeaderBoardModal> {
                 children: [
                   Row(
                     children: [
-                      SvgPicture.network(
-                        'https://api.multiavatar.com/${leaderboardController.leaderboardData[0].playerId}.svg',
+                      Image.network(
+                        'https://api.multiavatar.com/${leaderboardController.leaderboardData[0].playerId}.png',
                         width: 30.w,
                       ),
                       SizedBox(
@@ -126,8 +126,8 @@ class _LeaderBoardModalState extends State<LeaderBoardModal> {
                   SizedBox(width: 10.w,),
                   leaderboardController.leaderboardData.length >= 2 ?  Row(
                     children: [
-                      SvgPicture.network(
-                        'https://api.multiavatar.com/${leaderboardController.leaderboardData[1].playerId}.svg',
+                      Image.network(
+                        'https://api.multiavatar.com/${leaderboardController.leaderboardData[1].playerId}.png',
                         width: 30.w,
                       ),
                       SizedBox(

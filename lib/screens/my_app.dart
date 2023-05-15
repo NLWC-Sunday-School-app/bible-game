@@ -1,27 +1,28 @@
+import 'dart:async';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:bible_game/controllers/auth_controller.dart';
 import 'package:bible_game/controllers/awesome_notification_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/onboarding/splash_screen.dart';
 import 'package:bible_game/screens/pilgrim_progress/home.dart';
+import 'package:bible_game/screens/pilgrim_progress/new_level.dart';
 import 'package:bible_game/screens/quick_game/question_screen.dart';
 import 'package:bible_game/screens/quick_game/step_one.dart';
 import 'package:bible_game/screens/quick_game/step_two.dart';
 import 'package:bible_game/screens/tabs/tab_main_screen.dart';
-import 'package:bible_game/widgets/modals/welcome_modal.dart';
+import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:new_version/new_version.dart';
+import 'package:upgrader/upgrader.dart';
 import '../utilities/network_connection.dart';
-import 'authentication/login.dart';
-import 'authentication/signup.dart';
-import 'onboarding/know_scriptures.dart';
-import 'onboarding/meditate.dart';
-import 'onboarding/memorize.dart';
+import '../widgets/modals/network_modal.dart';
+
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -35,30 +36,39 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   GetStorage box = GetStorage();
   UserController userController = Get.put(UserController());
   NetworkConnection networkConnection = Get.put(NetworkConnection());
+  late StreamSubscription<InternetConnectionStatus> connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    playBackgroundMusic();
-    networkConnection.onConnectivityChanged();
+   // networkConnection.onConnectivityChanged();
     checkInternet();
-    checkForUpdateAppVersion();
-    print(AwesomeNotificationController.getFirebaseMessagingToken());
+    playBackgroundMusic();
+    getFcmToken();
+
+    if(GetPlatform.isIOS){
+      AwesomeNotifications().requestPermissionToSendNotifications(channelKey: 'game notifications');
+    }
   }
 
 
   @override
-  void dispose() {
+  void dispose(){
     userController.player.dispose();
     networkConnection.connectivitySubscription.cancel();
+    connectivitySubscription.cancel();
     super.dispose();
+  }
+
+  getFcmToken() async{
+    var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+    print('fb token: $firebaseAppToken');
   }
 
   checkForUpdateAppVersion() async{
     final newVersion = NewVersion();
     newVersion.showAlertIfNecessary(context: context);
-
     final status = await newVersion.getVersionStatus();
     if(status != null){
       newVersion.showUpdateDialog(
@@ -72,28 +82,36 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
- playBackgroundMusic(){
-      var pauseMusic = box.read('pauseGameMusic') ?? false;
+
+  Future<void> playBackgroundMusic() async{
+     var pauseMusic = box.read('pauseGameMusic') ?? false;
       if(pauseMusic == false){
-        userController.player.play();
+        userController.backgroundMusicPlayer.play();
       }
  }
 
- playGameSound(){
+  Future<void> playGameSound() async{
    var pauseGameSound = box.read('pauseGameSound') ?? false;
    if(pauseGameSound == false){
-     userController.player2.play();
+     await userController.player2.play();
    }
  }
 
 
  checkInternet() async{
-   bool result = await InternetConnectionChecker().hasConnection;
-   if(result == true) {
-     print('YAY! Free cute dog pics!');
-   } else {
-     print('No internet :( Reason:');
-   }
+   connectivitySubscription = InternetConnectionChecker().onStatusChange.listen((status) {
+     switch (status) {
+       case InternetConnectionStatus.connected:
+         print('Data connection is available.');
+         break;
+       case InternetConnectionStatus.disconnected:
+         print('You are disconnected from the internet.');
+         Get.dialog(const NoNetworkModal(), barrierDismissible: false);
+         break;
+     }
+   });
+
+
  }
 
 
@@ -106,26 +124,27 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
         splitScreenMode: false,
-        builder:(BuildContext context,child) => GetMaterialApp(
-          title: 'Bible Game',
-          theme: ThemeData(
-            fontFamily:  'Quicksand',
-            primaryColor: const Color.fromRGBO(118, 99, 229, 1),
+        builder:(BuildContext context,child) => UpgradeAlert(
+          upgrader: Upgrader(dialogStyle: GetPlatform.isIOS ? UpgradeDialogStyle.cupertino : UpgradeDialogStyle.material,
+              showLater: false,
+              showIgnore: false
           ),
-          // home: !isLoggedIn ? const LoginScreen() : const TabMainScreen(),
-          home: const SplashScreen(),
-          routes: {
-            MeditateScreen.routeName: (context) => const MeditateScreen(),
-            MemorizeScreen.routeName: (context) => const MemorizeScreen(),
-            KnowScripturesScreen.routeName: (context) => const KnowScripturesScreen(),
-            SignUpScreen.routeName: (context) =>  const SignUpScreen(),
-            LoginScreen.routeName: (context) => const LoginScreen(),
-            TabMainScreen.routeName: (context) => const TabMainScreen(),
-            QuickGameStepOneScreen.routeName: (context) => const QuickGameStepOneScreen(),
-            QuickGameStepTwoScreen.routeName: (context) => const QuickGameStepTwoScreen(),
-            QuickGameQuestionScreen.routeName:(context) => const   QuickGameQuestionScreen(),
-            PilgrimProgressHomeScreen.routeName:(context) => const PilgrimProgressHomeScreen()
-          },
+          child: GetMaterialApp(
+            title: 'Bible Game',
+            theme: ThemeData(
+              fontFamily:  'Quicksand',
+              primaryColor: const Color.fromRGBO(118, 99, 229, 1),
+            ),
+            home: const SplashScreen(),
+            routes: {
+              TabMainScreen.routeName: (context) => const TabMainScreen(),
+              QuickGameStepOneScreen.routeName: (context) => const QuickGameStepOneScreen(),
+              QuickGameStepTwoScreen.routeName: (context) => const QuickGameStepTwoScreen(),
+              QuickGameQuestionScreen.routeName:(context) => const   QuickGameQuestionScreen(),
+              PilgrimProgressHomeScreen.routeName:(context) => const PilgrimProgressHomeScreen(),
+
+            },
+          ),
         ),
       ),
     );
@@ -138,14 +157,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       case AppLifecycleState.resumed:
         var pauseMusic = box.read('pauseGameMusic') ?? false;
         if(pauseMusic == false){
-          userController.player.play();
+          userController.backgroundMusicPlayer.play();
         }
         break;
       case AppLifecycleState.paused:
-         userController.player.stop();
+         userController.backgroundMusicPlayer.stop();
         break;
       case AppLifecycleState.inactive:
-        userController.player.stop();
+        userController.backgroundMusicPlayer.stop();
         break;
       default:
         break;

@@ -5,17 +5,20 @@ List<Question> questionFromJson(String str) => List<Question>.from(json.decode(s
 
 
 class Question {
+  final String instruction;
   final String answer;
   final String question;
   final List<dynamic> options;
 
   Question({
+    required this.instruction,
     required this.answer,
     required this.question,
     required this.options,
   });
 
   factory Question.fromJson(Map<String, dynamic> json) => Question(
+    instruction: json["instruction"],
     question: json["question"],
     answer: json["correct_option"],
     options: json["options"]

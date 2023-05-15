@@ -79,8 +79,8 @@ class _TagPillState extends State<TagPill> {
         direction: Direction.horizontal,
         offset: 0.5,
         child: Container(
-          height: 90.w,
-          width: 90.w,
+          height: 70.w,
+          width: 70.w,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(width: 2, color: const Color(0xFF548BD5).withOpacity(0.3)),

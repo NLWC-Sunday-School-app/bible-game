@@ -16,7 +16,6 @@ class LeaderBoardCard extends StatelessWidget {
 
   }) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -47,7 +46,7 @@ class LeaderBoardCard extends StatelessWidget {
                   children: [
                     Container(
                       margin: EdgeInsets.only(right: 8.w, left: 50.w),
-                      child: SvgPicture.network(
+                      child: Image.network(
                         avatarUrl,
                         width: 34.w,
                       ),

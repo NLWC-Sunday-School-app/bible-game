@@ -72,18 +72,17 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(
-                          width: 20.h,
-                        ),
+                        const Spacer(),
                         AutoSizeText(
                           'Start Quick Game in \n2 easy steps',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 22.sp,
+                              fontSize: 20.sp,
                               letterSpacing: 1,
                               color: Colors.white,
                               fontFamily: 'Neuland'),
                         ),
+                        const Spacer(),
                       ],
                     ),
                     Container(

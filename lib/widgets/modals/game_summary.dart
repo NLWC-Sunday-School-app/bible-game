@@ -230,11 +230,11 @@ class GameSummaryModal extends StatelessWidget {
                           userController.soundIsOff.isFalse
                               ? userController.playGameSound()
                               : null,
+                          await userController.getUserData(),
                           Get.delete<PilgrimProgressQuestionController>(),
                           Get.delete<QuickGamesQuestionController>(),
                           Get.delete<GlobalQuestionController>(),
                           Get.delete<LeaderboardController>(),
-                          await userController.getUserData(),
                           GetStorage().write('isTempLoggedIn', false),
                           Get.offAll(() => const TabMainScreen(),
                               transition: Transition.fadeIn)

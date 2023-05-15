@@ -1,10 +1,8 @@
 import 'package:animated_digit/animated_digit.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../controllers/global_question_controller.dart';
-import '../../controllers/quick_game_question_controller.dart';
 import 'package:get/get.dart';
 
 class QuestionPoints extends StatelessWidget {

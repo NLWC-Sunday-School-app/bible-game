@@ -1,3 +1,5 @@
+
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/leaderboard_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
@@ -96,8 +98,8 @@ class PilgrimProgressController extends GetxController {
       var levelId = getLevelId(level);
       GetStorage().write('pilgrimProgressLevelId', levelId);
       GetStorage().write('pilgrimProgressSelectedLevel', level);
-      var noOfRoundLeft = isLoggedIn ? getNumberOfRoundsLeftPerLevel(level) : 5;
-      Get.dialog(PilgrimProgressModal(noOfRoundLeft: noOfRoundLeft),);
+      var noOfRoundLeft = isLoggedIn ? getNumberOfRoundsLeftPerLevel(level) : getNoOfTrialsPerLevel(level);
+      Get.dialog(PilgrimProgressModal(noOfRoundLeft: noOfRoundLeft, totalAvailablePoints: getLevelTotalPoints(level), noOfRoundPerLevel: getNoOfTrialsPerLevel(level),),);
       gameQuestions.value = isLoggedIn ? await GameService.getGameQuestions('PILGRIM_PROGRESS', level, null) : await GameService.getGameQuestionsWithoutToken('PILGRIM_PROGRESS', level, null);
       modalTitle.value = 'ready when you are!';
       pilgrimProgressGameLoading(false);
@@ -124,22 +126,39 @@ class PilgrimProgressController extends GetxController {
     }
   }
 
-  String getLevelTotalPoints(level){
+  getNoOfTrialsPerLevel(level){
     switch(level){
       case 'babe':
-        return totalPointsAvailableInBabe.toString();
+        return 5;
       case 'child':
-        return totalPointsAvailableInChild.toString();
+        return 4;
       case 'young believer':
-        return totalPointsAvailableInYb.toString();
+        return 3;
       case 'charity':
-        return totalPointsAvailableInCharity.toString();
+        return 2;
       case 'father':
-        return totalPointsAvailableInFather.toString();
+        return 2;
       case 'elder':
-        return totalPointsAvailableInElder.toString();
+        return 2;
+    }
+  }
+
+  int getLevelTotalPoints(level){
+    switch(level){
+      case 'babe':
+        return totalPointsAvailableInBabe.value;
+      case 'child':
+        return totalPointsAvailableInChild.value;
+      case 'young believer':
+        return totalPointsAvailableInYb.value;
+      case 'charity':
+        return totalPointsAvailableInCharity.value;
+      case 'father':
+        return totalPointsAvailableInFather.value;
+      case 'elder':
+        return totalPointsAvailableInElder.value;
       default:
-        return '0';
+        return 0;
     }
   }
 
@@ -184,31 +203,7 @@ class PilgrimProgressController extends GetxController {
 
   updatePilgrimProgressScore(){
     var gameSettings = box.read('game_settings');
-    totalPointsGainedInBabe.value = (_userController.userPilgrimProgress[0]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-    totalPointsGainedInChild.value = (_userController.userPilgrimProgress[1]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-    totalPointsGainedInYb.value = (_userController.userPilgrimProgress[2]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-    totalPointsGainedInCharity.value = (_userController.userPilgrimProgress[3]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-    totalPointsGainedInFather.value = (_userController.userPilgrimProgress[4]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-    totalPointsGainedInElder.value = (_userController.userPilgrimProgress[5]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-    babeProgressLevelValue.value = _userController.userPilgrimProgress[0]['progress'];
-    childProgressLevelValue.value = _userController.userPilgrimProgress[1]['progress'];
-    youngBelieverProgressLevelValue.value = _userController.userPilgrimProgress[2]['progress'];
-    charityProgressLevelValue.value = _userController.userPilgrimProgress[3]['progress'];
-    fatherProgressLevelValue.value = _userController.userPilgrimProgress[4]['progress'];
-    elderProgressLevelValue.value = _userController.userPilgrimProgress[5]['progress'];
-    noOfRoundsLeftInBabe.value = (_userController.userPilgrimProgress[0]['numberOfRounds']).toInt();
-    noOfRoundsLeftInChild.value = (_userController.userPilgrimProgress[1]['numberOfRounds']).toInt();
-    noOfRoundsLeftInYb.value = (_userController.userPilgrimProgress[2]['numberOfRounds']).toInt();
-    noOfRoundsLeftInCharity.value = (_userController.userPilgrimProgress[3]['numberOfRounds']).toInt();
-    noOfRoundsLeftInFather.value = (_userController.userPilgrimProgress[4]['numberOfRounds']).toInt();
-    noOfRoundsLeftInElder.value = (_userController.userPilgrimProgress[5]['numberOfRounds']).toInt();
-  }
-
-  setPilgrimData(){
     var isLoggedIn = box.read('userLoggedIn') ?? false;
-    var gameSettings = box.read('game_settings');
-    totalPointsAvailableInPilgrimProgress.value = int.parse(gameSettings['total_points_available_pilgrim_progress']).toInt();
-    passOnFirstTrialScore.value = int.parse(gameSettings['pass_on_first_trial_score']);
     if(isLoggedIn){
       var levelId = getLevelId(_userController.myUser['rank']);
       babeProgressLevelValue.value = _userController.userPilgrimProgress[0]['progress'];
@@ -223,12 +218,60 @@ class PilgrimProgressController extends GetxController {
       elderProgressLevelValue.value = _userController.userPilgrimProgress[5]['progress'];
       fatherProgressLevelValue.value >= 1.0 || levelId > 5 ? elderLevelIsLocked.value = false : elderLevelIsLocked.value = true;
       pointsPerQuestion = int.parse(gameSettings['base_score_pilgrim_progress']);
-      totalPointsGainedInBabe.value = (_userController.userPilgrimProgress[0]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-      totalPointsGainedInChild.value = (_userController.userPilgrimProgress[1]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-      totalPointsGainedInYb.value = (_userController.userPilgrimProgress[2]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-      totalPointsGainedInCharity.value = (_userController.userPilgrimProgress[3]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-      totalPointsGainedInFather.value = (_userController.userPilgrimProgress[4]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
-      totalPointsGainedInElder.value = (_userController.userPilgrimProgress[5]['progress'] * int.parse(gameSettings['total_points_available_pilgrim_progress'])).toInt();
+      totalPointsGainedInBabe.value = (_userController.userPilgrimProgress[0]['progress'] * int.parse(gameSettings['babe_to_child_total'])).toInt();
+      totalPointsGainedInChild.value = (_userController.userPilgrimProgress[1]['progress'] * int.parse(gameSettings['child_to_young_believer_total'])).toInt();
+      totalPointsGainedInYb.value = (_userController.userPilgrimProgress[2]['progress'] * int.parse(gameSettings['young_believer_to_charity_total'])).toInt();
+      totalPointsGainedInCharity.value = (_userController.userPilgrimProgress[3]['progress'] * int.parse(gameSettings['charity_to_father_total'])).toInt();
+      totalPointsGainedInFather.value = (_userController.userPilgrimProgress[4]['progress'] * int.parse(gameSettings['father_to_elder_total'])).toInt();
+      totalPointsGainedInElder.value = (_userController.userPilgrimProgress[5]['progress'] * int.parse(gameSettings['father_to_elder_total'])).toInt();
+      noOfRoundsLeftInBabe.value = (_userController.userPilgrimProgress[0]['numberOfRounds']).toInt();
+      noOfRoundsLeftInChild.value = (_userController.userPilgrimProgress[1]['numberOfRounds']).toInt();
+      noOfRoundsLeftInYb.value = (_userController.userPilgrimProgress[2]['numberOfRounds']).toInt();
+      noOfRoundsLeftInCharity.value = (_userController.userPilgrimProgress[3]['numberOfRounds']).toInt();
+      noOfRoundsLeftInFather.value = (_userController.userPilgrimProgress[4]['numberOfRounds']).toInt();
+      noOfRoundsLeftInElder.value = (_userController.userPilgrimProgress[5]['numberOfRounds']).toInt();
+
+    }else{
+      pointsPerQuestion = int.parse(gameSettings['base_score_pilgrim_progress']);
+      babeProgressLevelValue.value >= 1.0 ? childLevelIsLocked.value = false : childLevelIsLocked.value = true;
+    }
+
+  }
+
+  setPilgrimData(){
+    var isLoggedIn = box.read('userLoggedIn') ?? false;
+    var gameSettings = box.read('game_settings');
+    totalPointsAvailableInPilgrimProgress.value = int.parse(gameSettings['total_points_available_pilgrim_progress']).toInt();
+    totalPointsAvailableInBabe.value = int.parse(gameSettings['babe_to_child_total']).toInt();
+    totalPointsAvailableInChild.value =  int.parse(gameSettings['child_to_young_believer_total']).toInt();
+    totalPointsAvailableInYb.value =  int.parse(gameSettings['young_believer_to_charity_total']).toInt();
+    totalPointsAvailableInCharity.value = int.parse(gameSettings['charity_to_father_total']).toInt();
+    totalPointsAvailableInFather.value = int.parse(gameSettings['father_to_elder_total']).toInt();
+    totalPointsGainedInElder.value = int.parse(gameSettings['father_to_elder_total']).toInt();
+    totalPointsAvailableInElder.value = int.parse(gameSettings['father_to_elder_total']).toInt();
+    passOnFirstTrialScore.value = int.parse(gameSettings['pass_on_first_trial_score']);
+    if(isLoggedIn){
+
+      var levelId = getLevelId(_userController.myUser['rank']);
+
+      babeProgressLevelValue.value = _userController.userPilgrimProgress[0]['progress'];
+      childProgressLevelValue.value = _userController.userPilgrimProgress[1]['progress'];
+      babeProgressLevelValue.value >=  1.0 || levelId > 1 ? childLevelIsLocked.value = false : childLevelIsLocked.value = true;
+      youngBelieverProgressLevelValue.value = _userController.userPilgrimProgress[2]['progress'];
+      childProgressLevelValue.value >= 1.0 ||  levelId > 2 ? youngBelieversLevelIsLocked.value = false : youngBelieversLevelIsLocked.value = true;
+      charityProgressLevelValue.value = _userController.userPilgrimProgress[3]['progress'];
+      youngBelieverProgressLevelValue.value >= 1.0 || levelId > 3 ? charityLevelIsLocked.value = false : charityLevelIsLocked.value = true;
+      fatherProgressLevelValue.value = _userController.userPilgrimProgress[4]['progress'];
+      charityProgressLevelValue.value >= 1.0 ||  levelId > 4 ? fatherLevelIsLocked.value = false: fatherLevelIsLocked.value = true;
+      elderProgressLevelValue.value = _userController.userPilgrimProgress[5]['progress'];
+      fatherProgressLevelValue.value >= 1.0 || levelId > 5 ? elderLevelIsLocked.value = false : elderLevelIsLocked.value = true;
+      pointsPerQuestion = int.parse(gameSettings['base_score_pilgrim_progress']);
+      totalPointsGainedInBabe.value = (_userController.userPilgrimProgress[0]['progress'] * int.parse(gameSettings['babe_to_child_total'])).toInt();
+      totalPointsGainedInChild.value = (_userController.userPilgrimProgress[1]['progress'] * int.parse(gameSettings['child_to_young_believer_total'])).toInt();
+      totalPointsGainedInYb.value = (_userController.userPilgrimProgress[2]['progress'] * int.parse(gameSettings['young_believer_to_charity_total'])).toInt();
+      totalPointsGainedInCharity.value = (_userController.userPilgrimProgress[3]['progress'] * int.parse(gameSettings['charity_to_father_total'])).toInt();
+      totalPointsGainedInFather.value = (_userController.userPilgrimProgress[4]['progress'] * int.parse(gameSettings['father_to_elder_total'])).toInt();
+      totalPointsGainedInElder.value = (_userController.userPilgrimProgress[5]['progress'] * int.parse(gameSettings['father_to_elder_total'])).toInt();
       noOfRoundsLeftInBabe.value = (_userController.userPilgrimProgress[0]['numberOfRounds']).toInt();
       noOfRoundsLeftInChild.value = (_userController.userPilgrimProgress[1]['numberOfRounds']).toInt();
       noOfRoundsLeftInYb.value = (_userController.userPilgrimProgress[2]['numberOfRounds']).toInt();

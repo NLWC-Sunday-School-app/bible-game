@@ -8,7 +8,6 @@ class NewLevelScreen extends StatefulWidget {
   final String newLevel;
   final String newLevelBadge;
   const NewLevelScreen({Key? key, required this.newLevel, required this.newLevelBadge}) : super(key: key);
-
   @override
   State<NewLevelScreen> createState() => _NewLevelScreenState();
 }
@@ -21,16 +20,20 @@ class _NewLevelScreenState extends State<NewLevelScreen> {
   @override
   void initState() {
     confettiController.play();
-    _userController.toggleGameMusic();
     _player.setAsset('assets/audios/next_level.wav');
-    _player.play();
-
     super.initState();
+  }
+
+  playNextLevelMusic(){
+    if(_userController.musicIsOff.isFalse){
+      _player.play();
+    }
   }
 
   @override
   void dispose() {
     confettiController.dispose();
+    _player.dispose();
     super.dispose();
   }
 
@@ -108,7 +111,7 @@ class _NewLevelScreenState extends State<NewLevelScreen> {
               ),
               GestureDetector(
                 onTap: () =>  {
-                  _userController.toggleGameMusic(),
+                  _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                   Get.back()
                 },
                 child: Text(

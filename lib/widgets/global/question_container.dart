@@ -136,7 +136,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
             Padding(
               padding: EdgeInsets.only(left: 22.w, right: 45.w),
               child: Text(
-                'What verse was this found?',
+                widget.question.instruction,
                 style: TextStyle(
                     fontWeight: FontWeight.w700,
                     color: Colors.white,

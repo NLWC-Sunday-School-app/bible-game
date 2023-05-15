@@ -92,7 +92,7 @@ class _PilgrimProgressLeaderboardModalState extends State<PilgrimProgressLeaderb
                       playerId: leaderboardController
                           .leaderboardData[index].playerId,
                       avatarUrl:
-                      'https://api.multiavatar.com/${leaderboardController.leaderboardData[index].playerId}.svg',
+                      'https://api.multiavatar.com/${leaderboardController.leaderboardData[index].playerId}.png',
                     );
                   },
                   itemCount: leaderboardController

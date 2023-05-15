@@ -94,9 +94,12 @@ class _GameCardState extends State<GameCard> {
                     widget.gameIsLive
                         ? GestureDetector(
                          onTap: (){
-                           if(authController.isLoggedIn.isTrue){
+                           if(authController.isLoggedIn.isTrue && playedGame == false){
                              globalGameController.prepareQuestions(widget.campaignTag);
-                           }else{
+                           }else if(playedGame == true){
+
+                           }
+                           else{
                              Get.dialog(const AuthModal(title: 'LOG IN TO JOIN \nTHE CHALLENGE', text: 'Sign in to your profile to join \nthis live challenge.',));
                            }
 

@@ -48,7 +48,7 @@ class QuestionTimer extends StatelessWidget {
                 child: Text(
                   "00:${(controller.animation.value * controller.durationPerQuestion).round() < 10 ? '0' : ''}${(controller.animation.value * controller.durationPerQuestion).round()}",
                   style: TextStyle(
-                      fontSize: 25.sp,
+                      fontSize: 24.sp,
                       fontFamily: 'Neuland',
                       letterSpacing: 1,
                       color: Colors.red ),
@@ -57,7 +57,7 @@ class QuestionTimer extends StatelessWidget {
               Text(
                 "00:${(controller.animation.value * controller.durationPerQuestion).round() < 10 ? '0' : ''}${(controller.animation.value * controller.durationPerQuestion).round()}",
                 style: TextStyle(
-                    fontSize: 25.sp,
+                    fontSize: 24.sp,
                     fontFamily: 'Neuland',
                     letterSpacing: 1,
                     color: const Color.fromRGBO(118, 99, 229, 1)),

@@ -12,7 +12,8 @@ class UserController extends GetxController {
   final userGameSettings = <String, dynamic>{}.obs;
   final tempPlayerPoint = 0.obs;
   final adsData = <Ads>[].obs;
-  var isLoaded = false.obs;
+  var isLoaded = true.obs;
+  var isLoadingAds = true.obs;
   var musicIsOff = false.obs;
   var soundIsOff = false.obs;
   var notificationIsOff = false.obs;
@@ -22,39 +23,45 @@ class UserController extends GetxController {
   final player3 = AudioPlayer();
   final player4 = AudioPlayer();
   final player5 = AudioPlayer();
+  final backgroundMusicPlayer = AudioPlayer();
 
   toggleGameMusic() {
     musicIsOff.value = !musicIsOff.value;
     if (musicIsOff.isTrue) {
-      player.pause();
+      backgroundMusicPlayer.pause();
       box.write('pauseGameMusic', true);
     } else {
-      player.play();
+      backgroundMusicPlayer.play();
       box.write('pauseGameMusic', false);
     }
   }
-  playGameSound(){
-    player2.setAsset('assets/audios/click.mp3');
-    player2.play();
+
+  Future<void> playGameSound() async {
+    await player2.setAsset('assets/audios/click.mp3');
+    await player2.play();
   }
-  playSelectTabSound(){
-    player3.setAsset('assets/audios/select_tab.mp3');
-    player3.play();
+
+  Future<void> playSelectTabSound() async {
+    await player3.setAsset('assets/audios/select_tab.mp3');
+    await player3.play();
   }
-  playCorrectAnswerSound(){
-    player4.setAsset('assets/audios/success.mp3');
-    player4.setVolume(0.4);
-    player4.play();
+
+  Future<void> playCorrectAnswerSound() async {
+    await player4.setAsset('assets/audios/success.mp3');
+    await player4.setVolume(0.4);
+    await player4.play();
   }
-  playWrongAnswerSound(){
-    player5.setAsset('assets/audios/wrong_answer.wav');
-    player5.play();
+
+  Future<void> playWrongAnswerSound() async {
+    await player5.setAsset('assets/audios/wrong_answer.wav');
+    await player5.play();
   }
+
   toggleGameSound() {
     soundIsOff.value = !soundIsOff.value;
-    if(soundIsOff.isTrue){
+    if (soundIsOff.isTrue) {
       box.write('pauseGameSound', true);
-    }else{
+    } else {
       box.write('pauseGameSound', false);
     }
   }
@@ -72,37 +79,45 @@ class UserController extends GetxController {
 
   setAdsData() async {
     try {
+      isLoadingAds(true);
       var adsList = await UserService.getAds();
       adsData.value = adsList;
-      isLoaded(true);
+      isLoaded(false);
+      isLoadingAds(false);
     } catch (e) {
-      print(e);
+      isLoadingAds(false);
     }
   }
 
   getUserData() async {
     var isLoggedIn = box.read('userLoggedIn') ?? false;
     if (isLoggedIn) {
-      try{
+      try {
         await UserService.getUserData();
         await UserService.getUserPilgrimProgress();
-      }catch(e){
-
-      }
-
+      } catch (e) {}
     }
+  }
+
+  Future<void> setSoundValue() async {
+    await backgroundMusicPlayer.setAsset('assets/audios/background_music.mp3');
+    await backgroundMusicPlayer.setVolume(0.1);
+    await backgroundMusicPlayer.setLoopMode(LoopMode.all);
+    await player2.setAsset('assets/audios/click.mp3');
+    await player2.setVolume(0.5);
+    musicIsOff.value = box.read('pauseGameMusic') ?? false;
+    soundIsOff.value = box.read('pauseGameSound') ?? false;
+  }
+
+  @override
+  void onClose() {
+    player.dispose();
   }
 
   @override
   void onInit() async {
     super.onInit();
-    player.setAsset('assets/audios/background_music.mp3');
-    player.setVolume(0.1);
-    player.setLoopMode(LoopMode.all);
-    player2.setAsset('assets/audios/click.mp3');
-    player2.setVolume(0.5);
-    musicIsOff.value = box.read('pauseGameMusic') ?? false;
-    soundIsOff.value = box.read('pauseGameSound') ?? false;
     await setAdsData();
+    await setSoundValue();
   }
 }

@@ -34,7 +34,7 @@ class LeaderboardController extends GetxController{
     var isLoggedIn = box.read('userLoggedIn') ?? false;
     try {
       isLoading(true);
-      var leaderboardList = await GameService. getFourScriptureGameLeaderBoard('FOUR_SCRIPTURES');
+      var leaderboardList = isLoggedIn ? await GameService.getFourScriptureGameLeaderBoard('FOUR_SCRIPTURES') : await GameService.getFourScriptureGameLeaderBoardWithoutToken('FOUR_SCRIPTURES');
       leaderboardData.value = leaderboardList;
       leaderboardFormattedData.value = List.from(leaderboardList);
       leaderboardFormattedData.removeRange(0, 3);

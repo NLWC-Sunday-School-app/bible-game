@@ -33,9 +33,10 @@ class UserService {
     var response = await http.patch(Uri.parse('$baseUrl/users/$id/username?newName=$newUsername'), headers:  BaseUrlService().headers);
     if(response.statusCode == 200){
       return 200;
-    }else{
+    }else if(response.statusCode == 400){
       return 400;
     }
+    return 200;
   }
 
   static Future<int> updatePlayerRank(id, newRank) async {
@@ -61,6 +62,8 @@ class UserService {
 
   static Future<List<Tags>> getScriptureTags() async{
      var response = await http.get(Uri.parse('$baseUrl/tag'), headers:  BaseUrlService().headers);
+      print(json.decode(response.body));
+      print(tagsFromJson(response.body));
      return tagsFromJson(response.body);
   }
 
@@ -103,6 +106,8 @@ class UserService {
     var response = await http.get(Uri.parse('$baseUrl/playlog/leaderboards/$id'), headers:  BaseUrlService().headers);
     return leaderBoardFromJson(response.body);
   }
+  
+  
 
 }
 

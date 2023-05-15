@@ -9,9 +9,11 @@ import '../../screens/pilgrim_progress/pilgrim_progress_question_screen.dart';
 import '../game_button.dart';
 
 class PilgrimProgressModal extends StatelessWidget {
-  const PilgrimProgressModal({Key? key, required this.noOfRoundLeft})
+  const PilgrimProgressModal({Key? key, required this.noOfRoundLeft, required this.totalAvailablePoints, required this.noOfRoundPerLevel})
       : super(key: key);
   final int noOfRoundLeft;
+  final int totalAvailablePoints;
+  final int noOfRoundPerLevel;
 
 
   @override
@@ -26,8 +28,8 @@ class PilgrimProgressModal extends StatelessWidget {
       elevation: 0.0,
       backgroundColor: Colors.transparent,
       child: SizedBox(
-        child: Container(
-          margin: EdgeInsets.only(top: 80.0.h),
+        height: 570.h,
+        child: Center(
           child: Column(
             children: [
               Container(
@@ -52,6 +54,7 @@ class PilgrimProgressModal extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16.sp,
+                      //color:  const Color(0xFF548CD7),
                       fontFamily: 'neuland',
                       letterSpacing: 1,
                       height: 1,
@@ -79,10 +82,10 @@ class PilgrimProgressModal extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    noOfRoundLeft == 5 ? SizedBox(
+                    noOfRoundLeft == noOfRoundPerLevel ? SizedBox(
                       height: 15.h,
                     ) : const SizedBox(),
-                    noOfRoundLeft < 5 ? Container(
+                    noOfRoundLeft < noOfRoundPerLevel ? Container(
                       padding: EdgeInsets.only(left: 15.w, top: 12.h, bottom: 12.h),
                       decoration: BoxDecoration(
                           color: const Color(0xFFE7E2FF),
@@ -153,8 +156,8 @@ class PilgrimProgressModal extends StatelessWidget {
                                 text: 'Or Get ',
                                 style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), height: 1.5),
                                 children: <TextSpan>[
-                                  TextSpan(text: '${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
-                                  TextSpan(text: ' in five \ntrials to unlock new level!', style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D)),)
+                                  TextSpan(text: '${formatter.format(totalAvailablePoints)} points', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
+                                  TextSpan(text: ' in $noOfRoundPerLevel \ntrials to unlock new level!', style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D)),)
                                 ]
                             ),
                           ),
@@ -180,7 +183,7 @@ class PilgrimProgressModal extends StatelessWidget {
                                 text: 'Your points will be deleted \nif you don’t complete level\n',
                                 style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), height: 1.5),
                                 children: <TextSpan>[
-                                  TextSpan(text: ' after 5 trials.', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
+                                  TextSpan(text: ' after $noOfRoundPerLevel trials.', style:TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: const Color(0xFF22210D))),
                                 ]
                             ),
                           ),

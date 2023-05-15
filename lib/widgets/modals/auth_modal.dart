@@ -16,7 +16,6 @@ class AuthModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = AudioPlayer();
     UserController _userController = Get.put(UserController());
     return Dialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 20.w),

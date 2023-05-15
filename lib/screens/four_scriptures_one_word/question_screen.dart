@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../controllers/four_scriptures_question_controller.dart';
 import '../../widgets/modals/four_scriptures_quit_modal.dart';
 import '../../widgets/modals/quit_modal.dart';
-
+import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 class FourScriptureQuestionScreen extends StatefulWidget {
   const FourScriptureQuestionScreen({Key? key}) : super(key: key);
 
@@ -16,6 +16,7 @@ class FourScriptureQuestionScreen extends StatefulWidget {
 class _FourScriptureQuestionScreenState extends State<FourScriptureQuestionScreen> {
   Future<bool?> showWarning(BuildContext context) async => Get.dialog(const FourScripturesQuitModal(), barrierDismissible: false,);
   FourScriptureQuestionController fourScriptureQuestionController = Get.put(FourScriptureQuestionController());
+  bool _hasChanges = true;
 
   @override
   Widget build(BuildContext context) {

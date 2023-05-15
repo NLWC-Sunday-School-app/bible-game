@@ -34,6 +34,11 @@ class GameService {
     return leaderBoardFromDataJson(response.body);
   }
 
+  static Future<List<Leaderboard>> getFourScriptureGameLeaderBoardWithoutToken(campaignType) async{
+    var response = await http.get(Uri.parse('$baseUrl/playlog/open/campaigns/leaderboards?campaign=$campaignType&limit=20'), headers: BaseUrlService().headers);
+    return leaderBoardFromDataJson(response.body);
+  }
+
   static Future<List<GlobalLeaderboard>> getGlobalGameLeaderBoard(campaignType) async{
     var response = await http.get(Uri.parse('$baseUrl/playlog/campaigns/leaderboards?campaign=$campaignType&limit=20'), headers: BaseUrlService().headers);
     return globalLeaderBoardFromJson(response.body);
@@ -43,7 +48,6 @@ class GameService {
     var response = await http.get(Uri.parse('$baseUrl/playlog/open/leaderboards/$id'), headers: BaseUrlService().headers);
     return leaderBoardFromJson(response.body);
   }
-
 
   static Future<void> sendGameData(gameMode, totalScore, baseScore, bonusScore, averageTimeSpent,playerRank, noOfCorrectAnswers, playerId, userProgress, numberOfRoundsLeft) async {
     var response = await http.post(Uri.parse('$baseUrl/playlog'), headers: BaseUrlService().headers,

@@ -1,10 +1,12 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/user_controller.dart';
 import '../../utilities/validator.dart';
 
 class CreateProfileModal extends StatefulWidget {
@@ -27,7 +29,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
   @override
   Widget build(BuildContext context) {
     AuthController authController = Get.put(AuthController());
-    final player = AudioPlayer();
+    UserController _userController = Get.put(UserController());
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       backgroundColor: Colors.transparent,
@@ -52,8 +54,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      player.setAsset('assets/audios/click.mp3'),
-                      player.play(),
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                       Get.back()
                     },
                     child: Padding(
@@ -93,6 +94,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                         style: TextStyle(
                             height: 1.5.sp, color: const Color(0xFF104387),fontSize: 12.sp
                         ),
+                        inputFormatters: [ FilteringTextInputFormatter.allow(RegExp("[A-Za-z0-9#-]*")),],
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFD4DDDF),

@@ -29,7 +29,7 @@ class FourScripturesOneWordController extends GetxController {
    gameLevel.value = gameLevel.value + 1;
     try{
       await GameService.updateUserFourScriptureOneWordLevel(userController.myUser['id'], gameLevel);
-      //await userController.getUserData();
+      await userController.getUserData();
     }catch(e){
 
     }

@@ -37,7 +37,7 @@ class LeaderBoardBaseChampions extends StatelessWidget {
                 SizedBox(
                   height: 10.h,
                 ),
-                SvgPicture.network(
+                Image.network(
                   avatarUrl,
                   width: 47.w,
                 ),

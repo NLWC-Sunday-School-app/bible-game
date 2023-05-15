@@ -10,6 +10,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
+import 'delete_account_modal.dart';
 
 class SettingsModal extends StatefulWidget {
   const SettingsModal({Key? key}) : super(key: key);
@@ -71,8 +72,8 @@ class _SettingsModalState extends State<SettingsModal> {
                   const SizedBox(
                     height: 30,
                   ),
-                  SvgPicture.network(
-                    'https://api.multiavatar.com/${_userController.myUser['id']}.svg',
+                  Image.network(
+                    'https://api.multiavatar.com/${_userController.myUser['id']}.png',
                     width: 60.w,
                   ),
                   const SizedBox(
@@ -212,6 +213,18 @@ class _SettingsModalState extends State<SettingsModal> {
                   const SizedBox(
                     height: 20,
                   ),
+                  GestureDetector(
+                    onTap: (){
+                      Get.back();
+                      Get.dialog(const DeleterAccountModal());
+                    },
+                    child: const Text(
+                      'Delete Account', style: TextStyle(
+                       color: Colors.red,
+                       decoration: TextDecoration.underline
+                     ),
+                    ),
+                  )
                 ],
               ),
             ),

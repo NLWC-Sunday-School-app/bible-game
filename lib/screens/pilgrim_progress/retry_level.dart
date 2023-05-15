@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import '../../controllers/user_controller.dart';
 class RetryLevelScreen extends StatelessWidget {
   const RetryLevelScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final UserController _userController = Get.put(UserController());
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -55,6 +58,7 @@ class RetryLevelScreen extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () =>  {
+              _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
               Get.back()
             },
             child: Text(

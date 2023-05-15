@@ -51,11 +51,11 @@ class _TabMainScreenState extends State<TabMainScreen> {
     },
   ];
 
-  void selectPage(int index){
+  Future<void>selectPage(int index) async{
     if(userController.soundIsOff.isFalse){
-      player.setAsset('assets/audios/select_tab.mp3');
-      player.play();
-      player.setVolume(0.5);
+      await player.setAsset('assets/audios/select_tab.mp3');
+      await player.setVolume(0.5);
+      await player.play();
     }
     setState(() {
       selectedTabIndex = index;
@@ -106,17 +106,17 @@ class _TabMainScreenState extends State<TabMainScreen> {
             items: [
               BottomNavigationBarItem(
                 backgroundColor: Colors.white,
-                icon: Icon(Icons.home, size: 15.w,),
+                icon: Icon(Icons.home, size: 20.w,),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
                 backgroundColor: Colors.white,
-                icon: Icon(MyFlutterApp.application, size: 15.w,),
+                icon: Icon(MyFlutterApp.application, size: 20.w,),
                 label: 'Games',
               ),
               BottomNavigationBarItem(
                 backgroundColor: Colors.white,
-                icon: Icon(MyFlutterApp.trophy, size: 15.w,),
+                icon: Icon(MyFlutterApp.trophy, size: 20.w,),
                 label: 'Leaderboard',
               ),
               // BottomNavigationBarItem(

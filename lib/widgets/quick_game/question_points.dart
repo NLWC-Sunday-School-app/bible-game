@@ -1,5 +1,4 @@
 import 'package:animated_digit/animated_digit.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -41,9 +40,7 @@ class QuestionPoints extends StatelessWidget {
                 color: const Color.fromRGBO(229, 150, 75, 1)),
           ),
           Obx(
-              () =>
-              // only show
-              AnimatedDigitWidget(
+              () => AnimatedDigitWidget(
                   value: _questionController.pointsGained.value,
                 textStyle: TextStyle(
                         fontSize: 25.sp,

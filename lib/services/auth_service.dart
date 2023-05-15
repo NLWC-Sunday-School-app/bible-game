@@ -60,7 +60,10 @@ class AuthService {
               await UserService.getUserPilgrimProgressByToken(data['token']);
             }
             return 200;
-          }else if(response.statusCode == 400){
+          }else if (response.statusCode == 403){
+            return 403;
+          }
+          else if(response.statusCode == 400){
              return 400;
           }else{
             return 500;
@@ -68,7 +71,8 @@ class AuthService {
      }
 
      static Future<int> loginOutUser() async {
-       var response = await http.get(Uri.parse('$baseUrl/auth/logout'), headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Bearer ${box.read('user_token')}'});
+       var response = await http.get(Uri.parse('$baseUrl/auth/logout'),
+           headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Bearer ${box.read('user_token')}'});
         if(response.statusCode == 200){
            return 200;
         }else{
@@ -76,5 +80,13 @@ class AuthService {
         }
      }
 
+     static Future<int> deleteUserAccount(id)async {
+       var response = await http.delete(Uri.parse('$baseUrl/users/$id'), headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Bearer ${box.read('user_token')}'});
+       if(response.statusCode == 200){
+         print(response);
+         return 200;
+       }
+       return 200;
+     }
 
 }

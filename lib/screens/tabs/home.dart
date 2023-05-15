@@ -42,22 +42,16 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   final UserController _userController = Get.put(UserController());
   final AuthController _authController = Get.put(AuthController());
   final PilgrimProgressController _pilgrimProgressController = Get.put(PilgrimProgressController());
-  final assetsAudioPlayer = AssetsAudioPlayer();
-  final player = AudioPlayer();
 
   @override
   void dispose() {
     super.dispose();
-    player.dispose();
   }
 
   final gameSettings = GetStorage().read('game_settings');
 
   void goToQuickGameScreen(BuildContext context) {
-    Get.to(() => const QuickGameStepOneScreen(),
-        transition: Transition.downToUp);
-    // Get.to(const RetryLevelScreen());
-
+    Get.to(() => const QuickGameStepOneScreen());
   }
 
   navigateFourScriptures(){
@@ -72,7 +66,6 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
     }else{
       Get.dialog(const AuthModal(title: 'your profile', text: 'Sign in to your profile to save \n& continue your game play.'));
     }
-
 
   }
 
@@ -129,7 +122,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                       badgeName: 'BABE BADGE!',
                       badgeNameColor: 0xFF5D42C8,
                       pointsBgColor: 0xFFE2DAFF,
-                      badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+                      badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInBabe.value,
                       badgePointGained: _pilgrimProgressController.totalPointsGainedInBabe.value,
                       badgeSubText:
                       'Such a good start! Keep playing \nto grow through the ranks. \nChild badge in view!',
@@ -148,7 +141,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           badgeName: 'CHILD BADGE!',
           badgeNameColor: 0xFFC75523,
           pointsBgColor: 0xFFFDE3CA,
-          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInChild.value,
           badgePointGained: _pilgrimProgressController.totalPointsGainedInChild.value,
           badgeSubText:
           'Having a child badge means the \nmore you play the closer to \nbecoming a young believer!',
@@ -165,7 +158,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           badgeName: 'YOUNG BELIEVER\n BADGE!',
           badgeNameColor: 0xFF8999A8,
           pointsBgColor: 0xFF9EB7CD,
-          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInYb.value,
           badgePointGained: _pilgrimProgressController.totalPointsGainedInYb.value,
           badgeSubText:
           'The next badge is for Charity! \nDo not relent now, there is \nreward round the corner!',
@@ -182,7 +175,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           badgeName: 'CHARITY BADGE!',
           badgeNameColor: 0xFFC88008,
           pointsBgColor: 0xFFFFF44B,
-          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInCharity.value,
           badgePointGained: _pilgrimProgressController.totalPointsGainedInCharity.value,
           badgeSubText:
           'A milestone! Keep playing \nto grow through the ranks. \nFather badge in view!',
@@ -199,7 +192,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           badgeName: 'FATHER BADGE!',
           badgeNameColor: 0xFF4174E7,
           pointsBgColor: 0xFFDFEEFF,
-          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInFather.value,
           badgePointGained: _pilgrimProgressController.totalPointsGainedInFather.value,
           badgeSubText:
           'You’ve come a long way to \nget here, play more games \nto become an Elder!',
@@ -216,7 +209,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           badgeName: 'ELDER BADGE!',
           badgeNameColor: 0xFF3F4060,
           pointsBgColor: 0xFFFED806,
-          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value,
+          badgeTotalPoint: _pilgrimProgressController.totalPointsAvailableInElder.value,
           badgePointGained: _pilgrimProgressController.totalPointsGainedInElder.value,
           badgeSubText:
           'You have gotten to the height!\n Keep playing to unlock new \ntests!',
@@ -279,7 +272,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                 ),
                               ),
                               SizedBox(
-                                height: 10.h,
+                                height: 5.h,
                               ),
                               Obx(
                                 () => SizedBox(
@@ -289,7 +282,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                             (_userController.myUser['name'] ??
                                                 'Beloved'),
                                             style: TextStyle(
-                                                fontSize: 24.sp,
+                                                fontSize: 20.sp,
                                                 color: Colors.white,
                                                 fontFamily: 'Neuland',
                                                 fontWeight: FontWeight.w400),
@@ -298,7 +291,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                       : Text(
                                           'Beloved',
                                           style: TextStyle(
-                                              fontSize: 24.sp,
+                                              fontSize: 20.sp,
                                               color: Colors.white,
                                               fontFamily: 'Neuland',
                                               fontWeight: FontWeight.w400),
@@ -317,7 +310,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                             children: [
                               Obx(
                                 () => IconButton(
-                                  iconSize: 45.w,
+                                  iconSize: 36.w,
                                   onPressed: () {
                                     _userController.soundIsOff.isFalse ? _userController.playGameSound() : null;
                                     _authController.isLoggedIn.isTrue
@@ -339,7 +332,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                               ),
                               Obx(
                                 () => IconButton(
-                                  iconSize: 45.w,
+                                  iconSize: 36.w,
                                   onPressed: () => {
                                     _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                                     _authController.isLoggedIn.isTrue
@@ -352,8 +345,8 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                   },
                                   icon: _authController.isLoggedIn.isTrue
                                       ? Obx(
-                                          () => SvgPicture.network(
-                                            'https://api.multiavatar.com/${_userController.myUser['id']}.svg?apikey=${BaseUrlService().avatarApiKey}',
+                                          () => Image.network(
+                                            'https://api.multiavatar.com/${_userController.myUser['id']}.png?apikey=${BaseUrlService().avatarApiKey}',
                                           ),
                                         )
                                       : Image.asset(
@@ -395,11 +388,12 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                       child: Column(
                         children: [
                           Text(
-                            'Your High Score',
+                            'Your Quick Game High Score',
                             style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w700,
-                                color: const Color.fromRGBO(52, 42, 122, 1)),
+                                color: Colors.black,
+                            ),
                           ),
                           Obx(
                             () => SizedBox(
@@ -469,7 +463,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                   'Quick Game',
                                   style: TextStyle(
                                     letterSpacing: 0.5,
-                                    fontSize: 20.sp,
+                                    fontSize: 18.sp,
                                     fontWeight: FontWeight.w400,
                                     fontFamily: 'Neuland',
                                     color: const Color.fromRGBO(124, 110, 203, 1),
@@ -496,7 +490,8 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                 GestureDetector(
                                   onTap: () => {
                                     _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
-                                    goToQuickGameScreen(context)
+                                     goToQuickGameScreen(context)
+                                   // Get.to(() => const NewLevelScreen(newLevel: 'babe', newLevelBadge: 'babe')),
                                   },
                                   child: Container(
                                     padding: EdgeInsets.only(
@@ -575,7 +570,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                 AutoSizeText(
                                   'Pilgrim Progress',
                                   style: TextStyle(
-                                    fontSize: 20.sp,
+                                    fontSize: 18.sp,
                                     letterSpacing: 1,
                                     fontFamily: 'Neuland',
                                     fontWeight: FontWeight.w400,
@@ -682,7 +677,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                 AutoSizeText(
                                   '4 scriptures \n1 word!',
                                   style: TextStyle(
-                                    fontSize: 20.sp,
+                                    fontSize: 18.sp,
                                     letterSpacing: 1,
                                     fontFamily: 'Neuland',
                                     fontWeight: FontWeight.w400,
@@ -699,7 +694,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                       fontWeight: FontWeight.w500),
                                 ),
                                 Text(
-                                  'show off your skills!',
+                                  'Show thyself approved!',
                                   style: TextStyle(
                                       fontSize: 10.sp,
                                       fontWeight: FontWeight.w500),
@@ -777,7 +772,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                     ),
                     Obx(
                       () => SizedBox(
-                        child: _userController.isLoaded.isTrue
+                        child: _userController.isLoaded.isFalse
                             ? CarouselSlider.builder(
                                 itemCount: _userController.adsData.length,
                                 itemBuilder: (BuildContext context,
@@ -789,7 +784,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                       _userController.adsData[itemIndex].title,
                                 ),
                                 options: CarouselOptions(
-                                  aspectRatio:  Get.width > 900 ? 15/10 : 10/10,
+                                  aspectRatio:  Get.width > 900 ? 15/10 : 9/10,
                                   viewportFraction: 1,
                                   autoPlay: true,
                                   autoPlayInterval: const Duration(seconds: 5),

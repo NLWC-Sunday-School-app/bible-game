@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../controllers/auth_controller.dart';
+import '../../controllers/user_controller.dart';
 import '../../utilities/validator.dart';
 
 class LoginModal extends StatefulWidget {
@@ -28,7 +29,7 @@ class _LoginModalState extends State<LoginModal> {
   @override
   Widget build(BuildContext context) {
     AuthController authController = Get.put(AuthController());
-    final player = AudioPlayer();
+    UserController _userController = Get.put(UserController());
     return Dialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
         backgroundColor: Colors.transparent,
@@ -52,8 +53,7 @@ class _LoginModalState extends State<LoginModal> {
                     ),
                     GestureDetector(
                       onTap: () => {
-                        player.setAsset('assets/audios/click.mp3'),
-                        player.play(),
+                        _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
                         Get.back()
                       },
                       child: Padding(

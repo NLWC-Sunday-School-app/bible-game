@@ -1,4 +1,5 @@
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,7 +18,7 @@ class AwesomeNotificationController extends GetxController{
         // This license key is necessary only to remove the watermark for
         // push notifications in release mode. To know more about it, please
         // visit http://awesome-notifications.carda.me#prices
-        licenseKeys: null,
+        licenseKeys: ['EAGdLUy2QRsxxldCQSY8IEcIQUOWa/6xBdSJuXB3wTx7oq00VYVwFi0mtZt19AxUSV4XLijbz77ul3Q/9B67ZX9p3KDLrBCQxpxJRMVfUuWX6pmvJiBmzTNgAsCuqlARlVYOqp2YbgVEv9vSk5WsflUbihFfDgB34WCdlg5eCRQ='],
         debug: false);
   }
 

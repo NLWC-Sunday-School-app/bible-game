@@ -48,7 +48,7 @@ class GamesLeaderBoardCard extends StatelessWidget {
                     SizedBox(width: 10.w,),
                     Container(
                       margin: EdgeInsets.only(right: 8.w, left: 50.w),
-                      child: SvgPicture.network(
+                      child: Image.network(
                         avatarUrl,
                         width: 34.w,
                       ),

@@ -7,6 +7,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/tabs_controller.dart';
 import '../../utilities/network_connection.dart';
 import '../../widgets/modals/network_modal.dart';
 import '../../widgets/modals/welcome_modal.dart';
@@ -37,12 +38,14 @@ class SplashScreen extends StatelessWidget {
   }
 
   checkNetworkConnection() async{
+    final TabsController tabsController = Get.put(TabsController());
     NetworkConnection networkConnection = Get.put(NetworkConnection());
     if(await networkConnection.hasInternetConnection() == true){
       await UserService.getUserGameSettings();
       await setLoggedInState();
       await getUserData();
-     await Get.offAll(() => const TabMainScreen(), transition: Transition.leftToRight);
+      tabsController.selectPage(0);
+     await Get.offAll(() => const TabMainScreen());
     }else{
       Get.dialog(const NoNetworkModal(), barrierDismissible: false);
     }

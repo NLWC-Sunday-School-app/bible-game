@@ -18,10 +18,10 @@ class GlobalGameModal extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
-      // elevation: 0.0,
+      elevation: 0.0,
       backgroundColor: Colors.transparent,
-      child: Container(
-        margin: EdgeInsets.only(top: 120.0.h),
+      child: SizedBox(
+        height: 480.h,
         child: Column(
           children: [
             Container(

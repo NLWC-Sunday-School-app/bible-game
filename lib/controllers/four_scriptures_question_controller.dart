@@ -57,12 +57,13 @@ class FourScriptureQuestionController extends GetxController
 
   updateGamePoint(){
    totalPointsGained.value = totalPointsGained.value + quickGameController.pointsPerQuestion;
-   pointsGained.value = pointsGained.value + quickGameController.pointsPerQuestion;
+   pointsGained.value = quickGameController.pointsPerQuestion;
+
   }
 
 
   sendGameData() async {
-    fourScripturesOneWordController.updateGameLevel();
+    await fourScripturesOneWordController.updateGameLevel();
     var response = await GameService.sendGameData(
         'FOUR_SCRIPTURES',
         pointsGained.value,

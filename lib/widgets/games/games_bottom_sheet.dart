@@ -98,7 +98,7 @@ class _GamesBottomSheetModalState extends State<GamesBottomSheetModal> {
                                 playerId: _globalGamesController
                                     .globalGamesLeaderBoard[index].playerId,
                                 avatarUrl:
-                                    'https://api.multiavatar.com/${_globalGamesController.globalGamesLeaderBoard[index].playerId}.svg',
+                                    'https://api.multiavatar.com/${_globalGamesController.globalGamesLeaderBoard[index].playerId}.png',
                               );
                             },
                             itemCount: _globalGamesController

@@ -1,11 +1,7 @@
 import 'dart:async';
-import 'dart:math';
-
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
-import 'package:bible_game/screens/pilgrim_progress/pilgrim_progress_question_screen.dart';
 import 'package:bible_game/screens/pilgrim_progress/widgets/PligrimProgressLevelMenu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +10,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:just_audio/just_audio.dart';
-
 import '../../widgets/modals/pilgrim_progress_welcome_modal.dart';
 
 class PilgrimProgressHomeScreen extends StatefulWidget {
@@ -110,7 +104,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                   'pilgrim progress',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 22.sp,
+                                    fontSize: 20.sp,
                                     letterSpacing: 1,
                                     fontFamily: 'Neuland',
                                     color: Colors.white,
@@ -119,10 +113,12 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                 SizedBox(
                                   height: 10.h,
                                 ),
-                                const Text(
+                                Text(
                                   'Journey through the bible, Grow your \nknowledge as you progress ',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.white,
+                                    fontSize: 14.sp
+                                  ),
                                 )
                               ],
                             ),
@@ -139,7 +135,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
 
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 15.0.w),
-                    margin: EdgeInsets.only(top: 250.h),
+                    margin: EdgeInsets.only(top: 220.h),
                     child: Column(
                         children: [
                           Obx(
@@ -153,7 +149,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                       style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
                                       children: <TextSpan>[
                                     TextSpan(
-                                        text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
+                                        text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInBabe.value)} points',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.w600)),
                                     const TextSpan(
@@ -181,188 +177,198 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                               },
                             ),
                           ),
-                          PilgrimProgressLevelMenu(
-                            menuImage: 'assets/images/pilgrim_levels/child.png',
-                            menuNumber: '',
-                            textSpan: RichText(
-                                text: TextSpan(
-                                    text:
-                                        'Go further in your journey! Get up \nto',
-                                    style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D),fontFamily: 'QuickSand', height: 1.5),
-                                    children: <TextSpan>[
-                                  TextSpan(
-                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600)),
-                                  const TextSpan(
-                                    text: ' to grow from here.',
-                                  ),
-                                ])),
-                            menuLabel: 'Child',
-                            totalPointsGained: pilgrimProgressController
-                                .totalPointsGainedInChild.value,
-                            totalPointsAvailable: pilgrimProgressController
-                                .totalPointsAvailableInChild.value,
-                            isLocked: pilgrimProgressController
-                                .childLevelIsLocked.isTrue,
-                            menuProgressValue: pilgrimProgressController
-                                .childProgressLevelValue.value,
-                            boxShadowColor: 0xFFFCCB90,
-                            onTap: () => {
-                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                              if (pilgrimProgressController
-                                  .childLevelIsLocked.isFalse)
-                                {
-                                  pilgrimProgressController
-                                      .setSelectedLevel('child')
-                                }
-                            },
+                          Obx(
+                          () => PilgrimProgressLevelMenu(
+                              menuImage: 'assets/images/pilgrim_levels/child.png',
+                              menuNumber: '',
+                              textSpan: RichText(
+                                  text: TextSpan(
+                                      text:
+                                          'Go further in your journey! Get up \nto',
+                                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D),fontFamily: 'QuickSand', height: 1.5),
+                                      children: <TextSpan>[
+                                    TextSpan(
+                                        text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInChild.value)} points',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600)),
+                                    const TextSpan(
+                                      text: ' to grow from here.',
+                                    ),
+                                  ])),
+                              menuLabel: 'Child',
+                              totalPointsGained: pilgrimProgressController
+                                  .totalPointsGainedInChild.value,
+                              totalPointsAvailable: pilgrimProgressController
+                                  .totalPointsAvailableInChild.value,
+                              isLocked: pilgrimProgressController
+                                  .childLevelIsLocked.isTrue,
+                              menuProgressValue: pilgrimProgressController
+                                  .childProgressLevelValue.value,
+                              boxShadowColor: 0xFFFCCB90,
+                              onTap: () => {
+                                userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                                if (pilgrimProgressController
+                                    .childLevelIsLocked.isFalse)
+                                  {
+                                    pilgrimProgressController
+                                        .setSelectedLevel('child')
+                                  }
+                              },
+                            ),
                           ),
-                          PilgrimProgressLevelMenu(
-                            menuImage:
-                                'assets/images/pilgrim_levels/young_believer.png',
-                            menuNumber: '',
-                            textSpan: RichText(
-                                text: TextSpan(
-                                    text:
-                                        'You are growing! Almost there! Get \n',
-                                    style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
-                                    children: <TextSpan>[
-                                  TextSpan(
-                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600)),
-                                  const TextSpan(
-                                    text: ' to get to charity.',
-                                  ),
-                                ])),
-                            menuLabel: 'young believer',
-                            totalPointsGained: pilgrimProgressController
-                                .totalPointsGainedInYb.value,
-                            totalPointsAvailable: pilgrimProgressController
-                                .totalPointsAvailableInYb.value,
-                            isLocked: pilgrimProgressController
-                                .youngBelieversLevelIsLocked.isTrue,
-                            menuProgressValue: pilgrimProgressController
-                                .youngBelieverProgressLevelValue.value,
-                            boxShadowColor: 0xFFC7DAE1,
-                            onTap: () => {
-                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                              if (pilgrimProgressController
-                                  .youngBelieversLevelIsLocked.isFalse)
-                                {
-                                  pilgrimProgressController
-                                      .setSelectedLevel('young believer')
-                                }
-                            },
+                          Obx(
+                            ()=> PilgrimProgressLevelMenu(
+                              menuImage:
+                                  'assets/images/pilgrim_levels/young_believer.png',
+                              menuNumber: '',
+                              textSpan: RichText(
+                                  text: TextSpan(
+                                      text:
+                                          'You are growing! Almost there! Get \n',
+                                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
+                                      children: <TextSpan>[
+                                    TextSpan(
+                                        text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInYb.value)} points',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600)),
+                                    const TextSpan(
+                                      text: ' to get to charity.',
+                                    ),
+                                  ])),
+                              menuLabel: 'young believer',
+                              totalPointsGained: pilgrimProgressController
+                                  .totalPointsGainedInYb.value,
+                              totalPointsAvailable: pilgrimProgressController
+                                  .totalPointsAvailableInYb.value,
+                              isLocked: pilgrimProgressController
+                                  .youngBelieversLevelIsLocked.isTrue,
+                              menuProgressValue: pilgrimProgressController
+                                  .youngBelieverProgressLevelValue.value,
+                              boxShadowColor: 0xFFC7DAE1,
+                              onTap: () => {
+                                userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                                if (pilgrimProgressController
+                                    .youngBelieversLevelIsLocked.isFalse)
+                                  {
+                                    pilgrimProgressController
+                                        .setSelectedLevel('young believer')
+                                  }
+                              },
+                            ),
                           ),
-                          PilgrimProgressLevelMenu(
-                            menuImage:
-                                'assets/images/pilgrim_levels/charity.png',
-                            menuNumber: '',
-                            textSpan: RichText(
-                                text: TextSpan(
-                                    text:
-                                        'Charity is round the corner! Get up \nto',
-                                    style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
-                                    children: <TextSpan>[
-                                  TextSpan(
-                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600)),
-                                  const TextSpan(
-                                    text: ' to get to Father.',
-                                  ),
-                                ])),
-                            menuLabel: 'charity',
-                            totalPointsGained: pilgrimProgressController
-                                .totalPointsGainedInCharity.value,
-                            totalPointsAvailable: pilgrimProgressController
-                                .totalPointsAvailableInCharity.value,
-                            isLocked: pilgrimProgressController
-                                .charityLevelIsLocked.isTrue,
-                            menuProgressValue: pilgrimProgressController
-                                .charityProgressLevelValue.value,
-                            boxShadowColor: 0xFF92D6EE,
-                            onTap: () => {
-                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                              if (pilgrimProgressController
-                                  .charityLevelIsLocked.isFalse)
-                                {
-                                  pilgrimProgressController
-                                      .setSelectedLevel('charity')
-                                }
-                            },
+                          Obx(
+                             () => PilgrimProgressLevelMenu(
+                              menuImage:
+                                  'assets/images/pilgrim_levels/charity.png',
+                              menuNumber: '',
+                              textSpan: RichText(
+                                  text: TextSpan(
+                                      text:
+                                          'Charity is round the corner! Get up \nto',
+                                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
+                                      children: <TextSpan>[
+                                    TextSpan(
+                                        text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInCharity.value)} points',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600)),
+                                    const TextSpan(
+                                      text: ' to get to Father.',
+                                    ),
+                                  ])),
+                              menuLabel: 'charity',
+                              totalPointsGained: pilgrimProgressController
+                                  .totalPointsGainedInCharity.value,
+                              totalPointsAvailable: pilgrimProgressController
+                                  .totalPointsAvailableInCharity.value,
+                              isLocked: pilgrimProgressController
+                                  .charityLevelIsLocked.isTrue,
+                              menuProgressValue: pilgrimProgressController
+                                  .charityProgressLevelValue.value,
+                              boxShadowColor: 0xFF92D6EE,
+                              onTap: () => {
+                                userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                                if (pilgrimProgressController
+                                    .charityLevelIsLocked.isFalse)
+                                  {
+                                    pilgrimProgressController
+                                        .setSelectedLevel('charity')
+                                  }
+                              },
+                            ),
                           ),
-                          PilgrimProgressLevelMenu(
-                            menuImage:
-                                'assets/images/pilgrim_levels/father.png',
-                            menuNumber: '',
-                            textSpan: RichText(
-                                text: TextSpan(
-                                    text:
-                                        'Grown beyond this world! Get up to \n',
-                                    style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
-                                    children: <TextSpan>[
-                                  TextSpan(
-                                      text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value)} points',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600)),
-                                  const TextSpan(
-                                    text: ' to become an Elder.',
-                                  ),
-                                ])),
-                            menuLabel: 'father',
-                            totalPointsGained: pilgrimProgressController
-                                .totalPointsGainedInFather.value,
-                            totalPointsAvailable: pilgrimProgressController
-                                .totalPointsAvailableInFather.value,
-                            isLocked: pilgrimProgressController
-                                .fatherLevelIsLocked.isTrue,
-                            menuProgressValue: pilgrimProgressController
-                                .fatherProgressLevelValue.value,
-                            boxShadowColor: 0xFFF9ACBB,
-                            onTap: () => {
-                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                              if (pilgrimProgressController
-                                  .fatherLevelIsLocked.isFalse)
-                                {
-                                  pilgrimProgressController
-                                      .setSelectedLevel('father')
-                                }
-                            },
+                          Obx(
+                              () => PilgrimProgressLevelMenu(
+                              menuImage:
+                                  'assets/images/pilgrim_levels/father.png',
+                              menuNumber: '',
+                              textSpan: RichText(
+                                  text: TextSpan(
+                                      text:
+                                          'Grown beyond this world! Get up to \n',
+                                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D), fontFamily: 'QuickSand', height: 1.5),
+                                      children: <TextSpan>[
+                                    TextSpan(
+                                        text:' ${formatter.format(pilgrimProgressController.totalPointsAvailableInFather.value)} points',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600)),
+                                    const TextSpan(
+                                      text: ' to become an Elder.',
+                                    ),
+                                  ])),
+                              menuLabel: 'father',
+                              totalPointsGained: pilgrimProgressController
+                                  .totalPointsGainedInFather.value,
+                              totalPointsAvailable: pilgrimProgressController
+                                  .totalPointsAvailableInFather.value,
+                              isLocked: pilgrimProgressController
+                                  .fatherLevelIsLocked.value,
+                              menuProgressValue: pilgrimProgressController
+                                  .fatherProgressLevelValue.value,
+                              boxShadowColor: 0xFFF9ACBB,
+                              onTap: () => {
+                                userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                                if (pilgrimProgressController
+                                    .fatherLevelIsLocked.isFalse)
+                                  {
+                                    pilgrimProgressController
+                                        .setSelectedLevel('father')
+                                  }
+                              },
+                            ),
                           ),
-                          PilgrimProgressLevelMenu(
-                            menuImage: 'assets/images/pilgrim_levels/elder.png',
-                            menuNumber: '',
-                            textSpan: RichText(
-                                text: TextSpan(
-                                    text: 'Welcome to the peak! Test how \nskillful',
-                                    style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D),fontFamily: 'QuickSand', height: 1.5),
-                                    children: const <TextSpan>[
-                                  TextSpan(
-                                    text: '  & knowledgeable \nyou’ve become',
-                                  ),
-                                ])),
-                            menuLabel: 'elder',
-                            totalPointsGained: pilgrimProgressController
-                                .totalPointsGainedInElder.value,
-                            totalPointsAvailable: pilgrimProgressController
-                                .totalPointsAvailableInFather.value,
-                            isLocked: pilgrimProgressController
-                                .elderLevelIsLocked.isTrue,
-                            menuProgressValue: pilgrimProgressController
-                                .elderProgressLevelValue.value,
-                            boxShadowColor: 0xFFA2EAE0,
-                            onTap: () => {
-                              userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                              if (pilgrimProgressController
-                                  .elderLevelIsLocked.isFalse)
-                                {
-                                  pilgrimProgressController
-                                      .setSelectedLevel('elder')
-                                }
-                            },
+                          Obx(
+                           () => PilgrimProgressLevelMenu(
+                              menuImage: 'assets/images/pilgrim_levels/elder.png',
+                              menuNumber: '',
+                              textSpan: RichText(
+                                  text: TextSpan(
+                                      text: 'Welcome to the peak! Test how skillful',
+                                      style: TextStyle(fontSize: 12.sp, color: const Color(0xFF22210D),fontFamily: 'QuickSand', height: 1.5),
+                                      children: const <TextSpan>[
+                                    TextSpan(
+                                      text: '\n& knowledgeable you’ve become',
+                                    ),
+                                  ])),
+                              menuLabel: 'elder',
+                              totalPointsGained: pilgrimProgressController
+                                  .totalPointsGainedInElder.value,
+                              totalPointsAvailable: pilgrimProgressController
+                                  .totalPointsAvailableInElder.value,
+                              isLocked: pilgrimProgressController
+                                  .elderLevelIsLocked.isTrue,
+                              menuProgressValue: pilgrimProgressController
+                                  .elderProgressLevelValue.value,
+                              boxShadowColor: 0xFFA2EAE0,
+                              onTap: () => {
+                                userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                                if (pilgrimProgressController
+                                    .elderLevelIsLocked.isFalse)
+                                  {
+                                    pilgrimProgressController
+                                        .setSelectedLevel('elder')
+                                  }
+                              },
+                            ),
                           ),
                         ],
                       ),

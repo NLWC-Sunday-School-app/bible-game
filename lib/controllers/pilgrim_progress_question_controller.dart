@@ -91,7 +91,7 @@ class PilgrimProgressQuestionController extends GetxController
   }
 
   displayUnlockedNewLevelScreen(newLevel, newLevelBadgeUrl){
-      Timer(const Duration(seconds: 3), (){
+      Timer(const Duration(seconds: 1), (){
          Get.to(() => NewLevelScreen(newLevel: newLevel, newLevelBadge: newLevelBadgeUrl,));
       });
   }
@@ -147,8 +147,8 @@ class PilgrimProgressQuestionController extends GetxController
             pilgrimProgressController.noOfRoundsLeftInBabe.value >= 1 && userController.myUser['rank'] == 'babe' && !(pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInBabe.value : 5
           );
           await leaderboardController.setLeaderboardData(1);
-          if(pilgrimProgressController.noOfRoundsLeftInBabe.value < 1){
-            Timer(const Duration(seconds: 3), (){
+          if(pilgrimProgressController.noOfRoundsLeftInBabe.value < 1 && !(pilgrimProgressController.totalPointsGainedInBabe.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value)){
+            Timer(const Duration(seconds: 2), (){
               Get.to(() => const RetryLevelScreen());
             });
           }
@@ -172,12 +172,12 @@ class PilgrimProgressQuestionController extends GetxController
               numOfCorrectAnswers.value,
               userController.myUser['id'],
              pilgrimProgressController.noOfRoundsLeftInChild.value >= 1 ? pilgrimProgressController.childProgressLevelValue.value >= 1 ? 1.0 : pilgrimProgressController.childProgressLevelValue.value.toStringAsFixed(5) : (pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.childProgressLevelValue.value.toStringAsFixed(5) : 0,
-             pilgrimProgressController.noOfRoundsLeftInChild.value >= 1 && userController.myUser['rank'] == 'child' && !(pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInChild.value : 5
+             pilgrimProgressController.noOfRoundsLeftInChild.value >= 1 && userController.myUser['rank'] == 'child' && !(pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInChild.value : 4
 
            );
           await leaderboardController.setLeaderboardData(2);
-          if(pilgrimProgressController.noOfRoundsLeftInChild.value < 1){
-            Timer(const Duration(seconds: 3), (){
+          if(pilgrimProgressController.noOfRoundsLeftInChild.value < 1 && !(pilgrimProgressController.totalPointsGainedInChild.value + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value)){
+            Timer(const Duration(seconds: 2), (){
               Get.to(() => const RetryLevelScreen());
             });
           }
@@ -202,11 +202,11 @@ class PilgrimProgressQuestionController extends GetxController
               numOfCorrectAnswers.value,
               userController.myUser['id'],
               pilgrimProgressController.noOfRoundsLeftInYb.value >= 1 ? pilgrimProgressController.youngBelieverProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.youngBelieverProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInYb.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.youngBelieverProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInYb.value >= 1 && userController.myUser['rank'] == 'young believer' && !(pilgrimProgressController.totalPointsGainedInYb.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInYb.value : 5
+              pilgrimProgressController.noOfRoundsLeftInYb.value >= 1 && userController.myUser['rank'] == 'young believer' && !(pilgrimProgressController.totalPointsGainedInYb.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInYb.value : 3
           );
           await leaderboardController.setLeaderboardData(3);
-          if(pilgrimProgressController.noOfRoundsLeftInYb.value < 1){
-            Timer(const Duration(seconds: 3), (){
+          if(pilgrimProgressController.noOfRoundsLeftInYb.value < 1 && !(pilgrimProgressController.totalPointsGainedInYb.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value)){
+            Timer(const Duration(seconds: 2), (){
               Get.to(() => const RetryLevelScreen());
             });
           }
@@ -231,24 +231,21 @@ class PilgrimProgressQuestionController extends GetxController
               numOfCorrectAnswers.value,
               userController.myUser['id'],
               pilgrimProgressController.noOfRoundsLeftInCharity.value >= 1 ? pilgrimProgressController.charityProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.charityProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.charityProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInCharity.value >= 1 && userController.myUser['rank'] == 'charity' && !(pilgrimProgressController.totalPointsGainedInCharity.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInCharity.value : 5
+              pilgrimProgressController.noOfRoundsLeftInCharity.value >= 1 && userController.myUser['rank'] == 'charity' && !(pilgrimProgressController.totalPointsGainedInCharity.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInCharity.value : 2
 
           );
           await leaderboardController.setLeaderboardData(4);
-          if(pilgrimProgressController.noOfRoundsLeftInCharity.value < 1){
-            Timer(const Duration(seconds: 3), (){
+          if(pilgrimProgressController.noOfRoundsLeftInCharity.value < 1 && !(pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value)){
+            Timer(const Duration(seconds: 2), (){
               Get.to(() => const RetryLevelScreen());
             });
           }
-          if(pilgrimProgressController.noOfRoundsLeftInCharity.value < 1){
-            Timer(const Duration(seconds: 3), (){
-              Get.to(() => const RetryLevelScreen());
-            });
-          }
+
           if(userController.myUser['rank'] == 'charity' && (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value>= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value)){
             await UserService.updatePlayerRank(userController.myUser['id'], 'father');
             await displayUnlockedNewLevelScreen('father', 'assets/images/badges/father_badge.png');
           }
+
           break;
         case 'father':
           userController.myUser['rank'] == 'father' ? pilgrimProgressController.noOfRoundsLeftInFather.value-- : null;
@@ -265,11 +262,11 @@ class PilgrimProgressQuestionController extends GetxController
               numOfCorrectAnswers.value,
               userController.myUser['id'],
               pilgrimProgressController.noOfRoundsLeftInFather.value >= 1 ? pilgrimProgressController.fatherProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.fatherProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.fatherProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInFather.value >= 1 && userController.myUser['rank'] == 'father' && !(pilgrimProgressController.totalPointsGainedInFather.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInFather.value : 5
+              pilgrimProgressController.noOfRoundsLeftInFather.value >= 1 && userController.myUser['rank'] == 'father' && !(pilgrimProgressController.totalPointsGainedInFather.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInFather.value : 2
           );
           await leaderboardController.setLeaderboardData(5);
-          if(pilgrimProgressController.noOfRoundsLeftInFather.value < 1){
-            Timer(const Duration(seconds: 3), (){
+          if(pilgrimProgressController.noOfRoundsLeftInFather.value < 1 && !(pilgrimProgressController.totalPointsGainedInFather.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value)){
+            Timer(const Duration(seconds: 2), (){
               Get.to(() => const RetryLevelScreen());
             });
           }
@@ -293,9 +290,14 @@ class PilgrimProgressQuestionController extends GetxController
               numOfCorrectAnswers.value,
               userController.myUser['id'],
               pilgrimProgressController.noOfRoundsLeftInElder.value >= 1 ? pilgrimProgressController.elderProgressLevelValue.value >= 1.0 ? 1.0 : pilgrimProgressController.elderProgressLevelValue.value.toStringAsFixed(5): (pilgrimProgressController.totalPointsGainedInCharity.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.elderProgressLevelValue.value.toStringAsFixed(5) : 0 ,
-              pilgrimProgressController.noOfRoundsLeftInElder.value >= 1 && userController.myUser['rank'] == 'elder' && !(pilgrimProgressController.totalPointsGainedInElder.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInElder.value : 5
+              pilgrimProgressController.noOfRoundsLeftInElder.value >= 1 && userController.myUser['rank'] == 'elder' && !(pilgrimProgressController.totalPointsGainedInElder.value + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained.value >= pilgrimProgressController.passOnFirstTrialScore.value) ? pilgrimProgressController.noOfRoundsLeftInElder.value : 2
           );
           await leaderboardController.setLeaderboardData(6);
+          if(pilgrimProgressController.noOfRoundsLeftInElder.value < 1 && !(pilgrimProgressController.totalPointsGainedInElder.value  + pointsGained.value >= pilgrimProgressController.totalPointsAvailableInPilgrimProgress.value || pointsGained >= pilgrimProgressController.passOnFirstTrialScore.value)){
+            Timer(const Duration(seconds: 2), (){
+              Get.to(() => const RetryLevelScreen());
+            });
+          }
           break;
       }
     } else{
@@ -352,7 +354,7 @@ class PilgrimProgressQuestionController extends GetxController
             Get.back(),
             Get.off(() => const PilgrimProgressHomeScreen(),  transition: Transition.fadeIn),
             await userController.getUserData(),
-            await pilgrimProgressController.updatePilgrimProgressScore()
+            await pilgrimProgressController.setPilgrimData()
 
           },
           bonusPointsGained: totalBonusPointsGained.toString(),

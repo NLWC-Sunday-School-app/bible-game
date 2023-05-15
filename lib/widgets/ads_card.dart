@@ -15,16 +15,16 @@ class AdsCard extends StatelessWidget {
     return Container(
       width: Get.width >= 600 ? 510 : 350,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
+          color: const Color(0xFF214B86),
+        borderRadius: BorderRadius.circular(10.r),
       ),
       child: Column(
         children: [
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20.r),
-                  topLeft: Radius.circular(20.r)),
+                  topRight: Radius.circular(10.r),
+                  topLeft: Radius.circular(10.r)),
               child: Image.network(
                 imageUrl,
                 width: Get.width >= 600 ? 510 : 350,
@@ -33,11 +33,12 @@ class AdsCard extends StatelessWidget {
             ),
           ),
           Container(
+
             padding: const EdgeInsets.all(10),
             child: AutoSizeText(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700, color: Colors.white),
             ),
           )
         ],

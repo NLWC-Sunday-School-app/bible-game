@@ -17,6 +17,7 @@ class TagsPillController extends GetxController {
     isLoading(true);
     try{
        tagList.value = await UserService.getScriptureTags();
+
        isLoading(false);
     }catch(e){
       isLoading(false);

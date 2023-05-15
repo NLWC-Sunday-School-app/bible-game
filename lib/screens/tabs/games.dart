@@ -48,7 +48,6 @@ class TabGamesScreen extends StatelessWidget {
                   margin: EdgeInsets.only(top: 80.h),
                   child: Column(
                     children: [
-                      Text('${Get.width}'),
                       Text(
                         'Games',
                         style: TextStyle(

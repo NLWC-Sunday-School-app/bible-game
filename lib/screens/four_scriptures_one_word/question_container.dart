@@ -17,7 +17,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sms_autofill/sms_autofill.dart';
 import 'package:screenshot/screenshot.dart';
 import '../../models/question.dart';
 import '../../widgets/modals/quit_modal.dart';
@@ -124,11 +123,11 @@ class _QuestionContainerState extends State<QuestionContainer> {
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new,
-                        size: 20.w,
+                        size: 30.w,
                         color: Colors.white,
                       ),
                     ),
-                    const Spacer(),
+                    SizedBox(width: 20.w,),
                     const PointsCard(),
                     SizedBox(
                       width: 10.w,
@@ -257,7 +256,11 @@ class _QuestionContainerState extends State<QuestionContainer> {
                     .then((Uint8List? image) async {
                   if (image != null) {
                     final directory = await getApplicationDocumentsDirectory();
+                    print(directory);
+                    String fileName = DateTime.fromMicrosecondsSinceEpoch.toString();
+                    print(fileName);
                     final imagePath = File('${directory.path}/image.png');
+                    print(imagePath);
                     await imagePath.writeAsBytes(image);
 
                     final box = context.findRenderObject() as RenderBox?;
@@ -615,7 +618,8 @@ class QuestionNumberCard extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       fontFamily: 'neuland',
                       fontSize: 16.sp,
-                      color: Colors.white),
+                      color: Colors.white,
+                  ),
                 ),
               )),
         ),
