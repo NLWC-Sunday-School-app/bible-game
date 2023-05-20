@@ -18,15 +18,14 @@ class AuthService {
             headers: BaseUrlService().headers, body: jsonEncode({'name': name, 'email': email, 'password': password, 'fcmToken': fcmToken}));
            if(response.statusCode == 200){
             return 200;
-           }else if(response.statusCode == 400){
-             return 400;
            }else{
              var data = json.decode(response.body);
-             print(data);
+              print(data);
               print(data['errors'][0]);
              return data['errors'][0];
            }
-
+      // Beccagift
+       //DemiFash
      }
 
      static Future<int> loginUser(email, password) async {

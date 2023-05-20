@@ -49,7 +49,7 @@ class TabGamesScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Games',
+                        'Global challenges',
                         style: TextStyle(
                             fontFamily: 'Neuland',
                             letterSpacing: 1,

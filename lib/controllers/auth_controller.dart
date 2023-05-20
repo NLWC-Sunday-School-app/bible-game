@@ -47,22 +47,6 @@ class AuthController extends GetxController {
         isLoadingRegistration(false);
         Get.back();
         Get.dialog(const SuccessModal(), barrierDismissible: false);
-      } else if (status == 400) {
-        isLoadingRegistration(false);
-        Get.snackbar(
-            'Error',
-            'Enter a valid email address and password',
-            messageText: const Text(
-              'Enter a valid email address and password',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            backgroundColor: Colors.red,
-            colorText: Colors.white
-        );
       } else {
         isLoadingRegistration(false);
         Get.snackbar(
