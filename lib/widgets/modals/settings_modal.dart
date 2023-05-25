@@ -2,6 +2,7 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/widgets/modals/edit_profile.dart';
 import 'package:bible_game/widgets/modals/logout_modal.dart';
+import 'package:bible_game/widgets/modals/reset_password_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -77,7 +78,7 @@ class _SettingsModalState extends State<SettingsModal> {
                     width: 60.w,
                   ),
                   const SizedBox(
-                    height: 30,
+                    height: 20,
                   ),
                   Obx(
                     () => AutoSizeText(
@@ -101,21 +102,55 @@ class _SettingsModalState extends State<SettingsModal> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+
+                        SvgPicture.asset('assets/images/icons/edit.svg', width: 15.w,),
+                        SizedBox(width: 5.w,),
                         Text(
-                          'Edit Profile',
+                          'Edit your Profile',
                           style: TextStyle(
                               color: const Color(0xFF4075BB),
                              fontSize: 14.sp,
+                             fontWeight: FontWeight.w500,
                              decoration: TextDecoration.underline
                           ),
                         ),
-                        SizedBox(width: 5.w,),
-                        SvgPicture.asset('assets/images/icons/edit.svg', width: 15.w,)
+
                       ],
                     ),
                   ),
+                  SizedBox(height: 10.h,),
+                  GestureDetector(
+                    onTap: (){
+                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null;
+                      Get.back();
+                      Get.dialog(const EditProfileModal(),);
+                    },
+                    child: InkWell(
+                      onTap: (){
+                        Get.back();
+                        Get.dialog(const ResetPasswordModal());
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/images/icons/blue_padlock.png', width: 15.w,),
+                          SizedBox(width: 5.w,),
+                          Text(
+                            'Reset Password',
+                            style: TextStyle(
+                                color: const Color(0xFF4075BB),
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 0.0),
@@ -183,7 +218,7 @@ class _SettingsModalState extends State<SettingsModal> {
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   GestureDetector(
                     onTap: () => {
@@ -211,7 +246,7 @@ class _SettingsModalState extends State<SettingsModal> {
                       ),
                     ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   GestureDetector(
                     onTap: (){
@@ -224,7 +259,7 @@ class _SettingsModalState extends State<SettingsModal> {
                        decoration: TextDecoration.underline
                      ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

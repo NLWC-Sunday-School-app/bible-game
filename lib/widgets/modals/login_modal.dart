@@ -1,5 +1,6 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/widgets/modals/reset_password_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,7 +54,9 @@ class _LoginModalState extends State<LoginModal> {
                     ),
                     GestureDetector(
                       onTap: () => {
-                        _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                        _userController.soundIsOff.isFalse
+                            ? _userController.playGameSound()
+                            : null,
                         Get.back()
                       },
                       child: Padding(
@@ -97,7 +100,9 @@ class _LoginModalState extends State<LoginModal> {
                         child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
-                              height: 1.5.h, color: const Color(0xFF104387), fontSize: 12.sp),
+                              height: 1.5.h,
+                              color: const Color(0xFF104387),
+                              fontSize: 12.sp),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: const Color(0xFFD4DDDF),
@@ -188,7 +193,8 @@ class _LoginModalState extends State<LoginModal> {
                         () => Container(
                           width: 250.w,
                           padding: EdgeInsets.symmetric(
-                              vertical: 20.h,),
+                            vertical: 20.h,
+                          ),
                           decoration: BoxDecoration(
                               color: const Color(0xFFE8F8FF),
                               border:
@@ -217,6 +223,24 @@ class _LoginModalState extends State<LoginModal> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Get.back();
+                        Get.dialog(const ResetPasswordModal(), barrierDismissible: true);
+                      },
+                      child: Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          color: const Color(0xFF4075BB),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),

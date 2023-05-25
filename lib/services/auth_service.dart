@@ -20,17 +20,14 @@ class AuthService {
             return 200;
            }else{
              var data = json.decode(response.body);
-              print(data);
-              print(data['errors'][0]);
              return data['errors'][0];
            }
-      // Beccagift
-       //DemiFash
      }
 
-     static Future<int> loginUser(email, password) async {
+     static Future<dynamic> loginUser(email, password) async {
           var response = await http.post(Uri.parse('$baseUrl/auth/login'),
            headers: BaseUrlService().headers, body:  jsonEncode({'email': email, 'password': password}));
+          var responseData = json.decode(response.body);
           if(response.statusCode == 200){
             final data = json.decode(response.body) as Map<String, dynamic>;
             await box.write('user_token', data['token']);
@@ -59,19 +56,48 @@ class AuthService {
               await UserService.getUserPilgrimProgressByToken(data['token']);
             }
             return 200;
-          }else if (response.statusCode == 403){
-            return 403;
-          }
-          else if(response.statusCode == 400){
-             return 400;
           }else{
-            return 500;
+            var data = json.decode(response.body);
+
+            return data['errors'][0];
           }
+     }
+
+     static Future<dynamic>sendForgotPasswordMail(emailAddress) async {
+         GetStorage().write('reset_email', emailAddress);
+         var response = await http.get(Uri.parse('$baseUrl/auth/forgot-password?email=$emailAddress'),
+             headers: BaseUrlService().headers
+         );
+         if(response.statusCode == 200){
+           return 200;
+         }else{
+           var data = json.decode(response.body);
+           return data['errors'][0];
+         }
+     }
+
+     static Future<dynamic>verifyOTP(code) async{
+         var email = GetStorage().read('reset_email');
+         var response = await http.post(Uri.parse('$baseUrl/auth/verify-email-otp'),
+          headers: BaseUrlService().headers, body: jsonEncode({'code': code, 'email': email})
+         );
+           var data = json.decode(response.body);
+           return data;
+     }
+
+     static Future<dynamic>resetPassword(newPassword) async{
+       var email = GetStorage().read('reset_email');
+       var response = await http.post(Uri.parse('$baseUrl/auth/reset-password'),
+           headers: BaseUrlService().headers, body: jsonEncode({'newPassword': newPassword, 'email': email})
+       );
+       var data = json.decode(response.body);
+       return data;
      }
 
      static Future<int> loginOutUser() async {
        var response = await http.get(Uri.parse('$baseUrl/auth/logout'),
            headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Bearer ${box.read('user_token')}'});
+
         if(response.statusCode == 200){
            return 200;
         }else{

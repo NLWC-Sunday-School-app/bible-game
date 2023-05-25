@@ -19,7 +19,7 @@ class DeleterAccountModal extends StatelessWidget {
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       backgroundColor: Colors.transparent,
       child: SizedBox(
-        height: Get.width >= 500 ? 500.h : Get.height >= 800 ? 450.h : 500.h,
+        height: Get.width >= 500 ? 550.h : Get.height >= 800 ? 450.h : 550.h,
         width: Get.width >= 500 ? 500.h : 450.h,
         child: Container(
           decoration: const BoxDecoration(

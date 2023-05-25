@@ -29,18 +29,27 @@ class UserService {
      box.write('user_data', encodedResponseData);
   }
 
-  static Future<int> updateProfile(id, newUsername) async {
+  static Future<dynamic> updateProfile(id, newUsername) async {
     var response = await http.patch(Uri.parse('$baseUrl/users/$id/username?newName=$newUsername'), headers:  BaseUrlService().headers);
     if(response.statusCode == 200){
       return 200;
-    }else if(response.statusCode == 400){
-      return 400;
+    }else{
+      var data = json.decode(response.body);
+      return data['errors'][0];
     }
-    return 200;
   }
 
   static Future<int> updatePlayerRank(id, newRank) async {
     var response = await http.patch(Uri.parse('$baseUrl/users/$id/rank?newRank=$newRank'), headers:  BaseUrlService().headers);
+    if(response.statusCode == 200){
+      return 200;
+    }else{
+      return 400;
+    }
+  }
+
+  static Future<dynamic> updateUserFcmToken(token) async {
+    var response = await http.patch(Uri.parse('$baseUrl/users/fcm-token?newToken=$token'), headers:  BaseUrlService().headers);
     if(response.statusCode == 200){
       return 200;
     }else{

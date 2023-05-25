@@ -27,6 +27,16 @@ class Validator {
     return null;
   }
 
+  static String? validateConfirmPassword(String confirmPassword, String password){
+     if(confirmPassword.isEmpty){
+       return 'Confirm Password is Required';
+     }
+     if(confirmPassword != password){
+        return 'Passwords do not match';
+     }
+     return null;
+  }
+
   static String? validatePassword(String password) {
 
     if (password.isEmpty) {
