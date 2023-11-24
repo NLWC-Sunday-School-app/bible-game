@@ -1,4 +1,5 @@
 import 'package:bible_game/controllers/user_controller.dart';
+import 'package:bible_game/services/base_url_service.dart';
 import 'package:bible_game/widgets/modals/create_profile_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -71,7 +72,7 @@ class _LeaderBoardModalState extends State<LeaderBoardModal> {
                   Row(
                     children: [
                       Image.network(
-                        'https://api.multiavatar.com/${leaderboardController.leaderboardData[0].playerId}.png',
+                        '${BaseUrlService.avatarBaseUrl}/${leaderboardController.leaderboardData[0].playerId}.png',
                         width: 30.w,
                       ),
                       SizedBox(
@@ -127,7 +128,7 @@ class _LeaderBoardModalState extends State<LeaderBoardModal> {
                   leaderboardController.leaderboardData.length >= 2 ?  Row(
                     children: [
                       Image.network(
-                        'https://api.multiavatar.com/${leaderboardController.leaderboardData[1].playerId}.png',
+                        '${BaseUrlService.avatarBaseUrl}/${leaderboardController.leaderboardData[1].playerId}.png',
                         width: 30.w,
                       ),
                       SizedBox(

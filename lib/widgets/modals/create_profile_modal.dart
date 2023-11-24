@@ -9,6 +9,7 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
 import '../../utilities/validator.dart';
 
+
 class CreateProfileModal extends StatefulWidget {
   const CreateProfileModal({Key? key}) : super(key: key);
 
@@ -124,6 +125,8 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                   SizedBox(
                     height: Get.height <= 670 ? 15.h : 20.h,
                   ),
+
+
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 45.0.w),
                     child: SizedBox(

@@ -19,7 +19,7 @@ class EnterResetPasswordCodeModal extends StatefulWidget {
 class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModal> {
 
   AuthController authController = Get.put(AuthController());
-  UserController _userController = Get.put(UserController());
+  final UserController _userController = Get.put(UserController());
   //final otpController = TextEditingController();
 
   @override
@@ -49,7 +49,9 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
                     _userController.soundIsOff.isFalse
                         ? _userController.playGameSound()
                         : null,
+                    authController.otpController.text = '',
                     Get.back()
+
                   },
                   child: Padding(
                     padding: EdgeInsets.only(right: 15.0.w),
@@ -129,7 +131,7 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
                       _userController.soundIsOff.isFalse
                           ? _userController.playGameSound()
                           : null,
-                       authController.verifyOTP(authController.otpController.text)
+                       authController.verifyOTP(authController.otpController.text),
 
                     },
                     child: Container(

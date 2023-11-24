@@ -1,5 +1,6 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/services/base_url_service.dart';
 import 'package:bible_game/widgets/modals/edit_profile.dart';
 import 'package:bible_game/widgets/modals/logout_modal.dart';
 import 'package:bible_game/widgets/modals/reset_password_modal.dart';
@@ -74,7 +75,7 @@ class _SettingsModalState extends State<SettingsModal> {
                     height: 30,
                   ),
                   Image.network(
-                    'https://api.multiavatar.com/${_userController.myUser['id']}.png',
+                    '${BaseUrlService.avatarBaseUrl}/${_userController.myUser['id']}.png',
                     width: 60.w,
                   ),
                   const SizedBox(

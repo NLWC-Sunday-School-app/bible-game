@@ -19,8 +19,10 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:new_version/new_version.dart';
+import 'package:new_version_plus/new_version_plus.dart';
 import 'package:upgrader/upgrader.dart';
 import '../utilities/network_connection.dart';
+import '../widgets/modals/app_update_modal.dart';
 import '../widgets/modals/network_modal.dart';
 
 
@@ -46,6 +48,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     checkInternet();
     playBackgroundMusic();
     getFcmToken();
+    checkForUpdateAppVersion();
 
     if(GetPlatform.isIOS){
       AwesomeNotifications().requestPermissionToSendNotifications(channelKey: 'game notifications');
@@ -66,22 +69,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     print('fb token: $firebaseAppToken');
   }
 
-  checkForUpdateAppVersion() async{
-    final newVersion = NewVersion();
-    newVersion.showAlertIfNecessary(context: context);
+  checkForUpdateAppVersion() async {
+    final newVersion = NewVersionPlus();
     final status = await newVersion.getVersionStatus();
-    if(status != null){
-      newVersion.showUpdateDialog(
-        context: context,
-        versionStatus: status,
-        dialogTitle: 'Update Available',
-        dialogText: 'A new version of Bible Game is available.\n Please update the app to continue.',
-        allowDismissal: false,
-        updateButtonText: 'Update'
-      );
+    final localVersion = status?.localVersion;
+    final storeVersion = status?.storeVersion;
+    final appCanUpdate = status?.canUpdate;
+    if (appCanUpdate == true) {
+      Get.dialog(const AppUpdateModal(), barrierDismissible: false);
     }
   }
-
 
   Future<void> playBackgroundMusic() async{
      var pauseMusic = box.read('pauseGameMusic') ?? false;

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/tabs/tab_main_screen.dart';
@@ -82,6 +84,7 @@ class AuthController extends GetxController {
      try{
        isSendingCode(true);
        var response =  await AuthService.sendForgotPasswordMail(forgotPasswordMail.value);
+       GetStorage().write('reset_email', forgotPasswordMail.value);
        if(response == 200){
          Get.back();
          Get.snackbar(
@@ -126,7 +129,7 @@ class AuthController extends GetxController {
     isVerifyingCode(true);
     try{
      var response = await AuthService.verifyOTP(code);
-     if(response['verified'] == true){
+     if(response == 200){
        Get.back();
        Get.snackbar(
            'Awesome!',
@@ -145,24 +148,7 @@ class AuthController extends GetxController {
        otpController.text = '';
        Get.dialog(const SetNewPasswordModal());
        isVerifyingCode(false);
-     }else{
-       otpController.text = '';
-       Get.snackbar(
-           'Error',
-           response['message'],
-           messageText: Text(
-             response['message'],
-             style: TextStyle(
-               fontSize: 16.sp,
-               color: Colors.white,
-               fontWeight: FontWeight.w500,
-             ),
-           ),
-           backgroundColor: Colors.red,
-           colorText: Colors.white
-       );
      }
-     isVerifyingCode(false);
     }catch(e){
       isVerifyingCode(false);
     }
@@ -205,7 +191,6 @@ class AuthController extends GetxController {
   loginUser() async {
     isLoadingLogin(true);
     try {
-
       var response = await AuthService.loginUser(loginEmail.value, loginPassword.value);
       if (response == 200) {
         isLoadingLogin(false);

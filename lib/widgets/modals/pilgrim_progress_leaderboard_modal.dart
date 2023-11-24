@@ -1,6 +1,7 @@
 import 'package:bible_game/controllers/global_games_controller.dart';
 import 'package:bible_game/controllers/leaderboard_controller.dart';
 import 'package:bible_game/models/leaderboard.dart';
+import 'package:bible_game/services/base_url_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -92,7 +93,7 @@ class _PilgrimProgressLeaderboardModalState extends State<PilgrimProgressLeaderb
                       playerId: leaderboardController
                           .leaderboardData[index].playerId,
                       avatarUrl:
-                      'https://api.multiavatar.com/${leaderboardController.leaderboardData[index].playerId}.png',
+                      '${BaseUrlService.avatarBaseUrl}/${leaderboardController.leaderboardData[index].playerId}.png',
                     );
                   },
                   itemCount: leaderboardController

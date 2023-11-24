@@ -65,6 +65,12 @@ dependencies:
   cupertino_will_pop_scope: ^1.2.1
   upgrader: ^4.8.1
   package_info_plus: ^1.4.3+1
+  dio: ^5.3.3
+  new_version_plus: ^0.0.3
+  launch_review: ^3.0.1
+  dropdown_search: ^5.0.3
+  animated_svg: ^1.1.2
+
 
 flutter_icons:
   android: "launcher_icon"
@@ -74,8 +80,8 @@ flutter_icons:
   min_sdk_android: 21
 
 flutter_native_splash:
-  color: "#FECF75"
-  image: "assets/images/bible_game_text.png"
+  color: "#1896FD"
+  image: "assets/images/logo/new_logo.png"
   android: true
   ios: true
 
@@ -106,6 +112,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/images/
+     - assets/images/aesthetics/
      - assets/images/pilgrim_levels/
      - assets/audios/
      - assets/images/quick_game/

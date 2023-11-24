@@ -1,4 +1,5 @@
 import 'package:bible_game/controllers/global_games_controller.dart';
+import 'package:bible_game/services/base_url_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -98,7 +99,7 @@ class _GamesBottomSheetModalState extends State<GamesBottomSheetModal> {
                                 playerId: _globalGamesController
                                     .globalGamesLeaderBoard[index].playerId,
                                 avatarUrl:
-                                    'https://api.multiavatar.com/${_globalGamesController.globalGamesLeaderBoard[index].playerId}.png',
+                                    '${BaseUrlService.avatarBaseUrl}/${_globalGamesController.globalGamesLeaderBoard[index].playerId}.png',
                               );
                             },
                             itemCount: _globalGamesController

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:animated_svg/animated_svg.dart';
+import 'package:animated_svg/animated_svg_controller.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:bible_game/controllers/global_games_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
@@ -13,6 +15,7 @@ import 'package:bible_game/widgets/custom_icons/my_flutter_app_icons.dart';
 import 'package:bible_game/widgets/modals/pilgrim_progress_welcome_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
@@ -22,7 +25,6 @@ import '../../widgets/modals/welcome_modal.dart';
 
 class TabMainScreen extends StatefulWidget {
   static const routeName = '/tab-main-screen';
-
   const TabMainScreen({Key? key}) : super(key: key);
 
   @override
@@ -35,6 +37,7 @@ class _TabMainScreenState extends State<TabMainScreen> {
   var selectedTabIndex = GetStorage().read('tabIndex') ?? 0;
   UserController userController = Get.put(UserController());
   final player = AudioPlayer();
+  late final SvgController controller;
 
   final List<Map<String, dynamic>> _pages = [
     {
@@ -70,6 +73,7 @@ class _TabMainScreenState extends State<TabMainScreen> {
   void initState() {
     super.initState();
     displayWelcomeModal();
+    controller = AnimatedSvgController();
     //_setBottomTabPage();
   }
 
@@ -92,40 +96,66 @@ class _TabMainScreenState extends State<TabMainScreen> {
 
   Widget get _bottomNavigationBar {
     return SizedBox(
-        child:  BottomNavigationBar(
-            onTap: selectPage,
-            backgroundColor: const Color(0xFF558CD7),
-            unselectedItemColor: Colors.white,
-            unselectedLabelStyle:const TextStyle(fontWeight: FontWeight.w300, fontFamily: 'Neuland'),
-            selectedItemColor: const Color(0xFF214B86),
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Neuland'),
-            currentIndex: selectedTabIndex,
-            type: BottomNavigationBarType.fixed,
-            showUnselectedLabels: false,
-            showSelectedLabels: false,
-            items: [
-              BottomNavigationBarItem(
-                backgroundColor: Colors.white,
-                icon: Icon(Icons.home, size: 20.w,),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                backgroundColor: Colors.white,
-                icon: Icon(MyFlutterApp.application, size: 20.w,),
-                label: 'Games',
-              ),
-              BottomNavigationBarItem(
-                backgroundColor: Colors.white,
-                icon: Icon(MyFlutterApp.trophy, size: 20.w,),
-                label: 'Leaderboard',
-              ),
-              // BottomNavigationBarItem(
-              //   backgroundColor: Colors.white,
-              //   icon: Icon(Icons.account_circle_rounded),
-              //   label: 'Account',
-              // ),
-            ],
-          ),
+        child:  Container(
+             decoration: BoxDecoration(
+               border: Border(
+                 top: BorderSide(
+                   width: 5.w,
+                   color: const Color(0xFFF3DB3E),
+                 ),
+
+               ),
+             ),
+          child: BottomNavigationBar(
+              onTap: selectPage,
+              backgroundColor: const Color(0xFF2F5C9F),
+              unselectedItemColor: Colors.white,
+              unselectedLabelStyle:const TextStyle(fontWeight: FontWeight.w300, fontFamily: 'Neuland'),
+              selectedItemColor: const Color(0xFF214B86),
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Neuland'),
+              currentIndex: selectedTabIndex,
+              type: BottomNavigationBarType.fixed,
+              showUnselectedLabels: false,
+              showSelectedLabels: true,
+              items: [
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.red,
+                  icon:  AnimatedSvg(
+                    controller: controller,
+                    duration: const Duration(milliseconds: 600),
+                    onTap: () {selectPage(0);},
+                    size: 20.w,
+                    clockwise: true,
+                    isActive: true,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/icons/booster.svg',
+                      ),
+                      SvgPicture.asset(
+                        'assets/images/icons/padlock.svg',
+                      ),
+                    ],
+                  ),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.white,
+                  icon: Icon(MyFlutterApp.application, size: 20.w,),
+                  label: 'Games',
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Colors.white,
+                  icon: Icon(MyFlutterApp.trophy, size: 20.w,),
+                  label: 'Leaderboard',
+                ),
+                // BottomNavigationBarItem(
+                //   backgroundColor: Colors.white,
+                //   icon: Icon(Icons.account_circle_rounded),
+                //   label: 'Account',
+                // ),
+              ],
+            ),
+        ),
     );
   }
 

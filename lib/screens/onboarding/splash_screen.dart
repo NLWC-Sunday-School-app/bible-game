@@ -26,7 +26,7 @@ class SplashScreen extends StatelessWidget {
     if(authController.isLoggedIn.isTrue){
       await UserService.getUserData();
       await UserService.getUserPilgrimProgress();
-  }
+    }
   }
 
   displayWelcomeModal(){
@@ -62,14 +62,14 @@ class SplashScreen extends StatelessWidget {
         Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage( "assets/images/splash_screen.png"),
+              image: AssetImage( "assets/images/aesthetics/splash_screen.png"),
               fit: BoxFit.cover
             )
           ),
         ),
         Center(
           child: Container(
-            margin: EdgeInsets.only(top: Get.height < 750 ? 450 : 500),
+            margin: EdgeInsets.only(top: Get.height < 750 ? 450 : 700),
             padding: const EdgeInsets.symmetric(horizontal: 70),
             child: LinearPercentIndicator(
               lineHeight: 15.h,
