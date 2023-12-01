@@ -36,6 +36,11 @@ class GameCardInfo extends StatelessWidget {
               color: Color(cardColor),
               offset: const Offset(0, 15),
               blurRadius: 0,
+              spreadRadius: -10),
+          BoxShadow(
+              color: Color(cardColor),
+              offset: const Offset(0, -15),
+              blurRadius: 0,
               spreadRadius: -10)
         ],
       ),
@@ -56,10 +61,9 @@ class GameCardInfo extends StatelessWidget {
                   gameTitle,
                   style: TextStyle(
                     fontSize: 18.sp,
-                    letterSpacing: 1,
-                    fontFamily: 'Neuland',
-                    fontWeight: FontWeight.w500,
-                    color: const Color.fromRGBO(124, 110, 203, 1),
+                    fontFamily: 'Mikado',
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF3C78D1),
                   ),
                 ),
                 SizedBox(
@@ -69,7 +73,8 @@ class GameCardInfo extends StatelessWidget {
                   gameText,
                   style: TextStyle(
                       fontSize: 10.sp,
-                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Mikado',
+                      fontWeight: FontWeight.w400,
                       height: 1.5),
                 ),
                 SizedBox(
@@ -85,16 +90,18 @@ class GameCardInfo extends StatelessWidget {
                         bottom: 10.h,
                       ),
                       decoration: BoxDecoration(
-                        image: const DecorationImage(
-                          image: AssetImage('assets/images/home_button_bg.png'),
-                          fit: BoxFit.fill,
-                        ),
+                        // image: const DecorationImage(
+                        //   image: AssetImage('assets/images/home_button_bg.png'),
+                        //   fit: BoxFit.fill,
+                        // ),
+                        color: const Color(0xFF3C78D1),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
                         'PLAY',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
+                          fontFamily: 'Mikado',
                           fontSize: 12.sp,
                           color: const Color(0xFFFFFFFF),
                         ),

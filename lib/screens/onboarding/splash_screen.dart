@@ -68,20 +68,29 @@ class SplashScreen extends StatelessWidget {
           ),
         ),
         Center(
-          child: Container(
-            margin: EdgeInsets.only(top: Get.height < 750 ? 450 : 700),
-            padding: const EdgeInsets.symmetric(horizontal: 70),
-            child: LinearPercentIndicator(
-              lineHeight: 15.h,
-              percent: 1,
-              animation: true,
-              animationDuration: 2500,
-              barRadius: const Radius.circular(10),
-              progressColor: const Color(0xFFFECF75),
-              onAnimationEnd: () =>{
-                 checkNetworkConnection()
-              }
-            ),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: (){
+                  UserService.getUserData();
+                },
+                child: Container(
+                  margin: EdgeInsets.only(top: Get.height < 750 ? 450 : 700),
+                  padding: const EdgeInsets.symmetric(horizontal: 70),
+                  child: LinearPercentIndicator(
+                    lineHeight: 15.h,
+                    percent: 1,
+                    animation: true,
+                    animationDuration: 2500,
+                    barRadius: const Radius.circular(10),
+                    progressColor: const Color(0xFFFECF75),
+                    onAnimationEnd: () =>{
+                       checkNetworkConnection()
+                    }
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

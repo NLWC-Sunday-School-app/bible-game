@@ -70,6 +70,10 @@ dependencies:
   launch_review: ^3.0.1
   dropdown_search: ^5.0.3
   animated_svg: ^1.1.2
+  lottie: ^2.3.2
+  flutter_custom_clippers: ^2.1.0
+  flutter_timer_countdown: ^1.0.7
+  stroke_text: ^0.0.2
 
 
 flutter_icons:
@@ -120,7 +124,6 @@ flutter:
      - assets/images/ads/
      - assets/images/icons/
      - assets/images/badges/
-     - assets/images/games/
      - assets/images/four_scripture_one_word/
 
 
@@ -143,7 +146,16 @@ flutter:
          - asset: assets/fonts/quicksand/static/Quicksand-Medium.ttf
          - asset: assets/fonts/quicksand/static/Quicksand-Regular.ttf
          - asset: assets/fonts/quicksand/static/Quicksand-SemiBold.ttf
-
+     - family: Mikado
+       fonts:
+           - asset: assets/fonts/mikado/MikadoBlack.ttf
+           - asset: assets/fonts/mikado/MikadoBold.ttf
+           - asset: assets/fonts/mikado/MikadoBlack-Italic.ttf
+           - asset: assets/fonts/mikado/MikadoLight.ttf
+           - asset: assets/fonts/mikado/MikadoLight-Italic.ttf
+           - asset: assets/fonts/mikado/MikadoMedium.ttf
+           - asset: assets/fonts/mikado/MikadoRegular.ttf
+           - asset: assets/fonts/mikado/MikadoUltra.ttf
      - family: Neuland
        fonts:
          - asset: assets/fonts/neuland/Neuland.ttf

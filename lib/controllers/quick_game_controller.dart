@@ -66,7 +66,6 @@ class QuickGameController extends GetxController {
      modalTitle.value = 'All set to go 🥳😃';
      gameIsReady(true);
    } catch(e) {
-     print(e);
      gameIsReady(false);
    }
 

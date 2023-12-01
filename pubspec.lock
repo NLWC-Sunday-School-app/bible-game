@@ -328,6 +328,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_custom_clippers:
+    dependency: "direct main"
+    description:
+      name: flutter_custom_clippers
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -375,6 +382,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_timer_countdown:
+    dependency: "direct main"
+    description:
+      name: flutter_timer_countdown
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.7"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -492,6 +506,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  lottie:
+    dependency: "direct main"
+    description:
+      name: lottie
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.2"
   matcher:
     dependency: transitive
     description:
@@ -826,6 +847,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
+  stroke_text:
+    dependency: "direct main"
+    description:
+      name: stroke_text
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   term_glyph:
     dependency: transitive
     description:

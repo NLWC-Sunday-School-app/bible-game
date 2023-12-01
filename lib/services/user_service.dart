@@ -96,6 +96,16 @@ class UserService {
 
   }
 
+  static Future<void> initializeWallet() async{
+    try{
+      final response = await DioClient().dio.get('/store/wallet/initialize');
+    }on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+
+  }
+
   // static Future<void> getUserPilgrimProgressByToken(token) async{
   //   // var response = await http.get(Uri.parse('$baseUrl/user/progress/${_userController.myUser['id']}'), headers: {'Content-Type': 'application/json',
   //   // 'accept': 'application/json', 'Authorization': 'Bearer $token'},);
@@ -114,6 +124,7 @@ class UserService {
        final response = await DioClient().dio.get('/games/play/settings');
        _userController.userGameSettings.value = response.data;
        box.write('game_settings', response.data);
+       print('game setting: ${response.data}');
     }on DioException catch (e) {
       final errorMessage = DioExceptions.fromDioError(e).toString();
       throw errorMessage;

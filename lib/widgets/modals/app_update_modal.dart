@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:launch_review/launch_review.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 class AppUpdateModal extends StatelessWidget {
   const AppUpdateModal({Key? key}) : super(key: key);
@@ -35,13 +36,17 @@ class AppUpdateModal extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 20.h,),
-              Text(
-                'There’s a new game\n update for you!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 20.sp,
-                    fontFamily: 'Neuland',
-                    color: const Color(0xFF548BD5)
+              Center(
+                child: StrokeText(
+                  text: 'There’s a new game \n     update for you!',
+                  textStyle: TextStyle(
+                    color: const Color(0xFF1768B9),
+                    fontFamily: 'Mikado',
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  strokeColor: Colors.white,
+                  strokeWidth: 5,
                 ),
               ),
               SizedBox(height: 20.h,),
@@ -49,6 +54,7 @@ class AppUpdateModal extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 14.sp,
+                    fontFamily: 'Mikado',
                     fontWeight: FontWeight.w500
                 ),
               ),
@@ -69,17 +75,24 @@ class AppUpdateModal extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   decoration: BoxDecoration(
                       color: const Color(0xFF548BD5),
-                      border: Border.all(color: const Color(0xFF548CD7)),
+                      image: const DecorationImage(
+                        image: AssetImage(
+                            "assets/images/aesthetics/update_btn_bg.png"),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(color: const Color(0xFF1E62D4), width: 2.w),
                       borderRadius:
-                      const BorderRadius.all(Radius.circular(40))),
+                      BorderRadius.all(Radius.circular(10.r))),
                   child: Text(
-                    'UPDATE APP NOW',
+                    'Update app now',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontFamily: 'Neuland',
+                        fontFamily: 'Mikado',
                         letterSpacing: 1,
                         color: const Color(0xFFFFFFFF),
-                        fontSize: 14.sp),
+                        fontSize: 16.sp,
+                      fontWeight: FontWeight.w700
+                    ),
                   ),
                 ),
               ),

@@ -134,7 +134,7 @@ class _QuickGameStepOneScreenState extends State<QuickGameStepOneScreen> {
                   ? Center(
                       child: Image.asset('assets/images/icons/loader.gif'),
                     )
-                  : SizedBox()
+                  : const SizedBox()
             ])),
           ),
           Obx(

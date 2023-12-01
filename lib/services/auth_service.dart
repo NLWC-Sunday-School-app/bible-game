@@ -74,6 +74,8 @@ class AuthService {
             'email': email,
             'password': password
           });
+          print('token, ${response.data['token']}');
+          box.write('user_token', response.data['token']);
           return response.statusCode;
        } on DioException catch (e) {
          final errorMessage = DioExceptions.fromDioError(e).toString();

@@ -21,7 +21,7 @@ class FourScripturesOneWordController extends GetxController {
        isFetchingQuestions(false);
        Get.to(() => const FourScriptureQuestionScreen());
      }catch(e){
-       print(e);
+
      }
   }
 

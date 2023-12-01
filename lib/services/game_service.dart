@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:bible_game/models/leaderboard.dart';
+import 'package:bible_game/models/whoIsWhoLevel.dart';
 import 'package:bible_game/services/user_service.dart';
 import 'package:bible_game/utilities/dio_client.dart';
 import 'package:dio/dio.dart';
@@ -9,7 +10,9 @@ import '../models/fourScripturesOneWord.dart';
 import '../models/games.dart';
 import '../models/globalLeaderboard.dart';
 import '../models/question.dart';
+import '../models/whoIsWho.dart';
 import '../utilities/dio_exceptions.dart';
+import '../widgets/who_is_who/who_is_who_level.dart';
 import 'base_url_service.dart';
 
 class GameService {
@@ -194,6 +197,33 @@ class GameService {
     try{
       final response = await DioClient().dio.get('/four-scripts-one-word/total');
       return response.data;
+    }on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+
+  }
+
+  static Future<List<WhoIsWho>> getWhoIsWhoQuestions() async{
+    try{
+      final response = await DioClient().dio.get('/whoiswho/game');
+      final questions = (response.data as List)
+          .map((e) => WhoIsWho.fromJson(e))
+          .toList();
+      return questions;
+    }on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+  }
+
+  static Future<List<WhoIsWhoGameLevel>> getWhoIsWhoLevels() async{
+    try{
+      final response = await DioClient().dio.get('/whoiswho/levels/user');
+      final levels = (response.data as List)
+          .map((e) => WhoIsWhoGameLevel.fromJson(e))
+          .toList();
+      return levels;
     }on DioException catch (e) {
       final errorMessage = DioExceptions.fromDioError(e).toString();
       throw errorMessage;

@@ -16,7 +16,6 @@ class FourScriptureQuestionScreen extends StatefulWidget {
 class _FourScriptureQuestionScreenState extends State<FourScriptureQuestionScreen> {
   Future<bool?> showWarning(BuildContext context) async => Get.dialog(const FourScripturesQuitModal(), barrierDismissible: false,);
   FourScriptureQuestionController fourScriptureQuestionController = Get.put(FourScriptureQuestionController());
-  bool _hasChanges = true;
 
   @override
   Widget build(BuildContext context) {
