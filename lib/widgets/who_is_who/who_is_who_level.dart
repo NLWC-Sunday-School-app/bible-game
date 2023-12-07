@@ -19,7 +19,7 @@ class WhoIsWhoLevel extends StatelessWidget {
     return GestureDetector(
       onTap: (){
         if(isUnLocked){
-          wiwGameController.gameDuration.value = playTime;
+          wiwGameController.gameDuration.value = 1;
           wiwGameController.getQuestions();
         }
       },

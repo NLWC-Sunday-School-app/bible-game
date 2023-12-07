@@ -67,7 +67,8 @@ class GameSummaryModal extends StatelessWidget {
                         decoration: const BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage(
-                                'assets/images/game_completed_layout.png'),
+                              'assets/images/game_completed_layout.png',
+                            ),
                             fit: BoxFit.fill,
                           ),
                         ),

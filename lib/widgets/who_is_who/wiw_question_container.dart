@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:lottie/lottie.dart';
 import '../../controllers/wiw_game_question_controller.dart';
 import '../../models/whoIsWho.dart';
+import '../modals/wiw_quit_modal.dart';
 
 class WiwQuestionContainer extends StatefulWidget {
   const WiwQuestionContainer({Key? key, required this.question})
@@ -76,11 +77,14 @@ class _WiwQuestionContainerState extends State<WiwQuestionContainer> {
             )
           ),
           const Spacer(),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Image.asset(
-              'assets/images/icons/new_close.png',
-              width: 52.w,
+          InkWell(
+            onTap: () => Get.dialog(const WiwQuitModal()),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Image.asset(
+                'assets/images/icons/new_close.png',
+                width: 52.w,
+              ),
             ),
           ),
           SizedBox(

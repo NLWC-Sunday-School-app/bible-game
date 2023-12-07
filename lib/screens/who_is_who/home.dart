@@ -157,9 +157,7 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                                             return Column(
                                               children: [
                                                 WhoIsWhoLevel(
-                                                  isUnLocked: index == 0
-                                                      ? true
-                                                      : _wiwGameController
+                                                  isUnLocked: _wiwGameController
                                                       .gameLevels[index]
                                                       .isUnlocked,
                                                   level: (index + 1).toString(),
