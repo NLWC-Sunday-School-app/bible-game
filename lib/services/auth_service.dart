@@ -13,69 +13,36 @@ import '../utilities/dio_exceptions.dart';
 
 class AuthService {
      static GetStorage box = GetStorage();
-     
-     
-     static Future<dynamic> registerUser(name, email, password, fcmToken) async {
+
+     static Future<dynamic> registerUser(name, email, password, fcmToken, country) async {
        try{
-          final response = await DioClient().dio.post('/auth/register', data: {
-            'name': name,
-            'email': email,
-            'password': password,
-            'fcmToken': fcmToken
-          });
+         final response = await DioClient().dio.post('/auth/register', data:{
+           'name': name,
+           'email': email,
+           'password': password,
+           'fcmToken': fcmToken,
+           'country': country
+         });
+         return response.statusCode;
        } on DioException catch (e) {
          final errorMessage = DioExceptions.fromDioError(e).toString();
          throw errorMessage;
        }
+
      }
 
 
 
      static Future<dynamic> loginUser(email, password) async {
-          // var response = await http.post(Uri.parse('$baseUrl/auth/login'),
-          //  headers: BaseUrlService().headers, body:  jsonEncode({'email': email, 'password': password}));
-          // var responseData = json.decode(response.body);
-          // if(response.statusCode == 200){
-          //   final data = json.decode(response.body) as Map<String, dynamic>;
-          //   await box.write('user_token', data['token']);
-          //   var isTempLoggedIn = GetStorage().read('isTempLoggedIn') ?? false ;
-          //   await UserService.getUserDataByToken( data['token']);
-          //   await UserService.getUserPilgrimProgressByToken(data['token']);
-          //   if(isTempLoggedIn){
-          //      var userData = GetStorage().read('user_data');
-          //      var gameData = GetStorage().read('tempProgressData');
-          //      var userId = userData['id'];
-          //      await GameService.sendGameDataByToken(
-          //        gameData['gameMode'],
-          //        gameData['totalScore'],
-          //        gameData['baseScore'],
-          //        gameData['bonusScore'],
-          //        gameData['averageTimeSpent'],
-          //        gameData['playerRank'],
-          //        gameData['noOfCorrectAnswers'],
-          //        userId,
-          //        gameData['userProgress'],
-          //         gameData['numberOfRounds'],
-          //        data['token'],
-          //      );
-          //
-          //   }else{
-          //     await UserService.getUserPilgrimProgressByToken(data['token']);
-          //   }
-          //   return 200;
-          // }else{
-          //   var data = json.decode(response.body);
-          //
-          //   return data['errors'][0];
-          // }
-
        try{
           final response = await DioClient().dio.post('/auth/login', data:{
             'email': email,
             'password': password
           });
           print('token, ${response.data['token']}');
+          print('token, ${response.data['refreshToken']}');
           box.write('user_token', response.data['token']);
+          box.write('refresh_token', response.data['refreshToken']);
           return response.statusCode;
        } on DioException catch (e) {
          final errorMessage = DioExceptions.fromDioError(e).toString();
@@ -83,6 +50,26 @@ class AuthService {
        }
 
      }
+
+     static Future<dynamic> refreshToken(refreshToken) async {
+       try{
+         final response = await DioClient().dio.post('/auth/refresh-token', data:{
+           'refreshToken': refreshToken,
+         });
+         print('token, ${response.data['token']}');
+         print(response.data);
+         print('token, ${response.data['refreshToken']}');
+         box.write('user_token', response.data['token']);
+         box.write('refresh_token', response.data['refreshToken']);
+         return response.statusCode;
+       } on DioException catch (e) {
+         final errorMessage = DioExceptions.fromDioError(e).toString();
+         throw errorMessage;
+       }
+
+     }
+
+
 
      static Future<dynamic>sendForgotPasswordMail(emailAddress) async {
        try{
@@ -126,7 +113,7 @@ class AuthService {
      static Future<dynamic> loginOutUser() async {
        try{
          final response = await DioClient().dio.get('/auth/logout');
-         return response;
+         return response.statusCode;
        }on DioException catch (e) {
          final errorMessage = DioExceptions.fromDioError(e).toString();
          throw errorMessage;

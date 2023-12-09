@@ -50,7 +50,7 @@ class _QuickGameStepOneScreenState extends State<QuickGameStepOneScreen> {
                               bottom: Get.height < 680 ? 60.h : 80.h),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF32B1F2),
+                        color: const Color(0xFF084E9A),
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(30.r),
                           bottomRight: Radius.circular(30.r),

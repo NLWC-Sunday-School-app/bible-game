@@ -6,27 +6,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:stroke_text/stroke_text.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
+import '../button/modal_blue_button.dart';
 
 class EnterResetPasswordCodeModal extends StatefulWidget {
   const EnterResetPasswordCodeModal({Key? key}) : super(key: key);
 
   @override
-  State<EnterResetPasswordCodeModal> createState() => _EnterResetPasswordCodeModalState();
+  State<EnterResetPasswordCodeModal> createState() =>
+      _EnterResetPasswordCodeModalState();
 }
 
-class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModal> {
-
+class _EnterResetPasswordCodeModalState
+    extends State<EnterResetPasswordCodeModal> {
   AuthController authController = Get.put(AuthController());
   final UserController _userController = Get.put(UserController());
+
   //final otpController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+      insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
       backgroundColor: Colors.transparent,
       child: SizedBox(
         height: Get.width >= 500 ? 450.h : 500.h,
@@ -34,8 +37,9 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-                image: AssetImage('assets/images/modal_layout_2.png'),
-                fit: BoxFit.fill),
+              image: AssetImage('assets/images/aesthetics/modal_bg.png'),
+              fit: BoxFit.fill,
+            ),
           ),
           child: Form(
             child: Column(
@@ -51,7 +55,6 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
                         : null,
                     authController.otpController.text = '',
                     Get.back()
-
                   },
                   child: Padding(
                     padding: EdgeInsets.only(right: 15.0.w),
@@ -60,7 +63,7 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
                       children: [
                         Image.asset(
                           'assets/images/icons/close.png',
-                          width: 40.w,
+                          width: 35.w,
                         )
                       ],
                     ),
@@ -69,12 +72,16 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
                 const SizedBox(
                   height: 10,
                 ),
-                AutoSizeText(
-                  'code sent',
-                  style: TextStyle(
-                      fontFamily: 'Neuland',
-                      fontSize: 25.sp,
-                      color: const Color(0xFF4075BB)),
+                StrokeText(
+                  text: 'Code Sent',
+                  textStyle: TextStyle(
+                    color: const Color(0xFF1768B9),
+                    fontFamily: 'Mikado',
+                    fontSize: 25.sp,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  strokeColor: Colors.white,
+                  strokeWidth: 5,
                 ),
                 SizedBox(
                   height: 10.h,
@@ -82,8 +89,11 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
                 AutoSizeText(
                   'Kindly type in the code \nsent to your mail',
                   textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Mikado',
+                  ),
                 ),
                 SizedBox(
                   height: 25.h,
@@ -117,53 +127,29 @@ class _EnterResetPasswordCodeModalState extends State<EnterResetPasswordCodeModa
                       print('love');
                     },
                     appContext: context,
-                    onChanged: (String value) {
-
-                    },
+                    onChanged: (String value) {},
                   ),
                 ),
                 SizedBox(
                   height: 20.h,
                 ),
+
+
                 Obx(
-                  () => GestureDetector(
+                  () => ModalBlueButton(
+                    buttonText: 'Verify Code',
+                    buttonIsLoading: authController.isVerifyingCode.value,
                     onTap: () => {
                       _userController.soundIsOff.isFalse
                           ? _userController.playGameSound()
                           : null,
-                       authController.verifyOTP(authController.otpController.text),
+                      if(authController.otpController.text.length == 4){
+                        authController.verifyOTP(authController.otpController.text),
+                      }
 
                     },
-                    child: Container(
-                      width: 200.w,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFF548BD5),
-                          border: Border.all(color: const Color(0xFF548CD7)),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(40))),
-                      child: authController.isVerifyingCode.isTrue
-                          ? Center(
-                              child: SizedBox(
-                                  height: 20.w,
-                                  width: 20.w,
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  )),
-                            )
-                          : Text(
-                              'verify code',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontFamily: 'Neuland',
-                                  letterSpacing: 1,
-                                  color: Colors.white,
-                                  fontSize: 14.sp),
-                            ),
-                    ),
                   ),
-                ),
+                )
               ],
             ),
           ),

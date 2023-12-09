@@ -9,6 +9,7 @@ import 'package:bible_game/widgets/modals/wiw_success_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../widgets/modals/wiw_not_enough_coins_modal.dart';
 import '../widgets/modals/wiw_timeup_modal.dart';
 import 'auth_controller.dart';
 
@@ -58,10 +59,11 @@ class WiwGameQuestionController extends GetxController  with SingleGetTickerProv
       final seconds = myDuration.value.inSeconds - reduceSecondsBy;
       if (seconds < 0) {
         countdownTimer!.cancel();
-        if(numOfCorrectAnswers > 4){
+        if(numOfCorrectAnswers > 20){
           Get.dialog(const WiwSuccessModal());
         }else{
-          Get.dialog(const WiwTimeUpModal());
+            Get.dialog(const WiwTimeUpModal(), transitionCurve: Curves.fastOutSlowIn,
+                transitionDuration: const Duration(milliseconds: 500));
         }
       } else {
         myDuration.value = Duration(seconds: seconds);

@@ -3,10 +3,13 @@ import 'package:bible_game/widgets/modals/enter_reset_password_code_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
 import '../../utilities/validator.dart';
+import '../button/modal_blue_button.dart';
+
 class ResetPasswordModal extends StatefulWidget {
   const ResetPasswordModal({Key? key}) : super(key: key);
 
@@ -16,6 +19,7 @@ class ResetPasswordModal extends StatefulWidget {
 
 class _ResetPasswordModalState extends State<ResetPasswordModal> {
   final GlobalKey<FormState> _resetPasswordFormKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     AuthController authController = Get.put(AuthController());
@@ -29,7 +33,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-                image: AssetImage('assets/images/modal_layout_2.png'),
+                image: AssetImage('assets/images/aesthetics/modal_bg.png'),
                 fit: BoxFit.fill),
           ),
           child: Form(
@@ -54,7 +58,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                       children: [
                         Image.asset(
                           'assets/images/icons/close.png',
-                          width: 40.w,
+                          width: 35.w,
                         )
                       ],
                     ),
@@ -63,21 +67,28 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                 const SizedBox(
                   height: 10,
                 ),
-                AutoSizeText(
-                  'Reset password',
-                  style: TextStyle(
-                      fontFamily: 'Neuland',
-                      fontSize: 25.sp,
-                      color: const Color(0xFF4075BB)),
+                StrokeText(
+                  text: 'Reset password',
+                  textStyle: TextStyle(
+                    color: const Color(0xFF1768B9),
+                    fontFamily: 'Mikado',
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  strokeColor: Colors.white,
+                  strokeWidth: 5,
                 ),
                 SizedBox(
                   height: 10.h,
                 ),
-                AutoSizeText(
+                Text(
                   'Fear not, you can reset your \npassword.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: 14.sp, fontWeight: FontWeight.w500),
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Mikado'
+                  ),
                 ),
                 SizedBox(
                   height: 25.h,
@@ -90,7 +101,9 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                       style: TextStyle(
                           height: 1.5.h,
                           color: const Color(0xFF104387),
-                          fontSize: 12.sp),
+                          fontSize: 12.sp,
+                          fontFamily: 'Mikado'
+                      ),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFFD4DDDF),
@@ -111,55 +124,31 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                                 color: Color(0xFFD4DDDF), width: 1.5)),
                       ),
                       validator: (text) {
-                         var validation = Validator.validateEmail(text!);
-                         return validation;
+                        var validation = Validator.validateEmail(text!);
+                        return validation;
                       },
-                      onChanged: (text) =>
-                      {authController.forgotPasswordMail.value = text,
+                      onChanged: (text) => {
+                        authController.forgotPasswordMail.value = text,
                       },
                     ),
                   ),
                 ),
-                SizedBox(height: 40.h,),
-                GestureDetector(
-                  onTap: () => {
-                    _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
-                    if(_resetPasswordFormKey.currentState!.validate()){
-                      authController.sendForgotPasswordMail()
-                    }
-
-                  },
-                  child: Obx(
-                    () => Container(
-                      width: 200.w,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFF548BD5),
-                          border: Border.all(color: const Color(0xFF548CD7)),
-                          borderRadius:
-                          const BorderRadius.all(Radius.circular(40))),
-                      child: authController.isSendingCode.isTrue ?
-                      Center(
-                        child: SizedBox(
-                            height: 20.w,
-                            width: 20.w,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            )),
-                      )
-                          : Text(
-                        'send code',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: 'Neuland',
-                            letterSpacing: 1,
-                            color: Colors.white,
-                            fontSize: 14.sp),
-                      ),
-                    ),
-                  ),
+                SizedBox(
+                  height: 40.h,
                 ),
+                Obx(
+                  () => ModalBlueButton(
+                    buttonText: 'Send Code',
+                    buttonIsLoading: authController.isSendingCode.value,
+                      onTap: () => {
+                        _userController.soundIsOff.isFalse
+                            ? _userController.playGameSound()
+                            : null,
+                        if (_resetPasswordFormKey.currentState!.validate())
+                          {authController.sendForgotPasswordMail()}
+                      },
+                  ),
+                )
               ],
             ),
           ),

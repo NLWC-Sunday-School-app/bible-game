@@ -19,6 +19,7 @@ import 'package:bible_game/widgets/modals/nativity_loader.dart';
 import 'package:bible_game/widgets/modals/no_badge_info.dart';
 import 'package:bible_game/widgets/modals/pilgrim_progress_welcome_modal.dart';
 import 'package:bible_game/widgets/modals/settings_modal.dart';
+import 'package:bible_game/widgets/modals/who_is_who_guide.dart';
 import 'package:bible_game/widgets/shimmer/ads_shimmer.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   final UserController _userController = Get.put(UserController());
   final AuthController _authController = Get.put(AuthController());
   final PilgrimProgressController _pilgrimProgressController =
-  Get.put(PilgrimProgressController());
+      Get.put(PilgrimProgressController());
 
   @override
   void dispose() {
@@ -72,16 +73,14 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
       }
     } else {
       Get.dialog(const AuthModal(
-          title: 'your profile',
+          title: 'Your profile',
           text:
-          'Sign in to your profile to save \n& continue your game play.'));
+              'Sign in to your profile to save \n& continue your game play.'));
     }
   }
 
   String greeting() {
-    var hour = DateTime
-        .now()
-        .hour;
+    var hour = DateTime.now().hour;
     if (hour < 12) {
       return 'Good Morning,';
     }
@@ -122,21 +121,22 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         {
           Get.dialog(
             Obx(
-                  () =>
-                  BadgeInfo(
-                    modalLayoutUrl: 'assets/images/babe_layout.png',
-                    badgeUrl: 'assets/images/badges/babe_badge.png',
-                    badgeName: 'BABE BADGE!',
-                    badgeNameColor: 0xFF5D42C8,
-                    pointsBgColor: 0xFFE2DAFF,
-                    badgeTotalPoint:
+              () => BadgeInfo(
+                modalLayoutUrl: 'assets/images/babe_layout.png',
+                badgeUrl: 'assets/images/badges/babe_badge.png',
+                badgeName: 'BABE BADGE!',
+                badgeNameColor: 0xFF5D42C8,
+                pointsBgColor: 0xFFE2DAFF,
+                badgeTotalPoint:
                     _pilgrimProgressController.totalPointsAvailableInBabe.value,
-                    badgePointGained:
+                badgePointGained:
                     _pilgrimProgressController.totalPointsGainedInBabe.value,
-                    badgeSubText:
+                badgeSubText:
                     'Such a good start! Keep playing \nto grow through the ranks. \nChild badge in view!',
-                  ),
+              ),
             ),
+              transitionCurve: Curves.fastOutSlowIn,
+              transitionDuration: const Duration(milliseconds: 1000)
           );
 
           break;
@@ -144,101 +144,111 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
       case 'child':
         {
           Get.dialog(Obx(
-                () =>
-                BadgeInfo(
-                  modalLayoutUrl: 'assets/images/child_layout.png',
-                  badgeUrl: 'assets/images/badges/child_badge.png',
-                  badgeName: 'CHILD BADGE!',
-                  badgeNameColor: 0xFFC75523,
-                  pointsBgColor: 0xFFFDE3CA,
-                  badgeTotalPoint:
+            () => BadgeInfo(
+              modalLayoutUrl: 'assets/images/child_layout.png',
+              badgeUrl: 'assets/images/badges/child_badge.png',
+              badgeName: 'CHILD BADGE!',
+              badgeNameColor: 0xFFC75523,
+              pointsBgColor: 0xFFFDE3CA,
+              badgeTotalPoint:
                   _pilgrimProgressController.totalPointsAvailableInChild.value,
-                  badgePointGained:
+              badgePointGained:
                   _pilgrimProgressController.totalPointsGainedInChild.value,
-                  badgeSubText:
+              badgeSubText:
                   'Having a child badge means the \nmore you play the closer to \nbecoming a young believer!',
-                ),
-          ));
+            ),
+          ),
+              transitionCurve: Curves.fastOutSlowIn,
+              transitionDuration: const Duration(milliseconds: 1000)
+          );
           break;
         }
       case 'young believer':
         {
           Get.dialog(Obx(
-                () =>
-                BadgeInfo(
-                  modalLayoutUrl: 'assets/images/yb_layout.png',
-                  badgeUrl: 'assets/images/badges/yb_badge.png',
-                  badgeName: 'YOUNG BELIEVER\n BADGE!',
-                  badgeNameColor: 0xFF8999A8,
-                  pointsBgColor: 0xFF9EB7CD,
-                  badgeTotalPoint:
+            () => BadgeInfo(
+              modalLayoutUrl: 'assets/images/yb_layout.png',
+              badgeUrl: 'assets/images/badges/yb_badge.png',
+              badgeName: 'YOUNG BELIEVER\n BADGE!',
+              badgeNameColor: 0xFF8999A8,
+              pointsBgColor: 0xFF9EB7CD,
+              badgeTotalPoint:
                   _pilgrimProgressController.totalPointsAvailableInYb.value,
-                  badgePointGained:
+              badgePointGained:
                   _pilgrimProgressController.totalPointsGainedInYb.value,
-                  badgeSubText:
+              badgeSubText:
                   'The next badge is for Charity! \nDo not relent now, there is \nreward round the corner!',
-                ),
-          ));
+            ),
+          ),
+              transitionCurve: Curves.fastOutSlowIn,
+              transitionDuration: const Duration(milliseconds: 1000)
+          );
           break;
         }
       case 'charity':
         {
           Get.dialog(Obx(
-                () =>
-                BadgeInfo(
-                  modalLayoutUrl: 'assets/images/charity_layout.png',
-                  badgeUrl: 'assets/images/badges/charity_badge.png',
-                  badgeName: 'CHARITY BADGE!',
-                  badgeNameColor: 0xFFC88008,
-                  pointsBgColor: 0xFFFFF44B,
-                  badgeTotalPoint: _pilgrimProgressController
-                      .totalPointsAvailableInCharity.value,
-                  badgePointGained:
+            () => BadgeInfo(
+              modalLayoutUrl: 'assets/images/charity_layout.png',
+              badgeUrl: 'assets/images/badges/charity_badge.png',
+              badgeName: 'CHARITY BADGE!',
+              badgeNameColor: 0xFFC88008,
+              pointsBgColor: 0xFFFFF44B,
+              badgeTotalPoint: _pilgrimProgressController
+                  .totalPointsAvailableInCharity.value,
+              badgePointGained:
                   _pilgrimProgressController.totalPointsGainedInCharity.value,
-                  badgeSubText:
+              badgeSubText:
                   'A milestone! Keep playing \nto grow through the ranks. \nFather badge in view!',
-                ),
-          ));
+            ),
+          ),
+              transitionCurve: Curves.fastOutSlowIn,
+              transitionDuration: const Duration(milliseconds: 1000)
+          );
           break;
         }
       case 'father':
         {
           Get.dialog(Obx(
-                () =>
-                BadgeInfo(
-                  modalLayoutUrl: 'assets/images/father_layout.png',
-                  badgeUrl: 'assets/images/badges/father_badge.png',
-                  badgeName: 'FATHER BADGE!',
-                  badgeNameColor: 0xFF4174E7,
-                  pointsBgColor: 0xFFDFEEFF,
-                  badgeTotalPoint:
+            () => BadgeInfo(
+              modalLayoutUrl: 'assets/images/father_layout.png',
+              badgeUrl: 'assets/images/badges/father_badge.png',
+              badgeName: 'FATHER BADGE!',
+              badgeNameColor: 0xFF4174E7,
+              pointsBgColor: 0xFFDFEEFF,
+              badgeTotalPoint:
                   _pilgrimProgressController.totalPointsAvailableInFather.value,
-                  badgePointGained:
+              badgePointGained:
                   _pilgrimProgressController.totalPointsGainedInFather.value,
-                  badgeSubText:
+              badgeSubText:
                   'You’ve come a long way to \nget here, play more games \nto become an Elder!',
-                ),
-          ));
+            ),
+          ),
+              transitionCurve: Curves.fastOutSlowIn,
+              transitionDuration: const Duration(milliseconds: 1000)
+          );
           break;
         }
       case 'elder':
         {
           Get.dialog(Obx(
-                () =>
-                BadgeInfo(
-                  modalLayoutUrl: 'assets/images/elder_layout.png',
-                  badgeUrl: 'assets/images/badges/elder_badge.png',
-                  badgeName: 'ELDER BADGE!',
-                  badgeNameColor: 0xFF3F4060,
-                  pointsBgColor: 0xFFFED806,
-                  badgeTotalPoint:
+            () => BadgeInfo(
+              modalLayoutUrl: 'assets/images/elder_layout.png',
+              badgeUrl: 'assets/images/badges/elder_badge.png',
+              badgeName: 'ELDER BADGE!',
+              badgeNameColor: 0xFF3F4060,
+              pointsBgColor: 0xFFFED806,
+              badgeTotalPoint:
                   _pilgrimProgressController.totalPointsAvailableInElder.value,
-                  badgePointGained:
+              badgePointGained:
                   _pilgrimProgressController.totalPointsGainedInElder.value,
-                  badgeSubText:
+              badgeSubText:
                   'You have gotten to the height!\n Keep playing to unlock new \ntests!',
-                ),
-          ));
+            ),
+          ),
+              transitionCurve: Curves.fastOutSlowIn,
+              transitionDuration: const Duration(milliseconds: 1000)
+          );
           break;
         }
     }
@@ -263,8 +273,8 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                   height: Get.height < 680
                       ? 130
                       : (Get.height > 680 && Get.height < 800)
-                      ? 150
-                      : 60,
+                          ? 150
+                          : 60,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: const Color(0xFF366ABC),
@@ -291,15 +301,27 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                       Row(
                         children: [
                           Obx(
-                            () => _authController.isLoggedIn.isTrue ?  UserProfileInfo(
-                              avatarUrl: '${BaseUrlService.avatarBaseUrl}/${_userController.myUser['id']}.png?apikey=${BaseUrlService.avatarApiKey}',
-                              username:  _userController.myUser['name'] ?? 'Beloved' ,
-                              gameLevel: _userController.myUser['rank'],
-                              badgeSrc: getBadgeUrl(),
-                            ): const SignInProfile(),
+                            () => _authController.isLoggedIn.isTrue
+                                ? UserProfileInfo(
+                                    avatarUrl:
+                                        '${BaseUrlService.avatarBaseUrl}/${_userController.myUser['id']}.png?apikey=${BaseUrlService.avatarApiKey}',
+                                    username: _userController.myUser['name'] ??
+                                        'Beloved',
+                                    gameLevel: _userController.myUser['rank'],
+                                    badgeSrc: getBadgeUrl(),
+                                    displayBadgeInfo: displayBadgeInfo,
+                                  )
+                                : const SignInProfile(),
                           ),
                           const Spacer(),
-                          const GameScoreInfo()
+                          Obx(
+                            () => GameScoreInfo(
+                              noOfCoins: _authController.isLoggedIn.isTrue
+                                  ? _userController.myUser['coinWalletBalance']
+                                  : 0,
+                              noOfGems: 0,
+                            ),
+                          )
                         ],
                       ),
                       // Container(
@@ -485,12 +507,11 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                       GameCardInfo(
                         gameTitle: 'Quick Game',
                         gameText:
-                        'Test your bible knowledge \nthrough short quizzes',
-                        gameImageUrl: 'assets/images/bible_image.svg',
-                        gameImageWidth: 256.w,
+                            'Test your bible knowledge \nthrough short quizzes',
+                        gameImageUrl: 'assets/images/aesthetics/bible.gif',
+                        gameImageWidth: 130.w,
                         cardColor: 0xFF1A3B77,
-                        onTap: () =>
-                        {
+                        onTap: () => {
                           _userController.soundIsOff.isFalse
                               ? _userController.playGameSound()
                               : null,
@@ -503,14 +524,29 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                       GameCardInfo(
                         gameTitle: 'Who is who?',
                         gameText:
-                        'Know bible names and stories? \nPlay this easy game to learn \nmore!',
-                        gameImageUrl: 'assets/images/who.png',
-                        gameImageWidth: 200.w,
+                            'Know bible names and stories? \nPlay this easy game to learn \nmore!',
+                        gameImageUrl: 'assets/images/aesthetics/whoiswho.gif',
+                        gameImageWidth: 150.w,
                         cardColor: 0xFFDE2D42,
-                        onTap: () =>
-                        {
-                          // userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                          Get.to(() => const WhoIsWhoHomeScreen())
+                        onTap: () {
+                          var firstTime =
+                              GetStorage().read('wiw_info_first_time') ?? true;
+                          _userController.soundIsOff.isFalse
+                              ? _userController.playGameSound()
+                              : null;
+                          if (_authController.isLoggedIn.isTrue) {
+                            if (firstTime) {
+                              Get.dialog(const WhoIsWhoGuide());
+                            } else {
+                              Get.to(() => const WhoIsWhoHomeScreen());
+                            }
+                          } else {
+                            Get.dialog(const AuthModal(
+                                title: 'Your profile',
+                                text:
+                                    'Sign in to your profile to save \n& continue your game play.'));
+                          }
+
                         },
                       ),
                       SizedBox(
@@ -519,12 +555,12 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                       GameCardInfo(
                         gameTitle: 'Pilgrim Progress',
                         gameText:
-                        'Journey through the bible, \nGrow as you progress ',
-                        gameImageUrl: 'assets/images/pilgrim_progress.svg',
-                        gameImageWidth: 179.w,
+                            'Journey through the bible, \nGrow as you progress ',
+                        gameImageUrl:
+                            'assets/images/aesthetics/pilgrim_hill.gif',
+                        gameImageWidth: 150.w,
                         cardColor: 0xFF97D3FF,
-                        onTap: () =>
-                        {
+                        onTap: () => {
                           _userController.soundIsOff.isFalse
                               ? _userController.playGameSound()
                               : null,
@@ -537,12 +573,11 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                       GameCardInfo(
                         gameTitle: '4 scriptures, \n1 word!',
                         gameText:
-                        'Put together this puzzle, \nshow thyself approved ',
-                        gameImageUrl: 'assets/images/aesthetics/scroll.png',
-                        gameImageWidth: 170.w,
+                            'Put together this puzzle, \nshow thyself approved ',
+                        gameImageUrl: 'assets/images/aesthetics/scroll.gif',
+                        gameImageWidth: 150.w,
                         cardColor: 0xFFFFC973,
-                        onTap: () =>
-                        {
+                        onTap: () => {
                           _userController.soundIsOff.isFalse
                               ? _userController.playGameSound()
                               : null,
@@ -568,32 +603,31 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                         height: 15.h,
                       ),
                       Obx(
-                            () =>
-                            SizedBox(
-                              child: _userController.isLoaded.isFalse
-                                  ? CarouselSlider.builder(
-                                itemCount: _userController.adsData.length,
-                                itemBuilder: (BuildContext context,
-                                    int itemIndex, int pageViewIndex) =>
-                                    AdsCard(
-                                      imageUrl: _userController
-                                          .adsData[itemIndex].imageUrl,
-                                      title: _userController
-                                          .adsData[itemIndex].title,
-                                    ),
-                                options: CarouselOptions(
-                                  aspectRatio:
-                                  Get.width > 900 ? 15 / 10 : 9 / 10,
-                                  viewportFraction: 1,
-                                  autoPlay: true,
-                                  autoPlayInterval:
-                                  const Duration(seconds: 3),
-                                  autoPlayCurve: Curves.fastOutSlowIn,
-                                  enlargeCenterPage: true,
-                                ),
-                              )
-                                  : const AdsCardShimmer(),
-                            ),
+                        () => SizedBox(
+                          child: _userController.isLoaded.isFalse
+                              ? CarouselSlider.builder(
+                                  itemCount: _userController.adsData.length,
+                                  itemBuilder: (BuildContext context,
+                                          int itemIndex, int pageViewIndex) =>
+                                      AdsCard(
+                                    imageUrl: _userController
+                                        .adsData[itemIndex].imageUrl,
+                                    title: _userController
+                                        .adsData[itemIndex].title,
+                                  ),
+                                  options: CarouselOptions(
+                                    aspectRatio:
+                                        Get.width > 900 ? 15 / 10 : 9 / 10,
+                                    viewportFraction: 1,
+                                    autoPlay: true,
+                                    autoPlayInterval:
+                                        const Duration(seconds: 1),
+                                    autoPlayCurve: Curves.fastOutSlowIn,
+                                    enlargeCenterPage: true,
+                                  ),
+                                )
+                              : const AdsCardShimmer(),
+                        ),
                       ),
                       SizedBox(
                         height: 30.h,

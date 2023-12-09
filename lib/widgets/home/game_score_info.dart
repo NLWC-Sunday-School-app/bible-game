@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GameScoreInfo extends StatelessWidget {
-  const GameScoreInfo({Key? key}) : super(key: key);
+  const GameScoreInfo({Key? key, required this.noOfCoins, required this.noOfGems}) : super(key: key);
+  final int noOfCoins;
+  final int noOfGems;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,7 @@ class GameScoreInfo extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Text(
-                    '0',
+                    noOfCoins.toString(),
                     style: TextStyle(
                         fontFamily: 'Mikado',
                         fontWeight: FontWeight.w700,
@@ -89,7 +91,7 @@ class GameScoreInfo extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Text(
-                    '0',
+                    noOfGems.toString(),
                     style: TextStyle(
                         fontFamily: 'Mikado',
                         fontWeight: FontWeight.w700,

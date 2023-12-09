@@ -8,6 +8,8 @@ class DioExceptions implements Exception {
 
   DioExceptions.fromDioError(DioError dioError) {
     print('dioError, ${dioError.requestOptions.uri}');
+    print('dioError message, ${dioError.message}');
+    print('dioError response, ${dioError.response}');
     switch (dioError.type) {
       case DioErrorType.cancel:
         message = "Request to API server was cancelled";

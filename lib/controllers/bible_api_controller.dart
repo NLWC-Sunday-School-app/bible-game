@@ -657,7 +657,7 @@ class BibleApiController extends GetxController {
       var bibleKey = (bookId.toString() + chapter + verse);
       if(textKey != bibleKey){
         isLoadingBibleVerse(true);
-        var response = await http.get(Uri.parse('https://shark-app-fwwao.ondigitalocean.app/books/$bookId/chapters/$chapter/verse/KJV/$verse'));
+        var response = await http.get(Uri.parse('https://bible-api.nlwc.church/books/$bookId/chapters/$chapter/verse/KJV/$verse'));
         textKey = bookId.toString() + chapter + verse;
         var decodedResponse = json.decode(response.body);
         bibleText.value = decodedResponse['content']['t'];

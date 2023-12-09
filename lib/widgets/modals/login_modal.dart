@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
 import '../../utilities/validator.dart';
+import '../button/modal_blue_button.dart';
 
 class LoginModal extends StatefulWidget {
   const LoginModal({Key? key}) : super(key: key);
@@ -32,7 +34,7 @@ class _LoginModalState extends State<LoginModal> {
     AuthController authController = Get.put(AuthController());
     UserController _userController = Get.put(UserController());
     return Dialog(
-        insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+        insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
         backgroundColor: Colors.transparent,
         child: SingleChildScrollView(
           child: SizedBox(
@@ -41,7 +43,7 @@ class _LoginModalState extends State<LoginModal> {
             child: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/images/modal_layout_2.png'),
+                    image: AssetImage('assets/images/aesthetics/modal_bg.png'),
                     fit: BoxFit.fill),
               ),
               child: Form(
@@ -60,13 +62,13 @@ class _LoginModalState extends State<LoginModal> {
                         Get.back()
                       },
                       child: Padding(
-                        padding: EdgeInsets.only(right: 15.0.w),
+                        padding: EdgeInsets.only(right: 20.0.w),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Image.asset(
                               'assets/images/icons/close.png',
-                              width: 40.w,
+                              width: 35.w,
                             )
                           ],
                         ),
@@ -75,21 +77,27 @@ class _LoginModalState extends State<LoginModal> {
                     const SizedBox(
                       height: 10,
                     ),
-                    AutoSizeText(
-                      'LOG IN',
-                      style: TextStyle(
-                          fontFamily: 'Neuland',
-                          fontSize: 28.sp,
-                          color: const Color(0xFF4075BB)),
+                    StrokeText(
+                      text: 'Log in to play',
+                      textStyle: TextStyle(
+                        color: const Color(0xFF1768B9),
+                        fontFamily: 'Mikado',
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      strokeColor: Colors.white,
+                      strokeWidth: 5,
                     ),
                     SizedBox(
                       height: 10.h,
                     ),
-                    AutoSizeText(
-                      'Continue from where you \nstopped when you log in.',
+                    Text(
+                      'Pick up from where you stopped!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 14.sp, fontWeight: FontWeight.w500),
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Mikado'),
                     ),
                     SizedBox(
                       height: 40.h,
@@ -102,7 +110,8 @@ class _LoginModalState extends State<LoginModal> {
                           style: TextStyle(
                               height: 1.5.h,
                               color: const Color(0xFF104387),
-                              fontSize: 12.sp),
+                              fontSize: 12.sp,
+                              fontFamily: 'Mikado'),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: const Color(0xFFD4DDDF),
@@ -141,7 +150,10 @@ class _LoginModalState extends State<LoginModal> {
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: isToggle,
                           style: TextStyle(
-                              height: 1.5.h, color: const Color(0xFF104387)),
+                            height: 1.5.h,
+                            color: const Color(0xFF104387),
+                            fontFamily: 'Mikado'
+                          ),
                           decoration: InputDecoration(
                             suffixIcon: GestureDetector(
                               onTap: () => toggle(),
@@ -184,61 +196,73 @@ class _LoginModalState extends State<LoginModal> {
                     SizedBox(
                       height: 18.h,
                     ),
-                    GestureDetector(
-                      onTap: () => {
-                        if (_loginFormKey.currentState!.validate())
-                          {authController.loginUser()}
-                      },
-                      child: Obx(
-                        () => Container(
-                          width: 250.w,
-                          padding: EdgeInsets.symmetric(
-                            vertical: 20.h,
-                          ),
-                          decoration: BoxDecoration(
-                              color: const Color(0xFFE8F8FF),
-                              border:
-                                  Border.all(color: const Color(0xFF548CD7)),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(40))),
-                          child: authController.isLoadingLogin.isTrue
-                              ? Center(
-                                  child: SizedBox(
-                                      height: 20.w,
-                                      width: 20.w,
-                                      child: const CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Color(0xFF548CD7),
-                                      )),
-                                )
-                              : Text(
-                                  'LOG IN',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontFamily: 'Neuland',
-                                      letterSpacing: 1,
-                                      color: const Color(0xFF4075BB),
-                                      fontSize: 14.sp),
-                                ),
-                        ),
+                    // GestureDetector(
+                    //   onTap: () => {
+                    //     if (_loginFormKey.currentState!.validate())
+                    //       {authController.loginUser()}
+                    //   },
+                    //   child: Obx(
+                    //     () => Container(
+                    //       width: 250.w,
+                    //       padding: EdgeInsets.symmetric(
+                    //         vertical: 20.h,
+                    //       ),
+                    //       decoration: BoxDecoration(
+                    //           color: const Color(0xFFE8F8FF),
+                    //           border:
+                    //               Border.all(color: const Color(0xFF548CD7)),
+                    //           borderRadius:
+                    //               const BorderRadius.all(Radius.circular(40))),
+                    //       child: authController.isLoadingLogin.isTrue
+                    //           ? Center(
+                    //               child: SizedBox(
+                    //                   height: 20.w,
+                    //                   width: 20.w,
+                    //                   child: const CircularProgressIndicator(
+                    //                     strokeWidth: 2,
+                    //                     color: Color(0xFF548CD7),
+                    //                   )),
+                    //             )
+                    //           : Text(
+                    //               'LOG IN',
+                    //               textAlign: TextAlign.center,
+                    //               style: TextStyle(
+                    //                   fontFamily: 'Neuland',
+                    //                   letterSpacing: 1,
+                    //                   color: const Color(0xFF4075BB),
+                    //                   fontSize: 14.sp),
+                    //             ),
+                    //     ),
+                    //   ),
+                    // ),
+                    Obx(
+                      () => ModalBlueButton(
+                        buttonText: 'LOG IN',
+                        buttonIsLoading: authController.isLoadingLogin.value,
+                        onTap: () {
+                          if (_loginFormKey.currentState!.validate()) {
+                            authController.loginUser();
+                          }
+                        },
                       ),
                     ),
                     SizedBox(
                       height: 20.h,
                     ),
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Get.back();
-                        Get.dialog(const ResetPasswordModal(), barrierDismissible: true);
+                        Get.dialog(const ResetPasswordModal(),
+                            barrierDismissible: true);
                       },
                       child: Text(
                         'Forgot Password?',
                         style: TextStyle(
-                          color: const Color(0xFF4075BB),
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline
-                        ),
+                            color: const Color(0xFF4075BB),
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Mikado',
+                            decoration: TextDecoration.underline),
                       ),
                     )
                   ],

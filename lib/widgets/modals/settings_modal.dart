@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
@@ -28,16 +29,20 @@ class _SettingsModalState extends State<SettingsModal> {
     AuthController authController = Get.put(AuthController());
     UserController _userController = Get.put(UserController());
     return Dialog(
-        insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
+        insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
         backgroundColor: Colors.transparent,
         child: SingleChildScrollView(
           child: SizedBox(
-            height: Get.width >= 500 ? 600.h : Get.height >= 800 ? 550.h : 650.h,
-            width: Get.width >= 500? 500.h : 400.h,
+            height: Get.width >= 500
+                ? 600.h
+                : Get.height >= 800
+                    ? 550.h
+                    : 650.h,
+            width: Get.width >= 500 ? 500.h : 400.h,
             child: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/images/modal_layout_2.png'),
+                    image: AssetImage('assets/images/aesthetics/modal_bg.png'),
                     fit: BoxFit.fill),
               ),
               child: Column(
@@ -48,7 +53,9 @@ class _SettingsModalState extends State<SettingsModal> {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                      _userController.soundIsOff.isFalse
+                          ? _userController.playGameSound()
+                          : null,
                       Get.back()
                     },
                     child: Padding(
@@ -64,12 +71,16 @@ class _SettingsModalState extends State<SettingsModal> {
                       ),
                     ),
                   ),
-                  AutoSizeText(
-                    'YOUR PROFILE',
-                    style: TextStyle(
-                        fontFamily: 'Neuland',
-                        fontSize: 24.sp,
-                        color: const Color(0xFF4075BB)),
+                  StrokeText(
+                    text: 'Your Profile',
+                    textStyle: TextStyle(
+                      color: const Color(0xFF1768B9),
+                      fontFamily: 'Mikado',
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.w900,
+                    ),
+                    strokeColor: Colors.white,
+                    strokeWidth: 5,
                   ),
                   const SizedBox(
                     height: 30,
@@ -85,67 +96,85 @@ class _SettingsModalState extends State<SettingsModal> {
                     () => AutoSizeText(
                       (_userController.myUser['name']),
                       style: TextStyle(
-                          fontSize: 20.sp,
-                          color: const Color(0xFF323B63),
-                          fontFamily: 'Neuland',
-                          fontWeight: FontWeight.w400),
+                        fontSize: 20.sp,
+                        color: const Color(0xFF323B63),
+                        fontFamily: 'Mikado',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(
                     height: 5,
                   ),
                   GestureDetector(
-                    onTap: (){
-                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null;
+                    onTap: () {
+                      _userController.soundIsOff.isFalse
+                          ? _userController.playGameSound()
+                          : null;
                       Get.back();
-                      Get.dialog(const EditProfileModal(),);
+                      Get.dialog(
+                        const EditProfileModal(),
+                      );
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
-                        SvgPicture.asset('assets/images/icons/edit.svg', width: 15.w,),
-                        SizedBox(width: 5.w,),
+                        SvgPicture.asset(
+                          'assets/images/icons/edit.svg',
+                          width: 15.w,
+                        ),
+                        SizedBox(
+                          width: 5.w,
+                        ),
                         Text(
                           'Edit your Profile',
                           style: TextStyle(
                               color: const Color(0xFF4075BB),
-                             fontSize: 14.sp,
-                             fontWeight: FontWeight.w500,
-                             decoration: TextDecoration.underline
-                          ),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                              fontFamily: 'Mikado'),
                         ),
-
                       ],
                     ),
                   ),
-                  SizedBox(height: 10.h,),
+                  SizedBox(
+                    height: 10.h,
+                  ),
                   GestureDetector(
-                    onTap: (){
-                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null;
+                    onTap: () {
+                      _userController.soundIsOff.isFalse
+                          ? _userController.playGameSound()
+                          : null;
                       Get.back();
-                      Get.dialog(const EditProfileModal(),);
+                      Get.dialog(
+                        const EditProfileModal(),
+                      );
                     },
                     child: InkWell(
-                      onTap: (){
+                      onTap: () {
                         Get.back();
                         Get.dialog(const ResetPasswordModal());
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset('assets/images/icons/blue_padlock.png', width: 15.w,),
-                          SizedBox(width: 5.w,),
+                          Image.asset(
+                            'assets/images/icons/blue_padlock.png',
+                            width: 15.w,
+                          ),
+                          SizedBox(
+                            width: 5.w,
+                          ),
                           Text(
                             'Reset Password',
                             style: TextStyle(
                                 color: const Color(0xFF4075BB),
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline
-                            ),
+                                fontFamily: 'Mikado',
+                                decoration: TextDecoration.underline),
                           ),
-
                         ],
                       ),
                     ),
@@ -163,11 +192,12 @@ class _SettingsModalState extends State<SettingsModal> {
                           child: Obx(
                             () => IconButton(
                               iconSize: 50,
-                              onPressed: () =>{
-                                _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                              onPressed: () => {
+                                _userController.soundIsOff.isFalse
+                                    ? _userController.playGameSound()
+                                    : null,
                                 _userController.toggleGameSound(),
                               },
-
                               icon: _userController.soundIsOff.value
                                   ? Image.asset(
                                       'assets/images/icons/volume_down.png',
@@ -183,10 +213,12 @@ class _SettingsModalState extends State<SettingsModal> {
                           child: Obx(
                             () => IconButton(
                                 iconSize: 50,
-                                onPressed: () =>{
-                                  _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
-                                  _userController.toggleGameMusic(),
-                                },
+                                onPressed: () => {
+                                      _userController.soundIsOff.isFalse
+                                          ? _userController.playGameSound()
+                                          : null,
+                                      _userController.toggleGameMusic(),
+                                    },
                                 icon: _userController.musicIsOff.value
                                     ? Image.asset(
                                         'assets/images/icons/music_off.png',
@@ -201,11 +233,12 @@ class _SettingsModalState extends State<SettingsModal> {
                           child: Obx(
                             () => IconButton(
                                 iconSize: 50,
-                                onPressed: () =>{
-                                  _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
-                                  _userController.toggleNotification(),
-                                },
-
+                                onPressed: () => {
+                                      _userController.soundIsOff.isFalse
+                                          ? _userController.playGameSound()
+                                          : null,
+                                      _userController.toggleNotification(),
+                                    },
                                 icon: _userController.notificationIsOff.value
                                     ? Image.asset(
                                         'assets/images/icons/notification_off.png',
@@ -223,42 +256,47 @@ class _SettingsModalState extends State<SettingsModal> {
                   ),
                   GestureDetector(
                     onTap: () => {
-                      _userController.soundIsOff.isFalse ? _userController.playGameSound() : null,
+                      _userController.soundIsOff.isFalse
+                          ? _userController.playGameSound()
+                          : null,
                       Get.back(),
                       Get.dialog(const LogoutModal()),
                     },
                     child: Container(
-                        width: 200.w,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFF548BD5),
-                            border: Border.all(color: const Color(0xFF548CD7)),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(40))),
-                        child: Text(
-                                'LOG OUT',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontFamily: 'Neuland',
-                                    letterSpacing: 1,
-                                    color: const Color(0xFFFFFFFF),
-                                    fontSize: 14.sp),
-                              ),
+                      width: 200.w,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      decoration: BoxDecoration(
+                          color: const Color(0xFF548BD5),
+                          border: Border.all(color: const Color(0xFF548CD7)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(40))),
+                      child: Text(
+                        'LOG OUT',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: 'Mikado',
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1,
+                            color: const Color(0xFFFFFFFF),
+                            fontSize: 14.sp),
                       ),
                     ),
+                  ),
                   const SizedBox(
                     height: 15,
                   ),
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       Get.back();
                       Get.dialog(const DeleterAccountModal());
                     },
                     child: const Text(
-                      'Delete Account', style: TextStyle(
-                       color: Colors.red,
-                       decoration: TextDecoration.underline
-                     ),
+                      'Delete Account',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontFamily: 'Mikado',
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ],

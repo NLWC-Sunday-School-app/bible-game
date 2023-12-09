@@ -19,7 +19,7 @@ class WhoIsWhoLevel extends StatelessWidget {
     return GestureDetector(
       onTap: (){
         if(isUnLocked){
-          wiwGameController.gameDuration.value = 1;
+          wiwGameController.gameDuration.value = playTime;
           wiwGameController.getQuestions();
         }
       },
@@ -38,7 +38,10 @@ class WhoIsWhoLevel extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: isUnLocked
+                        color:
+                        isSpecialLevel ?
+                        const Color(0xFFF7A252):
+                        isUnLocked
                             ? const Color(0xFF3CE04D)
                             : const Color(0xFFD90429),
                         width: 3.w),
@@ -80,15 +83,18 @@ class WhoIsWhoLevel extends StatelessWidget {
               right: 4.w,
               child: Stack(
                 children: [
-                  isUnLocked
+                  isSpecialLevel
                       ? Image.asset(
-                          'assets/images/aesthetics/level_tag.png',
+                          'assets/images/aesthetics/special_level_tag.png',
                           width: 144.w,
                         )
-                      : Image.asset(
-                          'assets/images/aesthetics/red_level_tag.png',
+                      : isUnLocked ? Image.asset(
+                          'assets/images/aesthetics/level_tag.png',
                           width: 144.w,
-                        ),
+                        ) :Image.asset(
+                    'assets/images/aesthetics/red_level_tag.png',
+                    width: 144.w,
+                  ) ,
                   Positioned(
                     top: 2.h,
                     left: 65.w,

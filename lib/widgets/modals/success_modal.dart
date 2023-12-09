@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 import '../../controllers/user_controller.dart';
 class SuccessModal extends StatelessWidget {
@@ -22,7 +23,7 @@ class SuccessModal extends StatelessWidget {
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('assets/images/modal_layout_2.png'),
+                  image: AssetImage('assets/images/aesthetics/modal_success_bg.png'),
                   fit: BoxFit.fill
               ),
             ),
@@ -44,23 +45,32 @@ class SuccessModal extends StatelessWidget {
                       children: [
                         Image.asset(
                           'assets/images/icons/close.png',
-                          width: 40.w,
+                          width: 35.w,
                         )
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 20,),
-                 Image.asset('assets/images/icons/success_mark.png', width: 80,),
-                const SizedBox(height: 50,),
-               AutoSizeText(
-                    'Your profile has been\n created successfully',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Neuland',
-                      fontSize: 18.sp,
-                      color: const Color(0xFF4075BB)
-                  ),),
+                SizedBox(height: 20.h,),
+                 Image.asset('assets/images/icons/success_mark.png', width: 80.w,),
+                SizedBox(height: 30.h,),
+                StrokeText(
+                  text: 'Profile created \n successfully!',
+                  textStyle: TextStyle(
+                    color: const Color(0xFF1768B9),
+                    fontFamily: 'Mikado',
+                    fontSize: 23.sp,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  strokeColor: Colors.white,
+                  strokeWidth: 5,
+                ),
+                SizedBox(height: 15.h,),
+                Text('Enjoy the Bible game!', style: TextStyle(
+                  fontFamily: 'Mikado',
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500
+                ),)
 
               ],
             ),

@@ -63,6 +63,7 @@ class QuickGameController extends GetxController {
      var isLoggedIn = box.read('userLoggedIn') ?? false;
      gameQuestions.value = isLoggedIn ? await GameService.getGameQuestions('QUICK_GAME', userController.myUser['rank'], tagsPillController.selectedPill) :
      await GameService.getGameQuestionsWithoutToken('QUICK_GAME', userController.myUser['rank'], tagsPillController.selectedPill);
+     print('questions $gameQuestions');
      modalTitle.value = 'All set to go 🥳😃';
      gameIsReady(true);
    } catch(e) {
@@ -79,7 +80,7 @@ class QuickGameController extends GetxController {
 
   showDialogModal() {
     Get.dialog(const QuickGameModal(),
-        barrierDismissible: false,
+        barrierDismissible: true,
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.9));
   }
 

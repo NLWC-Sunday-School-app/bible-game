@@ -22,6 +22,7 @@ class TabsController extends GetxController{
      leaderboardTabIsSelected.value = false;
      arcadeTabIsSelected.value = false;
      teamTabIsSelected.value = false;
+     userController.getUserData();
      // Get.to(() => const TabHomeScreen());
    }
 

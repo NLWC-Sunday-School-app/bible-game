@@ -4,6 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../modals/auth_modal.dart';
+import '../modals/country_update_modal.dart';
+import '../modals/profile_updated_success_modal.dart';
+import '../modals/success_modal.dart';
 
 class SignInProfile extends StatelessWidget {
   const SignInProfile({
@@ -14,17 +17,20 @@ class SignInProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     UserController userController = Get.put(UserController());
     return GestureDetector(
-      onTap: (){
-        if(userController.soundIsOff.isFalse){
-           userController.playGameSound();
+      onTap: () {
+        if (userController.soundIsOff.isFalse) {
+          userController.playGameSound();
         }
         Get.dialog(
-        const AuthModal(
-          title: 'your profile',
-          text:
-          'Sign in to your profile to save \n& continue your game play.',
-        ), transitionCurve: Curves.fastOutSlowIn, transitionDuration: const Duration(milliseconds: 1000),
-        barrierDismissible: false);
+          const AuthModal(
+            title: 'Your Profile',
+            text:
+                'Sign in to your profile to save \n& continue your game play.',
+          ),
+          transitionCurve: Curves.fastOutSlowIn,
+          transitionDuration: const Duration(milliseconds: 1000),
+          barrierDismissible: false,
+        );
       },
       child: Stack(
         alignment: AlignmentDirectional.topEnd,
@@ -66,18 +72,17 @@ class SignInProfile extends StatelessWidget {
             left: 0.w,
             top: 6.h,
             child: Container(
-                decoration: BoxDecoration(
-                  color:  const Color(0xFF0F2957),
-                  shape: BoxShape.circle,
-                  border: Border.all(width: 2.w, color: const Color(0xFF4A91FF)),
-                ),
-                child: Image.asset(
-                  'assets/images/icons/person.png',
-                  width: 20.w,
-                ),
-                padding: EdgeInsets.all(18.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F2957),
+                shape: BoxShape.circle,
+                border: Border.all(width: 2.w, color: const Color(0xFF4A91FF)),
               ),
-
+              child: Image.asset(
+                'assets/images/icons/person.png',
+                width: 20.w,
+              ),
+              padding: EdgeInsets.all(18.w),
+            ),
           ),
         ],
       ),

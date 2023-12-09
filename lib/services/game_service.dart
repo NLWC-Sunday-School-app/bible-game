@@ -25,9 +25,11 @@ class GameService {
         'userRank': userRank,
         'tags': tags
       });
-      final gameQuestions = (response.data as List)
+      print('test1 ${response.data['plays']}');
+      final gameQuestions = (response.data['plays'] as List)
             .map((e) => Question.fromJson(e))
              .toList();
+
       return gameQuestions;
     }on DioException catch (e) {
       final errorMessage = DioExceptions.fromDioError(e).toString();
@@ -42,7 +44,7 @@ class GameService {
          'userRank': userRank,
          'tags': tags
        });
-       final gameQuestions = (response.data as List)
+       final gameQuestions = (response.data['plays'] as List)
            .map((e) => Question.fromJson(e))
            .toList();
        return gameQuestions;
@@ -230,5 +232,22 @@ class GameService {
     }
 
   }
+
+  static Future<dynamic> buyFromStore(userId, amount) async {
+    try{
+      final response = await DioClient().dio.post('/store/payment', data:{
+        "userId": userId,
+        "amount": amount,
+        "description": "Game Extra time"
+
+      });
+      return response.statusCode;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+
+  }
+
 
 }

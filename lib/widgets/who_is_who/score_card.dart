@@ -50,9 +50,6 @@ class ScoreCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                            InkWell(
-                             onTap:(){
-                               Get.dialog(const WiwNotEnoughCoinsModal());
-                           },
                              child: Image.asset(
                                 'assets/images/icons/coins.png',
                                 width: 24.w,

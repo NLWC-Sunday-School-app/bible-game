@@ -13,6 +13,7 @@ class UserController extends GetxController {
   final tempPlayerPoint = 0.obs;
   final adsData = <Ads>[].obs;
   var isLoaded = true.obs;
+  var isUpdatingCountry = false.obs;
   var isLoadingAds = true.obs;
   var musicIsOff = false.obs;
   var soundIsOff = false.obs;
@@ -96,6 +97,16 @@ class UserController extends GetxController {
         await UserService.getUserData();
         await UserService.getUserPilgrimProgress();
       } catch (e) {}
+    }
+  }
+
+  updateCountry(String country) async{
+    var isLoggedIn = box.read('userLoggedIn') ?? false;
+    if(isLoggedIn){
+      isUpdatingCountry.value = true;
+      await UserService.updateCountry(country);
+      isUpdatingCountry.value = false;
+      Get.back();
     }
   }
 

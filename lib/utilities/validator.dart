@@ -7,7 +7,6 @@ class Validator {
     if (nationality.length <= 3) {
       return 'too short';
     }
-
     return null;
   }
 
@@ -22,6 +21,17 @@ class Validator {
 
     if(name.length > 10) {
       return 'Not more 10 characters';
+    }
+
+    return null;
+  }
+  static String? validateCountry(String country) {
+    if (country.isEmpty) {
+      return 'Country is required';
+    }
+
+    if (country.length <= 4) {
+      return 'Country is too short!';
     }
 
     return null;

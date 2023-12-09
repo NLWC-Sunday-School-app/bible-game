@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
 import '../../utilities/validator.dart';
+import '../button/modal_blue_button.dart';
 
 class SetNewPasswordModal extends StatefulWidget {
   const SetNewPasswordModal({Key? key}) : super(key: key);
@@ -46,7 +48,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-                image: AssetImage('assets/images/modal_layout_2.png'),
+                image: AssetImage('assets/images/aesthetics/modal_bg.png'),
                 fit: BoxFit.fill),
           ),
           child: Form(
@@ -71,7 +73,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                       children: [
                         Image.asset(
                           'assets/images/icons/close.png',
-                          width: 40.w,
+                          width: 35.w,
                         )
                       ],
                     ),
@@ -80,21 +82,28 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                 const SizedBox(
                   height: 10,
                 ),
-                AutoSizeText(
-                  'set password',
-                  style: TextStyle(
-                      fontFamily: 'Neuland',
-                      fontSize: 25.sp,
-                      color: const Color(0xFF4075BB)),
+                StrokeText(
+                  text: 'Set Password',
+                  textStyle: TextStyle(
+                    color: const Color(0xFF1768B9),
+                    fontFamily: 'Mikado',
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  strokeColor: Colors.white,
+                  strokeWidth: 5,
                 ),
                 SizedBox(
                   height: 10.h,
                 ),
-                AutoSizeText(
+                Text(
                   'You are in control now, \nset a new password',
                   textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Mikado',
+                  ),
                 ),
                 SizedBox(
                   height: 30.h,
@@ -109,7 +118,8 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                         style: TextStyle(
                             height: 1.5.h,
                             color: const Color(0xFF104387),
-                            fontSize: 12.sp),
+                            fontSize: 12.sp,
+                            fontFamily: 'Mikado'),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp("[A-Za-z0-9#-]*")),
@@ -166,7 +176,9 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                         style: TextStyle(
                             height: 1.5.h,
                             color: const Color(0xFF104387),
-                            fontSize: 12.sp),
+                            fontSize: 12.sp,
+                            fontFamily: 'Mikado'
+                        ),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp("[A-Za-z0-9#-]*")),
@@ -215,45 +227,19 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                 SizedBox(
                   height: 40.h,
                 ),
-                GestureDetector(
-                  onTap: () => {
-                    userController.soundIsOff.isFalse
-                        ? userController.playGameSound()
-                        : null,
-                    if (_newPasswordFormKey.currentState!.validate())
-                      {authController.resetPassword(newPasswordController.text)}
-                  },
-                  child: Obx(
-                    () => Container(
-                      width: 200.w,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFF548BD5),
-                          border: Border.all(color: const Color(0xFF548CD7)),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(40))),
-                      child: authController.isResettingPassword.isTrue
-                          ? Center(
-                              child: SizedBox(
-                                  height: 20.w,
-                                  width: 20.w,
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  )),
-                            )
-                          : Text(
-                              'set new password',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontFamily: 'Neuland',
-                                  letterSpacing: 1,
-                                  color: Colors.white,
-                                  fontSize: 14.sp),
-                            ),
-                    ),
+                Obx(
+                      () => ModalBlueButton(
+                    buttonText: 'Set new password',
+                    buttonIsLoading: authController.isResettingPassword.value,
+                    onTap: () => {
+                      userController.soundIsOff.isFalse
+                          ? userController.playGameSound()
+                          : null,
+                      if (_newPasswordFormKey.currentState!.validate())
+                        {authController.resetPassword(newPasswordController.text)}
+                    },
                   ),
-                ),
+                )
               ],
             ),
           ),

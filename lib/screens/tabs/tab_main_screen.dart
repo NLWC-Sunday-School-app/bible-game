@@ -15,6 +15,7 @@ import 'package:bible_game/services/game_service.dart';
 import 'package:bible_game/services/user_service.dart';
 import 'package:bible_game/widgets/bottomTab/bottom_tab_item.dart';
 import 'package:bible_game/widgets/custom_icons/my_flutter_app_icons.dart';
+import 'package:bible_game/widgets/modals/country_update_modal.dart';
 import 'package:bible_game/widgets/modals/pilgrim_progress_welcome_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -83,10 +84,19 @@ class _TabMainScreenState extends State<TabMainScreen> {
     }
   }
 
+  displayCountryUpdateModal() async{
+    var hasSetCountry = await UserService.getUserCountryStatus();
+    if(!hasSetCountry){
+      Get.dialog(const CountryUpdateModal());
+    }
+    print('country $hasSetCountry');
+  }
+
   @override
   void initState() {
     super.initState();
     displayWelcomeModal();
+    displayCountryUpdateModal();
     controller = AnimatedSvgController();
     //_setBottomTabPage();
   }
@@ -99,7 +109,6 @@ class _TabMainScreenState extends State<TabMainScreen> {
 
   displayWelcomeModal() {
     var firstTime = GetStorage().read('first_time') ?? true;
-
     if (firstTime) {
       Timer(const Duration(seconds: 3), () {
         Get.dialog(const WelcomeModal());
@@ -107,6 +116,7 @@ class _TabMainScreenState extends State<TabMainScreen> {
       GetStorage().write('first_time', false);
     }
   }
+
 
   Widget get _bottomNavigationBar {
     return SizedBox(
@@ -136,7 +146,7 @@ class _TabMainScreenState extends State<TabMainScreen> {
               ),
               BottomTabItem(
                 itemLabel: 'assets/images/icons/tab_trophy.png',
-                itemIcon: 'Board',
+                itemIcon: 'Leaderboard',
                 itemIsSelected: _tabsController.leaderboardTabIsSelected.value,
                 onTap: (){
                   selectPage(2);

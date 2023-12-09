@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:stroke_text/stroke_text.dart';
 import '../../widgets/LeaderBoardCard.dart';
 
 class LeaderBoardScreen extends StatelessWidget {
@@ -31,7 +32,7 @@ class LeaderBoardScreen extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 200.h),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFF548CD7),
+                color: const Color(0xFF084E9A),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30.r),
                   bottomRight: Radius.circular(30.r),
@@ -71,15 +72,17 @@ class LeaderBoardScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  AutoSizeText(
-                            '${Get.arguments} \n Leaderboard',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Neuland',
-                                letterSpacing: 1,
-                                fontSize: 20.sp,
-                                color: Colors.white),
-                          ),
+                   StrokeText(
+                    text: '         ${Get.arguments} \n Leaderboard',
+                    textStyle: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Mikado',
+                      fontSize: 25.sp,
+                      fontWeight: FontWeight.w900,
+                    ),
+                    strokeColor: const Color(0xFF05477B) ,
+                    strokeWidth: 5,
+                  ),
                   SizedBox(width: 50.w,),
                   const Spacer()
                 ],

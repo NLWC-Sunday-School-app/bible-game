@@ -162,6 +162,26 @@ class UserService {
     }
 
   }
+
+  static Future<dynamic> getUserCountryStatus() async{
+    try{
+      final response = await DioClient().dio.get('/users/country-check');
+       return response.data;
+    }on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+  }
+
+  static Future<dynamic> updateCountry(country) async{
+    try{
+      final response = await DioClient().dio.patch('/users/country?country=$country');
+      return response.data;
+    }on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+  }
   
   
 

@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../services/auth_service.dart';
+import '../services/game_service.dart';
 import '../services/user_service.dart';
 import '../widgets/modals/enter_reset_password_code_modal.dart';
 import '../widgets/modals/reset_password_success_modal.dart';
@@ -49,32 +50,38 @@ class AuthController extends GetxController {
     try {
       var fcmToken = await AwesomeNotificationController.getFirebaseMessagingToken();
       var status = await AuthService.registerUser(
-          username.value, emailAddress.value, password.value, fcmToken);
-      if (status == 200) {
+          username.value, emailAddress.value, password.value, fcmToken, country.value);
+      if (status == 200){
+        var isTempLoggedIn = GetStorage().read('isTempLoggedIn') ?? false ;
         await AuthService.loginUser(emailAddress.value, password.value);
+        await UserService.getUserData();
+        await UserService.getUserPilgrimProgress();
+        if(isTempLoggedIn){
+          var userData = GetStorage().read('user_data');
+          var gameData = GetStorage().read('tempProgressData');
+          var userId = userData['id'];
+          await GameService.sendGameData(
+            gameData['gameMode'],
+            gameData['totalScore'],
+            gameData['baseScore'],
+            gameData['bonusScore'],
+            gameData['averageTimeSpent'],
+            gameData['playerRank'],
+            gameData['noOfCorrectAnswers'],
+            userId,
+            gameData['userProgress'],
+            gameData['numberOfRounds'],
+          );
+        }
         box.write('userLoggedIn', true);
         box.write('password', password.value);
         isLoggedIn(true);
         isLoadingRegistration(false);
         Get.back();
         Get.dialog(const SuccessModal(), barrierDismissible: false);
-      } else {
-        isLoadingRegistration(false);
-        Get.snackbar(
-            'Error',
-            status,
-            messageText: Text(
-                status,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            backgroundColor: Colors.red,
-            colorText: Colors.white
-        );
+        updateFcmToken();
       }
+      isLoadingRegistration(false);
     } catch (e) {
       isLoadingRegistration(false);
     }
@@ -103,21 +110,6 @@ class AuthController extends GetxController {
          );
          isSendingCode(false);
          Get.dialog(const EnterResetPasswordCodeModal(), barrierDismissible: false);
-       }else{
-         Get.snackbar(
-             'Error',
-             response,
-             messageText:Text(
-               response,
-               style: TextStyle(
-                 fontSize: 16.sp,
-                 color: Colors.white,
-                 fontWeight: FontWeight.w500,
-               ),
-             ),
-             backgroundColor: Colors.red,
-             colorText: Colors.white
-         );
        }
        isSendingCode(false);
      }catch(e){
@@ -130,12 +122,12 @@ class AuthController extends GetxController {
     try{
      var response = await AuthService.verifyOTP(code);
      if(response == 200){
-       Get.back();
-       Get.snackbar(
+        Get.back();
+        Get.snackbar(
            'Awesome!',
-           response['message'],
+           'verification successful',
            messageText: Text(
-             response['message'],
+            'verification successful',
              style: TextStyle(
                fontSize: 16.sp,
                color: Colors.white,
@@ -193,6 +185,26 @@ class AuthController extends GetxController {
     try {
       var response = await AuthService.loginUser(loginEmail.value, loginPassword.value);
       if (response == 200) {
+        var isTempLoggedIn = GetStorage().read('isTempLoggedIn') ?? false ;
+        await UserService.getUserData();
+        await UserService.getUserPilgrimProgress();
+        if(isTempLoggedIn){
+             var userData = GetStorage().read('user_data');
+             var gameData = GetStorage().read('tempProgressData');
+             var userId = userData['id'];
+             await GameService.sendGameData(
+               gameData['gameMode'],
+               gameData['totalScore'],
+               gameData['baseScore'],
+               gameData['bonusScore'],
+               gameData['averageTimeSpent'],
+               gameData['playerRank'],
+               gameData['noOfCorrectAnswers'],
+               userId,
+               gameData['userProgress'],
+                gameData['numberOfRounds'],
+             );
+          }
         isLoadingLogin(false);
         box.write('userLoggedIn', true);
         box.write('password', loginPassword.value);
@@ -266,7 +278,7 @@ class AuthController extends GetxController {
       } else {
         isLoadingLogout(false);
         Get.snackbar(
-            'Error',
+            'Oops',
             'Error',
             messageText: const Text(
               'Error',

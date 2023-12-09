@@ -13,7 +13,7 @@ class BottomTabItem extends StatelessWidget {
     return  GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-            width: itemIsSelected ? 120.w :  (Get.width - 120) / 4.098 ,
+            width: itemIsSelected ? 120.w :  (Get.width - 120.w) / 4 ,
             decoration: BoxDecoration(
               gradient: !itemIsSelected ? const LinearGradient(
                 begin: Alignment.topLeft,
@@ -40,7 +40,7 @@ class BottomTabItem extends StatelessWidget {
                 itemIsSelected ? Text(itemIcon, style: TextStyle(
                     fontFamily: 'Mikado',
                      color: Colors.white,
-                     fontSize: 16.sp,
+                     fontSize: 15.sp,
                      fontWeight: FontWeight.w900
                 ),) : const SizedBox()
               ],

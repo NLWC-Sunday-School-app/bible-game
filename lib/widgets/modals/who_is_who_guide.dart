@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:stroke_text/stroke_text.dart';
+
+import '../../screens/who_is_who/home.dart';
 
 class WhoIsWhoGuide extends StatelessWidget {
   const WhoIsWhoGuide({Key? key}) : super(key: key);
@@ -141,7 +144,16 @@ class WhoIsWhoGuide extends StatelessWidget {
                 ),
                 SizedBox(height: 50.h,),
                 InkWell(
-                  onTap: () => Get.back(),
+                  onTap: (){
+                    var firstTime = GetStorage().read('wiw_info_first_time') ?? true;
+                    if(firstTime){
+                      Get.back();
+                      Get.to(() => const WhoIsWhoHomeScreen());
+                      GetStorage().write('wiw_info_first_time', false);
+                    }else{
+                      Get.back();
+                    }
+                  },
                   child: StrokeText(
                     text:'Tap to continue',
                     textStyle: TextStyle(

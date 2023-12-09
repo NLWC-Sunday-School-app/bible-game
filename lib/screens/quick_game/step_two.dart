@@ -36,7 +36,7 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                 padding: Get.width > 900 ? EdgeInsets.only(bottom: 120.h) : EdgeInsets.only(bottom: Get.height < 680 ? 60.h : 80.h),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF32B1F2),
+                  color: const Color(0xFF084E9A),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.r),
                     bottomRight: Radius.circular(30.r),
@@ -79,8 +79,9 @@ class _QuickGameStepTwoScreenState extends State<QuickGameStepTwoScreen> {
                           style: TextStyle(
                               fontSize: 20.sp,
                               letterSpacing: 1,
+                              fontWeight: FontWeight.w900,
                               color: Colors.white,
-                              fontFamily: 'Neuland'),
+                              fontFamily: 'Mikdado'),
                         ),
                         const Spacer(),
                       ],

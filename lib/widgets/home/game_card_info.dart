@@ -72,7 +72,7 @@ class GameCardInfo extends StatelessWidget {
                 Text(
                   gameText,
                   style: TextStyle(
-                      fontSize: 10.sp,
+                      fontSize: 13.sp,
                       fontFamily: 'Mikado',
                       fontWeight: FontWeight.w400,
                       height: 1.5),

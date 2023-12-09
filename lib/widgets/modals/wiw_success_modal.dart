@@ -119,7 +119,8 @@ class WiwSuccessModal extends StatelessWidget {
                   Get.back();
                   Get.back();
                 },
-                child: Container(
+                child:
+                Container(
                   width: 240.w,
                   padding: EdgeInsets.symmetric(
                       vertical: 15.h, horizontal: 15.w),

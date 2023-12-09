@@ -1,5 +1,8 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/controllers/wiw_game_controller.dart';
 import 'package:bible_game/controllers/wiw_game_question_controller.dart';
+import 'package:bible_game/services/game_service.dart';
+import 'package:bible_game/widgets/modals/wiw_not_enough_coins_modal.dart';
 import 'package:bible_game/widgets/modals/wiw_try_again_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,8 +15,8 @@ class WiwTimeUpModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WiwGameQuestionController wiwGameQuestionController =
-        Get.put(WiwGameQuestionController());
+    WiwGameQuestionController wiwGameQuestionController = Get.put(WiwGameQuestionController());
+    UserController userController = Get.put(UserController());
     WiwGameController wiwGameController = Get.put(WiwGameController());
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 0.w),
@@ -121,9 +124,17 @@ class WiwTimeUpModal extends StatelessWidget {
                       height: 50.h,
                     ),
                     InkWell(
-                      onTap:(){
-                        wiwGameQuestionController.resetTimer();
-                        Get.back();
+                      onTap:()async{
+                        if(userController.myUser['coinWalletBalance'] >= wiwGameController.gameTimePurchasePrice){
+                          wiwGameQuestionController.resetTimer();
+                          Get.back();
+                         await GameService.buyFromStore(userController.myUser['id'],  wiwGameController.gameTimePurchasePrice);
+                         await userController.getUserData();
+                        }else{
+                          Get.back();
+                          Get.dialog(const WiwNotEnoughCoinsModal(), transitionCurve: Curves.fastOutSlowIn,
+                              transitionDuration: const Duration(milliseconds: 500));
+                        }
                       },
                       child: Container(
                         width: 240.w,

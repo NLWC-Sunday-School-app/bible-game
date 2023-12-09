@@ -7,8 +7,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../controllers/user_controller.dart';
-class LoginSuccessfulModal extends StatelessWidget {
-  const LoginSuccessfulModal({Key? key}) : super(key: key);
+class ProfileUpdatedSuccessModal extends StatelessWidget {
+  const ProfileUpdatedSuccessModal ({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -45,32 +45,33 @@ class LoginSuccessfulModal extends StatelessWidget {
                       children: [
                         Image.asset(
                           'assets/images/icons/close.png',
-                          width: 40.w,
+                          width: 35.w,
                         )
                       ],
                     ),
                   ),
                 ),
                 SizedBox(height: 20.h,),
-                Image.asset('assets/images/icons/success_mark.png', width: 80,),
-                SizedBox(height: 40.h,),
+                Image.asset('assets/images/icons/success_mark.png', width: 80.w,),
+                SizedBox(height: 30.h,),
                 StrokeText(
-                  text: 'Log in successful!',
+                  text: 'Profile Updated!',
                   textStyle: TextStyle(
                     color: const Color(0xFF1768B9),
                     fontFamily: 'Mikado',
-                    fontSize: 24.sp,
+                    fontSize: 23.sp,
                     fontWeight: FontWeight.w900,
                   ),
                   strokeColor: Colors.white,
                   strokeWidth: 5,
                 ),
-                SizedBox(height: 10.h,),
+                SizedBox(height: 15.h,),
                 Text('Enjoy the Bible game!', style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Mikdado',
-                  fontSize: 14.sp
+                    fontFamily: 'Mikado',
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500
                 ),)
+
               ],
             ),
           ),

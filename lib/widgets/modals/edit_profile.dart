@@ -5,8 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:get/get.dart';
+import 'package:stroke_text/stroke_text.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utilities/validator.dart';
+import '../button/modal_blue_button.dart';
 
 class EditProfileModal extends StatefulWidget {
   const EditProfileModal({Key? key}) : super(key: key);
@@ -50,7 +52,7 @@ class _EditProfileState extends State<EditProfileModal> {
   Widget build(BuildContext context) {
 
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+      insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
       backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         child: SizedBox(
@@ -59,7 +61,7 @@ class _EditProfileState extends State<EditProfileModal> {
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('assets/images/modal_layout_2.png'),
+                  image: AssetImage('assets/images/aesthetics/modal_bg.png'),
                   fit: BoxFit.fill
               ),
             ),
@@ -81,26 +83,32 @@ class _EditProfileState extends State<EditProfileModal> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Image.asset('assets/images/icons/close.png', width: 50.w,)
+                          Image.asset('assets/images/icons/close.png', width: 35.w,)
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 10,),
-                  AutoSizeText(
-                    'EDIT PROFILE',
-                    style: TextStyle(
-                        fontFamily: 'Neuland',
-                        fontSize: 24.sp,
-                        color: const Color(0xFF4075BB)),
+                  StrokeText(
+                    text: 'Edit Profile',
+                    textStyle: TextStyle(
+                      color: const Color(0xFF1768B9),
+                      fontFamily: 'Mikado',
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.w900,
+                    ),
+                    strokeColor: Colors.white,
+                    strokeWidth: 5,
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  AutoSizeText(
+                  Text(
                     'You can make updates to \n your profile',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 14.sp,fontWeight: FontWeight.w500,
+                      fontFamily: 'Mikado'
+                    ),
                   ),
                   SizedBox(
                     height: 20.h,
@@ -112,7 +120,8 @@ class _EditProfileState extends State<EditProfileModal> {
                         controller: nameController,
                         keyboardType: TextInputType.text,
                         style: TextStyle(
-                          height: 1.5.sp, color: const Color(0xFF104387), fontSize: 12.sp
+                          height: 1.5.sp, color: const Color(0xFF104387), fontSize: 12.sp,
+                          fontFamily: 'Mikado'
                         ),
                         decoration: InputDecoration(
                           filled: true,
@@ -148,44 +157,55 @@ class _EditProfileState extends State<EditProfileModal> {
                     height: Get.height <= 670 ? 15.h : 20.h,
                   ),
 
-                  GestureDetector(
-                    onTap: () => {
-                      userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                      if (_updateFormKey.currentState!.validate())
-                        authController.updateUserProfile(userController.myUser['id'])
-                    },
-                    child: Obx(
-                          () => Container(
-                        width: 200.w,
-                        padding: EdgeInsets.symmetric(
-                            vertical: Get.height <= 670 ? 10 : 15),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFF548CD7),
-                            border: Border.all(color: const Color(0xFF548CD7)),
-                            borderRadius:
-                            const BorderRadius.all(Radius.circular(40))),
-                        child: authController.isLoadingUpdate.isTrue
-                            ? Center(
-                          child: SizedBox(
-                              height: 20.w,
-                              width: 20.w,
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Color(0xFFFFFFFF),
-                              )),
-                        )
-                            : Text(
-                          'UPDATE PROFILE',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Neuland',
-                              letterSpacing: 1,
-                              color: Colors.white,
-                              fontSize: 14.sp),
-                        ),
-                      ),
+                  // GestureDetector(
+                  //   onTap: () => {
+                  //     userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                  //     if (_updateFormKey.currentState!.validate())
+                  //       authController.updateUserProfile(userController.myUser['id'])
+                  //   },
+                  //   child: Obx(
+                  //         () => Container(
+                  //       width: 200.w,
+                  //       padding: EdgeInsets.symmetric(
+                  //           vertical: Get.height <= 670 ? 10 : 15),
+                  //       decoration: BoxDecoration(
+                  //           color: const Color(0xFF548CD7),
+                  //           border: Border.all(color: const Color(0xFF548CD7)),
+                  //           borderRadius:
+                  //           const BorderRadius.all(Radius.circular(40))),
+                  //       child: authController.isLoadingUpdate.isTrue
+                  //           ? Center(
+                  //         child: SizedBox(
+                  //             height: 20.w,
+                  //             width: 20.w,
+                  //             child: const CircularProgressIndicator(
+                  //               strokeWidth: 2,
+                  //               color: Color(0xFFFFFFFF),
+                  //             )),
+                  //       )
+                  //           : Text(
+                  //         'UPDATE PROFILE',
+                  //         textAlign: TextAlign.center,
+                  //         style: TextStyle(
+                  //             fontFamily: 'Neuland',
+                  //             letterSpacing: 1,
+                  //             color: Colors.white,
+                  //             fontSize: 14.sp),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  Obx(
+                    () => ModalBlueButton(
+                      buttonText: 'Update Profile',
+                      buttonIsLoading: authController.isLoadingUpdate.value,
+                        onTap: () => {
+                          userController.soundIsOff.isFalse ? userController.playGameSound() : null,
+                          if (_updateFormKey.currentState!.validate())
+                            authController.updateUserProfile(userController.myUser['id'])
+                        }
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

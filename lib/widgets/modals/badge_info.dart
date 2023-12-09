@@ -59,7 +59,7 @@ class BadgeInfo extends StatelessWidget {
                     children: [
                       Image.asset(
                         'assets/images/icons/close.png',
-                        width: 40.w,
+                        width: 35.w,
                       )
                     ],
                   ),
@@ -76,7 +76,8 @@ class BadgeInfo extends StatelessWidget {
                 badgeName,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontFamily: 'Neuland',
+                    fontFamily: 'Mikado',
+                    fontWeight: FontWeight.w900,
                     fontSize: 20.sp,
                     color: Color(badgeNameColor)),
               ),
@@ -92,8 +93,9 @@ class BadgeInfo extends StatelessWidget {
                   'Your Point: ${formatter.format(badgePointGained)} of ${formatter.format(badgeTotalPoint)}',
                   style: TextStyle(
                     letterSpacing: 1,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 12.sp,
+                    fontFamily: 'Mikado',
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -106,6 +108,7 @@ class BadgeInfo extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.sp,
                   height: 1.5,
+                  fontFamily: 'Mikado',
                   fontWeight: FontWeight.w500,
                 ),
               )

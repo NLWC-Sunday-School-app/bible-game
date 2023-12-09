@@ -36,7 +36,10 @@ class WiwNotEnoughCoinsModal extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: InkWell(
-                    onTap: () => Get.back(),
+                    onTap: (){
+                      Get.back();
+                      Get.back();
+                    },
                     child: Image.asset(
                       'assets/images/icons/blue_close.png',
                       width: 48.w,
