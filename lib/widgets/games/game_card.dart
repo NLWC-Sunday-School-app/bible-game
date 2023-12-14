@@ -10,15 +10,13 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class GameCard extends StatefulWidget {
-
   const GameCard(
       {Key? key,
       required this.imageUrl,
       required this.title,
       required this.text,
       required this.gameIsLive,
-      required this.campaignTag
-      })
+      required this.campaignTag})
       : super(key: key);
   final String imageUrl;
   final String title;
@@ -31,14 +29,15 @@ class GameCard extends StatefulWidget {
 }
 
 class _GameCardState extends State<GameCard> {
-   late bool playedGame ;
+  late bool playedGame;
 
   @override
   void initState() {
     super.initState();
     setState(() => {
-      playedGame = GetStorage().read('PLAYED_${widget.campaignTag}') ?? false
-    });
+          playedGame =
+              GetStorage().read('PLAYED_${widget.campaignTag}') ?? false
+        });
   }
 
   @override
@@ -47,99 +46,137 @@ class _GameCardState extends State<GameCard> {
     AuthController authController = Get.put(AuthController());
     return Container(
       margin: EdgeInsets.only(bottom: 25.h),
-      padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
+      height: 150.h,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.r),
         boxShadow: const [
           BoxShadow(
-              color: Color(0xFFEAA459),
-              offset: Offset(0, 15),
-              blurRadius: 0,
-              spreadRadius: -10)
+            color: Color(0xFFDEC839),
+            offset: Offset(-3, 15),
+            blurRadius: 0,
+            spreadRadius: -10,
+          ),
+          BoxShadow(
+            color: Color(0xFFDEC839),
+            offset: Offset(-3, -15),
+            blurRadius: 0,
+            spreadRadius: -10,
+          )
         ],
       ),
       child: Row(
         children: [
-          Image.network(
-            widget.imageUrl,
-            width: 85.w,
+          ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8.r),
+              bottomLeft: Radius.circular(8.r),
+            ),
+            child: Image.network(
+              widget.imageUrl,
+              width: 120.w,
+              height: 150.h,
+              fit: BoxFit.cover,
+            ),
           ),
-          SizedBox(width: 25.w,),
-          Expanded(
+          SizedBox(
+            width: 10.w,
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 10.h, bottom: 10.h, right: 10.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.title,
                   style: TextStyle(
-                      fontFamily: 'neuland',
-                      color: const Color(0xFF558CD7),
-                      fontSize: 16.sp),
+                      fontFamily: 'Mikado',
+                      color: const Color(0xFF0971C8),
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w900),
                 ),
                 SizedBox(
                   height: 5.h,
                 ),
-                Text(
-                  widget.text,
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  style: TextStyle(fontSize: 12.sp),
-                ),
                 SizedBox(
-                  height: 15.h,
+                  width: 200.w,
+                  child: Text(
+                    widget.text,
+                    textAlign: TextAlign.left,
+                    softWrap: true,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontFamily: 'Mikado',
+                      fontWeight: FontWeight.w500
+                    ),
+                  ),
                 ),
+                Spacer(),
                 Row(
                   children: [
                     widget.gameIsLive
                         ? GestureDetector(
-                         onTap: (){
-                           if(authController.isLoggedIn.isTrue && playedGame == false){
-                             globalGameController.prepareQuestions(widget.campaignTag);
-                           }else if(playedGame == true){
-
-                           }
-                           else{
-                             Get.dialog(const AuthModal(title: 'LOG IN TO JOIN \nTHE CHALLENGE', text: 'Sign in to your profile to join \nthis live challenge.',));
-                           }
-
-                         },
-                          child: playedGame == false ? Container(
-                              padding: EdgeInsets.all(10.w),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(24.r),
-                                  color: const Color(0xFF558CD7)),
-                              child: Text(
-                                'Join Challenge',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12.sp
-                                ),
-                              ),
-                            ) : const GamesLockedButton(buttonText: 'Game Played',),
-                        )
-                        : const GamesLockedButton(buttonText: 'Game Locked',),
+                            onTap: () {
+                              if (authController.isLoggedIn.isTrue &&
+                                  playedGame == false) {
+                                globalGameController
+                                    .prepareQuestions(widget.campaignTag);
+                              } else if (playedGame == true) {
+                              } else {
+                                Get.dialog(const AuthModal(
+                                  title: 'LOG IN TO JOIN \nTHE CHALLENGE',
+                                  text:
+                                      'Sign in to your profile to join \nthis live challenge.',
+                                ));
+                              }
+                            },
+                            child: playedGame == false
+                                ? Container(
+                                    padding: EdgeInsets.all(10.w),
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(24.r),
+                                        color: const Color(0xFF558CD7)),
+                                    child: Text(
+                                      'Join Challenge',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12.sp),
+                                    ),
+                                  )
+                                : const GamesLockedButton(
+                                    buttonText: 'Game Played',
+                                  ),
+                          )
+                        : const GamesLockedButton(
+                            buttonText: 'Ended',
+                          ),
                     SizedBox(
                       width: 10.w,
                     ),
                     widget.gameIsLive
                         ? GestureDetector(
                             onTap: () {
-                             if(authController.isLoggedIn.isTrue){
-                               Get.bottomSheet(
-                                 GamesBottomSheetModal(campaignType: widget.campaignTag,),
-                                 isScrollControlled: true,
-                               );
-                             }else{
-                               Get.dialog(const AuthModal(title: 'LOG IN TO JOIN \nTHE CHALLENGE', text: 'Sign in to your profile to join \nthis live challenge.',));
-                             }
-
+                              if (authController.isLoggedIn.isTrue) {
+                                Get.bottomSheet(
+                                  GamesBottomSheetModal(
+                                    campaignType: widget.campaignTag,
+                                  ),
+                                  isScrollControlled: true,
+                                );
+                              } else {
+                                Get.dialog(const AuthModal(
+                                  title: 'LOG IN TO JOIN \nTHE CHALLENGE',
+                                  text:
+                                      'Sign in to your profile to join \nthis live challenge.',
+                                ));
+                              }
                             },
                             child: Container(
                               alignment: Alignment.center,
-                              height: 36.w,
-                              width: 36.w,
+                              height: 30.w,
+                              width: 30.w,
                               decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   gradient: LinearGradient(
@@ -158,7 +195,8 @@ class _GameCardState extends State<GameCard> {
                           )
                         : const SizedBox()
                   ],
-                )
+                ),
+                SizedBox(height: 5.h,)
               ],
             ),
           )
@@ -166,43 +204,44 @@ class _GameCardState extends State<GameCard> {
       ),
     );
   }
-
 }
 
 class GamesLockedButton extends StatelessWidget {
   const GamesLockedButton({
-    Key? key, required this.buttonText,
+    Key? key,
+    required this.buttonText,
   }) : super(key: key);
   final String buttonText;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.all(10.w),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24.r),
-            color: const Color(0xFFBCD8FF)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.lock_outline,
+      padding: EdgeInsets.symmetric(vertical:6.h, horizontal: 30.w),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24.r),
+          color: const Color(0xFFBCD8FF)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.lock_outline,
+            color: const Color(0xFF5A82B8),
+            size: 16.w,
+          ),
+          SizedBox(
+            width: 10.w,
+          ),
+          Text(
+            buttonText,
+            style: TextStyle(
+              fontSize: 12.sp,
               color: const Color(0xFF5A82B8),
-              size: 20.w,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Mikado'
             ),
-            SizedBox(
-              width: 10.w,
-            ),
-            Text(
-              buttonText,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: const Color(0xFF5A82B8),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 }

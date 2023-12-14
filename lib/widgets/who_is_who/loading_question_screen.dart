@@ -7,20 +7,25 @@ class WiwLoadingQuestionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: Get.height,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image:
-                AssetImage("assets/images/aesthetics/loading_question_bg.png"),
-            fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: () async{
+        return false;
+      },
+      child: Scaffold(
+        body: Container(
+          height: Get.height,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image:
+                  AssetImage("assets/images/aesthetics/loading_question_bg.png"),
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Image.asset('assets/images/icons/loading.gif', width: 40.w,),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Image.asset('assets/images/icons/loading.gif', width: 40.w,),
+          ),
         ),
       ),
     );

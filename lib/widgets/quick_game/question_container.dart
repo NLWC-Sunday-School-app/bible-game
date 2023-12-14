@@ -53,8 +53,8 @@ class _QuestionContainerState extends State<QuestionContainer> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors:  [
-                Color.fromRGBO(84, 140, 215, 1),
-                Color.fromRGBO(50, 177,242, 1),
+                Color(0xFF0C70DB),
+                Color(0xFF0B79D1),
               ],
             ),
             borderRadius: BorderRadius.only(

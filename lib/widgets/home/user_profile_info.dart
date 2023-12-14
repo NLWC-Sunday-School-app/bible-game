@@ -69,6 +69,9 @@ class UserProfileInfo extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: (){
+                    if (userController.soundIsOff.isFalse) {
+                      userController.playGameSound();
+                    }
                     displayBadgeInfo();
                   },
                   child: Container(
@@ -125,8 +128,8 @@ class UserProfileInfo extends StatelessWidget {
                 }
                 Get.dialog(const SettingsModal(),
                     barrierDismissible: false,
-                    transitionCurve: Curves.fastOutSlowIn,
-                    transitionDuration: const Duration(milliseconds: 1000));
+                    transitionCurve: Curves.easeIn,
+                    transitionDuration: const Duration(milliseconds: 500));
               },
               child: Container(
                 decoration: BoxDecoration(

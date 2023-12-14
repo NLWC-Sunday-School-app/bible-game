@@ -8,6 +8,7 @@ import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/user_controller.dart';
 import '../../widgets/modals/wiw_freebies_modal.dart';
 import '../../widgets/who_is_who/who_is_who_level.dart';
 
@@ -23,7 +24,7 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
   final int bannerCount = 3;
 
   final WiwGameController _wiwGameController = Get.put(WiwGameController());
-
+  final UserController _userController = Get.put(UserController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +75,12 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                         Row(
                           children: [
                             InkWell(
-                              onTap: () => Get.back(),
+                              onTap: (){
+                                _userController.soundIsOff.isFalse
+                                    ? _userController.playGameSound()
+                                    : null;
+                                Get.back();
+                              },
                               child: Image.asset(
                                 'assets/images/aesthetics/back.png',
                                 width: 44.w,
@@ -91,8 +97,16 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                                   fontSize: 26.sp),
                             )),
                             InkWell(
-                              onTap: () => Get.dialog(const WhoIsWhoGuide(),
-                                  barrierDismissible: false),
+                              onTap: () {
+                                _userController.soundIsOff.isFalse
+                                    ? _userController.playGameSound()
+                                    : null;
+                                Get.bottomSheet(
+                                  const WhoIsWhoGuide(),
+                                  isScrollControlled: true,
+                                  isDismissible: false,
+                                );
+                              },
                               child: Image.asset(
                                 'assets/images/aesthetics/info.png',
                                 width: 44.w,
@@ -166,6 +180,8 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                                                 .isSpecialLevel,
                                             playTime: _wiwGameController
                                                 .gameLevels[index].playTime,
+                                            reward: _wiwGameController
+                                                .gameLevels[index].reward,
                                           ),
                                         ],
                                       );

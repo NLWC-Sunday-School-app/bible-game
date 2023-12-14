@@ -6,7 +6,7 @@ class DioInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler)async {
-    options.headers = {'Content-Type': 'application/json','accept': 'application/json', 'Authorization': 'Bearer ${GetStorage().read('user_token')}'};
+    options.headers = {'Content-Type': 'application/json','accept': '*/*', 'Authorization': 'Bearer ${GetStorage().read('user_token')}'};
     super.onRequest(options, handler);
   }
 

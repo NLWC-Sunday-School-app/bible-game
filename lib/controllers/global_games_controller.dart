@@ -19,8 +19,16 @@ class GlobalGamesController extends GetxController{
         globalGames.value = games;
        isFetchingGames(false);
       }catch(e){
-        print(e);
+
       }
+   }
+   getGlobalGamesWithoutLoader()async{
+     try{
+       var games =  await GameService.getGlobalGames();
+       globalGames.value = games;
+     }catch(e){
+
+     }
    }
 
    getGlobalGameLeaderboard(campaignType) async{

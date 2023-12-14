@@ -142,7 +142,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           return validation;
                         },
                         onChanged: (text) =>
-                            {authController.username.value = text},
+                            {authController.username.value = text.removeAllWhitespace},
                       ),
                     ),
                   ),
@@ -183,7 +183,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           return validation;
                         },
                         onChanged: (text) =>
-                            {authController.emailAddress.value = text},
+                            {authController.emailAddress.value = text.removeAllWhitespace},
                       ),
                     ),
                   ),
@@ -240,7 +240,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           return validation;
                         },
                         onChanged: (text) =>
-                            {authController.emailAddress.value = text},
+                            {authController.emailAddress.value = text.removeAllWhitespace},
                       ),
                     ),
                   ),
@@ -293,7 +293,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           return validation;
                         },
                         onChanged: (text) =>
-                            {authController.password.value = text},
+                            {authController.password.value = text.removeAllWhitespace},
                       ),
                     ),
                   ),

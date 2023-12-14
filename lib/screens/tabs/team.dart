@@ -78,17 +78,18 @@ class TabTeamScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Image.asset('assets/images/aesthetics/fbl_coming_soon.png',
+              Image.asset('assets/images/aesthetics/store_coming_soon.gif',
                 width: 300.w,
               ),
               SizedBox(
-                height: 20.h,
+                height: 0.h,
               ),
               Text('Play and win with your friends!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 18.sp,
+                    fontFamily: 'Mikado',
                     fontWeight: FontWeight.w700
                 ),
               ),

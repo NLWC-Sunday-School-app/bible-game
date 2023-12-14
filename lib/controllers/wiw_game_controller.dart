@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/models/whoIsWhoLevel.dart';
 import 'package:bible_game/services/game_service.dart';
+import 'package:confetti/confetti.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
@@ -20,6 +21,10 @@ class WiwGameController extends GetxController
   var gameDuration = 0.obs;
   var gameTimePurchasePrice = 0;
   var pointPerQuestion = 0;
+  var passMark = 0;
+  var selectedGameLevel = 0.obs;
+  var completedGameLevel = false.obs;
+  final confettiController = ConfettiController();
   GetStorage box = GetStorage();
   final player = AudioPlayer();
   UserController userController = Get.put(UserController());
@@ -52,6 +57,17 @@ class WiwGameController extends GetxController
     var gameSettings = box.read('game_settings');
     pointPerQuestion = int.parse(gameSettings['num_whoiswho_plays']);
     gameTimePurchasePrice = int.parse(gameSettings['game_time_purchase_price']);
+    passMark = int.parse(gameSettings['whoiswho_questions_passmark']);
+  }
+
+  sendSpecialLevelData(points, level)async{
+    await GameService.sendWhoIsWhoGameData(
+        points,
+        userController.myUser['id'],
+        level,
+        true,
+    );
+    await userController.getUserData();
   }
 
   @override

@@ -78,7 +78,12 @@ class _WiwQuestionContainerState extends State<WiwQuestionContainer> {
           ),
           const Spacer(),
           InkWell(
-            onTap: () => Get.dialog(const WiwQuitModal()),
+            onTap: (){
+              if (userController.soundIsOff.isFalse) {
+              userController.playGameSound();
+              }
+              Get.dialog(const WiwQuitModal());
+         },
             child: Align(
               alignment: Alignment.bottomRight,
               child: Image.asset(

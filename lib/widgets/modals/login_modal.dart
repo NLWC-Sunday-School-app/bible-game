@@ -136,7 +136,7 @@ class _LoginModalState extends State<LoginModal> {
                             return validation;
                           },
                           onChanged: (text) =>
-                              {authController.loginEmail.value = text},
+                              {authController.loginEmail.value = text.removeAllWhitespace},
                         ),
                       ),
                     ),
@@ -189,7 +189,7 @@ class _LoginModalState extends State<LoginModal> {
                             return validation;
                           },
                           onChanged: (text) =>
-                              {authController.loginPassword.value = text},
+                              {authController.loginPassword.value = text.removeAllWhitespace},
                         ),
                       ),
                     ),

@@ -72,16 +72,15 @@ class LeaderBoardScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                   StrokeText(
-                    text: '         ${Get.arguments} \n Leaderboard',
-                    textStyle: TextStyle(
+                   Text(
+                     '${Get.arguments} \n Leaderboard',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'Mikado',
                       fontSize: 25.sp,
                       fontWeight: FontWeight.w900,
                     ),
-                    strokeColor: const Color(0xFF05477B) ,
-                    strokeWidth: 5,
                   ),
                   SizedBox(width: 50.w,),
                   const Spacer()

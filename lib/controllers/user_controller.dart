@@ -24,6 +24,7 @@ class UserController extends GetxController {
   final player3 = AudioPlayer();
   final player4 = AudioPlayer();
   final player5 = AudioPlayer();
+  final player6 = AudioPlayer();
   final backgroundMusicPlayer = AudioPlayer();
 
   toggleGameMusic() {
@@ -39,11 +40,18 @@ class UserController extends GetxController {
 
   Future<void> playGameSound() async {
     await player2.setAsset('assets/audios/click.mp3');
+    await player2.setVolume(0.2);
     await player2.play();
+  }
+  Future<void> playAchievementSound() async {
+    await player6.setAsset('assets/audios/achievement.mp3');
+    await player6.setVolume(0.2);
+    await player6.play();
   }
 
   Future<void> playSelectTabSound() async {
     await player3.setAsset('assets/audios/select_tab.mp3');
+    await player3.setVolume(0.05);
     await player3.play();
   }
 
@@ -111,11 +119,11 @@ class UserController extends GetxController {
   }
 
   Future<void> setSoundValue() async {
-    await backgroundMusicPlayer.setAsset('assets/audios/background_music.mp3');
-    await backgroundMusicPlayer.setVolume(0.1);
+    await backgroundMusicPlayer.setAsset('assets/audios/background_song.mp3');
+    await backgroundMusicPlayer.setVolume(0.05);
     await backgroundMusicPlayer.setLoopMode(LoopMode.all);
     await player2.setAsset('assets/audios/click.mp3');
-    await player2.setVolume(0.5);
+    await player2.setVolume(0.3);
     musicIsOff.value = box.read('pauseGameMusic') ?? false;
     soundIsOff.value = box.read('pauseGameSound') ?? false;
   }

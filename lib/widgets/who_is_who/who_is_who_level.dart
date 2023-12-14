@@ -1,26 +1,40 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/controllers/wiw_game_controller.dart';
 import 'package:bible_game/screens/who_is_who/home.dart';
 import 'package:bible_game/screens/who_is_who/question_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import '../modals/wiw_freebies_modal.dart';
 class WhoIsWhoLevel extends StatelessWidget {
-  const WhoIsWhoLevel({Key? key, required this.isUnLocked, required this.level, required this.backgroundUrl, required this.isSpecialLevel, required this.playTime}) : super(key: key);
+  const WhoIsWhoLevel({Key? key, required this.isUnLocked, required this.level, required this.backgroundUrl, required this.isSpecialLevel, required this.playTime, required this.reward}) : super(key: key);
   final bool isUnLocked;
   final String level;
   final String backgroundUrl;
   final bool isSpecialLevel;
   final int playTime;
-
-
+  final int reward;
   @override
   Widget build(BuildContext context) {
     WiwGameController wiwGameController = Get.put(WiwGameController());
+    UserController userController = Get.put(UserController());
     return GestureDetector(
       onTap: (){
-        if(isUnLocked){
-          wiwGameController.gameDuration.value = playTime;
-          wiwGameController.getQuestions();
+
+          wiwGameController.selectedGameLevel.value = int.parse(level);
+          wiwGameController.completedGameLevel.value = isUnLocked;
+        if(isSpecialLevel && isUnLocked){
+          userController.soundIsOff.isFalse
+              ? userController.playAchievementSound()
+              : null;
+           Get.bottomSheet(WiwFreebiesModal(level: level, pointsRewarded: reward,), isDismissible: false, isScrollControlled: true);
+        }else if(isUnLocked && !isSpecialLevel){
+          userController.soundIsOff.isFalse
+              ? userController.playGameSound()
+              : null;
+            wiwGameController.gameDuration.value = playTime;
+            wiwGameController.getQuestions();
         }
       },
       child: Container(

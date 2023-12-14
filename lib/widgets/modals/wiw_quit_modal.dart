@@ -1,3 +1,4 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ class WiwQuitModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WiwGameQuestionController wiwGameQuestionController = Get.put(WiwGameQuestionController());
+    final UserController userController = Get.put(UserController());
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
@@ -39,7 +41,12 @@ class WiwQuitModal extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: InkWell(
-                    onTap: () => Get.back(),
+                    onTap: (){
+                    if (userController.soundIsOff.isFalse) {
+                      userController.playGameSound();
+                     }
+                     Get.back();
+                    },
                     child: Image.asset(
                       'assets/images/icons/blue_close.png',
                       width: 48.w,
@@ -80,6 +87,9 @@ class WiwQuitModal extends StatelessWidget {
               ),
               InkWell(
                 onTap: (){
+                  if (userController.soundIsOff.isFalse) {
+                    userController.playGameSound();
+                  }
                   Get.back();
                   Get.back();
                   wiwGameQuestionController.stopTimer();

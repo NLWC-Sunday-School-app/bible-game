@@ -1,14 +1,22 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/controllers/wiw_game_question_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class WiwTryAgainModal extends StatelessWidget {
+class WiwTryAgainModal extends StatefulWidget {
   const WiwTryAgainModal({Key? key}) : super(key: key);
 
   @override
+  State<WiwTryAgainModal> createState() => _WiwTryAgainModalState();
+}
+
+class _WiwTryAgainModalState extends State<WiwTryAgainModal> {
+  WiwGameQuestionController wiwGameQuestionController = Get.put(WiwGameQuestionController());
+  UserController  userController = Get.put(UserController());
+  @override
   Widget build(BuildContext context) {
-    WiwGameQuestionController wiwGameQuestionController = Get.put(WiwGameQuestionController());
+
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 0.w),
       backgroundColor: Colors.transparent,
@@ -33,6 +41,9 @@ class WiwTryAgainModal extends StatelessWidget {
               ),
               InkWell(
                 onTap: (){
+                  if (userController.soundIsOff.isFalse) {
+                    userController.playGameSound();
+                  }
                   Get.back();
                   Get.back();
                 },
@@ -79,37 +90,19 @@ class WiwTryAgainModal extends StatelessWidget {
                             SizedBox(
                               width: 10.w,
                             ),
-                            Text(
-                              '0',
-                              style: TextStyle(
-                                  fontFamily: 'Mikado',
-                                  fontSize: 40.sp,
-                                  fontWeight: FontWeight.w900,
-                                  color: const Color(0xFFCC2C39)),
+                            Obx(
+                              () => Text(
+                                wiwGameQuestionController.pointsGained.value.toString(),
+                                style: TextStyle(
+                                    fontFamily: 'Mikado',
+                                    fontSize: 40.sp,
+                                    fontWeight: FontWeight.w900,
+                                    color: const Color(0xFFCC2C39)),
+                              ),
                             )
                           ],
                         )
                       ],
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.h),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 2.w, color: const Color(0xFFCC2C39)),
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(12.r),
-                            bottomRight: Radius.circular(12.r))),
-                    width: 120.w,
-                    child: Text(
-                      'Bonus point: +0',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: const Color(0xFFCC2C39),
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13.sp,
-                      ),
                     ),
                   ),
                   SizedBox(
@@ -149,7 +142,7 @@ class WiwTryAgainModal extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    height: 35.h,
+                    height: 50.h,
                   ),
                    InkWell(
                     onTap: () {
@@ -188,5 +181,11 @@ class WiwTryAgainModal extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    wiwGameQuestionController.sendGameData();
   }
 }

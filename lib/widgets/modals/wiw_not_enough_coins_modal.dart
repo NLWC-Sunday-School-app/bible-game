@@ -1,13 +1,18 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stroke_text/stroke_text.dart';
+
+import '../../controllers/wiw_game_question_controller.dart';
 
 class WiwNotEnoughCoinsModal extends StatelessWidget {
   const WiwNotEnoughCoinsModal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    WiwGameQuestionController wiwGameQuestionController = Get.put(WiwGameQuestionController());
+    UserController userController  = Get.put(UserController());
     return  Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
@@ -79,9 +84,14 @@ class WiwNotEnoughCoinsModal extends StatelessWidget {
                 height: 40.h,
               ),
               InkWell(
-                onTap: (){
+                onTap: ()async{
+                  if (userController.soundIsOff.isFalse) {
+                    userController.playGameSound();
+                  }
                   Get.back();
                   Get.back();
+                  await wiwGameQuestionController.sendGameData();
+                  await userController.getUserData();
                 },
                 child: Container(
                   width: 250.w,

@@ -5,6 +5,7 @@ import 'package:bible_game/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:get/get.dart';
@@ -14,8 +15,37 @@ import '../../utilities/network_connection.dart';
 import '../../widgets/modals/network_modal.dart';
 import '../../widgets/modals/welcome_modal.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  var isLoggedIn = GetStorage().read('userLoggedIn') ?? false;
+  AuthController authController = Get.put(AuthController());
+  final player = AudioPlayer();
+
+
+  Future<void> playGameSound() async {
+    await player.setAsset('assets/audios/splash_screen.mp3');
+    await player.setVolume(0.2);
+    await player.play();
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    player.dispose();
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    // playGameSound();
+  }
 
   setLoggedInState(){
     AuthController authController = Get.put(AuthController());
@@ -39,27 +69,41 @@ class SplashScreen extends StatelessWidget {
     }
   }
 
+
+
   checkNetworkConnection() async{
     final TabsController tabsController = Get.put(TabsController());
     NetworkConnection networkConnection = Get.put(NetworkConnection());
     if(await networkConnection.hasInternetConnection() == true){
       var token = GetStorage().read('user_token');
       var refreshToken = GetStorage().read('refresh_token');
-      bool tokenHasExpired = JwtDecoder.isExpired(token);
-      if(tokenHasExpired){
-         await AuthService.refreshToken(refreshToken);
-         await UserService.getUserGameSettings();
-         await setLoggedInState();
-         await getUserData();
-         tabsController.selectPage(0);
-         await Get.offAll(() => const TabMainScreen());
+      if(token != null){
+        bool tokenHasExpired = JwtDecoder.isExpired(token);
+        if(tokenHasExpired){
+          await AuthService.refreshToken(refreshToken);
+          await UserService.getUserGameSettings();
+          await setLoggedInState();
+          await getUserData();
+          tabsController.selectPage(0);
+          await Get.offAll(() => const TabMainScreen());
+        }else{
+          await UserService.getUserGameSettings();
+          await setLoggedInState();
+          await getUserData();
+          tabsController.selectPage(0);
+          await Get.offAll(() => const TabMainScreen());
+        }
       }else{
-         await UserService.getUserGameSettings();
-         await setLoggedInState();
-         await getUserData();
-         tabsController.selectPage(0);
-        await Get.offAll(() => const TabMainScreen());
+        await UserService.getUserGameSettings();
+        await setLoggedInState();
+        await getUserData();
+        tabsController.selectPage(0);
+        await Get.offAll(() => const TabMainScreen(),
+          transition: Transition.fade,
+          duration:  const Duration(milliseconds: 1000)
+        );
       }
+
     }else{
       Get.dialog(const NoNetworkModal(), barrierDismissible: false);
     }
@@ -68,9 +112,7 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GetStorage box = GetStorage();
-    var isLoggedIn = box.read('userLoggedIn') ?? false;
-    AuthController authController = Get.put(AuthController());
+
     return Stack(
       children: [
         Container(
@@ -95,7 +137,7 @@ class SplashScreen extends StatelessWidget {
                     lineHeight: 15.h,
                     percent: 1,
                     animation: true,
-                    animationDuration: 2500,
+                    animationDuration: 4500,
                     barRadius: const Radius.circular(10),
                     progressColor: const Color(0xFFFECF75),
                     onAnimationEnd: () =>{

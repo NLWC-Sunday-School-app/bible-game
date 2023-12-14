@@ -1,3 +1,4 @@
+import 'package:bible_game/controllers/wiw_game_controller.dart';
 import 'package:bible_game/controllers/wiw_game_question_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +11,7 @@ class WiwSuccessModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WiwGameQuestionController wiwGameQuestionController = Get.put(WiwGameQuestionController());
+    WiwGameController wiwGameController = Get.put(WiwGameController());
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 0.w),
       backgroundColor: Colors.transparent,
@@ -82,7 +84,8 @@ class WiwSuccessModal extends StatelessWidget {
               SizedBox(height: 20.h,),
               SizedBox(
                 width: 100.w,
-                child: Row(
+                child:
+                Row(
                   children: [
                     Image.asset(
                       'assets/images/icons/mark.png',
@@ -93,16 +96,18 @@ class WiwSuccessModal extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        Text(
-                          '${wiwGameQuestionController.numOfCorrectAnswers}/20',
-                          style: TextStyle(
-                              fontSize: 18.sp,
-                              fontFamily: 'Mikado',
-                              color: const Color(0xFF0155AF),
-                              fontWeight: FontWeight.w700),
+                        Obx(
+                          () => Text(
+                            '${wiwGameQuestionController.numOfCorrectAnswers}/${wiwGameQuestionController.numOfCorrectAnswers > wiwGameController.passMark ? wiwGameQuestionController.numOfAnsweredQuestions.value : wiwGameController.passMark}',
+                            style: TextStyle(
+                                fontSize: 18.sp,
+                                fontFamily: 'Mikado',
+                                color: const Color(0xFF0155AF),
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
                         Text(
-                          'answers',
+                          'questions',
                           style: TextStyle(
                               fontFamily: 'Mikado',
                               fontSize: 13.sp,
@@ -118,6 +123,7 @@ class WiwSuccessModal extends StatelessWidget {
                 onTap: () {
                   Get.back();
                   Get.back();
+                  wiwGameController.getGameLevels();
                 },
                 child:
                 Container(

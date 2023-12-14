@@ -85,7 +85,8 @@ class LeaderBoardMenuCard extends StatelessWidget {
                   levelLabel,
                   style: TextStyle(
                     fontSize: 24.sp,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Mikado'
                   ),
                 ),
                 Container(

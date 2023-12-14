@@ -1,3 +1,4 @@
+import 'package:bible_game/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ class WhoIsWhoGuide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UserController userController = Get.put(UserController());
     return Dialog(
       insetPadding: EdgeInsets.all(2.w),
       backgroundColor: Colors.black.withOpacity(0.86),
@@ -21,10 +23,12 @@ class WhoIsWhoGuide extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 50.w),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
 
                 SizedBox(
-                  height: 50.h,
+                  height: 20.h,
                 ),
 
                 StrokeText(
@@ -145,6 +149,9 @@ class WhoIsWhoGuide extends StatelessWidget {
                 SizedBox(height: 50.h,),
                 InkWell(
                   onTap: (){
+                    userController.soundIsOff.isFalse
+                        ? userController.playGameSound()
+                        : null;
                     var firstTime = GetStorage().read('wiw_info_first_time') ?? true;
                     if(firstTime){
                       Get.back();
@@ -167,7 +174,7 @@ class WhoIsWhoGuide extends StatelessWidget {
                     strokeWidth: 5,
                   ),
                 ),
-                const Spacer(),
+                // const Spacer(),
               ],
             ),
           ),

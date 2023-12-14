@@ -63,7 +63,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                         EdgeInsets.only(bottom: Get.height < 680 ? 20.h : 30.h),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF32B1F2),
+                      color: Color(0xFF0B79D1),
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(30.r),
                         bottomRight: Radius.circular(30.r),
@@ -101,12 +101,13 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                             Column(
                               children: [
                                 Text(
-                                  'pilgrim progress',
+                                  'Pilgrim progress',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 20.sp,
                                     letterSpacing: 1,
-                                    fontFamily: 'Neuland',
+                                    fontWeight: FontWeight.w900,
+                                    fontFamily: 'Mikado',
                                     color: Colors.white,
                                   ),
                                 ),
@@ -117,7 +118,8 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                   'Journey through the bible, Grow your \nknowledge as you progress ',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.white,
-                                    fontSize: 14.sp
+                                    fontSize: 14.sp,
+                                    fontFamily: 'Mikado',
                                   ),
                                 )
                               ],

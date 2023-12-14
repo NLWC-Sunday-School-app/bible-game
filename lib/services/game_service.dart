@@ -72,9 +72,10 @@ class GameService {
   static Future<List<Leaderboard>> getFourScriptureGameLeaderBoard(campaignType) async{
     try{
        final response = await DioClient().dio.get('/playlog/campaigns/leaderboards?campaign=$campaignType&limit=20');
-       final leaderBoardData = (response.data as List)
+       final leaderBoardData = (response.data['data'] as List)
            .map((e) => Leaderboard.fromJson(e))
            .toList();
+
        return leaderBoardData;
     }on DioException catch (e) {
       final errorMessage = DioExceptions.fromDioError(e).toString();
@@ -100,7 +101,7 @@ class GameService {
   static Future<List<GlobalLeaderboard>> getGlobalGameLeaderBoard(campaignType) async{
     try{
       final response = await DioClient().dio.get('/playlog/campaigns/leaderboards?campaign=$campaignType&limit=20');
-      final globalLeaderBoardData = (response.data as List)
+      final globalLeaderBoardData = (response.data['data'] as List)
           .map((e) => GlobalLeaderboard.fromJson(e))
           .toList();
       return globalLeaderBoardData;
@@ -239,7 +240,6 @@ class GameService {
         "userId": userId,
         "amount": amount,
         "description": "Game Extra time"
-
       });
       return response.statusCode;
     } on DioException catch (e) {
@@ -249,5 +249,41 @@ class GameService {
 
   }
 
+  static Future<dynamic> sendWhoIsWhoGameData(totalScore, playerId, levelId, completedLevel) async {
+    print('$playerId, $levelId, $completedLevel,$totalScore');
+    try{
+      print('$playerId, $levelId, $completedLevel,$totalScore');
+      final response = await DioClient().dio.post('/whoiswho/logs', data:{
+        "total_score": totalScore,
+        "player_id": playerId,
+        "level_id": levelId,
+        "completed_level": completedLevel
+      });
+      print('test: $playerId, $levelId, $completedLevel,$totalScore');
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+
+  }
+
+  static Future<dynamic> sendWhoIsWhoGameDataUsingGHttp(totalScore, playerId, levelId, completedLevel) async {
+    print('$playerId, $levelId, $completedLevel,$totalScore');
+    try{
+      print('$playerId, $levelId, $completedLevel,$totalScore');
+      final response = await http.post(Uri.parse('https://plankton-app-ikxuv.ondigitalocean.app/whoiswho/logs'), body:{
+        "total_score": totalScore,
+        "player_id": playerId,
+        "level_id": levelId,
+        "completedLevel": completedLevel
+      });
+      print('response $response');
+      print('test: $playerId, $levelId, $completedLevel,$totalScore');
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+
+  }
 
 }

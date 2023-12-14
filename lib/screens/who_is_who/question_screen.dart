@@ -43,6 +43,9 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen> {
               ),
               Expanded(
                 child: PageView.builder(
+                  onPageChanged: (value) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: wiwGameQuestionController.pageController,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: wiwGameQuestionController.questions.length,

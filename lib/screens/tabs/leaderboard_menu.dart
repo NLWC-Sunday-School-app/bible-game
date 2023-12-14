@@ -27,8 +27,7 @@ class TabLeaderBoardMenuScreen extends StatelessWidget {
         ),
         child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
+          return ConstrainedBox(
               constraints: BoxConstraints(
                   minHeight: constraints.maxHeight,
                   maxWidth: constraints.maxWidth),
@@ -93,22 +92,33 @@ class TabLeaderBoardMenuScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: constraints.maxHeight * 0.03),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/blue_bible.png',levelLabel: '4 Scriptures', levelNumber: '*', isNativity: true,),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/babe.png', levelLabel: 'Babe', levelNumber: '1', isNativity: false,),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/child.png', levelLabel: 'Child', levelNumber: '2', isNativity: false,),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/young_believer.png', levelLabel: 'Young Believer', levelNumber: '3', isNativity: false,),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/charity.png', levelLabel: 'Charity', levelNumber: '4', isNativity: false,),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/father.png', levelLabel: 'Father', levelNumber: '5', isNativity: false,),
-                        const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/elder.png', levelLabel: 'Elder', levelNumber: '6', isNativity: false,)
+                        Container(
+                          height: 6.h,
+                        ),
+                        SizedBox(
+                          height: Get.height - (160.h + 120.h + 6.h),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                const LeaderBoardMenuCard(levelImage:'assets/images/blue_bible.png',levelLabel: '4 Scriptures', levelNumber: '*', isNativity: true,),
+                                const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/babe.png', levelLabel: 'Babe', levelNumber: '1', isNativity: false,),
+                                const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/child.png', levelLabel: 'Child', levelNumber: '2', isNativity: false,),
+                                const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/young_believer.png', levelLabel: 'Young Believer', levelNumber: '3', isNativity: false,),
+                                const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/charity.png', levelLabel: 'Charity', levelNumber: '4', isNativity: false,),
+                                const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/father.png', levelLabel: 'Father', levelNumber: '5', isNativity: false,),
+                                const LeaderBoardMenuCard(levelImage:'assets/images/pilgrim_levels/elder.png', levelLabel: 'Elder', levelNumber: '6', isNativity: false,)
+                              ],
+                            ),
+                          ),
+                        ),
 
                       ],
                     ),
 
 
               ),
-            ),
-          );
+            );
         }),
       ),
     );

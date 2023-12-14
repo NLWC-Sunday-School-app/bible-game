@@ -93,8 +93,8 @@ class AuthModal extends StatelessWidget {
                       Get.dialog(
                         const LoginModal(),
                         barrierDismissible: false,
-                          transitionCurve: Curves.fastOutSlowIn,
-                          transitionDuration: const Duration(milliseconds: 1000)
+                          transitionCurve: Curves.easeIn,
+                          transitionDuration: const Duration(milliseconds: 500)
                       )
                     },
                     child: Container(
@@ -130,8 +130,8 @@ class AuthModal extends StatelessWidget {
                       Get.dialog(
                         const CreateProfileModal(),
                         barrierDismissible: false,
-                          transitionCurve: Curves.fastOutSlowIn,
-                          transitionDuration: const Duration(milliseconds: 1000)
+                          transitionCurve: Curves.easeIn,
+                          transitionDuration: const Duration(milliseconds: 500)
                       )
                     },
                     child: Container(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:animated_svg/animated_svg.dart';
 import 'package:animated_svg/animated_svg_controller.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:bible_game/controllers/auth_controller.dart';
 import 'package:bible_game/controllers/global_games_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/tabs/account.dart';
@@ -42,6 +43,7 @@ class _TabMainScreenState extends State<TabMainScreen> {
       Get.put(GlobalGamesController());
   var selectedTabIndex = GetStorage().read('tabIndex') ?? 0;
   UserController userController = Get.put(UserController());
+  AuthController authController = Get.put(AuthController());
   final player = AudioPlayer();
   late final SvgController controller;
 
@@ -66,7 +68,6 @@ class _TabMainScreenState extends State<TabMainScreen> {
       'page': const TabTeamScreen(),
       'title': 'Team',
     },
-
   ];
 
   Future<void> selectPage(int index) async {
@@ -82,14 +83,19 @@ class _TabMainScreenState extends State<TabMainScreen> {
     if (index == 1) {
       _globalGamesController.getGlobalGames();
     }
+    if (index == 0) {
+      await userController.getUserData();
+    }
   }
 
-  displayCountryUpdateModal() async{
-    var hasSetCountry = await UserService.getUserCountryStatus();
-    if(!hasSetCountry){
-      Get.dialog(const CountryUpdateModal());
+  displayCountryUpdateModal() async {
+    if (authController.isLoggedIn.isTrue) {
+      var hasSetCountry = await UserService.getUserCountryStatus();
+      if (!hasSetCountry) {
+        Get.dialog(const CountryUpdateModal());
+      }
+      print('country $hasSetCountry');
     }
-    print('country $hasSetCountry');
   }
 
   @override
@@ -117,11 +123,14 @@ class _TabMainScreenState extends State<TabMainScreen> {
     }
   }
 
-
   Widget get _bottomNavigationBar {
     return SizedBox(
-      height: 100.h,
+      // height: 100.h,
       child: Container(
+        constraints: BoxConstraints(
+          minHeight: 100,
+          maxHeight: 120.h,
+        ),
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
@@ -146,9 +155,9 @@ class _TabMainScreenState extends State<TabMainScreen> {
               ),
               BottomTabItem(
                 itemLabel: 'assets/images/icons/tab_trophy.png',
-                itemIcon: 'Leaderboard',
+                itemIcon: 'Board',
                 itemIsSelected: _tabsController.leaderboardTabIsSelected.value,
-                onTap: (){
+                onTap: () {
                   selectPage(2);
                   _tabsController.selectLeaderboardTab();
                 },

@@ -27,8 +27,8 @@ class SignInProfile extends StatelessWidget {
             text:
                 'Sign in to your profile to save \n& continue your game play.',
           ),
-          transitionCurve: Curves.fastOutSlowIn,
-          transitionDuration: const Duration(milliseconds: 1000),
+          transitionCurve: Curves.easeIn,
+          transitionDuration: const Duration(milliseconds: 500),
           barrierDismissible: false,
         );
       },
@@ -45,6 +45,7 @@ class SignInProfile extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(4.r),
+                    topLeft:  Radius.circular(10.r),
                     bottomRight: Radius.circular(10.r),
                     bottomLeft: Radius.circular(10.r)),
                 boxShadow: const [

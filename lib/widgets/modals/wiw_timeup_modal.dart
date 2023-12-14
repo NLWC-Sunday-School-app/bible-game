@@ -44,6 +44,9 @@ class WiwTimeUpModal extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: (){
+                        if (userController.soundIsOff.isFalse) {
+                          userController.playGameSound();
+                        }
                         Get.back();
                         Get.dialog(const WiwTryAgainModal());
                       },
@@ -125,6 +128,9 @@ class WiwTimeUpModal extends StatelessWidget {
                     ),
                     InkWell(
                       onTap:()async{
+                        if (userController.soundIsOff.isFalse) {
+                          userController.playGameSound();
+                        }
                         if(userController.myUser['coinWalletBalance'] >= wiwGameController.gameTimePurchasePrice){
                           wiwGameQuestionController.resetTimer();
                           Get.back();
