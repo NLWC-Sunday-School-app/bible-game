@@ -76,7 +76,7 @@ class UserProfileInfo extends StatelessWidget {
                   },
                   child: Container(
                       padding: EdgeInsets.only(
-                          left: 30.w, right: 10.w, top: 5.h, bottom: 5.h),
+                          left: 30.w, right: 5.w, top: 5.h, bottom: 5.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(

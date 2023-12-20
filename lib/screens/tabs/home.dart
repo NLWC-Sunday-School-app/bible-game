@@ -32,6 +32,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lottie/lottie.dart';
+import 'package:new_version_plus/new_version_plus.dart';
 import '../../widgets/games/game_card.dart';
 import '../../widgets/home/game_card_info.dart';
 import '../../widgets/home/game_score_info.dart';
@@ -96,6 +97,17 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
       if (!_userController.myUser['isWalletInitialized']) {
         await UserService.initializeWallet();
       }
+    }
+  }
+
+  checkForUpdateAppVersion() async {
+    final newVersion = NewVersionPlus();
+    final status = await newVersion.getVersionStatus();
+    final localVersion = status?.localVersion;
+    final storeVersion = status?.storeVersion;
+    final appCanUpdate = status?.canUpdate;
+    if (appCanUpdate == true) {
+      Get.dialog(const AppUpdateModal(), barrierDismissible: false);
     }
   }
 
@@ -277,11 +289,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           child: Column(
             children: [
               Container(
-                height: Get.height < 680
-                    ? 130.h
-                    : (Get.height > 680 && Get.height < 800)
-                        ? 150.h
-                        : 80.h,
+                height: 80.h,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xFF366ABC),
@@ -301,55 +309,57 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
               ),
               Container(
                 padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                height: Get.height - 200.h,
+                // height: Get.height - 200.h,
                 child: Column(
                   children: [
                     SizedBox(
-                      height: 20.h,
+                      height: 10.h,
                     ),
                     SizedBox(
-                      height: 85.h,
-                      child: Row(
-                        children: [
-                          Obx(
-                            () => _authController.isLoggedIn.isTrue
-                                ? UserProfileInfo(
-                                    avatarUrl:
-                                        '${BaseUrlService.avatarBaseUrl}/${_userController.myUser['id']}.png?apikey=${BaseUrlService.avatarApiKey}',
-                                    username: _userController.myUser['name'] ??
-                                        'Beloved',
-                                    gameLevel: _userController.myUser['rank'],
-                                    badgeSrc: getBadgeUrl(),
-                                    displayBadgeInfo: displayBadgeInfo,
-                                  )
-                                : const SignInProfile(),
-                          ),
-                          const Spacer(),
-                          Obx(
-                            () => GameScoreInfo(
-                              noOfCoins: _authController.isLoggedIn.isTrue
-                                  ? _userController.myUser['coinWalletBalance']
-                                  : 0,
-                              noOfGems: 0,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: Get.height - 200.h - 85.h - 20.h,
+                      height: Get.height - (200.h + 10.h),
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
                             SizedBox(
-                              height: 25.h,
+                              height: 10.h,
+                            ),
+                            SizedBox(
+                              child: Row(
+                                children: [
+                                  Obx(
+                                        () => _authController.isLoggedIn.isTrue
+                                        ? UserProfileInfo(
+                                      avatarUrl:
+                                      '${BaseUrlService.avatarBaseUrl}/${_userController.myUser['id']}.png?apikey=${BaseUrlService.avatarApiKey}',
+                                      username: _userController.myUser['name'] ??
+                                          'Beloved',
+                                      gameLevel: _userController.myUser['rank'],
+                                      badgeSrc: getBadgeUrl(),
+                                      displayBadgeInfo: displayBadgeInfo,
+                                    )
+                                        : const SignInProfile(),
+                                  ),
+                                  const Spacer(),
+                                  Obx(
+                                        () => GameScoreInfo(
+                                      noOfCoins: _authController.isLoggedIn.isTrue
+                                          ? _userController.myUser['coinWalletBalance']
+                                          : 0,
+                                      noOfGems: 0,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20.h,
                             ),
                             GameCardInfo(
                               gameTitle: 'Quick Game',
                               gameText:
                                   'Test your bible knowledge \nthrough short quizzes',
                               gameImageUrl: 'assets/images/aesthetics/bible.gif',
-                              gameImageWidth: 130.w,
+                              gameImageWidth: 150.w,
                               cardColor: 0xFF1A3B77,
                               onTap: () => {
                                 _userController.soundIsOff.isFalse
@@ -494,5 +504,6 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   void initState() {
     super.initState();
     initializeWallet();
+    checkForUpdateAppVersion();
   }
 }

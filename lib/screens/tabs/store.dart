@@ -78,13 +78,13 @@ class TabStoreScreen extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Image.asset('assets/images/aesthetics/fbl_coming_soon.gif',
+            Image.asset('assets/images/aesthetics/store_coming_soon.png',
              width: 300.w,
             ),
             SizedBox(
-              height: 0.h,
+              height: 30.h,
             ),
-            Text('Store up this gold,\n moth & rust can’t destroy it!',
+            Text('Store up this gold.\nMoth and rust cannot destroy it.',
              textAlign: TextAlign.center,
              style: TextStyle(
                color: Colors.white,

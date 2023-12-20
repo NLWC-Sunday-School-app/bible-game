@@ -78,11 +78,11 @@ class TabTeamScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Image.asset('assets/images/aesthetics/store_coming_soon.gif',
+              Image.asset('assets/images/aesthetics/fbl_coming_soon.png',
                 width: 300.w,
               ),
               SizedBox(
-                height: 0.h,
+                height: 30.h,
               ),
               Text('Play and win with your friends!',
                 textAlign: TextAlign.center,

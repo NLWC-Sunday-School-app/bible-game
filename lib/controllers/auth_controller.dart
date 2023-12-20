@@ -264,6 +264,14 @@ class AuthController extends GetxController {
     }
   }
 
+  resetAppData()async{
+    await box.write('userLoggedIn', false);
+    await Get.delete<PilgrimProgressController>();
+    await box.remove('user_token');
+    isLoggedIn(false);
+    isLoadingLogout(false);
+  }
+
   logoutUser() async {
     isLoadingLogout(true);
     try {

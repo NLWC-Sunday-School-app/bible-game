@@ -46,7 +46,7 @@ class _GameCardState extends State<GameCard> {
     AuthController authController = Get.put(AuthController());
     return Container(
       margin: EdgeInsets.only(bottom: 25.h),
-      height: 150.h,
+      height: 160.h,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.r),
@@ -75,7 +75,7 @@ class _GameCardState extends State<GameCard> {
             child: Image.network(
               widget.imageUrl,
               width: 120.w,
-              height: 150.h,
+              height: 160.h,
               fit: BoxFit.cover,
             ),
           ),

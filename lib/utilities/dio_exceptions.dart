@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:bible_game/controllers/auth_controller.dart';
 
 class DioExceptions implements Exception {
   late String message;
+  final AuthController _authController = Get.put(AuthController());
 
   DioExceptions.fromDioError(DioError dioError) {
     print('dioError, ${dioError.requestOptions.uri}');
@@ -45,11 +47,12 @@ class DioExceptions implements Exception {
   String _handleError(int? statusCode, dynamic error) {
     print('status code: $statusCode');
     print('error: ${error.runtimeType}');
+    print('errors: ${error['errors'][0]}');
     switch (statusCode) {
       case 400:
         if (error.runtimeType.toString() ==
             '_InternalLinkedHashMap<String, dynamic>') {
-          Get.snackbar('Error', error['message'],
+          Get.snackbar('Error', error['errors'][0],
               backgroundColor: Colors.red,
               colorText: Colors.white,
               duration: const Duration(seconds: 3),
@@ -64,11 +67,15 @@ class DioExceptions implements Exception {
 
         return 'Bad request';
       case 401:
-        Get.snackbar('Unauthorized', error,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 3),
-            snackPosition: SnackPosition.TOP);
+        Get.snackbar(
+          'Unauthorized',
+          error,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+          snackPosition: SnackPosition.TOP,
+        );
+        _authController.resetAppData();
         return 'Unauthorized';
       case 403:
         return 'Forbidden';
@@ -81,6 +88,7 @@ class DioExceptions implements Exception {
             colorText: Colors.white,
             duration: const Duration(seconds: 4),
             snackPosition: SnackPosition.TOP);
+        _authController.resetAppData();
         return 'Internal server error';
       case 502:
         return 'Bad gateway';

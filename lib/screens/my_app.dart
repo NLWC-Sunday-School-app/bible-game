@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     checkInternet();
     playBackgroundMusic();
     getFcmToken();
-    checkForUpdateAppVersion();
+    // checkForUpdateAppVersion();
 
     if(GetPlatform.isIOS){
       AwesomeNotifications().requestPermissionToSendNotifications(channelKey: 'game notifications');

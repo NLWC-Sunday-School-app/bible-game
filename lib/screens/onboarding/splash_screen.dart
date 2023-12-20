@@ -80,10 +80,14 @@ class _SplashScreenState extends State<SplashScreen> {
       if(token != null){
         bool tokenHasExpired = JwtDecoder.isExpired(token);
         if(tokenHasExpired){
-          await AuthService.refreshToken(refreshToken);
+          if(refreshToken != null){
+            await AuthService.refreshToken(refreshToken);
+            await setLoggedInState();
+            await getUserData();
+          }else{
+            await authController.resetAppData();
+          }
           await UserService.getUserGameSettings();
-          await setLoggedInState();
-          await getUserData();
           tabsController.selectPage(0);
           await Get.offAll(() => const TabMainScreen());
         }else{
@@ -99,8 +103,6 @@ class _SplashScreenState extends State<SplashScreen> {
         await getUserData();
         tabsController.selectPage(0);
         await Get.offAll(() => const TabMainScreen(),
-          transition: Transition.fade,
-          duration:  const Duration(milliseconds: 1000)
         );
       }
 
@@ -137,7 +139,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     lineHeight: 15.h,
                     percent: 1,
                     animation: true,
-                    animationDuration: 4500,
+                    animationDuration: 3500,
                     barRadius: const Radius.circular(10),
                     progressColor: const Color(0xFFFECF75),
                     onAnimationEnd: () =>{

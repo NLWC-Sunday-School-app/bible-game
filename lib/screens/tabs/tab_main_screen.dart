@@ -127,10 +127,7 @@ class _TabMainScreenState extends State<TabMainScreen> {
     return SizedBox(
       // height: 100.h,
       child: Container(
-        constraints: BoxConstraints(
-          minHeight: 100,
-          maxHeight: 120.h,
-        ),
+        height: 120.h,
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
