@@ -127,7 +127,7 @@ class _TabGamesScreenState extends State<TabGamesScreen> {
                           style: TextStyle(
                           color: selectedGlobalChallenge ? const Color(0xFFFFFAD3) : const Color(0xFFD5D5D5),
                           fontFamily: 'Mikado',
-                          fontSize: 18.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w900
                         ),),
                       ),
@@ -159,7 +159,7 @@ class _TabGamesScreenState extends State<TabGamesScreen> {
                           style: TextStyle(
                             color: !selectedGlobalChallenge ? const Color(0xFFFFFAD3) : const Color(0xFFD5D5D5),
                             fontFamily: 'Mikado',
-                            fontSize: 18.sp,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w900
                         ),),
                       ),
@@ -207,7 +207,7 @@ class _TabGamesScreenState extends State<TabGamesScreen> {
                 )) :
                 Container(
                   margin: EdgeInsets.only(top: 100.h),
-                  child: Image.asset('assets/images/aesthetics/multiplayer_coming_soon.png', width: 300.w,),
+                  child: Image.asset('assets/images/aesthetics/multiplayer_coming_soon.png', width: 330.w,),
                 )
           ],
         ),

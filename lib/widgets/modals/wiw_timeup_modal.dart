@@ -48,7 +48,7 @@ class WiwTimeUpModal extends StatelessWidget {
                           userController.playGameSound();
                         }
                         Get.back();
-                        Get.dialog(const WiwTryAgainModal());
+                        Get.dialog(const WiwTryAgainModal(),barrierDismissible: false);
                       },
                       child: Padding(
                         padding: EdgeInsets.only(right: 50.w),
@@ -138,7 +138,7 @@ class WiwTimeUpModal extends StatelessWidget {
                          await userController.getUserData();
                         }else{
                           Get.back();
-                          Get.dialog(const WiwNotEnoughCoinsModal(), transitionCurve: Curves.fastOutSlowIn,
+                          Get.dialog(const WiwNotEnoughCoinsModal(),barrierDismissible: false, transitionCurve: Curves.fastOutSlowIn,
                               transitionDuration: const Duration(milliseconds: 500));
                         }
                       },

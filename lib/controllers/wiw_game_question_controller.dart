@@ -62,6 +62,7 @@ class WiwGameQuestionController extends GetxController
         wiwGameController.completedGameLevel.value = true;
         Get.dialog(
           const WiwSuccessModal(),
+          barrierDismissible: false,
           transitionCurve: Curves.fastOutSlowIn,
           transitionDuration: const Duration(milliseconds: 500),
         );
@@ -72,6 +73,7 @@ class WiwGameQuestionController extends GetxController
         wiwGameController.completedGameLevel.value = true;
         Get.dialog(
           const WiwTimeUpModal(),
+          barrierDismissible: false,
           transitionCurve: Curves.fastOutSlowIn,
           transitionDuration: const Duration(milliseconds: 500),
         );

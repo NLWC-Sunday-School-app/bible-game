@@ -25,6 +25,14 @@ class _WiwQuestionContainerState extends State<WiwQuestionContainer> {
   bool isClicked = false;
 
   @override
+  void initState() {
+    super.initState();
+    setState(() {
+      isClicked = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -69,10 +77,8 @@ class _WiwQuestionContainerState extends State<WiwQuestionContainer> {
             (index) => OptionButton(
               characterName: widget.question.options[index],
               selectOption: () =>{
-                if(isClicked == false){
                   userController.soundIsOff.isFalse ? userController.playGameSound() : null,
                   wiwGameQuestionController.checkAnswer(widget.question, widget.question.options[index])
-                },
               },
             )
           ),
@@ -82,7 +88,7 @@ class _WiwQuestionContainerState extends State<WiwQuestionContainer> {
               if (userController.soundIsOff.isFalse) {
               userController.playGameSound();
               }
-              Get.dialog(const WiwQuitModal());
+              Get.dialog(const WiwQuitModal(), barrierDismissible: false);
          },
             child: Align(
               alignment: Alignment.bottomRight,
