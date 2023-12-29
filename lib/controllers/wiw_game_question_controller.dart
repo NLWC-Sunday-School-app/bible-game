@@ -133,6 +133,7 @@ class WiwGameQuestionController extends GetxController
     update();
     Future.delayed(const Duration(seconds: 1), () {
       goToNextQuestion();
+      _isAnswered = false;
     });
   }
 

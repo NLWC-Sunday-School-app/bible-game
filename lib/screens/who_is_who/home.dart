@@ -42,11 +42,7 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
             child: Column(
               children: [
                 Container(
-                  height: Get.height < 680
-                      ? 130
-                      : (Get.height > 680 && Get.height < 800)
-                          ? 150
-                          : 160.h,
+                  height: 150.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: const Color(0xFF366ABC),
@@ -132,8 +128,10 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: 6.h,
+                ),
                 SingleChildScrollView(
-                  // padding: EdgeInsets.only(left: 15.w, right: 15.w),
                   child: Obx(
                     () => Column(
                       children: [

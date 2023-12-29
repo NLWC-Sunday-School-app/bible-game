@@ -76,9 +76,14 @@ class _WiwQuestionContainerState extends State<WiwQuestionContainer> {
             widget.question.options.length,
             (index) => OptionButton(
               characterName: widget.question.options[index],
-              selectOption: () =>{
-                  userController.soundIsOff.isFalse ? userController.playGameSound() : null,
-                  wiwGameQuestionController.checkAnswer(widget.question, widget.question.options[index])
+              selectOption: (){
+                 if(!isClicked){
+                   userController.soundIsOff.isFalse ? userController.playGameSound() : null;
+                   wiwGameQuestionController.checkAnswer(widget.question, widget.question.options[index]);
+                 }
+                 setState(() {
+                   isClicked = true;
+                 });
               },
             )
           ),

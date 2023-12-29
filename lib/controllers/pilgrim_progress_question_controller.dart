@@ -54,7 +54,6 @@ class PilgrimProgressQuestionController extends GetxController
   @override
   void onInit() {
     super.onInit();
-    print(pilgrimProgressController.gameQuestions);
     _questions = pilgrimProgressController.gameQuestions;
     durationPerQuestion = pilgrimProgressController.durationPerQuestion;
     _pageController = PageController();
@@ -121,6 +120,7 @@ class PilgrimProgressQuestionController extends GetxController
     update();
     Future.delayed(const Duration(milliseconds: 2500), () {
       goToNextQuestion();
+      _isAnswered = false;
     });
   }
 

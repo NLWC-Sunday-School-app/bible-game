@@ -33,6 +33,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lottie/lottie.dart';
 import 'package:new_version_plus/new_version_plus.dart';
+import 'package:stroke_text/stroke_text.dart';
 import '../../widgets/games/game_card.dart';
 import '../../widgets/home/game_card_info.dart';
 import '../../widgets/home/game_score_info.dart';
@@ -41,6 +42,7 @@ import '../../widgets/modals/create_profile_modal.dart';
 import '../../widgets/modals/four_scriptures_welcome_modal.dart';
 import '../../widgets/modals/welcome_modal.dart';
 import '../four_scriptures_one_word/loading_screen.dart';
+import '../recap/home.dart';
 
 class TabHomeScreen extends StatefulWidget {
   const TabHomeScreen({Key? key}) : super(key: key);
@@ -76,8 +78,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
     } else {
       Get.dialog(const AuthModal(
           title: 'Your profile',
-          text:
-              'Sign in to your profile to save \n& continue your game play.'));
+          text: 'Log in to your profile to save \n& continue your game play.'));
     }
   }
 
@@ -327,24 +328,34 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                               child: Row(
                                 children: [
                                   Obx(
-                                        () => _authController.isLoggedIn.isTrue
+                                    () => _authController.isLoggedIn.isTrue
                                         ? UserProfileInfo(
-                                      avatarUrl:
-                                      '${BaseUrlService.avatarBaseUrl}/${_userController.myUser['id']}.png?apikey=${BaseUrlService.avatarApiKey}',
-                                      username: _userController.myUser['name'] ??
-                                          'Beloved',
-                                      gameLevel: _userController.myUser['rank'],
-                                      badgeSrc: getBadgeUrl(),
-                                      displayBadgeInfo: displayBadgeInfo,
-                                    )
+                                            avatarUrl:
+                                                '${BaseUrlService.avatarBaseUrl}/${_userController.myUser['id']}.png?apikey=${BaseUrlService.avatarApiKey}',
+                                            username: _userController
+                                                    .myUser['name'] ??
+                                                'Beloved',
+                                            gameLevel: _userController
+                                                        .myUser['rank']
+                                                        .toString()
+                                                        .toLowerCase() ==
+                                                    'young believer'
+                                                ? 'YB'
+                                                : _userController
+                                                    .myUser['rank'],
+                                            badgeSrc: getBadgeUrl(),
+                                            displayBadgeInfo: displayBadgeInfo,
+                                          )
                                         : const SignInProfile(),
                                   ),
                                   const Spacer(),
                                   Obx(
-                                        () => GameScoreInfo(
-                                      noOfCoins: _authController.isLoggedIn.isTrue
-                                          ? _userController.myUser['coinWalletBalance']
-                                          : 0,
+                                    () => GameScoreInfo(
+                                      noOfCoins:
+                                          _authController.isLoggedIn.isTrue
+                                              ? _userController
+                                                  .myUser['coinWalletBalance']
+                                              : 0,
                                       noOfGems: 0,
                                     ),
                                   )
@@ -354,11 +365,76 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                             SizedBox(
                               height: 20.h,
                             ),
+                            Obx(
+                              () => box.read('game_settings')['show_recap'] == "true" &&
+                                      _authController.isLoggedIn.isTrue
+                                  ? InkWell(
+                                      onTap: () {
+                                        _userController.soundIsOff.isFalse
+                                            ? _userController.playGameSound()
+                                            : null;
+                                        Get.bottomSheet(const RecapHomeScreen(),
+                                            isScrollControlled: true,
+                                            isDismissible: false);
+                                      },
+                                      child: Container(
+                                        height: 65.h,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEEF36A),
+                                          borderRadius:
+                                              BorderRadius.circular(8.r),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                                color: Color(0xFF504136),
+                                                offset: Offset(0, 15),
+                                                blurRadius: 0,
+                                                spreadRadius: -10),
+                                            BoxShadow(
+                                              color: Color(0xFF504136),
+                                              offset: Offset(0, -15),
+                                              blurRadius: 0,
+                                              spreadRadius: -10,
+                                            )
+                                          ],
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 25.w),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              StrokeText(
+                                                text: 'Your Bible Game Recap?',
+                                                textStyle: TextStyle(
+                                                  color: const Color(0xFF047AF3),
+                                                  fontFamily: 'Mikado',
+                                                  fontSize: 20.sp,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                                strokeColor: Colors.white,
+                                                strokeWidth: 4,
+                                              ),
+                                              Image.asset(
+                                                'assets/images/icons/blue_arrow.png',
+                                                width: 32.w,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                            ),
+                            SizedBox(
+                              height: 20.h,
+                            ),
                             GameCardInfo(
                               gameTitle: 'Quick Game',
                               gameText:
                                   'Test your bible knowledge \nthrough short quizzes',
-                              gameImageUrl: 'assets/images/aesthetics/bible.gif',
+                              gameImageUrl:
+                                  'assets/images/aesthetics/bible.gif',
                               gameImageWidth: 150.w,
                               cardColor: 0xFF1A3B77,
                               onTap: () => {
@@ -399,7 +475,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                     const AuthModal(
                                         title: 'Your profile',
                                         text:
-                                            'Sign in to your profile to save \n& continue your game play.'),
+                                            'Log in to your profile to save \n& continue your game play.'),
                                   );
                                 }
                               },
@@ -429,7 +505,8 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                               gameTitle: '4 scriptures, \n1 word!',
                               gameText:
                                   'Put together this puzzle, \nshow thyself approved ',
-                              gameImageUrl: 'assets/images/aesthetics/scroll.gif',
+                              gameImageUrl:
+                                  'assets/images/aesthetics/scroll.gif',
                               gameImageWidth: 150.w,
                               cardColor: 0xFFFFC973,
                               onTap: () => {
@@ -461,7 +538,8 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                               () => SizedBox(
                                 child: _userController.isLoaded.isFalse
                                     ? CarouselSlider.builder(
-                                        itemCount: _userController.adsData.length,
+                                        itemCount:
+                                            _userController.adsData.length,
                                         itemBuilder: (BuildContext context,
                                                 int itemIndex,
                                                 int pageViewIndex) =>
@@ -472,12 +550,13 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                                               .adsData[itemIndex].title,
                                         ),
                                         options: CarouselOptions(
-                                          aspectRatio:
-                                              Get.width > 900 ? 15 / 10 : 9 / 10,
+                                          aspectRatio: Get.width > 900
+                                              ? 15 / 10
+                                              : 9 / 10,
                                           viewportFraction: 1,
                                           autoPlay: true,
-                                          autoPlayInterval:
-                                              const Duration(milliseconds: 2500),
+                                          autoPlayInterval: const Duration(
+                                              milliseconds: 2500),
                                           autoPlayCurve: Curves.fastOutSlowIn,
                                           enlargeCenterPage: true,
                                         ),

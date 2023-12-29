@@ -58,6 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if(authController.isLoggedIn.isTrue){
       await UserService.getUserData();
       await UserService.getUserPilgrimProgress();
+      await UserService.getYearRecap();
     }
   }
 
@@ -128,12 +129,8 @@ class _SplashScreenState extends State<SplashScreen> {
         Center(
           child: Column(
             children: [
-              GestureDetector(
-                onTap: (){
-                  UserService.getUserData();
-                },
-                child: Container(
-                  margin: EdgeInsets.only(top: Get.height < 750 ? 450 : 700),
+              const Spacer(),
+              Container(
                   padding: const EdgeInsets.symmetric(horizontal: 70),
                   child: LinearPercentIndicator(
                     lineHeight: 15.h,
@@ -147,7 +144,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     }
                   ),
                 ),
-              ),
+              SizedBox(height: 50.h,)
             ],
           ),
         ),

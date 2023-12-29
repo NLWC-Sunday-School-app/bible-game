@@ -126,7 +126,7 @@ class _GameCardState extends State<GameCard> {
                                 Get.dialog(const AuthModal(
                                   title: 'LOG IN TO JOIN \nTHE CHALLENGE',
                                   text:
-                                      'Sign in to your profile to join \nthis live challenge.',
+                                      'Log in to your profile to join \nthis live challenge.',
                                 ));
                               }
                             },
@@ -169,7 +169,7 @@ class _GameCardState extends State<GameCard> {
                                 Get.dialog(const AuthModal(
                                   title: 'LOG IN TO JOIN \nTHE CHALLENGE',
                                   text:
-                                      'Sign in to your profile to join \nthis live challenge.',
+                                      'Log in to your profile to join \nthis live challenge.',
                                 ));
                               }
                             },

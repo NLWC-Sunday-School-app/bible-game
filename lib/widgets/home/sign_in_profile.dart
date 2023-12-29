@@ -25,7 +25,7 @@ class SignInProfile extends StatelessWidget {
           const AuthModal(
             title: 'Your Profile',
             text:
-                'Sign in to your profile to save \n& continue your game play.',
+                'Log in to your profile to save \n& continue your game play.',
           ),
           transitionCurve: Curves.easeIn,
           transitionDuration: const Duration(milliseconds: 500),

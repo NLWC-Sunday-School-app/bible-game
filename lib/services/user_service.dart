@@ -183,6 +183,18 @@ class UserService {
     }
   }
 
+  static Future<void> getYearRecap() async{
+    var userId = box.read('user_data')['id'];
+    try{
+      final response = await DioClient().dio.get('/users/recap?id=$userId');
+      print('recap ${response.data}');
+      box.write('game_recap', response.data);
+    }on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+
+  }
 
 }
 

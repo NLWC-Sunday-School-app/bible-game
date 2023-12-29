@@ -188,6 +188,7 @@ class AuthController extends GetxController {
         var isTempLoggedIn = GetStorage().read('isTempLoggedIn') ?? false ;
         await UserService.getUserData();
         await UserService.getUserPilgrimProgress();
+        await UserService.getYearRecap();
         if(isTempLoggedIn){
              var userData = GetStorage().read('user_data');
              var gameData = GetStorage().read('tempProgressData');
@@ -280,6 +281,7 @@ class AuthController extends GetxController {
         await box.write('userLoggedIn', false);
         await Get.delete<PilgrimProgressController>();
         await box.remove('user_token');
+        await box.remove('game_recap');
         isLoggedIn(false);
         isLoadingLogout(false);
         Get.back();

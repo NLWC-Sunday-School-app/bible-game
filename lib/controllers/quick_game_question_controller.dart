@@ -112,6 +112,7 @@ class QuickGamesQuestionController extends GetxController
     update();
     Future.delayed(const Duration(seconds: 2), () {
     goToNextQuestion();
+    _isAnswered = false;
     });
   }
 
