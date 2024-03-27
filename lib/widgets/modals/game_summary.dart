@@ -1,25 +1,10 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bible_game/controllers/global_question_controller.dart';
-import 'package:bible_game/controllers/pilgrim_progress_question_controller.dart';
-import 'package:bible_game/controllers/quick_game_question_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
-import 'package:bible_game/screens/quick_game/step_one.dart';
-import 'package:bible_game/screens/tabs/tab_main_screen.dart';
-import 'package:bible_game/services/user_service.dart';
 import 'package:bible_game/widgets/button/modal_blue_button.dart';
-import 'package:bible_game/widgets/game_summary_action_button.dart';
-import 'package:bible_game/widgets/modals/pilgrim_progress_leaderboard_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:just_audio/just_audio.dart';
-
-import '../../controllers/leaderboard_controller.dart';
 import '../../controllers/tabs_controller.dart';
-import '../custom_icons/my_flutter_app_icons.dart';
-import 'leaderboard_modal.dart';
+
 
 class GameSummaryModal extends StatelessWidget {
   const GameSummaryModal({
@@ -115,7 +100,7 @@ class GameSummaryModal extends StatelessWidget {
                                         width: 10.w,
                                       ),
                                       Text(
-                                        '2000',
+                                        pointsGained,
                                         style: TextStyle(
                                           fontFamily: 'Mikado',
                                           fontSize: 40.sp,

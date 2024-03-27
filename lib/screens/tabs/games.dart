@@ -20,12 +20,13 @@ class TabGamesScreen extends StatefulWidget {
 }
 
 class _TabGamesScreenState extends State<TabGamesScreen> {
-  GlobalGamesController globalGamesController = Get.put(GlobalGamesController());
+  GlobalGamesController globalGamesController =
+      Get.put(GlobalGamesController());
   UserController userController = Get.put(UserController());
   bool selectedGlobalChallenge = true;
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: const Color(0xFF214B86),
       body: Container(
@@ -96,119 +97,140 @@ class _TabGamesScreenState extends State<TabGamesScreen> {
               height: 65.h,
               decoration: BoxDecoration(
                   color: const Color(0xFF92C1F8),
-                borderRadius: BorderRadius.all(Radius.circular(4.r))
-              ),
+                  borderRadius: BorderRadius.all(Radius.circular(4.r))),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    InkWell(
-                      onTap:(){
-                        userController.soundIsOff.isFalse
-                            ? userController.playGameSound()
-                            : null;
-                        setState(() {
-                          selectedGlobalChallenge = true;
-                        });
-                        globalGamesController.getGlobalGamesWithoutLoader();
-                      },
-                      child: Container(
-                        width: 165.w,
-                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                        decoration: BoxDecoration(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      userController.soundIsOff.isFalse
+                          ? userController.playGameSound()
+                          : null;
+                      setState(() {
+                        selectedGlobalChallenge = true;
+                      });
+                      globalGamesController.getGlobalGamesWithoutLoader();
+                    },
+                    child: Container(
+                      width: 165.w,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.w, vertical: 10.h),
+                      decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: selectedGlobalChallenge ? const AssetImage("assets/images/aesthetics/selected_arcade_tab_bg.png") : const AssetImage("assets/images/aesthetics/unselected_arcade_tab_bg.png"),
+                            image: selectedGlobalChallenge
+                                ? const AssetImage(
+                                    "assets/images/aesthetics/selected_arcade_tab_bg.png")
+                                : const AssetImage(
+                                    "assets/images/aesthetics/unselected_arcade_tab_bg.png"),
                             fit: BoxFit.cover,
                           ),
-                        color: const Color(0xFF1E242A),
-                          borderRadius: BorderRadius.all(Radius.circular(12.r))
-                        ),
-                        child: Text('Global Challenge',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                          color: selectedGlobalChallenge ? const Color(0xFFFFFAD3) : const Color(0xFFD5D5D5),
-                          fontFamily: 'Mikado',
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w900
-                        ),),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: (){
-                        userController.soundIsOff.isFalse
-                            ? userController.playGameSound()
-                            : null;
-                        setState(() {
-                          selectedGlobalChallenge = false;
-                        });
-                      },
-                      child: Container(
-                        width: 165.w,
-                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: !selectedGlobalChallenge ? const AssetImage("assets/images/aesthetics/selected_arcade_tab_bg.png") : const AssetImage("assets/images/aesthetics/unselected_arcade_tab_bg.png"),
-                              fit: BoxFit.cover,
-                            ),
-                            color: const Color(0xFF1E242A),
-                            borderRadius: BorderRadius.all(Radius.circular(12.r))
-                        ),
-                        child:
-                        Text(
-                          'Multiplayer',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: !selectedGlobalChallenge ? const Color(0xFFFFFAD3) : const Color(0xFFD5D5D5),
+                          color: const Color(0xFF1E242A),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(12.r))),
+                      child: Text(
+                        'Global Challenge',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: selectedGlobalChallenge
+                                ? const Color(0xFFFFFAD3)
+                                : const Color(0xFFD5D5D5),
                             fontFamily: 'Mikado',
                             fontSize: 16.sp,
-                            fontWeight: FontWeight.w900
-                        ),),
+                            fontWeight: FontWeight.w900),
                       ),
-                    )
-                  ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      userController.soundIsOff.isFalse
+                          ? userController.playGameSound()
+                          : null;
+                      setState(() {
+                        selectedGlobalChallenge = false;
+                      });
+                    },
+                    child: Container(
+                      width: 165.w,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.w, vertical: 10.h),
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: !selectedGlobalChallenge
+                                ? const AssetImage(
+                                    "assets/images/aesthetics/selected_arcade_tab_bg.png")
+                                : const AssetImage(
+                                    "assets/images/aesthetics/unselected_arcade_tab_bg.png"),
+                            fit: BoxFit.cover,
+                          ),
+                          color: const Color(0xFF1E242A),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(12.r))),
+                      child: Text(
+                        'Multiplayer',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: !selectedGlobalChallenge
+                                ? const Color(0xFFFFFAD3)
+                                : const Color(0xFFD5D5D5),
+                            fontFamily: 'Mikado',
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
-            selectedGlobalChallenge ?
-            Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.0.w),
-                height: Get.height - (160.h + 120.h + 75.h),
-                child: Obx(
-                  () => SizedBox(
-                    child: globalGamesController.isFetchingGames.isFalse
-                        ? ListView.builder(
-                          padding: EdgeInsets.only(top: 20.h),
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return GameCard(
-                                imageUrl: globalGamesController
-                                    .globalGames[index].imageUrl,
-                                title: globalGamesController
-                                    .globalGames[index].title,
-                                text: globalGamesController
-                                    .globalGames[index].description,
-                                gameIsLive: globalGamesController
-                                    .globalGames[index].gameIsActive,
-                                campaignTag: globalGamesController
-                                    .globalGames[index].campaignTag,
-                              );
-                            },
-                            itemCount: globalGamesController.globalGames.length,
-                          )
-                        : Container(
-                            margin: EdgeInsets.only(
-                              top: 100.h,
-                            ),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
+            selectedGlobalChallenge
+                ? Container(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.w),
+                    height: Get.height - (160.h + 120.h + 75.h),
+                    child: Obx(
+                      () => SizedBox(
+                        child: globalGamesController.isFetchingGames.isFalse
+                            ? ListView.builder(
+                                padding: EdgeInsets.only(top: 20.h),
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GameCard(
+                                    imageUrl: globalGamesController
+                                        .globalGames[index].imageUrl,
+                                    title: globalGamesController
+                                        .globalGames[index].title,
+                                    text: globalGamesController
+                                        .globalGames[index].description,
+                                    gameIsLive: globalGamesController
+                                        .globalGames[index].gameIsActive,
+                                    campaignTag: globalGamesController
+                                        .globalGames[index].campaignTag,
+                                    startDate: globalGamesController
+                                        .globalGames[index].startDate,
+                                    endDate: globalGamesController
+                                        .globalGames[index].endDate,
+                                  );
+                                },
+                                itemCount:
+                                    globalGamesController.globalGames.length,
+                              )
+                            : Container(
+                                margin: EdgeInsets.only(
+                                  top: 100.h,
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                  ),
-                )) :
-                Container(
-                  margin: EdgeInsets.only(top: 100.h),
-                  child: Image.asset('assets/images/aesthetics/multiplayer_coming_soon.png', width: 330.w,),
-                )
+                      ),
+                    ))
+                : Container(
+                    margin: EdgeInsets.only(top: 100.h),
+                    child: Image.asset(
+                      'assets/images/aesthetics/multiplayer_coming_soon.png',
+                      width: 330.w,
+                    ),
+                  )
           ],
         ),
       ),

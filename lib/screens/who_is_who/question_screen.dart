@@ -2,7 +2,6 @@ import 'package:bible_game/widgets/who_is_who/score_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../controllers/wiw_game_question_controller.dart';
 import '../../widgets/modals/wiw_quit_modal.dart';
 import '../../widgets/who_is_who/wiw_question_container.dart';

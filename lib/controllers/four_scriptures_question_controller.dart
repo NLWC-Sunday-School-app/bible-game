@@ -4,6 +4,7 @@ import 'package:bible_game/controllers/user_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../models/fourScripturesOneWord.dart';
 import '../services/game_service.dart';
@@ -22,7 +23,7 @@ class FourScriptureQuestionController extends GetxController
   final bool _isAnswered = false;
   bool get isAnswered => _isAnswered;
   late String _correctAnswer;
-
+  var noOfHintsUsed = 0.obs;
   String get correctAnswer => _correctAnswer;
   late String selectedAnswer;
   final RxInt _questionNumber = 1.obs;
@@ -32,6 +33,8 @@ class FourScriptureQuestionController extends GetxController
   var numOfCorrectAnswers = 0.obs;
   var pointsGained = 0.obs;
   var totalPointsGained = 0.obs;
+  var gameHintPurchasePrice = 0.obs;
+  var hintIncrementalScore = 0.obs;
 
 
   @override
@@ -40,6 +43,8 @@ class FourScriptureQuestionController extends GetxController
     _questions = fourScripturesOneWordController.fourScripturesQuestions;
     _pageController = PageController();
     totalPointsGained.value = userController.myUser['fourScriptScore'];
+    noOfHintsUsed.value =  GetStorage().read('4ScripturesHintUsedd') ?? 0;
+    setGameSettings();
   }
 
   @override
@@ -53,6 +58,12 @@ class FourScriptureQuestionController extends GetxController
       duration: const Duration(milliseconds: 250),
       curve: Curves.ease,
     );
+  }
+
+  setGameSettings() {
+    var gameSettings = GetStorage().read('game_settings');
+    gameHintPurchasePrice.value = int.parse(gameSettings['game_time_purchase_price']);
+    hintIncrementalScore.value = int.parse(gameSettings['hint_incremental_score']);
   }
 
   updateGamePoint(){

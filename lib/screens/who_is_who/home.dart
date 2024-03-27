@@ -1,15 +1,9 @@
-import 'dart:async';
-
 import 'package:bible_game/controllers/wiw_game_controller.dart';
 import 'package:bible_game/widgets/modals/who_is_who_guide.dart';
-import 'package:bible_game/widgets/who_is_who/level_title_banner.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../controllers/user_controller.dart';
-import '../../widgets/modals/wiw_freebies_modal.dart';
 import '../../widgets/who_is_who/who_is_who_level.dart';
 
 class WhoIsWhoHomeScreen extends StatefulWidget {
@@ -22,9 +16,12 @@ class WhoIsWhoHomeScreen extends StatefulWidget {
 class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
   final int levelsCount = 24;
   final int bannerCount = 3;
+  GlobalKey gridItemKey = GlobalKey();
 
   final WiwGameController _wiwGameController = Get.put(WiwGameController());
   final UserController _userController = Get.put(UserController());
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,6 +99,7 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                                   isScrollControlled: true,
                                   isDismissible: false,
                                 );
+
                               },
                               child: Image.asset(
                                 'assets/images/aesthetics/info.png',
@@ -149,6 +147,7 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                                 height: constraints.maxHeight * 0.8,
                                 child: Obx(
                                   () => GridView.builder(
+                                    key: gridItemKey,
                                     // scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
                                     itemCount:

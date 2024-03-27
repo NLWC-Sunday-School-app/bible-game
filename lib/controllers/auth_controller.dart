@@ -1,16 +1,10 @@
-import 'dart:convert';
-
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
-import 'package:bible_game/controllers/user_controller.dart';
-import 'package:bible_game/screens/tabs/tab_main_screen.dart';
 import 'package:bible_game/widgets/modals/login_successful.dart';
 import 'package:bible_game/widgets/modals/success_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import '../services/auth_service.dart';
 import '../services/game_service.dart';
 import '../services/user_service.dart';

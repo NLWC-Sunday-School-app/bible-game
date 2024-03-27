@@ -2,8 +2,6 @@ import 'dart:math';
 
 import 'package:bible_game/controllers/wiw_game_controller.dart';
 import 'package:bible_game/controllers/wiw_game_question_controller.dart';
-import 'package:bible_game/widgets/modals/wiw_not_enough_coins_modal.dart';
-import 'package:bible_game/widgets/modals/wiw_success_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
@@ -90,32 +88,6 @@ class ScoreCard extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                              //   Obx(
-                              //     () => TimerCountdown(
-                              // format: CountDownTimerFormat.minutesSeconds,
-                              // endTime: DateTime.now().add(
-                              //       Duration(
-                              //         minutes: wiwGameController.gameDuration.value,
-                              //       ),
-                              // ),
-                              // timeTextStyle: TextStyle(
-                              //       fontSize: 24.sp,
-                              //       fontWeight: FontWeight.w900,
-                              //       fontFamily: 'Mikado',
-                              //       color: Colors.white
-                              // ),
-                              // colonsTextStyle: TextStyle(
-                              //         fontSize: 24.sp,
-                              //         fontWeight: FontWeight.w900,
-                              //         fontFamily: 'Mikado',
-                              //         color: Colors.white
-                              // ),
-                              // enableDescriptions: false,
-                              // spacerWidth: 0,
-                              // onEnd: () {
-                              //       Get.dialog(const WiwTimeUpModal());
-                              // }),
-                              //   ),
                               ],
                             ),
                           ),

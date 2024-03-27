@@ -29,13 +29,14 @@ class _FourScriptureLoadingScreenState extends State<FourScriptureLoadingScreen>
         child: Column(
           children: [
               SizedBox(height: 80.h,),
-              Image.asset('assets/images/four_scripture_one_word/bible_game_text.png', width: 100.w),
+              Image.asset('assets/images/logo/bible_game.png', width: 180.w),
               SizedBox(height: 160.h,),
               Image.asset('assets/images/four_scripture_one_word/test.png', width: 150.w,),
              SizedBox(height: 10.h,),
              Text('Preparing your questions...', style: TextStyle(
                fontSize: 16.sp,
                fontWeight: FontWeight.w600,
+               fontFamily: 'Mikado',
                color: Colors.white
              ),),
             SizedBox(height: 40.h,),
@@ -52,12 +53,13 @@ class _FourScriptureLoadingScreenState extends State<FourScriptureLoadingScreen>
                  ],
                ),
              ),
-             child: const Text('Study to shew thyself approved \nunto God, a workman that \nneedeth not to be ashamed, \nrightly dividing the word \nof truth',
+             child: Text('Study to shew thyself approved \nunto God, a workman that \nneedeth not to be ashamed, \nrightly dividing the word \nof truth',
                textAlign: TextAlign.center,
                style: TextStyle(
-                 fontWeight: FontWeight.w400,
+                 fontSize: 14.sp,
+                 fontWeight: FontWeight.w700,
                  color: Colors.white,
-                 fontFamily: 'neuland'
+                 fontFamily: 'Mikado'
               ),
              ),
            )

@@ -24,7 +24,7 @@ class AwesomeNotificationController extends GetxController{
 
   @pragma("vm:entry-point")
   static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
-    print('silent notification');
+
   }
 
   /// Use this method to detect when a new fcm token is received

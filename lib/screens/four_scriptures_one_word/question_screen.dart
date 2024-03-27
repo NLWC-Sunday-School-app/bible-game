@@ -1,11 +1,9 @@
-import 'package:bible_game/controllers/four_Scriptures_one_word_controller.dart';
 import 'package:bible_game/screens/four_scriptures_one_word/question_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/four_scriptures_question_controller.dart';
 import '../../widgets/modals/four_scriptures_quit_modal.dart';
-import '../../widgets/modals/quit_modal.dart';
-import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
+
 class FourScriptureQuestionScreen extends StatefulWidget {
   const FourScriptureQuestionScreen({Key? key}) : super(key: key);
 

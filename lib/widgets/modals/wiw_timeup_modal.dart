@@ -2,13 +2,13 @@ import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/controllers/wiw_game_controller.dart';
 import 'package:bible_game/controllers/wiw_game_question_controller.dart';
 import 'package:bible_game/services/game_service.dart';
-import 'package:bible_game/widgets/modals/wiw_not_enough_coins_modal.dart';
 import 'package:bible_game/widgets/modals/wiw_try_again_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../screens/who_is_who/question_screen.dart';
+import 'not_enough_coins_modal.dart';
 
 class WiwTimeUpModal extends StatelessWidget {
   const WiwTimeUpModal({Key? key}) : super(key: key);
@@ -138,11 +138,20 @@ class WiwTimeUpModal extends StatelessWidget {
                          await userController.getUserData();
                         }else{
                           Get.back();
-                          Get.dialog(const WiwNotEnoughCoinsModal(),barrierDismissible: false, transitionCurve: Curves.fastOutSlowIn,
+                          Get.dialog(NotEnoughCoinsModal(onTap: () async {
+                            if (userController.soundIsOff.isFalse) {
+                              userController.playGameSound();
+                            }
+                            Get.back();
+                            Get.back();
+                            await wiwGameQuestionController.sendGameData();
+                            await userController.getUserData();
+                          },),barrierDismissible: false, transitionCurve: Curves.fastOutSlowIn,
                               transitionDuration: const Duration(milliseconds: 500));
                         }
                       },
-                      child: Container(
+                      child:
+                      Container(
                         width: 240.w,
                         padding: EdgeInsets.symmetric(
                             vertical: 15.h, horizontal: 15.w),

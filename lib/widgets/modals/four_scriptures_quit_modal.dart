@@ -11,6 +11,7 @@ class FourScripturesQuitModal extends StatelessWidget {
   Widget build(BuildContext context) {
     UserController userController = Get.put(UserController());
     return Dialog(
+      insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         child: SizedBox(

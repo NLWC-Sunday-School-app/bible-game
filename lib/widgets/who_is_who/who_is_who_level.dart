@@ -21,7 +21,6 @@ class WhoIsWhoLevel extends StatelessWidget {
     UserController userController = Get.put(UserController());
     return GestureDetector(
       onTap: (){
-
           wiwGameController.selectedGameLevel.value = int.parse(level);
           wiwGameController.completedGameLevel.value = isUnLocked;
         if(isSpecialLevel && isUnLocked){

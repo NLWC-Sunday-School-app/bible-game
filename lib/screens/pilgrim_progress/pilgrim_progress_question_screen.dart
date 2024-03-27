@@ -26,21 +26,31 @@ class _PilgrimProgressQuestionScreenState extends State<PilgrimProgressQuestionS
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: pilgrimProgressQuestionController.pageController,
-                onPageChanged:
-                    pilgrimProgressQuestionController.updateTheQuestionNumber,
-                itemCount: pilgrimProgressQuestionController.questions.length,
-                itemBuilder: (context, index) => PilgrimProgressQuestionContainer(
-                  question: pilgrimProgressQuestionController.questions[index],
+        body: Container(
+          height: Get.height,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/aesthetics/wiw_question_bg.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: pilgrimProgressQuestionController.pageController,
+                  onPageChanged:
+                      pilgrimProgressQuestionController.updateTheQuestionNumber,
+                  itemCount: pilgrimProgressQuestionController.questions.length,
+                  itemBuilder: (context, index) => PilgrimProgressQuestionContainer(
+                    question: pilgrimProgressQuestionController.questions[index],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

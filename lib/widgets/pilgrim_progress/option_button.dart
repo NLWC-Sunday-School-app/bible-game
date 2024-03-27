@@ -55,7 +55,8 @@ class OptionButton extends StatelessWidget {
                   Text(
                     bibleVerse,
                     style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
+                        fontFamily: 'Mikado',
                         fontWeight: FontWeight.w500,
                         color: const Color.fromRGBO(39, 39, 39, 1)),
                   ),

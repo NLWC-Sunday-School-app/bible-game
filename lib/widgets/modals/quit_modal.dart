@@ -12,11 +12,12 @@ class QuitModal extends StatelessWidget {
   Widget build(BuildContext context) {
     UserController userController = Get.put(UserController());
     return Dialog(
+      insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         child: SizedBox(
           height: 450.h,
-          width: 350.w,
+          width: double.infinity,
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -37,9 +38,9 @@ class QuitModal extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20,),
-                const AutoSizeText(
+                Text(
                   'You will lose unsaved progress.',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500,
+                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500,
                    fontFamily: 'Mikado'
                   ),
                 ),

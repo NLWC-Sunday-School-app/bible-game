@@ -13,6 +13,7 @@ import 'package:just_audio/just_audio.dart';
 import '../game_button.dart';
 import '../modals/quit_modal.dart';
 import '../pilgrim_progress/option_button.dart';
+import '../pilgrim_progress/score_card.dart';
 
 class PilgrimProgressQuestionContainer extends StatefulWidget {
   final Question question;
@@ -37,194 +38,128 @@ class _PilgrimProgressQuestionContainerState
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Container(
-          height: Get.width >= 500
-              ? 350.h
-              : Get.height >= 800
-                  ? 350.h
-                  : 350.h,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color.fromRGBO(84, 140, 215, 1),
-                Color.fromRGBO(50, 177, 242, 1),
-              ],
-            ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30.r),
-              bottomRight: Radius.circular(30.r),
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      child: Stack(
+        children: [
+          Column(
             children: [
-              Image.asset(
-                'assets/images/question_screen_cloud.png',
-                width: 350.w,
+              const ScoreCard(),
+              SizedBox(
+                height: 20.h,
               ),
-            ],
-          ),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 45.h),
-              child: Obx(
-                () => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 20.0.w),
-                      child: GestureDetector(
-                        onTap: () => {
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFF15499E), width: 3.w),
+                  borderRadius: BorderRadius.all(Radius.circular(5.r)),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                child: Text(
+                  '"${widget.question.instruction}"',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      height: 1.5.h,
+                      fontFamily: 'Mikado',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15.sp),
+                ),
+              ),
+              SizedBox(
+                height: 2.h,
+              ),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFF15499E), width: 3.w),
+                  borderRadius: BorderRadius.all(Radius.circular(5.r)),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+                child: Text(
+                  '"${widget.question.question}"',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    height: 1.3.h,
+                    fontFamily: 'Mikado',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16.sp,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 30.h,
+              ),
+              ...List.generate(
+                widget.question.options.length,
+                    (index) => OptionButton(
+                    bibleVerse: widget.question.options[index],
+                    selectOption: () => {
+                      if (isClicked == false)
+                        {
                           userController.soundIsOff.isFalse
                               ? userController.playGameSound()
                               : null,
-                          Get.dialog(
-                            const QuitModal(),
-                            barrierDismissible: false,
-                          )
+                          pilgrimProgressQuestionController
+                              .checkAnswer(widget.question,
+                              widget.question.options[index]),
                         },
-                        child: Icon(
-                          Icons.arrow_back_ios_new,
-                          size: 24.w,
-                          color: Colors.white,
-                        ),
+                      setState(() {
+                        isClicked = true;
+                      }),
+                    }),
+              ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: (){
+                      if (userController.soundIsOff.isFalse) {
+                        userController.playGameSound();
+                      }
+                      Get.dialog(const QuitModal(), barrierDismissible: false);
+                    },
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Image.asset(
+                        'assets/images/icons/light_close.png',
+                        width: 64.w,
                       ),
                     ),
-                    const Spacer(),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Question ${pilgrimProgressQuestionController.questionNumber.value} of ${pilgrimProgressQuestionController.questions.length}",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: 'Neuland',
-                            letterSpacing: 1,
-                            fontSize: 16.sp,
-                            color: Colors.white),
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        userController.soundIsOff.isFalse
-                            ? userController.playGameSound()
-                            : null;
-                        pilgrimProgressQuestionController.goToNextQuestion();
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(right: 20.w),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 5.h),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25.r)),
-                        child: Text(
-                          'Skip',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF459DE3)),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: Get.height < 680 ? 30 : 40,
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 22.w, right: 45.w),
-              child: Text(
-                widget.question.instruction,
-                style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    fontSize: Get.height > 900 ? 16.sp : 14.sp),
-              ),
-            ),
-            SizedBox(
-              height: 10.h,
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 22.w, right: 45.w),
-              child: Text(
-                '"${widget.question.question}"',
-                style: TextStyle(
-                  fontSize: Get.height > 900 ? 16.sp : 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 300.h),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 30.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: const [QuestionTimer(), QuestionPoints()],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 50.h),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Column(
-                    children: [
-                      ...List.generate(
-                        widget.question.options.length,
-                        (index) => OptionButton(
-                            bibleVerse: widget.question.options[index],
-                            selectOption: () => {
-                                  if (isClicked == false)
-                                    {
-                                      userController.soundIsOff.isFalse
-                                          ? userController.playGameSound()
-                                          : null,
-                                      pilgrimProgressQuestionController
-                                          .checkAnswer(widget.question,
-                                              widget.question.options[index]),
-                                    },
-                                  setState(() {
-                                    isClicked = true;
-                                  }),
-                                }),
-                      ),
-                      SizedBox(
-                        height: 30.h,
-                      ),
-                    ],
                   ),
-                ),
-              )
+                  InkWell(
+                    onTap: (){
+                      if (userController.soundIsOff.isFalse) {
+                        userController.playGameSound();
+                      }
+
+                     !pilgrimProgressQuestionController.isAnswered ? pilgrimProgressQuestionController.goToNextQuestion() : null;
+                    },
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Image.asset(
+                        'assets/images/icons/skip.png',
+                        width: 64.w,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10.h,
+              ),
             ],
           ),
-        ),
-        ConfettiWidget(
-          confettiController:
-              pilgrimProgressQuestionController.confettiController,
-          shouldLoop: false,
-          blastDirectionality: BlastDirectionality.explosive,
-        ),
-      ],
+
+          ConfettiWidget(
+            confettiController:
+                pilgrimProgressQuestionController.confettiController,
+            shouldLoop: false,
+            blastDirectionality: BlastDirectionality.explosive,
+          ),
+        ],
+      ),
     );
   }
 }

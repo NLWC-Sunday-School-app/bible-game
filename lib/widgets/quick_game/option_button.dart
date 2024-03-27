@@ -40,8 +40,7 @@ class OptionButton extends StatelessWidget {
           return InkWell(
             onTap: selectOption,
             child: Container(
-              padding: EdgeInsets.only(
-                  left: 25.w, right: 25.w, top: 20.h, bottom: 20.h),
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
               margin: EdgeInsets.only(bottom: 15.h),
               width: double.infinity,
               decoration: BoxDecoration(
@@ -54,7 +53,8 @@ class OptionButton extends StatelessWidget {
                   Text(
                     bibleVerse,
                     style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
+                        fontFamily: 'Mikado',
                         fontWeight: FontWeight.w500,
                         color: const Color.fromRGBO(39, 39, 39, 1)),
                   ),

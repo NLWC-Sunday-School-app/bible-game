@@ -1,5 +1,6 @@
 import 'package:bible_game/controllers/auth_controller.dart';
 import 'package:bible_game/controllers/global_game_controller.dart';
+import 'package:bible_game/utilities/countdown_timer.dart';
 import 'package:bible_game/widgets/games/game_leaderboard_card.dart';
 import 'package:bible_game/widgets/games/games_bottom_sheet.dart';
 import 'package:bible_game/widgets/modals/auth_modal.dart';
@@ -8,6 +9,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
+
+import '../global/countdown_timer.dart';
 
 class GameCard extends StatefulWidget {
   const GameCard(
@@ -16,13 +20,17 @@ class GameCard extends StatefulWidget {
       required this.title,
       required this.text,
       required this.gameIsLive,
-      required this.campaignTag})
+      required this.campaignTag,
+      this.startDate,
+      this.endDate})
       : super(key: key);
   final String imageUrl;
   final String title;
   final String text;
   final bool gameIsLive;
   final String campaignTag;
+  final String? startDate;
+  final String? endDate;
 
   @override
   State<GameCard> createState() => _GameCardState();
@@ -30,20 +38,41 @@ class GameCard extends StatefulWidget {
 
 class _GameCardState extends State<GameCard> {
   late bool playedGame;
+  Duration _remainingTime =
+      const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
 
   @override
   void initState() {
     super.initState();
+    _startCountDown();
     setState(() => {
           playedGame =
               GetStorage().read('PLAYED_${widget.campaignTag}') ?? false
         });
   }
 
+  void _startCountDown() {
+    CountdownManager.startCountdown(
+        targetDate: DateTime.parse(
+          widget.startDate!,
+        ),
+        onUpdate: (duration) {
+          setState(() {
+            _remainingTime = duration;
+          });
+        },
+        onFinish: () {});
+  }
+
   @override
   Widget build(BuildContext context) {
     GlobalGameController globalGameController = Get.put(GlobalGameController());
     AuthController authController = Get.put(AuthController());
+    String days = (_remainingTime.inDays).toString().padLeft(2, '0');
+    String hours = (_remainingTime.inHours % 24).toString().padLeft(2, '0');
+    String minutes = (_remainingTime.inMinutes % 60).toString().padLeft(2, '0');
+    String seconds = (_remainingTime.inSeconds % 60).toString().padLeft(2, '0');
+
     return Container(
       margin: EdgeInsets.only(bottom: 25.h),
       height: 160.h,
@@ -105,10 +134,9 @@ class _GameCardState extends State<GameCard> {
                     textAlign: TextAlign.left,
                     softWrap: true,
                     style: TextStyle(
-                      fontSize: 13.sp,
-                      fontFamily: 'Mikado',
-                      fontWeight: FontWeight.w500
-                    ),
+                        fontSize: 13.sp,
+                        fontFamily: 'Mikado',
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
                 Spacer(),
@@ -149,8 +177,9 @@ class _GameCardState extends State<GameCard> {
                                     buttonText: 'Game Played',
                                   ),
                           )
-                        : const GamesLockedButton(
-                            buttonText: 'Ended',
+                        : GamesLockedButton(
+                            buttonText:
+                                '${days}D | ${hours}H:${minutes}M:${seconds}s',
                           ),
                     SizedBox(
                       width: 10.w,
@@ -196,7 +225,9 @@ class _GameCardState extends State<GameCard> {
                         : const SizedBox()
                   ],
                 ),
-                SizedBox(height: 5.h,)
+                SizedBox(
+                  height: 5.h,
+                )
               ],
             ),
           )
@@ -216,7 +247,7 @@ class GamesLockedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical:6.h, horizontal: 30.w),
+      padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 30.w),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24.r),
           color: const Color(0xFFBCD8FF)),
@@ -234,11 +265,10 @@ class GamesLockedButton extends StatelessWidget {
           Text(
             buttonText,
             style: TextStyle(
-              fontSize: 12.sp,
-              color: const Color(0xFF5A82B8),
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Mikado'
-            ),
+                fontSize: 12.sp,
+                color: const Color(0xFF5A82B8),
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Mikado'),
           ),
         ],
       ),

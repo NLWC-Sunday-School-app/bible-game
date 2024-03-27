@@ -662,8 +662,6 @@ class BibleApiController extends GetxController {
         var decodedResponse = json.decode(response.body);
         bibleText.value = decodedResponse['content']['t'];
         isLoadingBibleVerse(false);
-        print(json.decode(response.body));
-        print(decodedResponse['content']['t']);
       }
 
     } catch (e) {

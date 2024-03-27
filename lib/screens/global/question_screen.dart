@@ -26,19 +26,29 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(children: [
-          Expanded(
-            child: PageView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: _questionController.pageController,
-              onPageChanged: _questionController.updateTheQuestionNumber,
-              itemCount: _questionController.questions.length,
-              itemBuilder: (context, index) => QuestionContainer(
-                question: _questionController.questions[index],
-              ),
+        body: Container(
+          height: Get.height,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/aesthetics/wiw_question_bg.png"),
+              fit: BoxFit.cover,
             ),
-          )
-        ]),
+          ),
+          child: Column(children: [
+            Expanded(
+              child: PageView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _questionController.pageController,
+                onPageChanged: _questionController.updateTheQuestionNumber,
+                itemCount: _questionController.questions.length,
+                itemBuilder: (context, index) => QuestionContainer(
+                  question: _questionController.questions[index],
+                ),
+              ),
+            )
+          ]),
+        ),
       ),
     );
   }

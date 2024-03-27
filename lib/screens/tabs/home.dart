@@ -1,11 +1,7 @@
-import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/controllers/auth_controller.dart';
 import 'package:bible_game/controllers/pilgrim_progress_controller.dart';
 import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/screens/pilgrim_progress/home.dart';
-import 'package:bible_game/screens/pilgrim_progress/new_level.dart';
-import 'package:bible_game/screens/pilgrim_progress/retry_level.dart';
 import 'package:bible_game/screens/quick_game/step_one.dart';
 import 'package:bible_game/screens/who_is_who/home.dart';
 import 'package:bible_game/services/base_url_service.dart';
@@ -15,32 +11,20 @@ import 'package:bible_game/widgets/home/user_profile_info.dart';
 import 'package:bible_game/widgets/modals/app_update_modal.dart';
 import 'package:bible_game/widgets/modals/auth_modal.dart';
 import 'package:bible_game/widgets/modals/badge_info.dart';
-import 'package:bible_game/widgets/modals/nativity_info.dart';
-import 'package:bible_game/widgets/modals/nativity_loader.dart';
-import 'package:bible_game/widgets/modals/no_badge_info.dart';
-import 'package:bible_game/widgets/modals/pilgrim_progress_welcome_modal.dart';
-import 'package:bible_game/widgets/modals/settings_modal.dart';
 import 'package:bible_game/widgets/modals/who_is_who_guide.dart';
 import 'package:bible_game/widgets/shimmer/ads_shimmer.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:lottie/lottie.dart';
-import 'package:new_version_plus/new_version_plus.dart';
+// import 'package:new_version_plus/new_version_plus.dart';
 import 'package:stroke_text/stroke_text.dart';
-import '../../widgets/games/game_card.dart';
 import '../../widgets/home/game_card_info.dart';
 import '../../widgets/home/game_score_info.dart';
 import '../../widgets/home/sign_in_profile.dart';
-import '../../widgets/modals/create_profile_modal.dart';
 import '../../widgets/modals/four_scriptures_welcome_modal.dart';
-import '../../widgets/modals/welcome_modal.dart';
 import '../four_scriptures_one_word/loading_screen.dart';
 import '../recap/home.dart';
 
@@ -68,6 +52,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   navigateFourScriptures() {
     var firstTime =
         GetStorage().read('four_scriptures_modal_first_time') ?? true;
+
     if (_authController.isLoggedIn.isTrue) {
       if (firstTime) {
         Get.dialog(const FourScripturesWelcomeModal());
@@ -101,16 +86,16 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
     }
   }
 
-  checkForUpdateAppVersion() async {
-    final newVersion = NewVersionPlus();
-    final status = await newVersion.getVersionStatus();
-    final localVersion = status?.localVersion;
-    final storeVersion = status?.storeVersion;
-    final appCanUpdate = status?.canUpdate;
-    if (appCanUpdate == true) {
-      Get.dialog(const AppUpdateModal(), barrierDismissible: false);
-    }
-  }
+  // checkForUpdateAppVersion() async {
+  //   final newVersion = NewVersionPlus();
+  //   final status = await newVersion.getVersionStatus();
+  //   final localVersion = status?.localVersion;
+  //   final storeVersion = status?.storeVersion;
+  //   final appCanUpdate = status?.canUpdate;
+  //   if (appCanUpdate == true) {
+  //     Get.dialog(const AppUpdateModal(), barrierDismissible: false);
+  //   }
+  // }
 
   String getBadgeUrl() {
     var rank = _userController.myUser['rank'];
@@ -365,67 +350,76 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
                             SizedBox(
                               height: 20.h,
                             ),
-                            Obx(
-                              () => box.read('game_settings')['show_recap'] == "true" &&
-                                      _authController.isLoggedIn.isTrue
-                                  ? InkWell(
-                                      onTap: () {
-                                        _userController.soundIsOff.isFalse
-                                            ? _userController.playGameSound()
-                                            : null;
-                                        Get.bottomSheet(const RecapHomeScreen(),
-                                            isScrollControlled: true,
-                                            isDismissible: false);
-                                      },
-                                      child: Container(
-                                        height: 65.h,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFEEF36A),
-                                          borderRadius:
-                                              BorderRadius.circular(8.r),
-                                          boxShadow: const [
-                                            BoxShadow(
+                            Obx(() => InkWell(
+                                  onTap: () {
+                                    _userController.soundIsOff.isFalse
+                                        ? _userController.playGameSound()
+                                        : null;
+                                    Get.bottomSheet(const RecapHomeScreen(),
+                                        isScrollControlled: true,
+                                        isDismissible: false);
+                                  },
+                                  child: (box.read('game_settings')[
+                                                  'show_recap'] ==
+                                              "true" &&
+                                          _authController.isLoggedIn.isTrue)
+                                      ? Container(
+                                          height: 65.h,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFEEF36A),
+                                            borderRadius:
+                                                BorderRadius.circular(8.r),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                  color: Color(0xFF504136),
+                                                  offset: Offset(0, 15),
+                                                  blurRadius: 0,
+                                                  spreadRadius: -10),
+                                              BoxShadow(
                                                 color: Color(0xFF504136),
-                                                offset: Offset(0, 15),
+                                                offset: Offset(0, -15),
                                                 blurRadius: 0,
-                                                spreadRadius: -10),
-                                            BoxShadow(
-                                              color: Color(0xFF504136),
-                                              offset: Offset(0, -15),
-                                              blurRadius: 0,
-                                              spreadRadius: -10,
-                                            )
-                                          ],
-                                        ),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 25.w),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              StrokeText(
-                                                text: 'Your Bible Game Recap?',
-                                                textStyle: TextStyle(
-                                                  color: const Color(0xFF047AF3),
-                                                  fontFamily: 'Mikado',
-                                                  fontSize: 20.sp,
-                                                  fontWeight: FontWeight.w900,
-                                                ),
-                                                strokeColor: Colors.white,
-                                                strokeWidth: 4,
-                                              ),
-                                              Image.asset(
-                                                'assets/images/icons/blue_arrow.png',
-                                                width: 32.w,
+                                                spreadRadius: -10,
                                               )
                                             ],
                                           ),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 25.w),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                StrokeText(
+                                                  text:
+                                                      'Your Bible Game Recap?',
+                                                  textStyle: TextStyle(
+                                                    color:
+                                                        const Color(0xFF047AF3),
+                                                    fontFamily: 'Mikado',
+                                                    fontSize: 20.sp,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                  strokeColor: Colors.white,
+                                                  strokeWidth: 4,
+                                                ),
+                                                Image.asset(
+                                                  'assets/images/icons/blue_arrow.png',
+                                                  width: 32.w,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      : SizedBox(
+                                          child: Text(
+                                            _authController.isLoggedIn.isTrue
+                                                .toString(),
+                                            style: TextStyle(fontSize: 0.sp),
+                                          ),
                                         ),
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                            ),
+                                )),
                             SizedBox(
                               height: 20.h,
                             ),
@@ -583,6 +577,6 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   void initState() {
     super.initState();
     initializeWallet();
-    checkForUpdateAppVersion();
+    // checkForUpdateAppVersion();
   }
 }

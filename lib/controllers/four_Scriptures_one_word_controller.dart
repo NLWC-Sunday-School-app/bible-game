@@ -3,6 +3,7 @@ import 'package:bible_game/controllers/user_controller.dart';
 import 'package:bible_game/models/fourScripturesOneWord.dart';
 import 'package:bible_game/services/game_service.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../screens/four_scriptures_one_word/question_screen.dart';
 
@@ -12,6 +13,7 @@ class FourScripturesOneWordController extends GetxController {
   UserController userController = Get.put(UserController());
   var gameLevel = 0.obs;
   var totalNoOfQuestions = 0.obs;
+
 
   getFourScripturesOneWordQuestions() async{
      try{
@@ -40,14 +42,16 @@ class FourScripturesOneWordController extends GetxController {
      var response = await GameService.getTotalNoOfQuestionsInFourScriptures();
      totalNoOfQuestions.value = response;
     }catch(e){
-
     }
   }
+
+
 
   @override
   void onInit() {
     super.onInit();
     gameLevel.value = userController.myUser['fourScriptsLevel'];
     getTotalNoOfQuestions();
+
   }
 }

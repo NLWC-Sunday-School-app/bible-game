@@ -18,9 +18,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:new_version/new_version.dart';
-import 'package:new_version_plus/new_version_plus.dart';
-import 'package:upgrader/upgrader.dart';
+// import 'package:new_version/new_version.dart';
+// import 'package:new_version_plus/new_version_plus.dart';
+// import 'package:upgrader/upgrader.dart';
 import '../utilities/network_connection.dart';
 import '../widgets/modals/app_update_modal.dart';
 import '../widgets/modals/network_modal.dart';
@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
    // networkConnection.onConnectivityChanged();
-    checkInternet();
+   //  checkInternet();
     playBackgroundMusic();
     getFcmToken();
     // checkForUpdateAppVersion();
@@ -68,17 +68,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
     print('fb token: $firebaseAppToken');
   }
-
-  checkForUpdateAppVersion() async {
-    final newVersion = NewVersionPlus();
-    final status = await newVersion.getVersionStatus();
-    final localVersion = status?.localVersion;
-    final storeVersion = status?.storeVersion;
-    final appCanUpdate = status?.canUpdate;
-    if (appCanUpdate == true) {
-      Get.dialog(const AppUpdateModal(), barrierDismissible: false);
-    }
-  }
+  //
+  // checkForUpdateAppVersion() async {
+  //   final newVersion = NewVersionPlus();
+  //   final status = await newVersion.getVersionStatus();
+  //   final localVersion = status?.localVersion;
+  //   final storeVersion = status?.storeVersion;
+  //   final appCanUpdate = status?.canUpdate;
+  //   if (appCanUpdate == true) {
+  //     Get.dialog(const AppUpdateModal(), barrierDismissible: false);
+  //   }
+  // }
 
   Future<void> playBackgroundMusic() async{
      var pauseMusic = box.read('pauseGameMusic') ?? false;
@@ -121,11 +121,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
         splitScreenMode: false,
-        builder:(BuildContext context,child) => UpgradeAlert(
-          upgrader: Upgrader(dialogStyle: GetPlatform.isIOS ? UpgradeDialogStyle.cupertino : UpgradeDialogStyle.material,
-              showLater: false,
-              showIgnore: false
-          ),
           child: GetMaterialApp(
             title: 'Bible Game',
             theme: ThemeData(
@@ -142,7 +137,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
             },
           ),
-        ),
+
       ),
     );
   }

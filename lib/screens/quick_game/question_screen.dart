@@ -4,8 +4,9 @@ import 'package:bible_game/widgets/quick_game/question_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../controllers/quick_game_question_controller.dart';
+
+
 
 class QuickGameQuestionScreen extends StatefulWidget {
   const QuickGameQuestionScreen({Key? key}) : super(key: key);
@@ -28,19 +29,30 @@ class _QuickGameQuestionScreenState extends State<QuickGameQuestionScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(children: [
-          Expanded(
-            child: PageView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: _questionController.pageController,
-              onPageChanged: _questionController.updateTheQuestionNumber,
-              itemCount: _questionController.questions.length,
-              itemBuilder: (context, index) => QuestionContainer(
-                question: _questionController.questions[index],
-              ),
+        body: Container(
+          height: Get.height,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/aesthetics/wiw_question_bg.png"),
+              fit: BoxFit.cover,
             ),
-          )
-        ]),
+          ),
+          child: Column(children: [
+
+            Expanded(
+              child: PageView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _questionController.pageController,
+                onPageChanged: _questionController.updateTheQuestionNumber,
+                itemCount: _questionController.questions.length,
+                itemBuilder: (context, index) => QuestionContainer(
+                  question: _questionController.questions[index],
+                ),
+              ),
+            )
+          ]),
+        ),
       ),
     );
   }

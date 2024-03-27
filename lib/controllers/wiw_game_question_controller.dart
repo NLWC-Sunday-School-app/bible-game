@@ -9,7 +9,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../services/game_service.dart';
-import '../widgets/modals/wiw_not_enough_coins_modal.dart';
 import '../widgets/modals/wiw_timeup_modal.dart';
 import 'auth_controller.dart';
 
@@ -70,7 +69,7 @@ class WiwGameQuestionController extends GetxController
         await wiwGameController.getGameLevels();
         await userController.getUserData();
       } else {
-        wiwGameController.completedGameLevel.value = true;
+        wiwGameController.completedGameLevel.value = false;
         Get.dialog(
           const WiwTimeUpModal(),
           barrierDismissible: false,
@@ -97,7 +96,8 @@ class WiwGameQuestionController extends GetxController
         pointsGained.value,
         userController.myUser['id'],
         wiwGameController.selectedGameLevel.value,
-        wiwGameController.completedGameLevel.value);
+        wiwGameController.completedGameLevel.value,
+    );
   }
 
   void resetTimer() {

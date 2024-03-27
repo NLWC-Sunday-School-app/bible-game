@@ -6,13 +6,12 @@ import 'package:stroke_text/stroke_text.dart';
 
 import '../../controllers/wiw_game_question_controller.dart';
 
-class WiwNotEnoughCoinsModal extends StatelessWidget {
-  const WiwNotEnoughCoinsModal({Key? key}) : super(key: key);
+class NotEnoughCoinsModal extends StatelessWidget {
+  const NotEnoughCoinsModal({Key? key, required this.onTap}) : super(key: key);
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    WiwGameQuestionController wiwGameQuestionController = Get.put(WiwGameQuestionController());
-    UserController userController  = Get.put(UserController());
     return  Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
@@ -41,10 +40,7 @@ class WiwNotEnoughCoinsModal extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: InkWell(
-                    onTap: (){
-                      Get.back();
-                      Get.back();
-                    },
+                    onTap: onTap,
                     child: Image.asset(
                       'assets/images/icons/blue_close.png',
                       width: 48.w,
@@ -84,15 +80,7 @@ class WiwNotEnoughCoinsModal extends StatelessWidget {
                 height: 40.h,
               ),
               InkWell(
-                onTap: ()async{
-                  if (userController.soundIsOff.isFalse) {
-                    userController.playGameSound();
-                  }
-                  Get.back();
-                  Get.back();
-                  await wiwGameQuestionController.sendGameData();
-                  await userController.getUserData();
-                },
+                onTap: onTap,
                 child: Container(
                   width: 250.w,
                   padding: EdgeInsets.symmetric(vertical: 15.h),

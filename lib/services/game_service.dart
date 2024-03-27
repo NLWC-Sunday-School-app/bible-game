@@ -246,7 +246,6 @@ class GameService {
       final errorMessage = DioExceptions.fromDioError(e).toString();
       throw errorMessage;
     }
-
   }
 
   static Future<dynamic> sendWhoIsWhoGameData(totalScore, playerId, levelId, completedLevel) async {
