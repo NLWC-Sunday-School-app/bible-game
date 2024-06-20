@@ -21,3 +21,6 @@ formatScriptureString(text) {
     }
   }
 }
+
+String capitalizeText(String word) => word[0].toUpperCase() + word.substring(1);
+

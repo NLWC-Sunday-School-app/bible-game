@@ -11,6 +11,7 @@ class ProductImageRoutes {
    static const String patternBg = 'assets/images/product/shared/pattern_bg.png';
    static const String patternTwoBg = 'assets/images/product/shared/pattern_two_bg.png';
    static const String modalBg = 'assets/images/product/shared/modal_bg.png';
+   static const String successfulModalBg = 'assets/images/product/shared/successful_modal_bg.png';
    static const String blueButtonBg = 'assets/images/product/shared/blue_btn_bg.png';
    static const String inactiveBlueButtonBg = 'assets/images/product/shared/inactive_blue_btn.png';
    static const String inactiveQuickGameTag = 'assets/images/product/quick_game/inactive_topic_tag.png';
@@ -23,6 +24,12 @@ class ProductImageRoutes {
    static const String questionFrameBg = 'assets/images/product/shared/question_frame.png';
    static const String positionBg = 'assets/images/product/leaderboard/position.png';
    static const String defaultBadge = 'assets/images/product/shared/badges/default_badge.png';
+   static const String babeBadge = 'assets/images/product/shared/badges/babe_badge.png';
+   static const String childBadge = 'assets/images/product/shared/badges/child_badge.png';
+   static const String youngBelieverBadge = 'assets/images/product/shared/badges/yb_badge.png';
+   static const String charityBadge = 'assets/images/product/shared/badges/charity_badge.png';
+   static const String fatherBadge = 'assets/images/product/shared/badges/father_badge.png';
+   static const String elderBadge = 'assets/images/product/shared/badges/elder_badge.png';
    static const String createSword = 'assets/images/product/multi_player/create_sword.png';
    static const String joinSword = 'assets/images/product/multi_player/join_sword.png';
    static const String gameRequestSword = 'assets/images/product/multi_player/game_request_sword.png';
@@ -59,7 +66,8 @@ class ProductImageRoutes {
    static const String elder = 'assets/images/product/pilgrim_progress/elder.png';
    static const String father = 'assets/images/product/pilgrim_progress/father.png';
    static const String scriptureWoodenBg = 'assets/images/product/four_scripture/wooden_bg.png';
-
+   static const String successfulMark = 'assets/images/product/shared/success_mark.png';
+   static const String defaultAvatar = 'assets/images/product/shared/default_avatar.png';
 }
 
 class IconImageRoutes{
@@ -99,6 +107,8 @@ class IconImageRoutes{
   static const String padlock = 'assets/images/icons/user/padlock.png';
   static const String whitePadlock = 'assets/images/icons/user/padlock.svg';
   static const String star = 'assets/images/icons/user/star.png';
+  static const String edit = 'assets/images/icons/user/edit.svg';
+  static const String bluePadlock = 'assets/images/icons/user/blue_padlock.png';
 
 }
 

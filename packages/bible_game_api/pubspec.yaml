@@ -8,7 +8,9 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  another_flushbar: ^1.12.30
   dio: ^5.4.3+1
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
 

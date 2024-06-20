@@ -5,7 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
 class GameScoreInfo extends StatelessWidget {
-  const GameScoreInfo({super.key});
+  const GameScoreInfo({super.key, required this.noOfCoins, required this.noOfGems, required this.noOfStreaks});
+  final String noOfCoins;
+  final String noOfGems;
+  final String noOfStreaks;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class GameScoreInfo extends StatelessWidget {
           backgroundColor: AppColors.scoreBackground,
           borderColor: AppColors.scoreBorder,
           shadowColor: AppColors.scoreShade,
-          score: '0',
+          score: noOfCoins,
           iconImage: IconImageRoutes.coinIcon,
           iconWidth: 20.w,
           textColor: AppColors.scoreText,
@@ -29,7 +32,7 @@ class GameScoreInfo extends StatelessWidget {
               backgroundColor: AppColors.gemBackground,
               borderColor: AppColors.gemBorder,
               shadowColor: AppColors.gemShade,
-              score: '0',
+              score: noOfGems,
               iconImage: IconImageRoutes.gemIcon,
               iconWidth: 22.w,
               textColor: AppColors.gemText,
@@ -40,7 +43,7 @@ class GameScoreInfo extends StatelessWidget {
               backgroundColor: AppColors.streakBackground,
               borderColor: AppColors.streakBorder,
               shadowColor: AppColors.streakShade,
-              score: '0',
+              score: noOfStreaks,
               iconImage: IconImageRoutes.streakIcon,
               iconWidth: 14.w,
               textColor: AppColors.streakText,

@@ -1,33 +1,38 @@
 import 'package:bible_game_api/api/api_client.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
 
-class AuthenticationAPi {
+class AuthenticationAPI {
   final ApiClient apiClient;
 
-  AuthenticationAPi(this.apiClient);
+  AuthenticationAPI(this.apiClient);
 
   Future<bool> register(name, email, password, fcmToken, country) async {
     try {
-      final response = await apiClient.post('/register', data: {
+      final response = await apiClient.post('/auth/register', data: {
         'name': name,
         'email': email,
         'password': password,
         'fcmToken': fcmToken,
         'country': country
       });
-      return response.statusCode == 201;
+      return response.statusCode == 200;
     } on ApiException catch (e) {
       return false;
     }
   }
 
-  Future<bool> login(email, password) async {
+  Future<Map<String, dynamic>> login(email, password) async {
     try {
-      final response = await apiClient
-          .post('/login', data: {'email': email, 'password': password});
-      return response.statusCode == 200;
+      final response = await apiClient.post(
+        '/auth/login',
+        data: {
+          'email': email,
+          'password': password,
+        },
+      );
+      return response.data;
     } on ApiException catch (e) {
-      return false;
+      return e.message;
     }
   }
 

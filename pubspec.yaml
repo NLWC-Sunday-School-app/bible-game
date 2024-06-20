@@ -38,24 +38,20 @@ dependencies:
   cupertino_icons: ^1.0.2
   carousel_slider: ^4.2.1
   cached_network_image: ^3.3.1
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  another_flushbar: ^1.12.30
+  shared_preferences: ^2.2.3
+  connectivity_plus: ^6.0.3
   flutter_screenutil: ^5.3.1
   flutter_svg: ^1.0.3
   get: ^4.5.1
   auto_size_text: ^3.0.0
   get_storage: ^2.0.3
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
   assets_audio_player: ^3.0.5
   confetti: ^0.7.0
   http: ^0.13.5
   firebase_core: ^2.0.0
-#  awesome_notifications: ^0.7.4+1
-#  awesome_notifications_fcm: ^0.7.4+1
+  #  awesome_notifications: ^0.7.4+1
+  #  awesome_notifications_fcm: ^0.7.4+1
   flutter_native_splash: ^2.2.16
   shimmer: ^2.0.0
   show_up_animation: ^2.0.0
@@ -64,11 +60,10 @@ dev_dependencies:
   flutter_launcher_icons: ^0.11.0
   fluttertoast: ^8.1.2
   just_audio: ^0.9.30
-  connectivity_plus: ^2.3.8
   internet_connection_checker: ^0.0.1+4
   intl: ^0.17.0
   flutter_staggered_grid_view: ^0.6.2
-#  new_version: ^0.3.1
+  #  new_version: ^0.3.1
   pin_code_fields: ^7.4.0
   screenshot: ^1.3.0
   share_plus: ^7.2.2
@@ -78,7 +73,7 @@ dev_dependencies:
   upgrader: ^9.0.0
   package_info_plus: ^5.0.1
   dio: ^5.3.3
-#  new_version_plus: ^0.0.3
+  #  new_version_plus: ^0.0.3
   launch_review: ^3.0.1
   dropdown_search: ^5.0.3
   animated_svg: ^1.1.2
@@ -93,6 +88,13 @@ dev_dependencies:
   countup: ^0.1.4
   flutter_bloc: ^8.1.5
   equatable: ^2.0.5
+  bible_game_api:
+    path: './packages/bible_game_api'
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
 
 
 flutter_icons:

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/features/home/widget/modals/auth_modal.dart';
+import 'package:the_bible_game/features/home/widget/modals/successful_login_modal.dart';
 import 'package:the_bible_game/shared/constants/colors.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
+
+import 'modals/successful_registration_modal.dart';
 
 class SignInProfile extends StatelessWidget {
   const SignInProfile({
@@ -13,7 +16,7 @@ class SignInProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-          showAuthModal(context);
+        showAuthModal(context);
       },
       child: Stack(
         alignment: AlignmentDirectional.topEnd,
@@ -28,7 +31,7 @@ class SignInProfile extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(4.r),
-                    topLeft:  Radius.circular(10.r),
+                    topLeft: Radius.circular(10.r),
                     bottomRight: Radius.circular(10.r),
                     bottomLeft: Radius.circular(10.r)),
                 boxShadow: const [
@@ -61,7 +64,7 @@ class SignInProfile extends StatelessWidget {
                 border: Border.all(width: 3.w, color: AppColors.primaryColor),
               ),
               child: Image.asset(
-               IconImageRoutes.personIcon,
+                IconImageRoutes.personIcon,
                 width: 20.w,
               ),
               padding: EdgeInsets.all(18.w),
