@@ -3,6 +3,8 @@ import 'package:the_bible_game/features/four_scriptures/view/four_scripture_ques
 import 'package:the_bible_game/features/home/view/home_screen.dart';
 import 'package:the_bible_game/features/pilgrim_progress/view/home_screen.dart';
 import 'package:the_bible_game/features/pilgrim_progress/view/question_screen.dart';
+import 'package:the_bible_game/features/quick_game/bloc/quick_game_bloc.dart';
+import 'package:the_bible_game/features/quick_game/repository/quick_game_repository.dart';
 import 'package:the_bible_game/features/quick_game/view/home_screen.dart';
 import 'package:the_bible_game/features/quick_game/view/question_screen.dart';
 import 'package:the_bible_game/features/who_is_who/view/home_screen.dart';
@@ -11,6 +13,8 @@ import 'package:the_bible_game/navigation/widget/bottom%20_tab_navigation.dart';
 import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:the_bible_game/shared/features/authentication/repository/authentication_repository.dart';
+import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:the_bible_game/shared/features/settings/sound_manager.dart';
 import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:the_bible_game/shared/features/user/model/user.dart';
 import 'package:the_bible_game/shared/features/user/repository/user_repository.dart';
@@ -30,11 +34,15 @@ class App extends StatelessWidget {
     super.key,
     required this.authenticationRepository,
     required this.userRepository,
+    required this.quickGameRepository,
     required this.tokenNotifier,
+    required this.soundManager,
   });
 
+  final SoundManager soundManager;
   final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;
+  final QuickGameRepository quickGameRepository;
   final TokenNotifier tokenNotifier;
 
   // This widget is the root of your application.
@@ -52,10 +60,16 @@ class App extends StatelessWidget {
             ),
           ),
           BlocProvider<UserBloc>(
-            create: (context) => UserBloc(
-              userRepository: userRepository
-            ),
+            create: (context) => UserBloc(userRepository: userRepository),
           ),
+          BlocProvider<SettingsBloc>(
+            create: (context) => SettingsBloc(soundManager, userRepository: userRepository),
+          ),
+
+          BlocProvider<QuickGameBloc>(
+            create: (context) => QuickGameBloc(quickGameRepository: quickGameRepository, authenticationBloc: BlocProvider.of<AuthenticationBloc>(context), settingsBloc: BlocProvider.of<SettingsBloc>(context) ),
+          ),
+
           ChangeNotifierProvider(create: (_) => tokenNotifier),
         ],
         child: MaterialApp(
@@ -70,7 +84,7 @@ class App extends StatelessWidget {
             AppRoutes.questionLoadingScreen: (context) =>
                 QuestionLoadingScreen(),
             AppRoutes.quickGameQuestionScreen: (context) =>
-                QuickGameQuestionScreen(),
+                QuickGameQuestionScreen(authenticationBloc: BlocProvider.of<AuthenticationBloc>(context), quickGameRepository: quickGameRepository,),
             AppRoutes.multiplayerQuestionScreen: (context) =>
                 MultiplayerQuestionScreen(),
             AppRoutes.whoIsWhoHomeScreen: (context) => WhoIsWhoHomeScreen(),

@@ -90,6 +90,7 @@ dependencies:
   equatable: ^2.0.5
   bible_game_api:
     path: './packages/bible_game_api'
+  badges: ^3.1.2
 
 
 dev_dependencies:
@@ -148,7 +149,7 @@ flutter:
    - assets/images/product/who_is_who/
    - assets/images/product/pilgrim_progress/
    - assets/images/product/four_scripture/
-   - assets/audios/
+   - assets/sounds/
 
 
 

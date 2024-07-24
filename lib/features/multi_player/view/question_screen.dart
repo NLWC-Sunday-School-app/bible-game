@@ -57,14 +57,14 @@ class MultiplayerQuestionScreen extends StatelessWidget {
             SizedBox(
               height: 10.h,
             ),
-            QuestionBox(),
+            QuestionBox(instruction: '', question: '',),
             SizedBox(
               height: 15.h,
             ),
-            OptionButton(),
-            OptionButton(),
-            OptionButton(),
-            OptionButton(),
+            // OptionButton(),
+            // OptionButton(),
+            // OptionButton(),
+            // OptionButton(),
             Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

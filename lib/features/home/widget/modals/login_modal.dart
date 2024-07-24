@@ -10,6 +10,7 @@ import 'package:the_bible_game/features/home/widget/modals/successful_login_moda
 import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../../app.dart';
 import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../../shared/utils/token_notifier.dart';
 import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
@@ -57,6 +58,7 @@ class _LoginModalState extends State<LoginModal> {
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return SizedBox(
       height: 550.h,
       width: 500.w,
@@ -75,7 +77,10 @@ class _LoginModalState extends State<LoginModal> {
                 height: 50.h,
               ),
               GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  soundManager.playClickSound();
+                  Navigator.pop(context);
+                },
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: 10.w,
@@ -128,7 +133,7 @@ class _LoginModalState extends State<LoginModal> {
                     style: TextStyle(
                       height: 1.5.h,
                       color: const Color(0xFF104387),
-                      fontSize: 12.sp,
+                      fontSize: 14.sp,
                     ),
                     decoration: InputDecoration(
                       filled: true,
@@ -209,32 +214,30 @@ class _LoginModalState extends State<LoginModal> {
               ),
               BlocConsumer<AuthenticationBloc, AuthenticationState>(
                 listener: (context, state) {
-                  if (state is AuthenticationLoginSuccess) {
-                     Navigator.pop(context);
-                     showSuccessfulLoginModal(context);
+                  if (state.token != null) {
+                    Navigator.pop(context);
+                    showSuccessfulLoginModal(context);
                     final tokenNotifier =
                         Provider.of<TokenNotifier>(context, listen: false);
                     tokenNotifier.setToken(state.token);
                     final prefs = SharedPreferences.getInstance();
                     prefs.then((sharedPreferences) {
+                      sharedPreferences.setString('userToken', state.token!);
                       sharedPreferences.setString(
-                          'userToken', state.token);
-                      sharedPreferences.setString(
-                          'refreshToken', state.refreshToken);
-
+                          'refreshToken', state.refreshToken!);
                     });
-                  } else if (state is AuthenticationUnauthenticated) {
+                  } else if (state.isUnauthenticated) {
                     print(state);
                     ApiException.showSnackBar(context);
                   }
                 },
                 builder: (context, state) {
-                  bool isLoading = state is AuthenticationLoadingLogin;
                   return BlueButton(
                     width: 250.w,
                     buttonText: 'Login',
-                    buttonIsLoading: isLoading,
+                    buttonIsLoading: state.isLoadingLogin,
                     onTap: () {
+                      soundManager.playClickSound();
                       if (_loginFormKey.currentState!.validate()) {
                         context
                             .read<AuthenticationBloc>()

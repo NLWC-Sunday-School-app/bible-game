@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/features/home/widget/modals/create_profile_modal.dart';
 import 'package:the_bible_game/features/home/widget/modals/login_modal.dart';
@@ -6,7 +7,10 @@ import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:the_bible_game/shared/widgets/blue_button.dart';
 
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
+
 void showAuthModal(BuildContext context) {
+  final soundManager = context.read<SettingsBloc>().soundManager;
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -31,7 +35,10 @@ void showAuthModal(BuildContext context) {
                   height: 50.h,
                 ),
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: (){
+                    soundManager.playClickSound();
+                    Navigator.pop(context);
+                    },
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: 10.w,
@@ -77,6 +84,7 @@ void showAuthModal(BuildContext context) {
                   buttonText: 'Login',
                   buttonIsLoading: false,
                   onTap: () {
+                    soundManager.playClickSound();
                     Navigator.pop(context);
                     showLoginModal(context);
                   },
@@ -89,6 +97,7 @@ void showAuthModal(BuildContext context) {
                   buttonText: 'Create Profile',
                   buttonIsLoading: false,
                   onTap: () {
+                    soundManager.playClickSound();
                     Navigator.pop(context);
                     showCreateProfileModal(context);
                   },
@@ -96,32 +105,63 @@ void showAuthModal(BuildContext context) {
                 SizedBox(
                   height: 20.h,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0.w),
-                      child: Image.asset(
-                        IconImageRoutes.soundOn,
-                        width: 50.w,
+                BlocBuilder<SettingsBloc, SettingsState>(
+                  builder: (context, state) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () {
+                                soundManager.playClickSound();
+                                context.read<SettingsBloc>().add(ToggleSound());
+                              },
+                              child: Image.asset(
+                                state.isSoundOn
+                                    ? IconImageRoutes.soundOn
+                                    : IconImageRoutes.soundOff,
+                                width: 50.w,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                                onTap: () {
+                                  soundManager.playClickSound();
+                                  context.read<SettingsBloc>().add(ToggleMusic());
+                                },
+                                child: Image.asset(
+                                  state.isMusicOn
+                                      ? IconImageRoutes.musicOn
+                                      : IconImageRoutes.musicOff,
+                                  width: 50.w,
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                                onTap: () {
+                                  soundManager.playClickSound();
+                                  context
+                                      .read<SettingsBloc>()
+                                      .add(ToggleNotification());
+                                },
+                                child: Image.asset(
+                                  state.isNotificationOn
+                                      ? IconImageRoutes.notificationOn
+                                      : IconImageRoutes.notificationOff,
+                                  width: 50.w,
+                                )),
+                          ),
+                        ],
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.w),
-                      child: Image.asset(
-                        IconImageRoutes.musicOn,
-                        width: 50.w,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0.w),
-                      child: Image.asset(
-                        IconImageRoutes.notificationOn,
-                        width: 50.w,
-                      ),
-                    ),
-                  ],
-                )
+                    );
+                  },
+                ),
               ],
             ),
           ),

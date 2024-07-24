@@ -15,79 +15,82 @@ class GameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: 120.h,
-          margin: EdgeInsets.only(bottom: 20.h),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0xFFBFBDC3),
-                  offset: Offset(0, 8),
-                  blurRadius: 0,
-                  spreadRadius: -2,
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        children: [
+          Container(
+            height: 120.h,
+            margin: EdgeInsets.only(bottom: 20.h),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFFBFBDC3),
+                    offset: Offset(0, 8),
+                    blurRadius: 0,
+                    spreadRadius: -2,
+                  ),
+                ]),
+            child: Column(
+              children: [
+                ClipPath(
+                  clipper: InnerCurveClipper(),
+                  child: Container(
+                    height: 85.h,
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                  ),
                 ),
-              ]),
-          child: Column(
+                Container(
+                  height: 35.h,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 15.w,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                       gameText,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                        ),
+                      ),
+                      PlayButton(
+                        onTap: onTap,
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ClipPath(
-                clipper: InnerCurveClipper(),
-                child: Container(
-                  height: 85.h,
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(16.r),
+              Padding(
+                padding: EdgeInsets.only(left: 20.w),
+                child: Text(
+                  gameType,
+                  style: TextStyle(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              Container(
-                height: 35.h,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 15.w,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                     gameText,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                      ),
-                    ),
-                    PlayButton(
-                      onTap: onTap,
-                    )
-                  ],
-                ),
+              Image.asset(
+                gameImage,
+                width: gameImageWidth,
               )
             ],
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 20.w),
-              child: Text(
-                gameType,
-                style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            Image.asset(
-              gameImage,
-              width: gameImageWidth,
-            )
-          ],
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }

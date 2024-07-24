@@ -80,7 +80,8 @@ class AuthenticationAPI {
   Future<bool> logout() async {
     try {
       final response = await apiClient.get('/auth/logout');
-      return response.statusCode == 200;
+      var test =  response.statusCode == 200;
+      return test;
     } on ApiException catch (e) {
       return false;
     }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/features/home/widget/modals/auth_modal.dart';
 import 'package:the_bible_game/features/home/widget/modals/successful_login_modal.dart';
 import 'package:the_bible_game/shared/constants/colors.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import 'modals/successful_registration_modal.dart';
 
 class SignInProfile extends StatelessWidget {
@@ -14,8 +16,10 @@ class SignInProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return InkWell(
       onTap: () {
+        soundManager.playClickSound();
         showAuthModal(context);
       },
       child: Stack(

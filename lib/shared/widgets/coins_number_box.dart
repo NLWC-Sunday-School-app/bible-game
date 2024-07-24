@@ -3,7 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
 class CoinsNumberBox extends StatelessWidget {
-  const CoinsNumberBox({super.key});
+  const CoinsNumberBox({super.key, required this.noOfCoins});
+  final int noOfCoins;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class CoinsNumberBox extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    '120,4321',
+                    noOfCoins.toString(),
                     style: TextStyle(
                       fontFamily: 'Mikado',
                       fontWeight: FontWeight.w700,

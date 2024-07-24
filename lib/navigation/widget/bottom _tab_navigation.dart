@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/features/arcade/view/arcade_screen.dart';
 import 'package:the_bible_game/features/fantasy_league/view/home_screen.dart';
@@ -7,6 +8,7 @@ import 'package:the_bible_game/features/leader_board/view/leaderboard_screen.dar
 import 'package:the_bible_game/features/store/view/home_screen.dart';
 import '../../features/home/view/home_screen.dart';
 import '../../shared/constants/image_routes.dart';
+import '../../shared/features/settings/bloc/settings_bloc.dart';
 import 'bottom_tab_item.dart';
 
 
@@ -49,7 +51,8 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
     },
   ];
 
-  Widget get _bottomNavigationBar {
+  Widget  _bottomNavigationBar(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return SizedBox(
       child: Container(
         height: 120.h,
@@ -68,6 +71,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 itemIcon: IconImageRoutes.storeTabIcon,
                 itemIsSelected: _selectedStoreTab,
                 onTap: () {
+                  soundManager.playTabClickSound();
                  setState(() {
                    _selectedLeagueTab = false;
                    _selectedStoreTab = true;
@@ -83,6 +87,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 itemIcon: IconImageRoutes.trophyTabICon,
                 itemIsSelected: _selectedLeaderboardTab,
                 onTap: () {
+                  soundManager.playTabClickSound();
                   setState(() {
                     _selectedLeagueTab = false;
                     _selectedStoreTab = false;
@@ -98,6 +103,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 itemIcon: IconImageRoutes.homeTabIcon,
                 itemIsSelected: _selectedHomeTab,
                 onTap: () {
+                  soundManager.playTabClickSound();
                   setState(() {
                     _selectedLeagueTab = false;
                     _selectedStoreTab = false;
@@ -113,6 +119,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 itemIcon: IconImageRoutes.swordTabIcon,
                 itemIsSelected: _selectedArcadeTab,
                 onTap: () {
+                  soundManager.playTabClickSound();
                   setState(() {
                     _selectedLeagueTab = false;
                     _selectedStoreTab = false;
@@ -129,6 +136,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 itemIcon: IconImageRoutes.leagueTabIcon,
                 itemIsSelected: _selectedLeagueTab,
                 onTap: () {
+                  soundManager.playTabClickSound();
                  setState(() {
                    _selectedLeagueTab = true;
                    _selectedStoreTab = false;
@@ -151,7 +159,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedTabIndex]['page'],
-      bottomNavigationBar: _bottomNavigationBar,
+      bottomNavigationBar: _bottomNavigationBar(context),
     );
   }
 }

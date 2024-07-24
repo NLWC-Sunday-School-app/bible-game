@@ -14,47 +14,22 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   UserBloc({required UserRepository userRepository})
       : _userRepository = userRepository,
-        super(UserInitial()) {
-    on<ToggleSound>(_onToggleSound);
-    on<ToggleMusic>(_onToggleMusic);
-    on<ToggleNotification>(_onToggleNotification);
+        super(UserState()) {
     on<FetchAds>(_onFetchAds);
     on<FetchPilgrimProgressData>(_onFetchPilgrimProgressData);
-    on<FetchGamePlaySettings>(_onFetchGamePlaySettings);
+
   }
 
-  void _onToggleSound(ToggleSound event, Emitter<UserState> emit) {
-    if (state is SoundOn) {
-      emit(SoundOff());
-    } else {
-      emit(SoundOn());
-    }
-  }
 
-  void _onToggleMusic(ToggleMusic event, Emitter<UserState> emit) {
-    if (state is MusicOn) {
-      emit(MusicOff());
-    } else {
-      emit(MusicOn());
-    }
-  }
 
-  void _onToggleNotification(
-      ToggleNotification event, Emitter<UserState> emit) {
-    if (state is NotificationOn) {
-      emit(NotificationOff());
-    } else {
-      emit(NotificationOn());
-    }
-  }
 
   Future<void> _onFetchAds(FetchAds event, Emitter<UserState> emit) async {
-    emit(LoadingAds());
+    emit(state.copyWith(isLoadingAds: true));
     try {
       final response = await _userRepository.getAds();
-      emit(AdsDisplayed(response));
+      emit(state.copyWith(isLoadingAds: false, adContent: response));
     } catch (_) {
-      emit(LoadedAds());
+      emit(state.copyWith(isLoadingAds: false));
     }
   }
 
@@ -63,16 +38,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       final response =
           await _userRepository.getUserPilgrimProgressData(event.userId);
-      emit(PilgrimProgressData(response));
+      emit(state.copyWith(pilgrimProgressDetails: response));
     } catch (_) {}
   }
 
-  Future<void> _onFetchGamePlaySettings(FetchGamePlaySettings event, Emitter<UserState> emit) async{
-      try{
-        final response = await _userRepository.getUserGamePlaySettings();
-        emit(GamePlaySettings(response));
-      }catch(_){
 
-      }
-  }
 }

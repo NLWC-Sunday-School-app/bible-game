@@ -12,13 +12,14 @@ class GameSummaryModal extends StatelessWidget {
       required this.bonusPoint,
       required this.noOfCorrectionQuestions,
       required this.totalQuestions,
-      required this.averageTimePerQuestion});
+      required this.averageTimePerQuestion, required this.onTap});
 
   final String pointsEarned;
   final String bonusPoint;
   final String noOfCorrectionQuestions;
   final String totalQuestions;
   final String averageTimePerQuestion;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -186,8 +187,8 @@ class GameSummaryModal extends StatelessWidget {
                 height: 30.h,
               ),
               BlueButton(
-                onTap: () => Navigator.pushNamed(context, AppRoutes.multiplayerQuestionScreen),
-                buttonText: 'See leaderboard',
+                onTap: onTap,
+                buttonText: 'Go home',
                 buttonIsLoading: false,
                 width: 235.w,
               )

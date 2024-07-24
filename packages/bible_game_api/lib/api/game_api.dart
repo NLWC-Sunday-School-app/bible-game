@@ -16,7 +16,7 @@ class GameAPI {
 
   Future<List<GameQuestion>> getQuestions(gameMode, userRank, tags) async {
     try {
-      final response = await apiClient.post('games/play',
+      final response = await apiClient.post('/games/play',
           data: {'gameMode': gameMode, 'userRank': userRank, 'tags': tags});
       final gameQuestions = (response.data['plays'] as List)
           .map((e) => GameQuestion.fromJson(e))
@@ -43,7 +43,7 @@ class GameAPI {
     }
   }
 
-  Future<List<QuickGameTopic>> getScriptureTags() async {
+  Future<List<QuickGameTopic>> getQuickGameTopics() async {
     try {
       final response = await apiClient.get('/tag');
       final tags = (response.data as List)

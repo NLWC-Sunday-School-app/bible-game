@@ -3,15 +3,15 @@ import 'package:bible_game_api/bible_game_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
 
-import '../../../../shared/features/user/bloc/user_bloc.dart';
 import '../../../../shared/utils/avatar_credentials.dart';
+import '../../../../shared/widgets/blue_button.dart';
 
 void showGameSettingsModal(BuildContext context, User user) {
   showDialog(
@@ -40,6 +40,7 @@ class GameSettingsModal extends StatefulWidget {
 class _GameSettingsModalState extends State<GameSettingsModal> {
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return SingleChildScrollView(
       child: SizedBox(
         height: 600.h,
@@ -58,7 +59,10 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                 height: 50.h,
               ),
               GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  soundManager.playClickSound();
+                  Navigator.pop(context);
+                },
                 child: Padding(
                   padding: EdgeInsets.only(right: 15.0.w),
                   child: Row(
@@ -83,10 +87,12 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                 strokeWidth: 5,
               ),
               const SizedBox(
-                height: 30,
+                height: 20,
               ),
-              Image.network(
-                '${AvatarCredentials.BaseURL}/${widget.user.id}.png?apikey=${AvatarCredentials.APIKey}/',
+              FadeInImage.assetNetwork(
+                placeholder: ProductImageRoutes.defaultAvatar,
+                image:
+                    '${AvatarCredentials.BaseURL}/${widget.user.id}.png?apikey=${AvatarCredentials.APIKey}/',
                 width: 60.w,
               ),
               const SizedBox(
@@ -147,10 +153,11 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                       Text(
                         'Reset Password',
                         style: TextStyle(
-                            color: const Color(0xFF4075BB),
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline),
+                          color: const Color(0xFF4075BB),
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ],
                   ),
@@ -159,8 +166,8 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
               const SizedBox(
                 height: 15,
               ),
-              BlocBuilder<UserBloc, UserState>(
-                builder: (context, userState) {
+              BlocBuilder<SettingsBloc, SettingsState>(
+                builder: (context, state) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 0.0),
                     child: Row(
@@ -168,13 +175,13 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: IconButton(
-                            iconSize: 50,
-                            onPressed: () => {
-                               context.read<UserBloc>().add(ToggleSound())
+                          child: InkWell(
+                            onTap: () {
+                              soundManager.playClickSound();
+                              context.read<SettingsBloc>().add(ToggleSound());
                             },
-                            icon: Image.asset(
-                              userState is SoundOn
+                            child: Image.asset(
+                              state.isSoundOn
                                   ? IconImageRoutes.soundOn
                                   : IconImageRoutes.soundOff,
                               width: 50.w,
@@ -183,13 +190,13 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: IconButton(
-                              iconSize: 50,
-                              onPressed: () => {
-                                context.read<UserBloc>().add(ToggleMusic())
+                          child: InkWell(
+                              onTap: () {
+                                soundManager.playClickSound();
+                                context.read<SettingsBloc>().add(ToggleMusic());
                               },
-                              icon: Image.asset(
-                                userState is MusicOn
+                              child: Image.asset(
+                                state.isMusicOn
                                     ? IconImageRoutes.musicOn
                                     : IconImageRoutes.musicOff,
                                 width: 50.w,
@@ -197,13 +204,15 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: IconButton(
-                              iconSize: 50,
-                              onPressed: () => {
-                                context.read<UserBloc>().add(ToggleNotification())
+                          child: InkWell(
+                              onTap: () {
+                                soundManager.playClickSound();
+                                context
+                                    .read<SettingsBloc>()
+                                    .add(ToggleNotification());
                               },
-                              icon: Image.asset(
-                                userState is NotificationOn
+                              child: Image.asset(
+                                state.isNotificationOn
                                     ? IconImageRoutes.notificationOn
                                     : IconImageRoutes.notificationOff,
                                 width: 50.w,
@@ -214,30 +223,52 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                   );
                 },
               ),
-              const SizedBox(
-                height: 15,
+              SizedBox(
+                height: 30.h,
               ),
-              GestureDetector(
-                onTap: () => {},
-                child: Container(
-                  width: 200.w,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  decoration: BoxDecoration(
-                      color: const Color(0xFF548BD5),
-                      border: Border.all(color: const Color(0xFF548CD7)),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(40))),
-                  child: Text(
-                    'LOG OUT',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1,
-                        color: const Color(0xFFFFFFFF),
-                        fontSize: 14.sp),
-                  ),
-                ),
+              BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                listener: (context, state) {
+                  if (!state.isLoggedIn) {
+                    Navigator.pop(context);
+                    final prefs = SharedPreferences.getInstance();
+                    prefs.then((sharedPreferences) {
+                      sharedPreferences.remove('userToken');
+                      sharedPreferences.remove('refreshToken');
+                    });
+                  }
+                },
+                builder: (context, state) {
+                  return BlueButton(
+                    width: 200.w,
+                    buttonText: 'LOG OUT',
+                    buttonIsLoading: state.isLoggingOut,
+                    onTap: () {
+                      context
+                          .read<AuthenticationBloc>()
+                          .add(AuthenticationLogoutRequested());
+                    },
+                  );
+                },
               ),
+              // Container(
+              //   width: 200.w,
+              //   padding: const EdgeInsets.symmetric(vertical: 15),
+              //   decoration: BoxDecoration(
+              //       color: const Color(0xFF548BD5),
+              //       border: Border.all(color: const Color(0xFF548CD7)),
+              //       borderRadius:
+              //           const BorderRadius.all(Radius.circular(40))),
+              //   child: Text(
+              //     'LOG OUT',
+              //     textAlign: TextAlign.center,
+              //     style: TextStyle(
+              //         fontWeight: FontWeight.w900,
+              //         letterSpacing: 1,
+              //         color: const Color(0xFFFFFFFF),
+              //         fontSize: 14.sp),
+              //   ),
+              // ),
+
               const SizedBox(
                 height: 15,
               ),

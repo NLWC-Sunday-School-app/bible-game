@@ -109,7 +109,7 @@ class IconImageRoutes{
   static const String star = 'assets/images/icons/user/star.png';
   static const String edit = 'assets/images/icons/user/edit.svg';
   static const String bluePadlock = 'assets/images/icons/user/blue_padlock.png';
-
+  static const String blueCancel = 'assets/images/icons/user/blue_cancel.png';
 }
 
 class LogoImageRoutes{

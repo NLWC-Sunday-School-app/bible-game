@@ -7,12 +7,6 @@ sealed class UserEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class ToggleSound extends UserEvent {}
-
-class ToggleMusic extends UserEvent {}
-
-class ToggleNotification extends UserEvent {}
-
 class FetchAds extends UserEvent {}
 
 class FetchPilgrimProgressData extends UserEvent {
@@ -24,4 +18,4 @@ class FetchPilgrimProgressData extends UserEvent {
   List<Object> get props => [userId];
 }
 
-class FetchGamePlaySettings extends UserEvent {}
+

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/features/home/widget/modals/game_settings_modal.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:the_bible_game/shared/utils/formatter.dart';
 import 'package:bible_game_api/bible_game_api.dart';
+
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 
 class UserProfileInfo extends StatelessWidget {
   const UserProfileInfo(
@@ -16,14 +19,16 @@ class UserProfileInfo extends StatelessWidget {
 
   final String badgeSrc;
   final String avatarUrl;
-  final User user;
+  final User? user;
   final VoidCallback displayBadgeInfo;
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return GestureDetector(
       onTap: () {
-        showGameSettingsModal(context, user);
+        soundManager.playClickSound();
+        showGameSettingsModal(context, user!);
       },
       child: SizedBox(
         width: 185.w,
@@ -57,7 +62,7 @@ class UserProfileInfo extends StatelessWidget {
                       padding: EdgeInsets.only(left: 30.w),
                       width: 110.w,
                       child: Text(
-                        user.name,
+                        user!.name,
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w900,
@@ -102,7 +107,7 @@ class UserProfileInfo extends StatelessWidget {
                                 width: 5.w,
                               ),
                               Text(
-                                capitalizeText(user.rank),
+                                capitalizeText(user!.rank),
                                 style: TextStyle(
                                   fontSize: 13.sp,
                                   fontWeight: FontWeight.w900,

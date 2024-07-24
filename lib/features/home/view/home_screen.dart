@@ -13,6 +13,7 @@ import 'package:the_bible_game/shared/utils/avatar_credentials.dart';
 import 'package:the_bible_game/shared/utils/user_badge.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../widget/user_profile_info.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -20,6 +21,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
+    if (context.read<SettingsBloc>().state.isMusicOn) {
+      soundManager.playGameMusic();
+    }
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -77,22 +82,21 @@ class HomeScreen extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  state is AuthenticationAuthenticated
+                                  state.user  != null
                                       ? UserProfileInfo(
                                           user: state.user,
                                           badgeSrc:
-                                              getBadgeUrl(state.user.rank),
+                                              getBadgeUrl(state.user?.rank),
                                           avatarUrl:
-                                              '${AvatarCredentials.BaseURL}/${state.user.id}.png?apikey=${AvatarCredentials.APIKey}/',
+                                              '${AvatarCredentials.BaseURL}/${state.user?.id}.png?apikey=${AvatarCredentials.APIKey}/',
                                           displayBadgeInfo: () {},
                                         )
                                       : SignInProfile(),
                                   GameScoreInfo(
-                                    noOfCoins:
-                                        state is AuthenticationAuthenticated
-                                            ? state.user.coinWalletBalance
-                                                .toString()
-                                            : '0',
+                                    noOfCoins: state.user != null
+                                        ? state.user?.coinWalletBalance
+                                            .toString()
+                                        : '0',
                                     noOfGems: '0',
                                     noOfStreaks: '0',
                                   ),

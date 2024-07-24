@@ -167,6 +167,7 @@ class PlayersWaitingModal extends StatelessWidget {
                             context: context,
                             builder: (BuildContext context) {
                               return GameSummaryModal(
+                                onTap: () =>{},
                                 pointsEarned: '230',
                                 bonusPoint: '10',
                                 noOfCorrectionQuestions: '10',

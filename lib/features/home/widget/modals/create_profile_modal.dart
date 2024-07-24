@@ -306,7 +306,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                     ),
                     BlocConsumer<AuthenticationBloc, AuthenticationState>(
                       listener: (context, state) {
-                        if (state is AuthenticationLoginSuccess) {
+                        if (state.user != null) {
                           Navigator.pop(context);
                           showSuccessfulRegistrationModal(context);
                           final tokenNotifier = Provider.of<TokenNotifier>(
@@ -318,19 +318,17 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           final prefs = SharedPreferences.getInstance();
                           prefs.then((sharedPreferences) {
                             sharedPreferences.setString(
-                                'refreshToken', state.refreshToken);
+                                'refreshToken', state.refreshToken!);
                           });
-                        } else if (state is AuthenticationUnauthenticated) {
-                          print(state);
+                        } else if (state.isUnauthenticated) {
                           ApiException.showSnackBar(context);
                         }
                       },
                       builder: (context, state) {
-                        bool isLoading = state is AuthenticationLoadingLogin;
                         return BlueButton(
                           width: 250.w,
                           buttonText: 'Create Profile',
-                          buttonIsLoading: isLoading,
+                          buttonIsLoading: state.isLoadingLogin,
                           onTap: () {
                             if (_registerFormKey.currentState!.validate()) {
                               context
