@@ -47,9 +47,13 @@ class SoundManager {
   void playGameMusic() {
     if (isMusicOn) {
       gameMusicPlayer.setLoopMode(LoopMode.one);
-      gameMusicPlayer.setVolume(0.2);
+      gameMusicPlayer.setVolume(0.1);
       gameMusicPlayer.play();
     }
+  }
+
+  void pauseGameMusic(){
+    gameMusicPlayer.pause();
   }
 
   void stopGameMusic() {

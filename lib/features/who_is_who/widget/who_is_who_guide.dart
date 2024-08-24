@@ -21,7 +21,9 @@ class WhoIsWhoGuide extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    return  Dialog(
+    return
+
+      Dialog(
       insetPadding: EdgeInsets.zero,
       backgroundColor: Colors.black.withOpacity(0.96),
       child:  SizedBox(

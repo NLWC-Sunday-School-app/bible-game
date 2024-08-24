@@ -58,4 +58,31 @@ class AuthenticationRegisterRequested extends AuthenticationEvent {
 
 class FetchUserDataRequested extends AuthenticationEvent {}
 
+class UpdateFCMToken extends AuthenticationEvent {}
 
+class SendForgotPasswordMail extends AuthenticationEvent {
+  final String email;
+
+  SendForgotPasswordMail(this.email);
+
+  @override
+  List<Object> get props => [email];
+}
+
+class VerifyOTP extends AuthenticationEvent {
+  final String OTP;
+
+  VerifyOTP(this.OTP);
+
+  @override
+  List<Object> get props => [this.OTP];
+}
+
+class ResetPassword extends AuthenticationEvent {
+  final String newPassword;
+
+  ResetPassword(this.newPassword);
+
+  @override
+  List<Object> get props => [this.newPassword];
+}

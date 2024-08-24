@@ -1,11 +1,13 @@
 
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
+
 List<WhoIsWhoGameLevel> whoIsWhoGameLevelFromJson(String str) => List<WhoIsWhoGameLevel>.from(json.decode(str).map((x) => WhoIsWhoGameLevel.fromJson(x)));
 
 String whoIsWhoGameLevelToJson(List<WhoIsWhoGameLevel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class WhoIsWhoGameLevel {
+class WhoIsWhoGameLevel extends Equatable {
   final String alias;
   final String backgroundImage;
   final int reward;
@@ -43,4 +45,7 @@ class WhoIsWhoGameLevel {
     "isUnlocked": isUnlocked,
     "groupName": groupName,
   };
+
+  @override
+  List<Object?> get props => [alias, backgroundImage, reward, isSpecialLevel, playTime, isUnlocked, groupName];
 }

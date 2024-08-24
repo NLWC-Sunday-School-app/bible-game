@@ -12,6 +12,7 @@ class ApiException implements Exception {
 
   @override
   String toString() {
+    print('show: $message');
     return 'ApiException: $code - $message';
   }
 

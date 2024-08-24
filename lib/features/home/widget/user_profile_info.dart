@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:the_bible_game/features/home/widget/modals/game_settings_modal.dart';
+import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:the_bible_game/shared/utils/formatter.dart';
 import 'package:bible_game_api/bible_game_api.dart';
@@ -28,7 +30,8 @@ class UserProfileInfo extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         soundManager.playClickSound();
-        showGameSettingsModal(context, user!);
+        // showGameSettingsModal(context, user!);
+        Navigator.pushNamed(context, AppRoutes.profileScreen);
       },
       child: SizedBox(
         width: 185.w,
@@ -107,7 +110,7 @@ class UserProfileInfo extends StatelessWidget {
                                 width: 5.w,
                               ),
                               Text(
-                                capitalizeText(user!.rank),
+                                capitalizeText(user!.rank == 'young believer' ? 'YB' : user!.rank),
                                 style: TextStyle(
                                   fontSize: 13.sp,
                                   fontWeight: FontWeight.w900,
@@ -141,11 +144,19 @@ class UserProfileInfo extends StatelessWidget {
                         color: const Color(0xFF4A91FF),
                       ),
                     ),
-                    child: FadeInImage.assetNetwork(
-                      placeholder: ProductImageRoutes.defaultAvatar,
-                      image: avatarUrl,
+                    child:
+                    SvgPicture.network(
+                     avatarUrl,
                       width: 50.w,
+                      semanticsLabel: 'Logo',
+                      placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
                     ),
+
+                    // FadeInImage.assetNetwork(
+                    //   placeholder: ProductImageRoutes.defaultAvatar,
+                    //   image: avatarUrl,
+                    //   width: 50.w,
+                    // ),
                     padding: EdgeInsets.all(5.w),
                   ),
                 ),

@@ -29,7 +29,9 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     on<SelectQuickGameTopic>(_onSelectQuickGameTopic);
     on<OptionSelected>(_onOptionSelected);
     on<MoveToNextPage>(_onMoveToNextPage);
+    on<SubmitQuickGameScore>(_onSubmitQuickGameScore);
     on<ClearQuickGameData>(_onClearQuickGameData);
+    on<FindQuickGameTopics>(_onFindQuickGameTopics);
   }
 
   Future<void> _onFetchQuickGameTopics(
@@ -45,6 +47,32 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     }
   }
 
+  Future<void> _onSubmitQuickGameScore(
+     SubmitQuickGameScore event,
+      Emitter<QuickGameState> emit,
+      ) async {
+    try {
+      final authenticationState = _authenticationBloc.state;
+      final response = await _quickGameRepository.sendGameData(
+        'QUICK_GAME',
+        state.coinsGained!,
+        state.coinsGained!,
+        state.totalBonusCoinsGained!,
+        (state.totalTimeSpent! ~/ state.quickGameQuestions!.length),
+        authenticationState.user!.rank,
+        state.noOfCorrectAnswers,
+        authenticationState.user!.id,
+        null,
+        5,
+      );
+
+    } catch (_) {
+
+    }
+  }
+
+
+
   List<String> quickGameTopicsToTags(List<QuickGameTopic> topics) {
     return topics.map((topic) => topic.tag).toList();
   }
@@ -56,7 +84,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     try {
       List<String> selectedTopics =
           quickGameTopicsToTags(state.selectedGameTopics!);
-      final userRank = _authenticationBloc.state.user!.rank;
+      final userRank = _authenticationBloc.state.user.rank;
       emit(state.copyWith(isLoadingGameQuestions: true));
       final questions = await _quickGameRepository.getQuickGameQuestions(
           'QUICK_GAME', userRank, selectedTopics);
@@ -91,18 +119,18 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
 
   void _onOptionSelected(OptionSelected event, Emitter<QuickGameState> emit) {
     final soundManager = _settingsBloc.soundManager;
+    final settingsState = _settingsBloc.state;
+
     int coinsGained = state.coinsGained ?? 0;
     int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
-    final isCorrect = event.gameQuestion.answer ==
-        event.gameQuestion.options[event.selectedOptionIndex];
-
-    final settingsState = _settingsBloc.state;
-    final pointsPerQuestion = int.parse(
-        settingsState.gamePlaySettings['base_score_pilgrim_progress']);
-    final durationPerQuestion =
-        int.parse(settingsState.gamePlaySettings['normal_game_speed']);
+    int noOfCorrectAnswers = state.noOfCorrectAnswers;
+    final pointsPerQuestion = int.parse(settingsState.gamePlaySettings['base_score_pilgrim_progress']);
+    final durationPerQuestion = int.parse(settingsState.gamePlaySettings['normal_game_speed']);
     final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
+    final totalTimeSpent = state.totalTimeSpent!  + (durationPerQuestion - event.remainingTime);
+    final isCorrect = event.gameQuestion.answer == event.gameQuestion.options[event.selectedOptionIndex];
     if (isCorrect) {
+      noOfCorrectAnswers++;
       soundManager.playCorrectAnswerSound();
       dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
           halfOfTotalPointPerQuestion;
@@ -110,6 +138,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
           (halfOfTotalPointPerQuestion + timeBonusPoint).round();
       totalBonusCoinsGained =
           (state.totalBonusCoinsGained! + timeBonusPoint).round();
+
     } else {
       soundManager.playWrongAnswerSound();
     }
@@ -120,30 +149,40 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
         correctAnswer: event.gameQuestion.answer,
         selectedOptionIndex: event.selectedOptionIndex,
         coinsGained: coinsGained,
-        totalBonusCoinsGained: totalBonusCoinsGained));
+        totalBonusCoinsGained: totalBonusCoinsGained,
+        totalTimeSpent: totalTimeSpent,
+        noOfCorrectAnswers: noOfCorrectAnswers
+    ));
+   Future.delayed(Duration(seconds: 1), (){
+     add(MoveToNextPage());
+   });
 
-    Future.delayed(Duration(seconds: 1), () {
-      add(MoveToNextPage());
-    });
   }
 
   void _onMoveToNextPage(MoveToNextPage event, Emitter<QuickGameState> emit) {
-    if ((state.quickGameQuestions?.length ?? 0) >
-        (state.selectedOptionIndex ?? 0) + 1) {
-      emit(state.copyWith(
+    emit(state.copyWith(hasAnswered: false,));
+      if ((state.quickGameQuestions?.length ?? 0) >
+          (state.selectedOptionIndex ?? 0) + 1) {
+        emit(state.copyWith(
           selectedOptionIndex: null,
           isCorrectAnswer: null,
           correctAnswer: null,
-          hasAnswered: false));
-    } else {
-      emit(state.copyWith(
-        selectedOptionIndex: null,
-        isCorrectAnswer: null,
-        correctAnswer: null,
-        hasAnswered: false,
-      ));
+
+        ));
+      }
+  }
+
+  Future<void> _onFindQuickGameTopics(
+      FindQuickGameTopics event, Emitter<QuickGameState> emit) async {
+    try {
+      emit(state.copyWith(isLoadingGameTopics: true));
+      final topics = await _quickGameRepository.findQuickGameTopics(event.code);
+      emit(state.copyWith(quickGameTopics: topics, isLoadingGameTopics: false));
+    } catch (_) {
+      emit(state.copyWith(isLoadingGameTopics: false));
     }
   }
+
 
   void _onClearQuickGameData(
     ClearQuickGameData event,

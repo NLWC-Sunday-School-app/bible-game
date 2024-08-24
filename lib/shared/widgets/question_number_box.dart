@@ -3,9 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
 class QuestionNumberBox extends StatelessWidget {
-  const QuestionNumberBox({super.key, required this.currentQuestionNumber, required this.totalQuestions});
+  const QuestionNumberBox({super.key, required this.currentQuestionNumber, required this.totalQuestions, this.isWhoIsWho = false, this.noOfCorrectQuestions});
   final String currentQuestionNumber;
   final String totalQuestions;
+  final bool? isWhoIsWho;
+  final String? noOfCorrectQuestions;
   @override
   Widget build(BuildContext context) {
     return
@@ -41,7 +43,7 @@ class QuestionNumberBox extends StatelessWidget {
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  '$currentQuestionNumber/$totalQuestions Qs',
+                 isWhoIsWho! ? '$noOfCorrectQuestions Q' : '$currentQuestionNumber/$totalQuestions Qs',
                   style: TextStyle(
                     fontFamily: 'Mikado',
                     fontWeight: FontWeight.w700,

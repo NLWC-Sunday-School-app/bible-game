@@ -2,11 +2,17 @@ import 'package:bible_game_api/api/api_client.dart';
 import 'package:bible_game_api/model/game_question.dart';
 import 'package:bible_game_api/model/who_is_who_question.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../model/four_scriptures.dart';
 import '../model/global_game.dart';
+import '../model/global_leaderboard.dart';
 import '../model/leaderboard.dart';
+import '../model/league_data.dart';
+import '../model/league_preview.dart';
+import '../model/pilgrim_progress_level_data.dart';
 import '../model/quick_game_topic.dart';
+import '../model/user_league_preview.dart';
 import '../model/who_is_who_level.dart';
 
 class GameAPI {
@@ -98,6 +104,23 @@ class GameAPI {
     }
   }
 
+  Future<List<GlobalChallengeLeaderboard>> getGlobalGameLeaderBoard(
+      campaignType) async {
+    try {
+      final response = await apiClient.get(
+          '/playlog/campaigns/leaderboards?campaign=$campaignType&limit=20');
+      print('leader: ${response.data['data']}');
+      final leaderBoardData = (response.data['data'] as List)
+          .map((e) => GlobalChallengeLeaderboard.fromJson(e))
+          .toList();
+
+      return leaderBoardData;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
   Future<void> sendGameData(
       gameMode,
       totalScore,
@@ -141,6 +164,25 @@ class GameAPI {
     }
   }
 
+  Future<void> updateGlobalChallengeGame(id, title, description, image,
+      campaignTag, isActive, isComingSoon, startDate, endDate) async {
+    try {
+      final response = await apiClient.patch('/catalog/$id', data: {
+        "title": title,
+        "description": description,
+        "image": image,
+        "campaign_tag": campaignTag,
+        "is_active": isActive,
+        "is_coming_soon": isComingSoon,
+        "start_date": startDate,
+        "end_date": endDate
+      });
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
   Future<List<FourScripturesOneWordQuestion>> getFourScripturesOneWordQuestions(
       levelNumber) async {
     try {
@@ -177,12 +219,11 @@ class GameAPI {
     }
   }
 
-  Future<List<WhoIsWhoQuestion>> getWhoIsWhoQuestions() async {
+  Future<List<GameQuestion>> getWhoIsWhoQuestions() async {
     try {
       final response = await apiClient.get('/whoiswho/game');
-      final questions = (response.data as List)
-          .map((e) => WhoIsWhoQuestion.fromJson(e))
-          .toList();
+      final questions =
+          (response.data as List).map((e) => GameQuestion.fromJson(e)).toList();
       return questions;
     } on ApiException catch (e) {
       final errorMessage = e.toString();
@@ -230,4 +271,128 @@ class GameAPI {
       return false;
     }
   }
+
+  Future<List<PilgrimProgressLevelData>> getUserPilgrimProgress(userId) async {
+    try {
+      final response = await apiClient.get('/user/progress/$userId');
+      final progressData = (response.data as List)
+          .map((e) => PilgrimProgressLevelData.fromJson(e))
+          .toList();
+
+      return progressData;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<bool> updatePlayerRank(id, newRank) async {
+    try {
+      final response =
+          await apiClient.patch('/users/$id/rank?newRank=$newRank', data: {});
+      return response.statusCode == 200;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<Map<String, dynamic>> createFantasyBibleLeague(name, goal, isOpen, seasonEnd) async {
+    try {
+     final response =  await apiClient.post('/leagues', data: {
+        "name": name,
+        "goal": goal,
+        "isOpen": isOpen,
+        "seasonEnd": seasonEnd
+      });
+     return response.data;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<List<LeaguePreview>> getOpenLeagues() async {
+    try {
+      final response = await apiClient.get('/leagues/open');
+      final openLeagues = (response.data as List)
+          .map((e) => LeaguePreview.fromJson(e))
+          .toList();
+      return openLeagues;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<List<LeaguePreview>> findLeague(code) async {
+    try {
+      final response = await apiClient.get('/leagues/find?query=$code');
+      final openLeagues = (response.data as List)
+          .map((e) => LeaguePreview.fromJson(e))
+          .toList();
+      return openLeagues;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<List<QuickGameTopic>> findQuickGameTopic(code) async {
+    try {
+      final response = await apiClient.get('/tag/search?query=$code');
+      final tags = (response.data as List)
+          .map((e) => QuickGameTopic.fromJson(e))
+          .toList();
+      return tags;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<List<UserLeaguePreview>> getUserLeagues(userId) async {
+    try {
+      final response = await apiClient.get('/leagues/user/$userId');
+      final openLeagues = (response.data as List)
+          .map((e) => UserLeaguePreview.fromJson(e))
+          .toList();
+      return openLeagues;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<LeagueData> viewLeagueData(leagueId) async {
+    try {
+      final response = await apiClient.get('/leagues/$leagueId/board');
+      return LeagueData.fromJson(response.data);
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<void> joinLeague(leagueId) async {
+    try {
+      await apiClient.get('/leagues/$leagueId/join');
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<void> leaveLeague(leagueId) async {
+    try {
+      await apiClient.delete('/leagues/$leagueId/leave');
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+
+
+
 }

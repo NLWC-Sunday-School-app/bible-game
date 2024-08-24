@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ScoreBox extends StatelessWidget {
   const ScoreBox({
-    Key? key,
+    Key? key, required this.coinsAvailable,
   }) : super(key: key);
+
+  final int coinsAvailable;
 
   @override
   Widget build(BuildContext context) {
+    var formatter = NumberFormat('#,##,###');
     return Stack(
       children: [
         Padding(
@@ -28,10 +32,9 @@ class ScoreBox extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(36.r)),
                   border: Border.all(color: Colors.white, width: 1.5)),
               child: Text(
-                  '2000',
+                  formatter.format(coinsAvailable),
                   style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'Mikado',
                       fontSize: 16.sp,
                       color: Colors.white),
                 ),

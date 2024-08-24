@@ -7,7 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:the_bible_game/features/home/widget/modals/reset_password_modal.dart';
 import 'package:the_bible_game/features/home/widget/modals/successful_login_modal.dart';
+import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
 import '../../../../app.dart';
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -26,17 +29,14 @@ void showLoginModal(BuildContext context) {
           backgroundColor: Colors.transparent,
           insetAnimationCurve: Curves.easeIn,
           insetAnimationDuration: const Duration(milliseconds: 500),
-          child: LoginModal(
-            rootContext: scaffoldMessengerKey.currentContext!,
-          ),
+          child: LoginModal(),
         );
       });
 }
 
 class LoginModal extends StatefulWidget {
-  const LoginModal({super.key, required this.rootContext});
+  const LoginModal({super.key});
 
-  final BuildContext rootContext;
 
   @override
   State<LoginModal> createState() => _LoginModalState();
@@ -214,22 +214,52 @@ class _LoginModalState extends State<LoginModal> {
               ),
               BlocConsumer<AuthenticationBloc, AuthenticationState>(
                 listener: (context, state) {
-                  if (state.token != null) {
-                    Navigator.pop(context);
-                    showSuccessfulLoginModal(context);
-                    final tokenNotifier =
-                        Provider.of<TokenNotifier>(context, listen: false);
-                    tokenNotifier.setToken(state.token);
-                    final prefs = SharedPreferences.getInstance();
-                    prefs.then((sharedPreferences) {
-                      sharedPreferences.setString('userToken', state.token!);
-                      sharedPreferences.setString(
-                          'refreshToken', state.refreshToken!);
-                    });
-                  } else if (state.isUnauthenticated) {
-                    print(state);
+                  if( state.failedToLogin){
                     ApiException.showSnackBar(context);
                   }
+
+                  if(state.token != null){
+                    print('token accepted');
+                  final tokenNotifier =
+                      Provider.of<TokenNotifier>(context, listen: false);
+                  tokenNotifier.setToken(state.token);
+                  final prefs = SharedPreferences.getInstance();
+                  prefs.then((sharedPreferences) {
+                    sharedPreferences.setString('userToken', state.token!);
+                    sharedPreferences.setString(
+                        'refreshToken', state.refreshToken!);
+                  });
+                   Navigator.pop(context);
+                   showSuccessfulLoginModal(context);
+                  }
+
+
+                  // if(state.isUnauthenticated){
+                  //   ApiException.showSnackBar(context);
+                  // }
+
+
+
+                  // if (state.token != null) {
+                  //   Navigator.pop(context);
+                  //   Navigator.pushNamed(context, AppRoutes.home);
+                  //   showSuccessfulLoginModal(context);
+                  //   final tokenNotifier =
+                  //       Provider.of<TokenNotifier>(context, listen: false);
+                  //   tokenNotifier.setToken(state.token);
+                  //   final prefs = SharedPreferences.getInstance();
+                  //   prefs.then((sharedPreferences) {
+                  //     sharedPreferences.setString('userToken', state.token!);
+                  //     sharedPreferences.setString(
+                  //         'refreshToken', state.refreshToken!);
+                  //   });
+                  //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
+                  // } else if (state.isUnauthenticated) {
+                  //   print(state);
+                  //   ApiException.showSnackBar(context);
+                  // }
+
+
                 },
                 builder: (context, state) {
                   return BlueButton(
@@ -239,12 +269,11 @@ class _LoginModalState extends State<LoginModal> {
                     onTap: () {
                       soundManager.playClickSound();
                       if (_loginFormKey.currentState!.validate()) {
-                        context
-                            .read<AuthenticationBloc>()
-                            .add(AuthenticationLoginRequested(
-                              emailController.text,
-                              passwordController.text,
-                            ));
+                        print('Validated');
+                        // BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+                        BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginRequested(emailController.text,
+                          passwordController.text,));
+
                       }
                     },
                   );

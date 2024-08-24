@@ -14,18 +14,12 @@ class UserRepository {
     return await userAPI.updateProfile(id, newUsername);
   }
 
-  Future<bool> updatePlayerRank(id, newRank) async {
-    return await userAPI.updatePlayerRank(id, newRank);
-  }
+
 
   Future<dynamic> updateUserFCMToken(token) async {
     return await userAPI.updateFCMToken(token);
   }
 
-  Future<List<PilgrimProgressLevelData>> getUserPilgrimProgressData(
-      userId) async {
-    return await userAPI.getUserPilgrimProgress(userId);
-  }
 
   Future<bool> initializeUserWallet() async {
     return await userAPI.initializeWallet();
@@ -50,4 +44,33 @@ class UserRepository {
   Future<Map<String, dynamic>> getUserYearlyRecap(userId) async {
     return await userAPI.getYearRecap(userId);
   }
+
+  Future<List<Leaderboard>>getGlobalLeaderBoard(bool isLoggedIn) async{
+    return await userAPI.getGlobalLeaderBoard(isLoggedIn);
+  }
+
+  Future<List<Leaderboard>>getCountryLeaderBoard(countryName) async{
+    return await userAPI.getCountryLeaderBoard(countryName);
+  }
+
+  Future<Map<String, dynamic>> getStreakDetails(userId) async {
+    return await userAPI.getStreakDetails(userId);
+  }
+
+  Future<void>  purchaseGem (userId, quantity) async{
+    return await userAPI.purchaseGem(userId, quantity);
+  }
+
+  Future<void>  restoreStreak (userId) async{
+    return await userAPI.restoreStreak(userId);
+  }
+
+  Future<void> onboardCollaborator (userId) async{
+    return await userAPI.onboardCollaborator(userId);
+  }
+
+  Future<void> updateCountry (country) async{
+    return await userAPI.updateCountry(country);
+  }
+
 }

@@ -17,10 +17,14 @@ class User extends Equatable {
   final int highScore;
   final String rank;
   final int fourScripturesScore;
+  final int fourScriptsLevel;
   final int coinWalletBalance;
   final String fcmToken;
+  final String country;
+  final int streak;
+  final int gems;
+  final bool isWalletInitialized;
 
-  // Constructor
   const User({
     required this.id,
     required this.name,
@@ -29,22 +33,31 @@ class User extends Equatable {
     required this.rank,
     required this.highScore,
     required this.fourScripturesScore,
+    required this.fourScriptsLevel,
     required this.coinWalletBalance,
     required this.fcmToken,
+    required this.country,
+    required this.streak,
+    required this.gems,
+    required this.isWalletInitialized,
   });
 
   // Factory constructor for creating a User instance from JSON
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["id"],
-        name: json["name"],
-        email: json["email"],
-        profileUrl: json["profileUrl"],
-        highScore: json["highScore"],
-        rank: json["rank"],
-        fourScripturesScore: json["fourScriptScore"],
-        coinWalletBalance: json["coinWalletBalance"],
-        fcmToken: '',
-      );
+      id: json["id"],
+      name: json["name"],
+      email: json["email"],
+      profileUrl: json["profileUrl"],
+      highScore: json["highScore"],
+      rank: json["rank"],
+      fourScripturesScore: json["fourScriptScore"],
+      fourScriptsLevel: json["fourScriptsLevel"],
+      coinWalletBalance: json["coinWalletBalance"],
+      fcmToken: json["fcmToken"],
+      country: json["country"],
+      streak: json["streak"],
+      gems: json["gems"],
+      isWalletInitialized: json["isWalletInitialized"]);
 
   // Method to convert a User instance to JSON
   Map<String, dynamic> toJson() => {
@@ -56,7 +69,12 @@ class User extends Equatable {
         "rank": rank,
         "coinWalletBalance": coinWalletBalance,
         "fourScriptScore": fourScripturesScore,
-        "fcmToken": fcmToken
+        "fourScriptsLevel": fourScriptsLevel,
+        "fcmToken": fcmToken,
+        "country": country,
+        "streak": streak,
+        "gems": gems,
+        "isWalletInitialized": isWalletInitialized
       };
 
   // Override props for Equatable
@@ -68,9 +86,14 @@ class User extends Equatable {
         profileUrl,
         highScore,
         fourScripturesScore,
+        fourScriptsLevel,
         coinWalletBalance,
         fcmToken,
-        rank
+        rank,
+        country,
+        streak,
+        gems,
+        isWalletInitialized
       ];
 }
 
@@ -83,6 +106,11 @@ const emptyUser = User(
   rank: '',
   highScore: 0,
   fourScripturesScore: 0,
+  fourScriptsLevel: 0,
   coinWalletBalance: 0,
   fcmToken: '',
+  country: '',
+  streak: 0,
+  gems: 0,
+  isWalletInitialized: false,
 );

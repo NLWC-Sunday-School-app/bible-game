@@ -19,6 +19,8 @@ class QuickGameState extends Equatable {
   final bool? isCorrectAnswer;
   final int? selectedOptionIndex;
   final bool hasAnswered;
+  final bool quickGameCompleted;
+  final int noOfCorrectAnswers;
 
   const QuickGameState({
     this.quickGameTopics = const [],
@@ -38,7 +40,9 @@ class QuickGameState extends Equatable {
     this.correctAnswer,
     this.selectedOptionIndex,
     this.isCorrectAnswer,
-    this.hasAnswered = false
+    this.hasAnswered = false,
+    this.quickGameCompleted = false,
+    this.noOfCorrectAnswers = 0
   });
 
   QuickGameState copyWith({
@@ -59,7 +63,9 @@ class QuickGameState extends Equatable {
     String? correctAnswer,
     int? selectedOptionIndex,
     bool? isCorrectAnswer,
-    bool? hasAnswered
+    bool? hasAnswered,
+    bool? quickGameCompleted,
+    int? noOfCorrectAnswers
   }) {
     return QuickGameState(
       quickGameTopics: quickGameTopics ?? this.quickGameTopics,
@@ -83,7 +89,9 @@ class QuickGameState extends Equatable {
       correctAnswer: correctAnswer ?? null,
       selectedOptionIndex: selectedOptionIndex ?? null,
       isCorrectAnswer: isCorrectAnswer ?? null,
-      hasAnswered: hasAnswered ?? this.hasAnswered
+      hasAnswered: hasAnswered ?? this.hasAnswered,
+      quickGameCompleted: quickGameCompleted ?? this.quickGameCompleted,
+      noOfCorrectAnswers: noOfCorrectAnswers ?? this.noOfCorrectAnswers
     );
   }
 
@@ -106,6 +114,7 @@ class QuickGameState extends Equatable {
         correctAnswer,
         selectedOptionIndex,
         isCorrectAnswer,
-        hasAnswered
+        hasAnswered,
+        quickGameCompleted
       ];
 }

@@ -4,11 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
 import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:the_bible_game/shared/utils/network_connection.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:the_bible_game/shared/widgets/modal/network_modal.dart';
 import '../constants/image_routes.dart';
 import '../features/authentication/bloc/authentication_bloc.dart';
 
@@ -42,10 +44,17 @@ class _SplashScreenState extends State<SplashScreen> {
                   final route = ModalRoute.of(context);
                   final isCurrentRoute = route?.isCurrent ?? false;
                   if (isCurrentRoute) {
-                    if (state.user != null) {
-                      print('${state.user}');
-                      Navigator.pushReplacementNamed(context, AppRoutes.home);
-                    } else if (state.isUnauthenticated) {}
+                    if (state.user.id != 0) {
+                      BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
+                      BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+                      Navigator.pushNamedAndRemoveUntil(context,
+                          AppRoutes.home, (Route<dynamic> route) => false);
+                    } else if (state.isUnauthenticated) {
+
+                    }
+
+                  }else{
+                     // Navigator.pushReplacementNamed(context, AppRoutes.home);
                   }
                 },
                 builder: (context, state) {
@@ -81,6 +90,7 @@ class _SplashScreenState extends State<SplashScreen> {
     NetworkConnection networkConnection = NetworkConnection();
     if (await networkConnection.hasInternetConnection()) {
       if (userToken != null) {
+        print('userToken $userToken');
         bool tokenHasExpired = JwtDecoder.isExpired(userToken);
         if (tokenHasExpired && refreshToken != null) {
           BlocProvider.of<AuthenticationBloc>(context)
@@ -89,13 +99,16 @@ class _SplashScreenState extends State<SplashScreen> {
         } else {
           // print('RESET APP');
         }
-        BlocProvider.of<AuthenticationBloc>(context)
-            .add(FetchUserDataRequested());
+        print('still have good token');
+        BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+
       } else {
         Navigator.pushNamed(context, AppRoutes.home);
       }
      BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
-     BlocProvider.of<UserBloc>(context).add(FetchAds());
+     BlocProvider.of<SettingsBloc>(context).add(FetchAds());
+    }else{
+        showNetworkModal(context);
     }
   }
 }

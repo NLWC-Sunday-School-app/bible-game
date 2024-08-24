@@ -1,24 +1,37 @@
 import 'package:bible_game_api/bible_game_api.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:the_bible_game/shared/widgets/option_button.dart';
 import 'package:the_bible_game/shared/widgets/question_box.dart';
 import 'package:the_bible_game/shared/widgets/question_clock.dart';
 import 'package:the_bible_game/shared/widgets/question_number_box.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:the_bible_game/shared/widgets/quit_modal.dart';
 import '../../../shared/widgets/coins_number_box.dart';
+import '../features/settings/bloc/settings_bloc.dart';
 
-typedef OptionSelectedCallback = void Function(
-    int selectedOption);
+typedef OptionSelectedCallback = void Function(int selectedOption);
 
 class QuestionContainer extends StatelessWidget {
-  const QuestionContainer(
-      {super.key,
-      required this.gameQuestion,
-      required this.animationController,
-      required this.currentPage,
-      required this.totalQuestions,
-      required this.optionSelectedCallback, required this.isCorrectAnswer, required this.selectedOptionIndex, required this.hasAnswered, required this.coinsGained});
+  const QuestionContainer({
+    super.key,
+    required this.gameQuestion,
+    required this.animationController,
+    required this.currentPage,
+    required this.totalQuestions,
+    this.hasTimer = true,
+    required this.optionSelectedCallback,
+    required this.isCorrectAnswer,
+    required this.selectedOptionIndex,
+    required this.hasAnswered,
+    required this.coinsGained,
+    required this.skipQuestion,
+    this.isWhoIsWho = false,
+    this.whoIsWhoGameDuration = 0,
+    this.durationPerQuestion = 0,
+    this.noOfCorrectAnswers = 0
+  });
 
   final GameQuestion gameQuestion;
   final AnimationController animationController;
@@ -28,10 +41,17 @@ class QuestionContainer extends StatelessWidget {
   final int selectedOptionIndex;
   final OptionSelectedCallback optionSelectedCallback;
   final bool hasAnswered;
+  final bool? isWhoIsWho;
+  final bool? hasTimer;
   final int coinsGained;
+  final int? whoIsWhoGameDuration;
+  final VoidCallback skipQuestion;
+  final int? durationPerQuestion;
+  final int? noOfCorrectAnswers;
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return Container(
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
@@ -49,13 +69,25 @@ class QuestionContainer extends StatelessWidget {
               child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              CoinsNumberBox(noOfCoins: coinsGained,),
-              QuestionClock(
-                animationController: animationController,
+              CoinsNumberBox(
+                noOfCoins: coinsGained,
               ),
+              hasTimer!
+                  ? QuestionClock(
+                      isWhoIsWho: isWhoIsWho,
+                      whoIsWhoGameDuration: whoIsWhoGameDuration,
+                      animationController: animationController,
+                      durationPerQuestion: durationPerQuestion,
+                    )
+                  : Image.asset(
+                      ProductImageRoutes.theBibleGame,
+                      width: 80.w,
+                    ),
               QuestionNumberBox(
+                isWhoIsWho: isWhoIsWho,
                 currentQuestionNumber: currentPage.toString(),
                 totalQuestions: totalQuestions.toString(),
+                noOfCorrectQuestions: noOfCorrectAnswers.toString(),
               )
             ],
           )),
@@ -63,42 +95,51 @@ class QuestionContainer extends StatelessWidget {
             height: 15.h,
           ),
           QuestionBox(
+            isWhoIsWho: isWhoIsWho,
             instruction: gameQuestion.instruction,
             question: gameQuestion.question,
           ),
           SizedBox(
             height: 15.h,
           ),
-          ...List.generate(
-              gameQuestion.options.length,
-              (index) {
-                final isSelected = selectedOptionIndex == index;
-                final isCorrect = isSelected ? isCorrectAnswer : null;
-                return OptionButton(
-                    text: gameQuestion.options[index],
-                    correctAnswer: gameQuestion.answer,
-                    index: index,
-                    onTap: () {
-                      optionSelectedCallback(index);
-                    },
-                  isSelected: isSelected,
-                  isCorrect: isCorrect,
-                  hasAnswered: hasAnswered ,
-
-                  );}
-          ),
+          ...List.generate(gameQuestion.options.length, (index) {
+            final isSelected = selectedOptionIndex == index;
+            final isCorrect = isSelected ? isCorrectAnswer : null;
+            return OptionButton(
+              text: gameQuestion.options[index],
+              correctAnswer: gameQuestion.answer,
+              index: index,
+              onTap: () {
+                optionSelectedCallback(index);
+              },
+              isSelected: isSelected,
+              isCorrect: isCorrect,
+              hasAnswered: hasAnswered,
+            );
+          }),
           Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Image.asset(
-                IconImageRoutes.redCircleClose,
-                width: 64.w,
+              GestureDetector(
+                onTap: () {
+                  soundManager.playClickSound();
+                  showQuitModal(context);
+                },
+                child: Image.asset(
+                  IconImageRoutes.redCircleClose,
+                  width: 64.w,
+                ),
               ),
-              Image.asset(
-                IconImageRoutes.skip,
-                width: 64.w,
-              ),
+              isWhoIsWho!
+                  ? SizedBox()
+                  : GestureDetector(
+                      onTap: skipQuestion,
+                      child: Image.asset(
+                        IconImageRoutes.skip,
+                        width: 64.w,
+                      ),
+                    )
             ],
           ),
           SizedBox(

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:the_bible_game/shared/widgets/blue_button.dart';
 
-void showQuickGameTipsModal(BuildContext context) {
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
+
+void showQuickGameTipsModal(BuildContext context, bool hasTimer) {
+  final soundManager = context
+      .read<SettingsBloc>()
+      .soundManager;
   showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
           insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -38,7 +45,8 @@ void showQuickGameTipsModal(BuildContext context) {
                       child: Row(
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(left: 10.w, top: 10.h, bottom: 10.h),
+                            padding: EdgeInsets.only(
+                                left: 10.w, top: 10.h, bottom: 10.h),
                             child: Text(
                               'Bonus point for when you \nget all questions right!',
                               style: TextStyle(
@@ -56,22 +64,25 @@ void showQuickGameTipsModal(BuildContext context) {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20.h,),
+                  SizedBox(
+                    height: 20.h,
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40.w),
                     child: Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(horizontal: 10.w),
                       decoration: BoxDecoration(
-                          color: Color(0xFFF8E193),
-                          border: Border.all(color: Color(0xFFBE9F37)),
+                          color: Color(0xFE7F2E6),
+                          border: Border.all(color: Color(0xFF7FB57A)),
                           borderRadius: BorderRadius.circular(8.r)),
                       child: Row(
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(left: 10.w, top: 10.h, bottom: 10.h),
+                            padding: EdgeInsets.only(
+                                left: 10.w, top: 10.h, bottom: 10.h),
                             child: Text(
-                              'Bonus point for when you \nget all questions right!',
+                              'Speed is an extra advantage',
                               style: TextStyle(
                                   fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,
@@ -80,18 +91,24 @@ void showQuickGameTipsModal(BuildContext context) {
                           ),
                           Spacer(),
                           Image.asset(
-                            IconImageRoutes.coinIcon,
+                            ProductImageRoutes.rocket,
                             width: 56.w,
                           )
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 40.h,),
+                  SizedBox(
+                    height: 40.h,
+                  ),
                   BlueButton(
                     buttonText: 'Play Now',
                     buttonIsLoading: false,
-                    onTap: () => Navigator.pushNamed(context, AppRoutes.quickGameQuestionScreen),
+                    onTap: () {
+                      soundManager.playClickSound();
+                      Navigator.pushNamed(
+                          context, AppRoutes.quickGameQuestionScreen, arguments:{ 'hasTimer': hasTimer});
+                    },
                     width: 280.w,
                   )
                 ],

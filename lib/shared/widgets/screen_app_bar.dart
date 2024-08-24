@@ -10,7 +10,7 @@ class ScreenAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150.h,
+      height: 140.h,
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.primaryColorShade,

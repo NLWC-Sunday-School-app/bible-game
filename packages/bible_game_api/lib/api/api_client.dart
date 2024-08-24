@@ -55,7 +55,15 @@ class ApiClient {
   Future<Response> patch(String endpoint,
       {required Map<String, dynamic> data}) async {
     try {
-      return await dio.post(endpoint, data: data);
+      return await dio.patch(endpoint, data: data);
+    } on DioException catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  Future<Response> delete(String endpoint) async {
+    try {
+      return await dio.delete(endpoint);
     } on DioException catch (e) {
       return _handleError(e);
     }

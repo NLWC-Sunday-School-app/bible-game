@@ -6,6 +6,7 @@ import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../bloc/quick_game_bloc.dart';
 
 class TopicTag extends StatelessWidget {
@@ -17,6 +18,7 @@ class TopicTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final QuickGameBloc bloc = BlocProvider.of<QuickGameBloc>(context);
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return BlocBuilder<QuickGameBloc, QuickGameState>(
       builder: (context, state) {
         bool isSelected = state.selectedGameTopics
@@ -24,6 +26,7 @@ class TopicTag extends StatelessWidget {
             false;
         return GestureDetector(
           onTap: () {
+            soundManager.playClickSound();
             bloc.add(SelectQuickGameTopic(QuickGameTopic(id: id, tag: topic)));
           },
           child: Container(

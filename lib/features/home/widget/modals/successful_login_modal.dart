@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
+import '../../../../shared/constants/app_routes.dart';
 import '../../../../shared/constants/image_routes.dart';
 
 void showSuccessfulLoginModal(BuildContext context) {
@@ -29,7 +30,12 @@ void showSuccessfulLoginModal(BuildContext context) {
                     height: 40.h,
                   ),
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamedAndRemoveUntil(context,
+                          AppRoutes.home, (Route<dynamic> route) => false);
+
+                    },
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 10.w,

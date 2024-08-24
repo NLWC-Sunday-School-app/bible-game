@@ -71,7 +71,8 @@ class PlayersWaitingModal extends StatelessWidget {
                               ),
                             ],
                           )
-                        : Column(
+                        :
+                    Column(
                             children: [
                               SizedBox(
                                 height: 70.h,

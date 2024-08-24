@@ -1,23 +1,40 @@
 import 'dart:convert';
 
-List<Leaderboard> leaderBoardFromJson(String str) => List<Leaderboard>.from(json.decode(str).map((x) => Leaderboard.fromJson(x)));
-List<Leaderboard> leaderBoardFromDataJson(String str) => List<Leaderboard>.from(json.decode(str)['data'].map((x) => Leaderboard.fromJson(x)));
+import 'package:equatable/equatable.dart';
 
+class Leaderboard extends Equatable {
+  final int userId;
+  final int walletBalance;
+  final String name;
+  final int position;
+  final dynamic country;
+  final String status;
 
-class Leaderboard{
-  int playerId;
-  int playerScore;
-  String playerName;
-  int playerPosition;
-
-  Leaderboard({required this.playerId, required this.playerScore, required this.playerPosition, required this. playerName});
+  const Leaderboard({
+    required this.userId,
+    required this.walletBalance,
+    required this.position,
+    required this.name,
+    required this.status,
+    required this.country,
+  });
 
   factory Leaderboard.fromJson(Map<String, dynamic> json) => Leaderboard(
-      playerId: json["playerId"],
-      playerScore: json["totalScore"],
-      playerName: json["playerName"],
-      playerPosition: json["position"]
+      userId: json["userId"],
+      walletBalance: json["balance"],
+      name: json["name"],
+      position: json["position"],
+      status: json["status"],
+      country: json["country"]
   );
 
-
+  @override
+  List<Object?> get props => [
+        userId,
+        walletBalance,
+        position,
+        name,
+        status,
+        country,
+      ];
 }

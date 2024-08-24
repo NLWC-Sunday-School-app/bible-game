@@ -12,6 +12,7 @@ class ScoreInfo extends StatelessWidget {
     required this.iconImage,
     required this.textColor,
     required this.iconWidth,
+    required this.onTap
   });
 
   final double width;
@@ -22,43 +23,48 @@ class ScoreInfo extends StatelessWidget {
   final String iconImage;
   final double iconWidth;
   final Color textColor;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 5.h),
-      decoration: BoxDecoration(
-          color: backgroundColor,
-          border: Border.all(
-            width: 2.w,
-            color: borderColor,
-          ),
-          borderRadius: BorderRadius.all(Radius.circular(26.r)),
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor,
-              offset: Offset(0, 5),
-              blurRadius: 0,
-              spreadRadius: -2,
+    return GestureDetector(
+      onTap: onTap,
+      child:
+      Container(
+        width: width,
+        padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 5.h),
+        decoration: BoxDecoration(
+            color: backgroundColor,
+            border: Border.all(
+              width: 2.w,
+              color: borderColor,
             ),
-          ]),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Image.asset(
-            iconImage,
-            width: iconWidth,
-          ),
-          Text(
-            score,
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 14.sp,
-              color: textColor,
+            borderRadius: BorderRadius.all(Radius.circular(26.r)),
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor,
+                offset: Offset(0, 5),
+                blurRadius: 0,
+                spreadRadius: -2,
+              ),
+            ]),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Image.asset(
+              iconImage,
+              width: iconWidth,
             ),
-          ),
-        ],
+            Text(
+              score,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 14.sp,
+                color: textColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

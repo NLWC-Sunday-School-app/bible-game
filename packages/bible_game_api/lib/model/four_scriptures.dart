@@ -1,11 +1,13 @@
-
 import 'dart:convert';
 
-List<FourScripturesOneWordQuestion> fourScripturesFromJson(String str) => List<FourScripturesOneWordQuestion>.from(json.decode(str).map((x) => FourScripturesOneWordQuestion.fromJson(x)));
+import 'package:equatable/equatable.dart';
 
+List<FourScripturesOneWordQuestion> fourScripturesFromJson(String str) =>
+    List<FourScripturesOneWordQuestion>.from(
+        json.decode(str).map((x) => FourScripturesOneWordQuestion.fromJson(x)));
 
-class FourScripturesOneWordQuestion {
-  FourScripturesOneWordQuestion({
+class FourScripturesOneWordQuestion extends Equatable {
+  const FourScripturesOneWordQuestion({
     required this.id,
     required this.scriptureOne,
     required this.scriptureTwo,
@@ -14,19 +16,30 @@ class FourScripturesOneWordQuestion {
     required this.answer,
   });
 
-  int id;
-  String scriptureOne;
-  String scriptureTwo;
-  String scriptureThree;
-  String scriptureFour;
-  String answer;
+ final int id;
+ final String scriptureOne;
+ final String scriptureTwo;
+ final String scriptureThree;
+ final String scriptureFour;
+ final String answer;
 
-  factory FourScripturesOneWordQuestion.fromJson(Map<String, dynamic> json) => FourScripturesOneWordQuestion(
-    id: json["id"],
-    scriptureOne: json["scriptureOne"],
-    scriptureTwo: json["scriptureTwo"],
-    scriptureThree: json["scriptureThree"],
-    scriptureFour: json["scriptureFour"],
-    answer: json["answer"],
-  );
+  factory FourScripturesOneWordQuestion.fromJson(Map<String, dynamic> json) =>
+      FourScripturesOneWordQuestion(
+        id: json["id"],
+        scriptureOne: json["scriptureOne"],
+        scriptureTwo: json["scriptureTwo"],
+        scriptureThree: json["scriptureThree"],
+        scriptureFour: json["scriptureFour"],
+        answer: json["answer"],
+      );
+
+  @override
+  List<Object?> get props => [
+        id,
+        scriptureOne,
+        scriptureTwo,
+        scriptureThree,
+        scriptureFour,
+        answer,
+      ];
 }

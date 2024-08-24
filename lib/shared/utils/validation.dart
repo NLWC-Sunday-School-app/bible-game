@@ -25,6 +25,41 @@ class Validator {
 
     return null;
   }
+
+  static String? validateLeagueName(String name) {
+    if (name.isEmpty) {
+      return 'League name is required';
+    }
+
+    if (name.length <= 4) {
+      return 'League name is too short!';
+    }
+
+    if(name.length > 20) {
+      return 'Not more 20 characters';
+    }
+
+    return null;
+  }
+
+  static String? validateCoinsGoal(String goal) {
+    print('goal $goal');
+    if (goal.isEmpty) {
+      return 'Coins goal is required';
+    }
+
+    if (int.parse(goal.replaceAll(',', '')) > 100000) {
+      return 'Coins goal maximum is 100,000';
+    }
+
+    if (int.parse(goal.replaceAll(',', '')) < 5000) {
+      return 'Coins goal minimum is 5,000';
+    }
+
+    return null;
+  }
+
+
   static String? validateCountry(String country) {
     if (country.isEmpty) {
       return 'Country is required';

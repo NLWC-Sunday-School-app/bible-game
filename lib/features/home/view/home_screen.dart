@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:the_bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
 import 'package:the_bible_game/features/home/widget/game_card.dart';
 import 'package:the_bible_game/features/home/widget/game_score_info.dart';
 import 'package:the_bible_game/features/home/widget/global_challenge_countdown.dart';
@@ -9,23 +14,71 @@ import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/constants/colors.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:the_bible_game/shared/utils/avatar_credentials.dart';
 import 'package:the_bible_game/shared/utils/user_badge.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../shared/widgets/modal/network_modal.dart';
+import '../../pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
 import '../widget/user_profile_info.dart';
+import 'package:intl/intl.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final soundManager = context.read<SettingsBloc>().soundManager;
-    if (context.read<SettingsBloc>().state.isMusicOn) {
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+
+  Future<void> setSoundState() async {
+    final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+    final soundManager = settingsBloc.soundManager;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    dynamic isMusicOn = prefs.getBool('isMusicOn') ?? true;
+    dynamic isSoundOn = prefs.getBool('isSoundOn') ?? true;
+    settingsBloc.add(UpdateSoundState(isMusicOn, isSoundOn));
+    if (isMusicOn) {
       soundManager.playGameMusic();
     }
+  }
+
+
+  initializeWallet() {
+    final userState = BlocProvider.of<AuthenticationBloc>(context).state;
+    if (userState.user.id != 0) {
+      if (!userState.user.isWalletInitialized) {
+        context.read<UserBloc>().add(InitializeWallet());
+      }
+    }
+  }
+
+  fetchGameData() {
+    final userState = BlocProvider.of<AuthenticationBloc>(context).state;
+    if(userState.user.id != 0){
+      BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
+      BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setSoundState();
+    initializeWallet();
+    fetchGameData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var formatter = NumberFormat('#,###,###');
     double screenHeight = MediaQuery.of(context).size.height;
+    final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+    final soundManager = settingsBloc.soundManager;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFF548CD7),
@@ -82,23 +135,27 @@ class HomeScreen extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  state.user  != null
+                                  state.user.id != 0
                                       ? UserProfileInfo(
                                           user: state.user,
                                           badgeSrc:
-                                              getBadgeUrl(state.user?.rank),
+                                              getBadgeUrl(state.user.rank),
                                           avatarUrl:
-                                              '${AvatarCredentials.BaseURL}/${state.user?.id}.png?apikey=${AvatarCredentials.APIKey}/',
+                                              '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
                                           displayBadgeInfo: () {},
                                         )
                                       : SignInProfile(),
                                   GameScoreInfo(
-                                    noOfCoins: state.user != null
-                                        ? state.user?.coinWalletBalance
-                                            .toString()
+                                    noOfCoins: state.user.id != 0
+                                        ? formatter.format(
+                                            state.user.coinWalletBalance)
                                         : '0',
-                                    noOfGems: '0',
-                                    noOfStreaks: '0',
+                                    noOfGems: state.user.id != 0
+                                        ? state.user.gems.toString()
+                                        : '0',
+                                    noOfStreaks: state.user.id != 0
+                                        ? state.user.streak.toString()
+                                        : '0',
                                   ),
                                 ],
                               ),
@@ -116,8 +173,14 @@ class HomeScreen extends StatelessWidget {
                                 gameImage: ProductImageRoutes.crossBible,
                                 gameImageWidth: 100.w,
                                 onTap: () {
-                                  Navigator.pushNamed(
-                                      context, AppRoutes.quickGameHomeScreen);
+                                  soundManager.playClickSound();
+                                  if(state.user.id != 0){
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.quickGameHomeScreen);
+                                  }else{
+                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  }
+
                                 },
                               ),
                               GameCard(
@@ -127,8 +190,14 @@ class HomeScreen extends StatelessWidget {
                                 gameImage: ProductImageRoutes.wiwMask,
                                 gameImageWidth: 90.w,
                                 onTap: () {
-                                  Navigator.pushNamed(
-                                      context, AppRoutes.whoIsWhoHomeScreen);
+                                  soundManager.playClickSound();
+                                  if(state.user.id != 0){
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.whoIsWhoHomeScreen);
+                                  }else{
+                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  }
+
                                 },
                               ),
                               GameCard(
@@ -138,8 +207,14 @@ class HomeScreen extends StatelessWidget {
                                 gameImage: ProductImageRoutes.mountain,
                                 gameImageWidth: 75.w,
                                 onTap: () {
-                                  Navigator.pushNamed(context,
-                                      AppRoutes.pilgrimProgressHomeScreen);
+                                  soundManager.playClickSound();
+                                  if(state.user.id != 0){
+                                    Navigator.pushNamed(context,
+                                        AppRoutes.pilgrimProgressHomeScreen);
+                                  }else{
+                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  }
+
                                 },
                               ),
                               GameCard(
@@ -149,8 +224,17 @@ class HomeScreen extends StatelessWidget {
                                 gameImage: ProductImageRoutes.scroll,
                                 gameImageWidth: 80.w,
                                 onTap: () {
-                                  Navigator.pushNamed(context,
-                                      AppRoutes.fourScriptureQuestionScreen);
+                                  soundManager.playClickSound();
+                                  if(state.user.id != 0){
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.questionLoadingScreen,
+                                        arguments: {
+                                          'gameType': 'four_scriptures_game'
+                                        });
+                                  }else{
+                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  }
+
                                 },
                               ),
                               SizedBox(

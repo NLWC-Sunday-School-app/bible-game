@@ -67,6 +67,7 @@ class AuthenticationAPI {
     }
   }
 
+
   Future<bool> resetPassword(newPassword, email) async {
     try {
       final response = await apiClient.post('/auth/reset-password',

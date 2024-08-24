@@ -31,4 +31,14 @@ class AuthenticationRepository {
   Future<bool> logOut() async {
     return await authenticationAPI.logout();
   }
+
+  Future<dynamic> sendForgotPasswordMail(email) async{
+     return await authenticationAPI.sendForgotPasswordMail(email);
+  }
+
+  Future<dynamic> resetPassword(newPassword, email) async {
+    return await authenticationAPI.resetPassword(newPassword, email);
+  }
+
+
 }

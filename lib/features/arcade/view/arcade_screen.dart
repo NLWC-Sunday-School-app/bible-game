@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:the_bible_game/features/global_challenge/view/home_screen.dart';
 import 'package:the_bible_game/features/multi_player/view/home_screen.dart';
 import 'package:the_bible_game/shared/constants/colors.dart';
@@ -6,6 +7,7 @@ import 'package:the_bible_game/shared/widgets/screen_app_bar.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../shared/constants/image_routes.dart';
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/tab_button.dart';
 
 class ArcadeScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return Scaffold(
       backgroundColor: Color(0xFF014AA0),
       body: Container(
@@ -75,18 +78,22 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     TabButton(
+                      width: 164,
                       buttonText: 'Global Challenge',
                       buttonSelected: _selectedGlobalChallenge,
                       onTap: () {
+                        soundManager.playClickSound();
                         setState(() {
                           _selectedGlobalChallenge = true;
                         });
                       },
                     ),
                     TabButton(
+                      width: 164,
                       buttonText: 'Multiplayer',
                       buttonSelected: !_selectedGlobalChallenge,
                       onTap: () {
+                        soundManager.playClickSound();
                         setState(() {
                           _selectedGlobalChallenge = false;
                         });
@@ -104,7 +111,13 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                   ? SizedBox(
                   height: screenHeight - (150.h + 20.h + 72.h + 5.h + 120.h + 7.h),
                   child: GlobalChallengeHomeScreen())
-                  : MultiplayerHomeScreen()
+                  :  Container(
+                margin: EdgeInsets.only(top: 100.h),
+                child: Image.asset(
+                  ProductImageRoutes.multiplayerComingSoon,
+                  width: 330.w,
+                ),
+              )
             )
           ],
         ),

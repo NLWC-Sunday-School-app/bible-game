@@ -1,14 +1,24 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_bible_game/features/arcade/view/arcade_screen.dart';
 import 'package:the_bible_game/features/fantasy_league/view/home_screen.dart';
 import 'package:the_bible_game/features/leader_board/view/leaderboard_screen.dart';
+import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
 import 'package:the_bible_game/features/store/view/home_screen.dart';
+import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:the_bible_game/shared/widgets/modal/country_update_modal.dart';
+import 'package:the_bible_game/shared/widgets/modal/welcome_modal.dart';
 import '../../features/home/view/home_screen.dart';
 import '../../shared/constants/image_routes.dart';
 import '../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../shared/widgets/modal/network_modal.dart';
 import 'bottom_tab_item.dart';
 
 
@@ -22,6 +32,7 @@ class BottomTabNavigation extends StatefulWidget {
 }
 
 class _BottomTabNavigationState extends State<BottomTabNavigation> {
+  late StreamSubscription<InternetConnectionStatus> connectivitySubscription;
   int _selectedTabIndex = 2;
   bool _selectedHomeTab = true;
   bool _selectedLeaderboardTab = false;
@@ -35,7 +46,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
     },
     {
       'page': const LeaderBoardScreen(),
-      'title': 'Leaderboard',
+      'title': 'Board',
     },
     {
       'page': const HomeScreen(),
@@ -50,6 +61,52 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
       'title': 'Team',
     },
   ];
+
+  displayWelcomeModal()async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var firstTime = prefs.getBool('first_time') ?? true;
+    if (firstTime) {
+      Timer(const Duration(seconds: 3), () {
+         showWelcomeModal(context);
+      });
+      prefs.setBool('first_time', false);
+    }
+  }
+
+  checkInternet(BuildContext context) async {
+    connectivitySubscription =
+        InternetConnectionChecker().onStatusChange.listen((status) {
+          switch (status) {
+            case InternetConnectionStatus.connected:
+              print('Data connection is available.');
+              break;
+            case InternetConnectionStatus.disconnected:
+              print('You are disconnected from the internet.');
+              showNetworkModal(context);
+              break;
+          }
+        });
+  }
+
+
+
+
+  displayCountryUpdateModal() async {
+    final userState = BlocProvider.of<AuthenticationBloc>(context).state;
+    if (userState.user.id != 0 && (userState.user.country == '')) {
+      Timer(const Duration(seconds: 3), () {
+        showCountryUpdateModal(context);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+   displayWelcomeModal();
+   displayCountryUpdateModal();
+   checkInternet(context);
+  }
 
   Widget  _bottomNavigationBar(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
@@ -83,7 +140,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 },
               ),
               BottomTabItem(
-                itemLabel: 'Leaderboard',
+                itemLabel: 'Board',
                 itemIcon: IconImageRoutes.trophyTabICon,
                 itemIsSelected: _selectedLeaderboardTab,
                 onTap: () {
@@ -112,6 +169,11 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                     _selectedArcadeTab = false;
                     _selectedTabIndex = 2;
                   });
+                  if(BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0){
+                    BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+                    BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
+                    BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+                  }
                 },
               ),
               BottomTabItem(

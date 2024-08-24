@@ -1,15 +1,17 @@
 
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
+
 List<GameQuestion> questionFromJson(String str) => List<GameQuestion>.from(json.decode(str)['plays'].map((x) => GameQuestion.fromJson(x)));
 
-class GameQuestion {
+class GameQuestion extends Equatable {
   final String instruction;
   final String answer;
   final String question;
   final List<dynamic> options;
 
-  GameQuestion({
+  const GameQuestion({
     required this.instruction,
     required this.answer,
     required this.question,
@@ -22,5 +24,9 @@ class GameQuestion {
       answer: json["correct_option"],
       options: json["options"]
   );
+
+  @override
+
+  List<Object?> get props => [instruction, question, answer, options];
 
 }

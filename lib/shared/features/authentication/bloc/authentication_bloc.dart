@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bible_game_api/model/user.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../utils/awesome_notification.dart';
 import '../../user/repository/user_repository.dart';
 import '../repository/authentication_repository.dart';
 
@@ -28,6 +30,10 @@ class AuthenticationBloc
     on<AuthenticationRegisterRequested>(_onAuthenticationRegisterRequested);
     on<FetchUserDataRequested>(_onFetchUserDataRequested);
     on<AuthenticationRefreshTokenRequested>(_onRefreshTokenRequested);
+    on<UpdateFCMToken>(_onUpdateFCMToken);
+    on<SendForgotPasswordMail>(_onSendForgotPasswordEmail);
+    on<VerifyOTP>(_onVerifyOTP);
+    on<ResetPassword>(_onResetPassword);
   }
 
   Future<void> _onAuthenticationStatusChanged(
@@ -41,20 +47,22 @@ class AuthenticationBloc
     AuthenticationLogoutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    if (state.user != null) {
+    if (state.user.id != 0) {
       emit(state.copyWith(isLoggingOut: true));
       try {
         final loggedOut = await _authenticationRepository.logOut();
         if (loggedOut) {
           emit(state.copyWith(
-            isLoggedIn: false,
             isUnauthenticated: true,
             isLoadingLogin: false,
             isLoggingOut: false,
-            user: null,
+            user: emptyUser,
             token: null,
             refreshToken: null,
+            isLoggedIn: false,
           ));
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.remove('userToken');
         }
       } catch (_) {
         emit(state.copyWith(isLoggingOut: false));
@@ -66,20 +74,22 @@ class AuthenticationBloc
     AuthenticationLoginRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(state.copyWith(isLoadingLogin: true));
+    emit(state.copyWith(isLoadingLogin: true, failedToLogin: false));
     final response =
         await _authenticationRepository.logIn(event.email, event.password);
     if (response.containsKey('token')) {
       emit(state.copyWith(
-        isLoggedIn: true,
-        isLoadingLogin: false,
-        token: response['token'],
-        refreshToken: response['refreshToken'],
-        isUnauthenticated: false,
-      ));
+          isLoggedIn: true,
+          isLoadingLogin: false,
+          token: response['token'],
+          refreshToken: response['refreshToken'],
+          failedToLogin: false));
       add(FetchUserDataRequested());
+      add(UpdateFCMToken());
+      emit(state.copyWith(isLoadingLogin: false, failedToLogin: false));
     } else {
-      emit(state.copyWith(isLoadingLogin: false, isUnauthenticated: true));
+      emit(state.copyWith(isLoadingLogin: false, failedToLogin: true));
+      emit(state.copyWith(isLoadingLogin: false, failedToLogin: false));
     }
   }
 
@@ -87,7 +97,8 @@ class AuthenticationBloc
     AuthenticationRegisterRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(state.copyWith(isLoadingLogin: true));
+    emit(state.copyWith(isLoadingLogin: true, failedToRegister: false));
+
     final success = await _authenticationRepository.register(
         event.name, event.email, event.password, event.fcmToken, event.country);
     if (success) {
@@ -95,15 +106,21 @@ class AuthenticationBloc
           await _authenticationRepository.logIn(event.email, event.password);
       if (response.containsKey('token')) {
         emit(state.copyWith(
+          isLoggedIn: true,
           isLoadingLogin: false,
           token: response['token'],
           refreshToken: response['refreshToken'],
-          isUnauthenticated: false,
+          failedToRegister: false
         ));
-        add(FetchUserDataRequested());
+        Future.delayed(Duration(seconds: 1), () {
+          add(FetchUserDataRequested());
+          add(UpdateFCMToken());
+        });
+        emit(state.copyWith(isLoadingLogin: false, failedToRegister: false));
       }
     } else {
-      emit(state.copyWith(isLoadingLogin: false, isUnauthenticated: true));
+      emit(state.copyWith(isLoadingLogin: false, failedToRegister: true));
+      emit(state.copyWith(isLoadingLogin: false, failedToRegister: false));
     }
   }
 
@@ -113,10 +130,18 @@ class AuthenticationBloc
   ) async {
     try {
       final user = await _userRepository.getUser();
-       emit(state.copyWith(user: user));
+      emit(state.copyWith(user: user));
     } catch (_) {
       emit(state.copyWith(isUnauthenticated: true, user: null));
     }
+  }
+
+  Future<void> _onUpdateFCMToken(
+      UpdateFCMToken event, Emitter<AuthenticationState> emit) async {
+    try {
+      final fcmToken = await AwesomeNotification.getFirebaseMessagingToken();
+      await _userRepository.updateUserFCMToken(fcmToken);
+    } catch (_) {}
   }
 
   Future<void> _onRefreshTokenRequested(
@@ -132,6 +157,46 @@ class AuthenticationBloc
     } catch (_) {
       emit(state.copyWith(
           isUnauthenticated: true, token: null, refreshToken: null));
+    }
+  }
+
+  Future<void> _onSendForgotPasswordEmail(
+      SendForgotPasswordMail event, Emitter<AuthenticationState> emit) async {
+    try {
+      emit(state.copyWith(isSendingForgotPasswordCode: true));
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('reset_email', event.email);
+      await _authenticationRepository.sendForgotPasswordMail(event.email);
+      emit(state.copyWith(
+          isSendingForgotPasswordCode: false, forgotPasswordMailSent: true));
+    } catch (_) {
+      emit(state.copyWith(isSendingForgotPasswordCode: false));
+    }
+  }
+
+  Future<void> _onVerifyOTP(
+      VerifyOTP event, Emitter<AuthenticationState> emit) async {
+    try {
+      emit(state.copyWith(isVerifyingCode: true));
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('reset_email');
+      await _authenticationRepository.verifyOTP(event.OTP, email);
+      emit(state.copyWith(isVerifyingCode: false, hasVerifiedCode: true));
+    } catch (_) {
+      emit(state.copyWith(isVerifyingCode: false));
+    }
+  }
+
+  Future<void> _onResetPassword(
+      ResetPassword event, Emitter<AuthenticationState> emit) async {
+    try {
+      emit(state.copyWith(isResettingPassword: true));
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('reset_email');
+      await _authenticationRepository.resetPassword(event.newPassword, email);
+      emit(state.copyWith(isResettingPassword: false, hasResetPassword: true));
+    } catch (_) {
+      emit(state.copyWith(isResettingPassword: false));
     }
   }
 }

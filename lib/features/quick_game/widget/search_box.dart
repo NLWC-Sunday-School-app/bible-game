@@ -5,7 +5,12 @@ import 'package:the_bible_game/shared/constants/colors.dart';
 import 'package:the_bible_game/shared/widgets/blue_button.dart';
 
 class SearchBox extends StatefulWidget {
-  const SearchBox({super.key});
+  const SearchBox({super.key, required this.onTap, this.isActive = false, required this.onTextChanged, required this.hintPlaceholder});
+  final VoidCallback onTap;
+  final bool? isActive;
+  final ValueChanged<String> onTextChanged;
+  final String hintPlaceholder;
+
 
   @override
   State<SearchBox> createState() => _SearchBoxState();
@@ -15,11 +20,20 @@ class _SearchBoxState extends State<SearchBox> {
   TextEditingController _controller = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      widget.onTextChanged(_controller.text);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.w),
       child: Container(
-        margin: EdgeInsets.only(top: 20.h),
+        height: 65.h,
+        margin: EdgeInsets.only(top: 10.h),
         width: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
         decoration: BoxDecoration(
@@ -40,7 +54,7 @@ class _SearchBoxState extends State<SearchBox> {
                 controller: _controller,
                 cursorColor: AppColors.primaryColor,
                 decoration: InputDecoration(
-                  hintText: 'Search tags',
+                  hintText: widget.hintPlaceholder,
                   hintStyle: TextStyle(
                     fontWeight: FontWeight.w900,
                     color: Color(0xFF9C9C9C)
@@ -75,8 +89,11 @@ class _SearchBoxState extends State<SearchBox> {
               width: 10.w,
             ),
             BlueButton(
+              onTap: widget.onTap,
+              height: 40.h,
               width: 90.w,
               buttonText: 'Search',
+             isActive: widget.isActive!,
               buttonIsLoading: false,
             )
           ],

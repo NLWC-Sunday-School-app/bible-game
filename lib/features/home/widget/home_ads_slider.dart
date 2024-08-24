@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
 
 class HomeAdsSlider extends StatelessWidget {
@@ -10,9 +11,9 @@ class HomeAdsSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UserBloc, UserState>(
+    return BlocBuilder<SettingsBloc, SettingsState>(
       builder: (context, state) {
-        return CarouselSlider.builder(
+        return state.isLoadingAds ? Text('Ads') : CarouselSlider.builder(
             itemCount: state.adContent!.length,
             itemBuilder: (BuildContext context, int itemIndex,
                 int pageViewIndex) =>

@@ -1,23 +1,34 @@
-import 'dart:convert';
+import 'package:equatable/equatable.dart';
 
-List<PilgrimProgressLevelData> adsFromJson(String str) => List<PilgrimProgressLevelData>.from(json.decode(str).map((x) => PilgrimProgressLevelData.fromJson(x)));
+class PilgrimProgressLevelData extends Equatable {
+  const PilgrimProgressLevelData({
+    required this.id,
+    required this.uuid,
+    required this.userId,
+    required this.rankId,
+    required this.progress,
+    required this.numberOfRounds,
+  });
 
+  final int? id;
+  final String? uuid;
+  final int? userId;
+  final int? rankId;
+  final double? progress;
+  final int? numberOfRounds;
 
-class PilgrimProgressLevelData{
-  int id;
-  int userId;
-  int rankId;
-  int progress;
-  int numberOfRounds;
-  PilgrimProgressLevelData({required this.id, required this.userId, required this.rankId, required this.numberOfRounds, required this.progress});
+  factory PilgrimProgressLevelData.fromJson(Map<String, dynamic> json){
+    return PilgrimProgressLevelData(
+      id: json["id"],
+      uuid: json["uuid"],
+      userId: json["userId"],
+      rankId: json["rankId"],
+      progress: json["progress"],
+      numberOfRounds: json["numberOfRounds"],
+    );
+  }
 
-  factory PilgrimProgressLevelData.fromJson(Map<String, dynamic> json) => PilgrimProgressLevelData(
-    id: json["id"],
-    userId: json["userId"],
-    rankId: json["rankId"],
-    progress: json["progress"],
-    numberOfRounds: json["numberOfRounds"]
-  );
-
+  @override
+  List<Object?> get props => [id, uuid, userId, rankId, progress, numberOfRounds];
 
 }

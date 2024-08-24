@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:the_bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
+import 'package:the_bible_game/features/four_scriptures/widget/modal/scripture_modal.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
 class ScriptureBox extends StatelessWidget {
@@ -13,9 +16,10 @@ class ScriptureBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
       onTap: () {
+        BlocProvider.of<FourScripturesOneWordBloc>(context).add(FetchBibleVerse(unFormattedScripture));
+        showScriptureModal(context, unFormattedScripture);
       },
       child: SizedBox(
         height: 150.h,

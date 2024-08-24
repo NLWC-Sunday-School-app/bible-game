@@ -5,7 +5,8 @@ class QuickGameRepository {
 
   QuickGameRepository(this.gameAPI);
 
-  Future<List<GameQuestion>> getQuickGameQuestions(String gameMode, String userRank, List<String> tags) async {
+  Future<List<GameQuestion>> getQuickGameQuestions(
+      String gameMode, String userRank, List<String> tags) async {
     return await gameAPI.getQuestions(gameMode, userRank, tags);
   }
 
@@ -13,4 +14,33 @@ class QuickGameRepository {
     return await gameAPI.getQuickGameTopics();
   }
 
+  Future<List<QuickGameTopic>> findQuickGameTopics(code) async {
+    return await gameAPI.findQuickGameTopic(code);
+  }
+
+  Future<void> sendGameData(
+    gameMode,
+    totalScore,
+    baseScore,
+    bonusScore,
+    averageTimeSpent,
+    playerRank,
+    noOfCorrectAnswers,
+    playerId,
+    userProgress,
+    numberOfRoundsLeft,
+  ) async {
+    return await gameAPI.sendGameData(
+      gameMode,
+      totalScore,
+      baseScore,
+      bonusScore,
+      averageTimeSpent,
+      playerRank,
+      noOfCorrectAnswers,
+      playerId,
+      userProgress,
+      numberOfRoundsLeft,
+    );
+  }
 }

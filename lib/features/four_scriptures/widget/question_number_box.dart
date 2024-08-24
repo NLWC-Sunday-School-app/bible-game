@@ -4,8 +4,11 @@ import 'package:the_bible_game/shared/constants/image_routes.dart';
 
 class QuestionNumberBox extends StatelessWidget {
   const QuestionNumberBox({
-    Key? key,
+    Key? key, required this.totalQuestions, required this.gameLevel,
   }) : super(key: key);
+
+  final int totalQuestions;
+  final int gameLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,7 @@ class QuestionNumberBox extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(36.r)),
                   border: Border.all(color: Colors.white, width: 1.5)),
               child:  Text(
-                  '50/164',
+                  '$gameLevel/$totalQuestions',
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontFamily: 'Mikado',

@@ -15,13 +15,14 @@ class AppBlocObserver extends BlocObserver {
 
   @override
   void onClose(BlocBase<dynamic> bloc) {
-    print('onClose: $bloc');
+    // print('onClose: $bloc');
     super.onClose(bloc);
   }
 
   @override
   void onError(BlocBase<dynamic> bloc, Object error, StackTrace stackTrace) {
-    print('onError: $error');
+    print('onError: $error ');
+    print('onError details: $stackTrace ');
     super.onError(bloc, error, stackTrace);
   }
 
@@ -34,7 +35,7 @@ class AppBlocObserver extends BlocObserver {
 
   @override
   void onChange(BlocBase<dynamic> bloc, Change<dynamic> change) {
-    // print('onChange: $change');
+    print('onChange: $change');
     super.onChange(bloc, change);
   }
 }

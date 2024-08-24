@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/constants/image_routes.dart';
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../bloc/quick_game_bloc.dart';
 
 class SelectedTopicPill extends StatelessWidget {
@@ -15,8 +16,10 @@ class SelectedTopicPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final QuickGameBloc bloc = BlocProvider.of<QuickGameBloc>(context);
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return  GestureDetector(
       onTap: () {
+        soundManager.playClickSound();
       bloc.add(SelectQuickGameTopic(QuickGameTopic(id: id, tag: topic)));
     },
       child: Container(

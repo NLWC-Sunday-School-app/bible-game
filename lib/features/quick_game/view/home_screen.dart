@@ -2,6 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:the_bible_game/features/quick_game/bloc/quick_game_bloc.dart';
+import 'package:the_bible_game/features/quick_game/widget/modal/use_timer_modal.dart';
 import 'package:the_bible_game/features/quick_game/widget/search_box.dart';
 import 'package:the_bible_game/features/quick_game/widget/selected_topic_pill.dart';
 import 'package:the_bible_game/features/quick_game/widget/topic_tag.dart';
@@ -14,6 +15,8 @@ import '../../../shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:badges/badges.dart' as badges;
 
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
+
 class QuickGameHomeScreen extends StatefulWidget {
   const QuickGameHomeScreen({super.key});
 
@@ -25,12 +28,21 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
   final GlobalKey _key = GlobalKey();
   double? searchBoxHeight;
   QuickGameBloc? quickGameBloc;
+  String searchText = "";
+
+  void handleSearchTextChanged(String text) {
+    setState(() {
+      searchText = text;
+    });
+    if (searchText.isEmpty) {
+      BlocProvider.of<QuickGameBloc>(context).add(FetchQuickGameTopics());
+    }
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    quickGameBloc = BlocProvider.of<QuickGameBloc>(context);
-    quickGameBloc?.add(FetchQuickGameTopics());
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         searchBoxHeight = getHeightOfWidget(_key);
@@ -41,11 +53,8 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   setState(() {
-    //     searchBoxHeight = getHeightOfWidget(_key);
-    //   });
-    // });
+    quickGameBloc = BlocProvider.of<QuickGameBloc>(context);
+    quickGameBloc?.add(FetchQuickGameTopics());
   }
 
   @override
@@ -57,8 +66,8 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    final QuickGameBloc bloc = BlocProvider.of<QuickGameBloc>(context);
-    bloc.add(FetchQuickGameTopics());
+    // final QuickGameBloc bloc = BlocProvider.of<QuickGameBloc>(context);
+    // bloc.add(FetchQuickGameTopics());
 
     return Scaffold(
         backgroundColor: Color(0xFF014AA0),
@@ -76,6 +85,7 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
             }
           },
           builder: (context, state) {
+            final soundManager = context.read<SettingsBloc>().soundManager;
             return Container(
               height: MediaQuery.of(context).size.height,
               width: double.infinity,
@@ -91,7 +101,10 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
                       Row(
                         children: [
                           InkWell(
-                            onTap: () => Navigator.pop(context),
+                            onTap: () {
+                              soundManager.playClickSound();
+                              Navigator.pop(context);
+                            },
                             child: Image.asset(
                               IconImageRoutes.arrowCircleBack,
                               width: 44.w,
@@ -112,7 +125,9 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
                             ),
                           ),
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              soundManager.playClickSound();
+                            },
                             child: Image.asset(
                               IconImageRoutes.infoCircle,
                               width: 44.w,
@@ -137,53 +152,71 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
                   Container(
                     key: _key,
-                    child: SearchBox(),
+                    child: SearchBox(
+                      onTap: () {
+                        soundManager.playClickSound();
+                        if (searchText.isNotEmpty) {
+                          context
+                              .read<QuickGameBloc>()
+                              .add(FindQuickGameTopics(searchText));
+                        }
+                      },
+                      onTextChanged: handleSearchTextChanged,
+                      isActive: searchText.isNotEmpty,
+                      hintPlaceholder: 'Search tags',
+                    ),
                   ),
                   SizedBox(
                     height: 20.h,
                   ),
-                 state.selectedGameTopics!.length >= 1 ? Container(
-                    // color: Colors.red,
-                    padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
-                    constraints: BoxConstraints(maxHeight: 102.h),
-                    child: Column(
-                      children: [
-                        Wrap(
-                          spacing: 2.w,
-                          runSpacing: 8.w,
-                          children: List.generate(
-                              state.selectedGameTopics!.length, (index) {
-                            return SelectedTopicPill(
-                              id: state.selectedGameTopics![index].id,
-                              topic: state.selectedGameTopics![index].tag,
-                            );
-                          }),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            double height = getHeightOfWidget(_key);
-                            print('Height of the widget: $height');
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 20.w),
-                            child: Align(
-                              alignment: Alignment.topRight,
-                              child: Text(
-                                '(${state.selectedGameTopics!.length}/4)',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                  fontSize: 15.sp,
+                  state.selectedGameTopics!.length >= 1
+                      ? Container(
+                          // color: Colors.red,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 5.w, vertical: 5.h),
+                          constraints: BoxConstraints(maxHeight: 102.h),
+                          child: Column(
+                            children: [
+                              Wrap(
+                                spacing: 2.w,
+                                runSpacing: 8.w,
+                                children: List.generate(
+                                    state.selectedGameTopics!.length, (index) {
+                                  return SelectedTopicPill(
+                                    id: state.selectedGameTopics![index].id,
+                                    topic: state.selectedGameTopics![index].tag,
+                                  );
+                                }),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  double height = getHeightOfWidget(_key);
+                                  print('Height of the widget: $height');
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 20.w),
+                                  child: Align(
+                                    alignment: Alignment.topRight,
+                                    child: Text(
+                                      '(${state.selectedGameTopics!.length}/4)',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                        fontSize: 15.sp,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ): SizedBox(),
+                        )
+                      : SizedBox(),
                   state.isLoadingGameTopics!
                       ? Center(
                           child: CircularProgressIndicator(
@@ -193,8 +226,13 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
                           children: [
                             Container(
                               constraints: BoxConstraints(
-                                maxHeight:
-                                    screenHeight - (160.h + 97.h + 30.h + (state.selectedGameTopics!.length >= 1 ? 102.h : 0) ),
+                                maxHeight: screenHeight -
+                                    (160.h +
+                                        97.h +
+                                        30.h +
+                                        (state.selectedGameTopics!.length >= 1
+                                            ? 102.h
+                                            : 0)),
                               ),
                               child: GridView.builder(
                                 padding: EdgeInsets.only(bottom: 100.h),
@@ -214,20 +252,28 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
                                 },
                               ),
                             ),
-                            state.selectedGameTopics!.length >= 1 ? Positioned(
-                              top:  320.h ,
-                              right: 35.w,
-                              left: 35.w,
-                              child: BlueButton(
-                                buttonText: 'Play now',
-                                buttonIsLoading: false,
-                                width: 250.w,
-                                onTap: () {
-                                  if (state.selectedGameTopics!.length >= 1 && state.selectedGameTopics!.length < 5)
-                                    Navigator.pushNamed(context, AppRoutes.questionLoadingScreen, arguments:{ 'gameType': 'quick_game'});
-                                },
-                              ),
-                            ) : SizedBox()
+                            state.selectedGameTopics!.length >= 1
+                                ? Positioned(
+                                    top: 320.h,
+                                    right: 35.w,
+                                    left: 35.w,
+                                    child: BlueButton(
+                                      buttonText: 'Play now',
+                                      buttonIsLoading: false,
+                                      width: 250.w,
+                                      onTap: () {
+                                        soundManager.playClickSound();
+                                        if (state.selectedGameTopics!.length >=
+                                                1 &&
+                                            state.selectedGameTopics!.length <
+                                                5) {
+                                          showUseTimerModal(context);
+                                        }
+                                        // Navigator.pushNamed(context, AppRoutes.questionLoadingScreen, arguments:{ 'gameType': 'quick_game'});
+                                      },
+                                    ),
+                                  )
+                                : SizedBox()
                           ],
                         ),
                   SizedBox(

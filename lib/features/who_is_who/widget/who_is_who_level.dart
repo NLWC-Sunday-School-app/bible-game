@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
+import 'package:the_bible_game/features/who_is_who/widget/modal/freebies_modal.dart';
+import 'package:the_bible_game/features/who_is_who/widget/modal/wiw_time_up_modal.dart';
 import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
@@ -11,7 +16,8 @@ class WhoIsWhoLevel extends StatelessWidget {
       required this.backgroundUrl,
       required this.isSpecialLevel,
       required this.playTime,
-      required this.reward})
+      required this.reward,
+      required this.nextLevelIsLocked})
       : super(key: key);
   final bool isUnLocked;
   final String level;
@@ -19,12 +25,31 @@ class WhoIsWhoLevel extends StatelessWidget {
   final bool isSpecialLevel;
   final int playTime;
   final int reward;
+  final bool nextLevelIsLocked;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-       Navigator.pushNamed(context, AppRoutes.whoIsWhoQuestionScreen);
+      onTap: () async {
+        BlocProvider.of<WhoIsWhoBloc>(context).add(
+          SetGameData(
+            gameDuration: playTime,
+            selectedGameLevel: int.parse(level),
+          ),
+        );
+        BlocProvider.of<WhoIsWhoBloc>(context).add(
+          SetUserCompletedLeveLState(isUnLocked),
+        );
+        if (isSpecialLevel && isUnLocked && !nextLevelIsLocked) {
+          BlocProvider.of<WhoIsWhoBloc>(context)
+              .add(SubmitSpecialLevelScore(reward));
+          showWhoIsWhoFreebiesModal(context, reward);
+          BlocProvider.of<WhoIsWhoBloc>(context)
+              .add(FetchGameLevels());
+        } else if (isUnLocked && !isSpecialLevel) {
+          Navigator.pushNamed(context, AppRoutes.questionLoadingScreen,
+              arguments: {'gameType': 'wiw_game'});
+        }
       },
       child: Container(
         alignment: Alignment.center,

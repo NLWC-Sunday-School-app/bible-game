@@ -2,35 +2,37 @@
 
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
+
 List<WhoIsWhoQuestion> whoIsWhoQuestionFromJson(String str) => List<WhoIsWhoQuestion>.from(json.decode(str).map((x) => WhoIsWhoQuestion.fromJson(x)));
 
-String whoIsWhoToJson(List<WhoIsWhoQuestion> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class WhoIsWhoQuestion {
+class WhoIsWhoQuestion extends Equatable {
+  final String instruction;
   final String question;
   final String category;
   final List<String> options;
-  final String correctOption;
+  final String answer;
 
-  WhoIsWhoQuestion({
+  const WhoIsWhoQuestion({
+    required this.instruction,
     required this.question,
     required this.category,
     required this.options,
-    required this.correctOption,
+    required this.answer,
   });
 
   factory WhoIsWhoQuestion.fromJson(Map<String, dynamic> json) => WhoIsWhoQuestion(
+    instruction: json["instruction"],
     question: json["question"],
     category: json["category"],
     options: List<String>.from(json["options"].map((x) => x)),
-    correctOption: json["correct_option"],
+    answer: json["correct_option"],
   );
 
-  Map<String, dynamic> toJson() => {
-    "question": question,
-    "category": category,
-    "options": List<dynamic>.from(options.map((x) => x)),
-    "correct_option": correctOption,
-  };
+  @override
+  List<Object?> get props => [];
+
+
 }
 

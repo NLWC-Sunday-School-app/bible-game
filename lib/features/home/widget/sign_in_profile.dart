@@ -6,6 +6,7 @@ import 'package:the_bible_game/features/home/widget/modals/successful_login_moda
 import 'package:the_bible_game/shared/constants/colors.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
+import '../../../shared/constants/app_routes.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import 'modals/successful_registration_modal.dart';
 
@@ -20,7 +21,8 @@ class SignInProfile extends StatelessWidget {
     return InkWell(
       onTap: () {
         soundManager.playClickSound();
-        showAuthModal(context);
+        // showAuthModal(context);
+        Navigator.pushNamed(context, AppRoutes.profileScreen);
       },
       child: Stack(
         alignment: AlignmentDirectional.topEnd,

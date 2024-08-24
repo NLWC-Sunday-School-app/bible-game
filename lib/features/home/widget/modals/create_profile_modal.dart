@@ -8,6 +8,7 @@ import 'package:the_bible_game/shared/features/authentication/bloc/authenticatio
 import '../../../../shared/constants/image_routes.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../../shared/utils/token_notifier.dart';
 import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
@@ -51,6 +52,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return SingleChildScrollView(
       child: SizedBox(
         height: 690.h,
@@ -68,7 +70,10 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                 height: 40.h,
               ),
               GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  soundManager.playClickSound();
+                  Navigator.pop(context);
+                },
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: 10.w,
@@ -215,6 +220,8 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                                 setState(() => countryController.text =
                                     country.flagEmoji + " " + country.name);
                                 countryName = country.name;
+
+                                print(country.countryCode);
                               },
                             );
                           },
@@ -263,7 +270,6 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           style: TextStyle(
                             height: 1.5.h,
                             color: const Color(0xFF104387),
-                            fontFamily: 'Mikado',
                             fontSize: 13.sp,
                           ),
                           keyboardType: TextInputType.visiblePassword,
@@ -306,9 +312,10 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                     ),
                     BlocConsumer<AuthenticationBloc, AuthenticationState>(
                       listener: (context, state) {
-                        if (state.user != null) {
-                          Navigator.pop(context);
-                          showSuccessfulRegistrationModal(context);
+                        if( state.failedToRegister){
+                          ApiException.showSnackBar(context);
+                        }
+                        if (state.token != null) {
                           final tokenNotifier = Provider.of<TokenNotifier>(
                               context,
                               listen: false);
@@ -318,28 +325,38 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           final prefs = SharedPreferences.getInstance();
                           prefs.then((sharedPreferences) {
                             sharedPreferences.setString(
+                                'userToken', state.token!);
+                            sharedPreferences.setString(
                                 'refreshToken', state.refreshToken!);
                           });
-                        } else if (state.isUnauthenticated) {
-                          ApiException.showSnackBar(context);
+                          Navigator.pop(context);
+                          showSuccessfulRegistrationModal(context);
                         }
+
+                        // if (state.isUnauthenticated) {
+                        //   ApiException.showSnackBar(context);
+                        // }
                       },
                       builder: (context, state) {
                         return BlueButton(
                           width: 250.w,
                           buttonText: 'Create Profile',
                           buttonIsLoading: state.isLoadingLogin,
-                          onTap: () {
+                          onTap: () async {
+                            final SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            final fcmToken = await prefs.getString('fcmToken');
                             if (_registerFormKey.currentState!.validate()) {
-                              context
-                                  .read<AuthenticationBloc>()
+                              print('fcm $fcmToken');
+                              print('loading State ${state.isLoggingOut}');
+                              BlocProvider.of<AuthenticationBloc>(context)
                                   .add(AuthenticationRegisterRequested(
-                                    userNameController.text,
-                                    emailController.text,
-                                    passwordController.text,
-                                    '123djsjkdjksjljkljdljskj',
-                                    countryName,
-                                  ));
+                                userNameController.text,
+                                emailController.text,
+                                passwordController.text,
+                                fcmToken!,
+                                countryName,
+                              ));
                             }
                           },
                         );

@@ -7,8 +7,6 @@ sealed class UserEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchAds extends UserEvent {}
-
 class FetchPilgrimProgressData extends UserEvent {
   final int userId;
 
@@ -18,4 +16,41 @@ class FetchPilgrimProgressData extends UserEvent {
   List<Object> get props => [userId];
 }
 
+class FetchGlobalLeaderBoard extends UserEvent {
+  final bool isLoggedIn;
 
+  FetchGlobalLeaderBoard(this.isLoggedIn);
+
+  @override
+  List<Object> get props => [isLoggedIn];
+}
+
+class FetchCountryLeaderBoard extends UserEvent {}
+
+class FetchUserStreakDetails extends UserEvent {}
+
+class UpdateUserProfile extends UserEvent {
+  final newUserName;
+
+  UpdateUserProfile(this.newUserName);
+
+  @override
+  List<Object> get props => [newUserName];
+}
+
+class PurchaseGem extends UserEvent {}
+
+class RestoreStreak extends UserEvent {}
+
+class OnboardCollaborator extends UserEvent {}
+
+class InitializeWallet extends UserEvent {}
+
+class UpdateCountry extends UserEvent {
+  final String country;
+
+  UpdateCountry(this.country);
+
+  @override
+  List<Object> get props => [country];
+}
