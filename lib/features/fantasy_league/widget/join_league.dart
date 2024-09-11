@@ -161,6 +161,7 @@ class _JoinLeagueState extends State<JoinLeague> {
                                   width: 260.w,
                                   onTap: () {
                                     soundManager.playClickSound();
+                                    Navigator.pushNamed(context, AppRoutes.fantasyBibleLeagueHomeScreen);
                                     // Navigator.pushNamed(context,
                                     //     AppRoutes.fantasyBibleLeagueHomeScreen);
                                   },

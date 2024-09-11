@@ -203,6 +203,7 @@ class PilgrimProgressBloc
             totalCoinsAvailableForSelectedLevel,
         selectedGameLevel: selectedLevel,
       ));
+      emit(state.copyWith(pilgrimProgressQuestionLoaded: false));
     } catch (_) {
       emit(state.copyWith(pilgrimProgressQuestionLoaded: false));
     }
@@ -212,45 +213,47 @@ class PilgrimProgressBloc
       OptionSelected event, Emitter<PilgrimProgressState> emit) {
     final soundManager = _settingsBloc.soundManager;
     final settingsState = _settingsBloc.state;
+    if(!state.hasAnswered){
+      int coinsGained = state.coinsGained ?? 0;
+      int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
+      int noOfCorrectAnswers = state.noOfCorrectAnswers;
+      final pointsPerQuestion = int.parse(
+          settingsState.gamePlaySettings['base_score_pilgrim_progress']);
+      final durationPerQuestion =
+      int.parse(settingsState.gamePlaySettings['normal_game_speed']);
+      final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
+      final totalTimeSpent =
+          state.totalTimeSpent! + (durationPerQuestion - event.remainingTime);
+      final isCorrect = event.gameQuestion.answer ==
+          event.gameQuestion.options[event.selectedOptionIndex];
+      if (isCorrect) {
+        noOfCorrectAnswers++;
+        soundManager.playCorrectAnswerSound();
+        dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
+            halfOfTotalPointPerQuestion;
+        coinsGained = state.coinsGained +
+            (halfOfTotalPointPerQuestion + timeBonusPoint).round();
+        totalBonusCoinsGained =
+            (state.totalBonusCoinsGained! + timeBonusPoint).round();
+      } else {
+        soundManager.playWrongAnswerSound();
+      }
 
-    int coinsGained = state.coinsGained ?? 0;
-    int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
-    int noOfCorrectAnswers = state.noOfCorrectAnswers;
-    final pointsPerQuestion = int.parse(
-        settingsState.gamePlaySettings['base_score_pilgrim_progress']);
-    final durationPerQuestion =
-        int.parse(settingsState.gamePlaySettings['normal_game_speed']);
-    final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
-    final totalTimeSpent =
-        state.totalTimeSpent! + (durationPerQuestion - event.remainingTime);
-    final isCorrect = event.gameQuestion.answer ==
-        event.gameQuestion.options[event.selectedOptionIndex];
-    if (isCorrect) {
-      noOfCorrectAnswers++;
-      soundManager.playCorrectAnswerSound();
-      dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
-          halfOfTotalPointPerQuestion;
-      coinsGained = state.coinsGained +
-          (halfOfTotalPointPerQuestion + timeBonusPoint).round();
-      totalBonusCoinsGained =
-          (state.totalBonusCoinsGained! + timeBonusPoint).round();
-    } else {
-      soundManager.playWrongAnswerSound();
+      emit(state.copyWith(
+          hasAnswered: true,
+          isCorrectAnswer: isCorrect,
+          correctAnswer: event.gameQuestion.answer,
+          selectedOptionIndex: event.selectedOptionIndex,
+          coinsGained: coinsGained,
+          totalBonusCoinsGained: totalBonusCoinsGained,
+          totalTimeSpent: totalTimeSpent,
+          noOfCorrectAnswers: noOfCorrectAnswers));
+
+      Future.delayed(Duration(seconds: 1), () {
+        add(MoveToNextPage());
+      });
     }
 
-    emit(state.copyWith(
-        hasAnswered: true,
-        isCorrectAnswer: isCorrect,
-        correctAnswer: event.gameQuestion.answer,
-        selectedOptionIndex: event.selectedOptionIndex,
-        coinsGained: coinsGained,
-        totalBonusCoinsGained: totalBonusCoinsGained,
-        totalTimeSpent: totalTimeSpent,
-        noOfCorrectAnswers: noOfCorrectAnswers));
-
-    Future.delayed(Duration(seconds: 1), () {
-      add(MoveToNextPage());
-    });
   }
 
   void _onMoveToNextPage(
@@ -285,7 +288,7 @@ class PilgrimProgressBloc
         var childLevelIsLocked = state.childLevelIsLocked;
         userRank == 'babe' ? roundsLeft-- : null;
         var score =
-            state.coinsGained! / state.totalCoinsAvailableForSelectedLevel!;
+            state.coinsGained / state.totalCoinsAvailableForSelectedLevel!;
         userProgress += score;
         var coinsGained = state.coinsGained;
         state.pilgrimProgressLevelData[0].numberOfRounds! >= 1.0 ||
@@ -298,19 +301,19 @@ class PilgrimProgressBloc
           state.coinsGained,
           state.totalBonusCoinsGained!,
           averageTimeSpent,
-          authenticationState.user!.rank,
+          'babe',
           state.noOfCorrectAnswers,
-          authenticationState.user!.id,
+          authenticationState.user.id,
           roundsLeft >= 1
               ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInBabe + coinsGained! >=
+              : (totalPointsGainedInBabe + coinsGained >=
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
                   ? userProgress.toStringAsFixed(5)
                   : 0,
           roundsLeft >= 1 &&
                   userRank == 'babe' &&
-                  !(totalPointsGainedInBabe + state.coinsGained! >=
+                  !(totalPointsGainedInBabe + state.coinsGained >=
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
@@ -359,9 +362,9 @@ class PilgrimProgressBloc
           state.coinsGained,
           state.totalBonusCoinsGained!,
           averageTimeSpent,
-          authenticationState.user!.rank,
+          'child',
           state.noOfCorrectAnswers,
-          authenticationState.user!.id,
+          authenticationState.user.id,
           roundsLeft >= 1
               ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
               : (totalPointsGainedInChild + coinsGained >=
@@ -421,12 +424,12 @@ class PilgrimProgressBloc
           state.coinsGained,
           state.totalBonusCoinsGained!,
           averageTimeSpent,
-          authenticationState.user!.rank,
+          'young believer',
           state.noOfCorrectAnswers,
-          authenticationState.user!.id,
+          authenticationState.user.id,
           roundsLeft >= 1
               ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInYB + coinsGained! >=
+              : (totalPointsGainedInYB + coinsGained >=
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
                   ? userProgress.toStringAsFixed(5)
@@ -447,7 +450,7 @@ class PilgrimProgressBloc
           emit(state.copyWith(userHasToRetry: true));
         }
         if (userRank == 'young believer' &&
-            (totalPointsGainedInYB + coinsGained! >=
+            (totalPointsGainedInYB + coinsGained >=
                     state.totalCoinsAvailableForSelectedLevel! ||
                 coinsGained >= state.passOnFirstTrialScore)) {
           add(UpdateUserRank('charity'));
@@ -483,9 +486,9 @@ class PilgrimProgressBloc
           state.coinsGained,
           state.totalBonusCoinsGained!,
           averageTimeSpent,
-          authenticationState.user!.rank,
+          'charity',
           state.noOfCorrectAnswers,
-          authenticationState.user!.id,
+          authenticationState.user.id,
           roundsLeft >= 1
               ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
               : (totalPointsGainedInCharity + coinsGained >=
@@ -495,7 +498,7 @@ class PilgrimProgressBloc
                   : 0,
           roundsLeft >= 1 &&
                   userRank == 'charity' &&
-                  !(totalPointsGainedInCharity + state.coinsGained! >=
+                  !(totalPointsGainedInCharity + state.coinsGained >=
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
@@ -509,9 +512,9 @@ class PilgrimProgressBloc
           emit(state.copyWith(userHasToRetry: true));
         }
         if (userRank == 'charity' &&
-            (totalPointsGainedInCharity + coinsGained <
+            (totalPointsGainedInCharity + coinsGained >=
                     state.totalCoinsAvailableForSelectedLevel! ||
-                coinsGained < state.passOnFirstTrialScore)) {
+                coinsGained >= state.passOnFirstTrialScore)) {
           add(UpdateUserRank('father'));
           emit(state.copyWith(
             hasUnlockedNewRank: true,
@@ -545,9 +548,9 @@ class PilgrimProgressBloc
           state.coinsGained,
           state.totalBonusCoinsGained!,
           averageTimeSpent,
-          authenticationState.user!.rank,
+          'father',
           state.noOfCorrectAnswers,
-          authenticationState.user!.id,
+          authenticationState.user.id,
           roundsLeft >= 1
               ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
               : (totalPointsGainedInFather + coinsGained >=
@@ -571,9 +574,9 @@ class PilgrimProgressBloc
           emit(state.copyWith(userHasToRetry: true));
         }
         if (userRank == 'father' &&
-            (totalPointsGainedInFather + coinsGained <
+            (totalPointsGainedInFather + coinsGained >=
                     state.totalCoinsAvailableForSelectedLevel! ||
-                coinsGained < state.passOnFirstTrialScore)) {
+                coinsGained >= state.passOnFirstTrialScore)) {
           add(UpdateUserRank('elder'));
           emit(state.copyWith(
             hasUnlockedNewRank: true,
@@ -593,7 +596,7 @@ class PilgrimProgressBloc
         var userProgress = state.pilgrimProgressLevelData[5].progress!;
         userRank == 'father' ? roundsLeft-- : null;
         var score =
-            state.coinsGained! / state.totalCoinsAvailableForSelectedLevel!;
+            state.coinsGained / state.totalCoinsAvailableForSelectedLevel!;
         userProgress += score;
         var coinsGained = state.coinsGained;
 
@@ -603,12 +606,12 @@ class PilgrimProgressBloc
           state.coinsGained,
           state.totalBonusCoinsGained!,
           averageTimeSpent,
-          authenticationState.user!.rank,
+          'elder',
           state.noOfCorrectAnswers,
-          authenticationState.user!.id,
+          authenticationState.user.id,
           roundsLeft >= 1
               ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInElder + coinsGained! >=
+              : (totalPointsGainedInElder + coinsGained >=
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
                   ? userProgress.toStringAsFixed(5)
@@ -636,7 +639,7 @@ class PilgrimProgressBloc
     try {
       final authenticationState = _authenticationBloc.state;
       final response = await _pilgrimProgressRepository.updateUserRank(
-          _authenticationBloc.state.user!.id, event.rank);
+          _authenticationBloc.state.user.id, event.rank);
     } catch (_) {}
   }
 

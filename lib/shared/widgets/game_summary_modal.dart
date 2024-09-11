@@ -116,6 +116,7 @@ class GameSummaryModal extends StatelessWidget {
                       SizedBox(
                         width: 10.w,
                       ),
+
                       StrokeText(
                         text: pointsEarned!,
                         textStyle: TextStyle(

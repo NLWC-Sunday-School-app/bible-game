@@ -55,6 +55,7 @@ class _WiwTryAgainModalState extends State<WiwTryAgainModal> {
                   ),
                   InkWell(
                     onTap: () {
+                      context.read<WhoIsWhoBloc>().add(ClearWhoIsWhoGameData());
                       soundManager.playClickSound();
                       Navigator.pushNamedAndRemoveUntil(
                         context,
@@ -163,6 +164,7 @@ class _WiwTryAgainModalState extends State<WiwTryAgainModal> {
                         buttonIsLoading: false,
                         width: 230.w,
                         onTap: (){
+                          context.read<WhoIsWhoBloc>().add(ClearWhoIsWhoGameData());
                           soundManager.playClickSound();
                           Navigator.pushNamedAndRemoveUntil(
                             context,

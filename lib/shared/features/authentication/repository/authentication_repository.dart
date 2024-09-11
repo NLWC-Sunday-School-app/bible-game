@@ -20,7 +20,7 @@ class AuthenticationRepository {
     return await authenticationAPI.login(email.trim(), password.trim());
   }
 
-  Future<bool> refreshToken(refreshToken) async {
+  Future<Map<String, dynamic>> refreshToken(refreshToken) async {
     return await authenticationAPI.refreshToken(refreshToken);
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
@@ -38,6 +40,13 @@ class _PilgrimQuestionScreenState extends State<PilgrimQuestionScreen> with Sing
     _initializeAnimationController();
   }
 
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _initializeAnimationController() {
     _animationController = AnimationController(
       vsync: this,
@@ -73,7 +82,6 @@ class _PilgrimQuestionScreenState extends State<PilgrimQuestionScreen> with Sing
             .round(),
         isWhoIsWho: false,
         onTap:  () {
-
           context.read<PilgrimProgressBloc>().add(FetchPilgrimProgressLevelData());
           Navigator.pushNamedAndRemoveUntil(
             context,
@@ -81,11 +89,12 @@ class _PilgrimQuestionScreenState extends State<PilgrimQuestionScreen> with Sing
             ModalRoute.withName('/home'),
           );
           context.read<PilgrimProgressBloc>().add(ClearPilgrimProgressData());
-          BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
         },
       );
       BlocProvider.of<PilgrimProgressBloc>(context).add(CalculateGameScore());
-
+      Timer(Duration(seconds: 2), (){
+        BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+      });
     }
   }
  
@@ -132,7 +141,7 @@ class _PilgrimQuestionScreenState extends State<PilgrimQuestionScreen> with Sing
             hasAnswered: state.hasAnswered,
             coinsGained: state.coinsGained,
             skipQuestion: () => _moveToNextPage(),
-            durationPerQuestion: durationPerQuestion,
+            durationPerQuestion: durationPerQuestion, gameMode: 'pilgrimProgress',
 
           );
         }

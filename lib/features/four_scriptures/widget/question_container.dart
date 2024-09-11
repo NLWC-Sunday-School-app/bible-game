@@ -170,8 +170,8 @@ class _QuestionContainerState extends State<QuestionContainer> {
     final soundManager = BlocProvider.of<SettingsBloc>(context).soundManager;
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child:
+        Column(
           children: [
             ScreenAppBar(
               widgets: [
@@ -180,7 +180,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
                     InkWell(
                       onTap: () {
                         soundManager.playClickSound();
-                        showQuitModal(context, isFourScripturesOneWord: true);
+                        showQuitModal(context, gameMode: 'fourScriptures');
                       },
                       child: Image.asset(
                         IconImageRoutes.arrowCircleBack,
@@ -191,7 +191,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
                     BlocBuilder<AuthenticationBloc, AuthenticationState>(
                       builder: (context, state) {
                         return ScoreBox(
-                          coinsAvailable: state.user!.coinWalletBalance,
+                          coinsAvailable: state.user.coinWalletBalance,
                         );
                       },
                     ),
@@ -475,7 +475,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
               ],
             ),
             SizedBox(
-              height: 40.h,
+              height: 140.h,
             ),
           ],
         ),

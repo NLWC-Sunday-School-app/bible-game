@@ -36,14 +36,14 @@ class AuthenticationAPI {
     }
   }
 
-  Future<bool> refreshToken(refreshToken) async {
+  Future<Map<String, dynamic>> refreshToken(refreshToken) async {
     try {
       final response = await apiClient.post('/auth/refresh-token', data: {
         'refreshToken': refreshToken,
       });
-      return response.statusCode == 200;
+      return response.data;
     } on ApiException catch (e) {
-      return false;
+      return e.message;
     }
   }
 

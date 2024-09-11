@@ -5,25 +5,28 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:the_bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
+import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:the_bible_game/features/quick_game/bloc/quick_game_bloc.dart';
+import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
 import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
-void showQuitModal(BuildContext context, {bool? isFourScripturesOneWord}) {
+void showQuitModal(BuildContext context, {String? gameMode }) {
   showDialog(
       barrierDismissible: true,
       barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
       context: context,
       builder: (BuildContext context) {
         return QuitModal(
-          isFourScripturesOneWord: isFourScripturesOneWord ?? false,
+          gameMode: gameMode ?? '',
         );
       });
 }
 
 class QuitModal extends StatelessWidget {
-  const QuitModal({Key? key, this.isFourScripturesOneWord = false})
+  const QuitModal({Key? key, this.gameMode = ''})
       : super(key: key);
-  final bool isFourScripturesOneWord;
+  final String gameMode;
 
   @override
   Widget build(BuildContext context) {
@@ -92,17 +95,42 @@ class QuitModal extends StatelessWidget {
                   height: 20,
                 ),
                 GestureDetector(
-                  onTap: !isFourScripturesOneWord!
-                      ? () {
-                          Navigator.pushNamedAndRemoveUntil(context,
-                              AppRoutes.home, (Route<dynamic> route) => false);
-                        }
-                      : () {
-                          Navigator.pushNamedAndRemoveUntil(context,
-                              AppRoutes.home, (Route<dynamic> route) => false);
-                          BlocProvider.of<FourScripturesOneWordBloc>(context)
-                              .add(ClearFourScripturesOneWordData());
-                        },
+                  onTap: () {
+                    if (gameMode == 'fourScriptures') {
+                      Navigator.pushNamedAndRemoveUntil(context,
+                          AppRoutes.home, (Route<dynamic> route) => false);
+                      BlocProvider.of<FourScripturesOneWordBloc>(context)
+                          .add(ClearFourScripturesOneWordData());
+                    } else if (gameMode == 'pilgrimProgress') {
+                      BlocProvider.of<PilgrimProgressBloc>(context).add(
+                          ClearPilgrimProgressData());
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.pilgrimProgressHomeScreen,
+                        ModalRoute.withName('/home'),
+                      );
+                    } else if (gameMode == 'whoIsWho') {
+                      BlocProvider.of<WhoIsWhoBloc>(context).add(
+                          ClearWhoIsWhoGameData());
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.whoIsWhoHomeScreen,
+                        ModalRoute.withName('/home'),
+                      );
+                    } else if (gameMode == 'quickGame') {
+                      BlocProvider.of<QuickGameBloc>(context).add(
+                          ClearQuickGameData());
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.quickGameHomeScreen,
+                        ModalRoute.withName('/home'),
+                      );
+                    } else {
+                      Navigator.pushNamedAndRemoveUntil(context,
+                          AppRoutes.home, (Route<dynamic> route) => false);
+                    }
+
+                  },
                   child: Container(
                     width: 200.w,
                     padding: const EdgeInsets.symmetric(vertical: 15),

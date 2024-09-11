@@ -30,7 +30,8 @@ class QuestionContainer extends StatelessWidget {
     this.isWhoIsWho = false,
     this.whoIsWhoGameDuration = 0,
     this.durationPerQuestion = 0,
-    this.noOfCorrectAnswers = 0
+    this.noOfCorrectAnswers = 0,
+    required this.gameMode,
   });
 
   final GameQuestion gameQuestion;
@@ -48,6 +49,7 @@ class QuestionContainer extends StatelessWidget {
   final VoidCallback skipQuestion;
   final int? durationPerQuestion;
   final int? noOfCorrectAnswers;
+  final String gameMode;
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +126,7 @@ class QuestionContainer extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   soundManager.playClickSound();
-                  showQuitModal(context);
+                  showQuitModal(context, gameMode: gameMode);
                 },
                 child: Image.asset(
                   IconImageRoutes.redCircleClose,

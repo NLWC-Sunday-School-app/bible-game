@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
@@ -32,7 +33,7 @@ class LogoutModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
-        if (!state.isLoggedIn) {
+        if (state.hasLoggedOut) {
           Navigator.pop(context);
           Navigator.pushNamedAndRemoveUntil(context,
               AppRoutes.home, (Route<dynamic> route) => false);
@@ -102,11 +103,12 @@ class LogoutModal extends StatelessWidget {
                       color: const Color(0xFF4A91FF),
                     ),
                   ),
-                  child: FadeInImage.assetNetwork(
-                    placeholder: ProductImageRoutes.defaultAvatar,
-                    image:
-                        '${AvatarCredentials.BaseURL}/${state.user?.id}.png?apikey=${AvatarCredentials.APIKey}/',
+                  child:
+                  SvgPicture.network(
+                    '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
                     width: 70.w,
+                    semanticsLabel: 'avatar',
+                    placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
                   ),
                 ),
                 SizedBox(
@@ -144,10 +146,14 @@ class LogoutModal extends StatelessWidget {
                       ),
                       child: Center(
                         child: state.isLoggingOut
-                            ? CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              )
+                            ? SizedBox(
+                              height: 20.h,
+                              width: 20.w,
+                              child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                            )
                             : StrokeText(
                                 text: 'Yes, log me out',
                                 textStyle: TextStyle(

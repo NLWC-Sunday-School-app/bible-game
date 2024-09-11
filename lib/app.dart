@@ -84,8 +84,6 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
 
-
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -195,7 +193,7 @@ class _AppState extends State<App> {
                   globalChallengeRepository: widget.globalChallengeRepository,
                 ),
             AppRoutes.arcadeScreen: (context) => ArcadeScreen(),
-            AppRoutes.fantasyBibleLeagueHomeScreen: (context) => FantasyLeagueHomeScreen(),
+            AppRoutes.fantasyBibleLeagueHomeScreen: (context) => BottomTabNavigation(),
             AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
           },
           home: const SplashScreen(),

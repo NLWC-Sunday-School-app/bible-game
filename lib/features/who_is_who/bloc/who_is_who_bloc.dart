@@ -77,35 +77,37 @@ class WhoIsWhoBloc extends Bloc<WhoIsWhoEvent, WhoIsWhoState> {
   void _onOptionSelected(OptionSelected event, Emitter<WhoIsWhoState> emit) {
     final soundManager = _settingsBloc.soundManager;
     final settingsState = _settingsBloc.state;
-    int coinsGained = state.coinsGained ?? 0;
-    int noOfQuestionsAnswered = state.noOfQuestionsAnswered!;
-    int noOfCorrectAnswers = state.noOfCorrectAnswers!;
-    final pointsPerQuestion =
-    int.parse(settingsState.gamePlaySettings['num_whoiswho_plays']);
-    final isCorrect = event.gameQuestion.answer ==
-        event.gameQuestion.options[event.selectedOptionIndex];
-    noOfQuestionsAnswered++;
-    if (isCorrect) {
-      noOfCorrectAnswers++;
-      soundManager.playCorrectAnswerSound();
-      coinsGained = state.coinsGained! + pointsPerQuestion;
-    } else {
-      soundManager.playWrongAnswerSound();
-    }
-    print(state.noOfCorrectAnswers);
-    emit(state.copyWith(
-      hasAnswered: true,
-      isCorrectAnswer: isCorrect,
-      correctAnswer: event.gameQuestion.answer,
-      selectedOptionIndex: event.selectedOptionIndex,
-      coinsGained: coinsGained,
-      noOfCorrectAnswers: noOfCorrectAnswers,
-      noOfQuestionsAnswered: noOfQuestionsAnswered,
-    ));
+    if(!state.hasAnswered){
+      int coinsGained = state.coinsGained ?? 0;
+      int noOfQuestionsAnswered = state.noOfQuestionsAnswered!;
+      int noOfCorrectAnswers = state.noOfCorrectAnswers!;
+      final pointsPerQuestion =
+      int.parse(settingsState.gamePlaySettings['num_whoiswho_plays']);
+      final isCorrect = event.gameQuestion.answer ==
+          event.gameQuestion.options[event.selectedOptionIndex];
+      noOfQuestionsAnswered++;
+      if (isCorrect) {
+        noOfCorrectAnswers++;
+        soundManager.playCorrectAnswerSound();
+        coinsGained = state.coinsGained! + pointsPerQuestion;
+      } else {
+        soundManager.playWrongAnswerSound();
+      }
+      print(state.noOfCorrectAnswers);
+      emit(state.copyWith(
+        hasAnswered: true,
+        isCorrectAnswer: isCorrect,
+        correctAnswer: event.gameQuestion.answer,
+        selectedOptionIndex: event.selectedOptionIndex,
+        coinsGained: coinsGained,
+        noOfCorrectAnswers: noOfCorrectAnswers,
+        noOfQuestionsAnswered: noOfQuestionsAnswered,
+      ));
 
-    Future.delayed(Duration(seconds: 1), () {
-      add(MoveToNextPage());
-    });
+      Future.delayed(Duration(seconds: 1), () {
+        add(MoveToNextPage());
+      });
+    }
   }
 
   void _onMoveToNextPage(MoveToNextPage event, Emitter<WhoIsWhoState> emit) {
@@ -137,7 +139,7 @@ class WhoIsWhoBloc extends Bloc<WhoIsWhoEvent, WhoIsWhoState> {
         final authenticationState = _authenticationBloc.state;
         await _whoIsWhoRepository.submitWhoIsWhoScore(
             state.coinsGained,
-            authenticationState.user!.id,
+            authenticationState.user.id,
             state.selectedGameLevel,
             state.completedSelectedLevel);
       } catch (_) {}

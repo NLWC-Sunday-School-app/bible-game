@@ -244,7 +244,7 @@ class PilgrimProgressTipsModal extends StatelessWidget {
                   BlueButton(
                     buttonText: 'Play Now',
                     buttonIsLoading: false,
-                    onTap: () => Navigator.pushNamed(
+                    onTap: () => Navigator.pushReplacementNamed(
                       context,
                       AppRoutes.pilgrimProgressQuestionScreen,
                     ),

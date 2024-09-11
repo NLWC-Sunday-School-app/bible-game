@@ -16,6 +16,7 @@ class AuthenticationState extends Equatable {
   final bool hasResetPassword;
   final bool failedToLogin;
   final bool failedToRegister;
+  final bool hasLoggedOut;
 
   const AuthenticationState(
       {this.isLoggedIn = false,
@@ -32,7 +33,9 @@ class AuthenticationState extends Equatable {
       this.token,
       this.refreshToken,
       this.failedToLogin = false,
-      this.failedToRegister = false});
+      this.failedToRegister = false,
+      this.hasLoggedOut = false,
+      });
 
   AuthenticationState copyWith({
     bool? isLoggedIn,
@@ -50,6 +53,7 @@ class AuthenticationState extends Equatable {
     String? refreshToken,
     bool? failedToLogin,
     bool? failedToRegister,
+    bool? hasLoggedOut
   }) {
     return AuthenticationState(
         isLoggedIn: isLoggedIn ?? this.isLoggedIn,
@@ -68,7 +72,9 @@ class AuthenticationState extends Equatable {
         token: token ?? null,
         refreshToken: refreshToken ?? null,
         failedToLogin: failedToLogin ?? this.failedToLogin,
-        failedToRegister: failedToRegister ?? this.failedToRegister);
+        failedToRegister: failedToRegister ?? this.failedToRegister,
+        hasLoggedOut:  hasLoggedOut ?? this.hasLoggedOut
+    );
   }
 
   @override
@@ -87,6 +93,7 @@ class AuthenticationState extends Equatable {
         token,
         refreshToken,
         failedToLogin,
-        failedToRegister
+        failedToRegister,
+        hasLoggedOut
       ];
 }

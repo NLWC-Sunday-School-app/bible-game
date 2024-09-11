@@ -106,7 +106,7 @@ void showQuickGameTipsModal(BuildContext context, bool hasTimer) {
                     buttonIsLoading: false,
                     onTap: () {
                       soundManager.playClickSound();
-                      Navigator.pushNamed(
+                      Navigator.pushReplacementNamed(
                           context, AppRoutes.quickGameQuestionScreen, arguments:{ 'hasTimer': hasTimer});
                     },
                     width: 280.w,

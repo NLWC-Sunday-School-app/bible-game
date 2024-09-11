@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:the_bible_game/shared/widgets/game_summary_modal.dart';
@@ -101,10 +104,14 @@ class _QuickGameQuestionScreenState extends State<QuickGameQuestionScreen>
             AppRoutes.quickGameHomeScreen,
             ModalRoute.withName('/home'),
           );
+
         },
       );
 
       BlocProvider.of<QuickGameBloc>(context).add(SubmitQuickGameScore());
+      Timer(Duration(seconds: 2), (){
+        BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+      });
     }
   }
 
@@ -170,7 +177,7 @@ class _QuickGameQuestionScreenState extends State<QuickGameQuestionScreen>
                   soundManager.playClickSound();
                 },
                 durationPerQuestion: durationPerQuestion,
-                hasTimer: hasTimer,
+                hasTimer: hasTimer, gameMode: 'quickGame',
               );
             },
           ));

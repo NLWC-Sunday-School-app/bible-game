@@ -48,7 +48,7 @@ class AuthenticationBloc
     Emitter<AuthenticationState> emit,
   ) async {
     if (state.user.id != 0) {
-      emit(state.copyWith(isLoggingOut: true));
+      emit(state.copyWith(isLoggingOut: true, hasLoggedOut: false));
       try {
         final loggedOut = await _authenticationRepository.logOut();
         if (loggedOut) {
@@ -60,12 +60,14 @@ class AuthenticationBloc
             token: null,
             refreshToken: null,
             isLoggedIn: false,
+            hasLoggedOut:true
           ));
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.remove('userToken');
+          emit(state.copyWith(hasLoggedOut: false));
+          // final SharedPreferences prefs = await SharedPreferences.getInstance();
+          // await prefs.remove('userToken');
         }
       } catch (_) {
-        emit(state.copyWith(isLoggingOut: false));
+        emit(state.copyWith(isLoggingOut: false, hasLoggedOut: false));
       }
     }
   }
@@ -150,10 +152,11 @@ class AuthenticationBloc
   ) async {
     try {
       final newTokens = await _authenticationRepository.refreshToken('');
-      // emit(state.copyWith(
-      //   token: newTokens['token'],
-      //   refreshToken: newTokens['refreshToken'],
-      // ));
+      emit(state.copyWith(
+        token: newTokens['token'],
+        refreshToken: newTokens['refreshToken'],
+      ));
+      add(FetchUserDataRequested());
     } catch (_) {
       emit(state.copyWith(
           isUnauthenticated: true, token: null, refreshToken: null));

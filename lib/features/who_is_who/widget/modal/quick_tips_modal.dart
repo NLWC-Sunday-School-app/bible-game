@@ -93,7 +93,7 @@ void showWhoIsWhoTipsModal(BuildContext context) {
                   BlueButton(
                     buttonText: 'Play Now',
                     buttonIsLoading: false,
-                    onTap: () => Navigator.pushNamed(context, AppRoutes.whoIsWhoQuestionScreen),
+                    onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.whoIsWhoQuestionScreen),
                     width: 280.w,
                   )
                 ],

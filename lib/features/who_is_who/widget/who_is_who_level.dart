@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stroke_text/stroke_text.dart';
 import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
 import 'package:the_bible_game/features/who_is_who/widget/modal/freebies_modal.dart';
 import 'package:the_bible_game/features/who_is_who/widget/modal/wiw_time_up_modal.dart';
 import 'package:the_bible_game/shared/constants/app_routes.dart';
 import 'package:the_bible_game/shared/constants/image_routes.dart';
 
-class WhoIsWhoLevel extends StatelessWidget {
+class WhoIsWhoLevel extends StatefulWidget {
   const WhoIsWhoLevel(
       {Key? key,
       required this.isUnLocked,
@@ -28,30 +30,92 @@ class WhoIsWhoLevel extends StatelessWidget {
   final bool nextLevelIsLocked;
 
   @override
+  State<WhoIsWhoLevel> createState() => _WhoIsWhoLevelState();
+}
+
+class _WhoIsWhoLevelState extends State<WhoIsWhoLevel> {
+  void showCustomToast(BuildContext context, String message) {
+    FToast fToast = FToast();
+    fToast.init(context);
+    LinearGradient linearGradient = LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Color.fromRGBO(34, 34, 34, 0.0),
+        Color.fromRGBO(34, 34, 34, 0.2333),
+        Color.fromRGBO(34, 34, 34, 0.141846),
+        Color.fromRGBO(136, 136, 136, 0.0),
+      ],
+      stops: [
+        0.0,
+        0.375,
+        0.62,
+        1.0,
+      ],
+    );
+    Widget toast = Container(
+        width: 375.w,
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          gradient: linearGradient,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            StrokeText(
+              text: message,
+              textStyle: TextStyle(
+                color: Color(0xFFFFD400),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w900,
+              ),
+              strokeColor: Color(0xFF000000),
+              strokeWidth: 6,
+            ),
+          ],
+        ));
+
+    fToast.showToast(
+      child: toast,
+      gravity: ToastGravity.CENTER,
+      toastDuration: const Duration(seconds: 2),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
         BlocProvider.of<WhoIsWhoBloc>(context).add(
           SetGameData(
-            gameDuration: playTime,
-            selectedGameLevel: int.parse(level),
+            gameDuration: widget.playTime,
+            selectedGameLevel: int.parse(widget.level),
           ),
         );
         BlocProvider.of<WhoIsWhoBloc>(context).add(
-          SetUserCompletedLeveLState(isUnLocked),
+          SetUserCompletedLeveLState(widget.isUnLocked),
         );
-        if (isSpecialLevel && isUnLocked && !nextLevelIsLocked) {
+        if (widget.isSpecialLevel &&
+            widget.isUnLocked &&
+            !widget.nextLevelIsLocked) {
           BlocProvider.of<WhoIsWhoBloc>(context)
-              .add(SubmitSpecialLevelScore(reward));
-          showWhoIsWhoFreebiesModal(context, reward);
-          BlocProvider.of<WhoIsWhoBloc>(context)
-              .add(FetchGameLevels());
-        } else if (isUnLocked && !isSpecialLevel) {
+              .add(SubmitSpecialLevelScore(widget.reward));
+          showWhoIsWhoFreebiesModal(context, widget.reward);
+          BlocProvider.of<WhoIsWhoBloc>(context).add(FetchGameLevels());
+        } else if (widget.isSpecialLevel &&
+            widget.isUnLocked &&
+            widget.nextLevelIsLocked) {
+          showCustomToast(context, "You've already used your freebie");
+        } else if (widget.isUnLocked && !widget.isSpecialLevel) {
           Navigator.pushNamed(context, AppRoutes.questionLoadingScreen,
               arguments: {'gameType': 'wiw_game'});
+        } else if (!widget.isUnLocked) {
+          showCustomToast(context, 'Pass the previous level to play this!');
         }
       },
       child: Container(
+        height: 180.h,
         alignment: Alignment.center,
         child: Stack(
           children: [
@@ -66,9 +130,9 @@ class WhoIsWhoLevel extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: isSpecialLevel
+                        color: widget.isSpecialLevel
                             ? const Color(0xFFF7A252)
-                            : isUnLocked
+                            : widget.isUnLocked
                                 ? const Color(0xFF3CE04D)
                                 : const Color(0xFFD90429),
                         width: 3.w),
@@ -82,15 +146,15 @@ class WhoIsWhoLevel extends StatelessWidget {
                           border: Border.all(color: Colors.white, width: 3.w),
                         ),
                         child: Opacity(
-                          opacity: !isUnLocked ? 0.4 : 1,
+                          opacity: !widget.isUnLocked ? 0.4 : 1,
                           child: FadeInImage.assetNetwork(
                             placeholder: ProductImageRoutes.placeholderWIW,
-                            image: backgroundUrl,
+                            image: widget.backgroundUrl,
                             width: 136.w,
                           ),
                         ),
                       ),
-                      !isUnLocked
+                      !widget.isUnLocked
                           ? Positioned(
                               top: 0,
                               bottom: 0,
@@ -112,12 +176,12 @@ class WhoIsWhoLevel extends StatelessWidget {
               right: 4.w,
               child: Stack(
                 children: [
-                  isSpecialLevel
+                  widget.isSpecialLevel
                       ? Image.asset(
                           ProductImageRoutes.specialLevelTag,
                           width: 144.w,
                         )
-                      : isUnLocked
+                      : widget.isUnLocked
                           ? Image.asset(
                               ProductImageRoutes.greenLevelTag,
                               width: 144.w,
@@ -131,7 +195,7 @@ class WhoIsWhoLevel extends StatelessWidget {
                     left: 65.w,
                     bottom: 0,
                     child: Text(
-                      level,
+                      widget.level,
                       style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontFamily: 'Mikado',

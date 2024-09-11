@@ -12,7 +12,7 @@ class ScoreBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var formatter = NumberFormat('#,##,###');
+    var formatter = NumberFormat('#,###,###');
     return Stack(
       children: [
         Padding(

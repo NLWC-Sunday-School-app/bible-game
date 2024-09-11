@@ -29,6 +29,7 @@ class _GlobalChallengeHomeScreenState extends State<GlobalChallengeHomeScreen> {
             itemCount: state.globalChallengeGames.length,
             itemBuilder: (BuildContext context, int index) {
               return GlobalChallengeCard(
+
                 id: state.globalChallengeGames[index].id,
                 imageUrl: state.globalChallengeGames[index].imageUrl,
                 title: state.globalChallengeGames[index].title,

@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -26,7 +27,7 @@ class StoreHomeScreen extends StatefulWidget {
 class _StoreHomeScreenState extends State<StoreHomeScreen> {
 
 
-  void showCustomToast(BuildContext context) {
+  void showCustomToast(BuildContext context,) {
     FToast fToast = FToast();
     fToast.init(context);
     LinearGradient linearGradient = LinearGradient(
@@ -239,7 +240,16 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                                   onTap: (){
                                     if(coinBalance >= int.parse(gemPrice)){
                                       context.read<UserBloc>().add(PurchaseGem());
-                                      context.read<AuthenticationBloc>().add(FetchUserDataRequested());
+                                      Future.delayed(Duration(seconds: 2), (){
+                                        context.read<AuthenticationBloc>().add(FetchUserDataRequested());
+                                      });
+                                      Flushbar(
+                                        message: 'Bought successfully',
+                                        flushbarPosition: FlushbarPosition.TOP,
+                                        flushbarStyle: FlushbarStyle.GROUNDED,
+                                        backgroundColor: Colors.green,
+                                        duration: Duration(seconds: 3),
+                                      ).show(context);
                                     }else{
                                       showCustomToast(context);
                                     }

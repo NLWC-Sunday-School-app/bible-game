@@ -381,7 +381,9 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
   }
 
   GestureDetector buildLeaderboardNavigator(VoidCallback onTap, text) {
-    return GestureDetector(
+    return
+
+      GestureDetector(
       onTap: onTap,
       child: Container(
           height: 28.h,

@@ -14,6 +14,7 @@ import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/utils/avatar_credentials.dart';
+import '../../../shared/utils/user_badge.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
 import '../widget/modals/bg_streak_modal.dart';
 import '../widget/modals/create_profile_modal.dart';
@@ -203,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Row(
                                     children: [
                                       Image.asset(
-                                        ProductImageRoutes.defaultBadge,
+                                        getBadgeUrl(state.user.rank),
                                         width: 18.sp,
                                       ),
                                       SizedBox(
@@ -440,7 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   height: 20.h,
                 ),
-                BlocConsumer<UserBloc, UserState>(
+                state.user.id != 0 ?   BlocConsumer<UserBloc, UserState>(
                   listener: (context, state) {
                     if(state.hasSentCollaboratorMail){
                       Flushbar(
@@ -497,7 +498,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     );
                   },
-                ),
+                ) : SizedBox(),
                 SizedBox(
                   height: 20.h,
                 ),

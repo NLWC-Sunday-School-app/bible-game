@@ -36,18 +36,19 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
 
     final whoIsWhoBloc = BlocProvider.of<WhoIsWhoBloc>(context);
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+    final selectedLevelDuration =  BlocProvider.of<WhoIsWhoBloc>(context).state.gameDuration;
     gameDuration = whoIsWhoBloc.state.gameDuration!;
     questionsRequiredToPass = int.parse(
         settingsBloc.state.gamePlaySettings['whoiswho_questions_passmark']);
     gameTimePurchasePrice = int.parse(
         settingsBloc.state.gamePlaySettings['game_time_purchase_price']);
-    _initializeAnimationController(Duration(minutes: 1));
+    _initializeAnimationController(Duration(minutes: gameDuration));
   }
 
   void _initializeAnimationController(Duration duration) {
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(minutes: 1),
+      duration: duration,
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           _moveToNextPage();
@@ -73,7 +74,7 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
       );
     } else {
       _animationController.stop();
-      if (wiwGameBloc.state.noOfCorrectAnswers! <= questionsRequiredToPass) {
+      if (wiwGameBloc.state.noOfCorrectAnswers! >= questionsRequiredToPass) {
         wiwGameBloc.add(SetUserCompletedLeveLState(true));
         showGameSummaryModal(
           context: context,
@@ -103,12 +104,14 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
             gameTimePurchasePrice: gameTimePurchasePrice, onTap: () {
           if (authenticationBloc.state.user.coinWalletBalance >=
               gameTimePurchasePrice) {
+             gameDuration = 1;
             _restartAnimationController(Duration(minutes: 1));
             Navigator.pop(context);
             wiwGameBloc.add(PurchaseExtraTime(
                 authenticationBloc.state.user.id, gameTimePurchasePrice));
             Future.delayed(Duration(seconds: 2), () {
               authenticationBloc.add(FetchUserDataRequested());
+              context.read<WhoIsWhoBloc>().add(ClearWhoIsWhoGameData());
             });
           } else {
             Navigator.pop(context);
@@ -123,7 +126,6 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
                 authenticationBloc.add(FetchUserDataRequested());
               });
             });
-            print('not sure');
           }
         });
         print('not passed');
@@ -187,7 +189,7 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
                 skipQuestion: () => _moveToNextPage(),
                 isWhoIsWho: true,
                 noOfCorrectAnswers: state.noOfCorrectAnswers,
-                whoIsWhoGameDuration: 1,
+                whoIsWhoGameDuration: gameDuration, gameMode: 'whoIsWho',
               );
             },
           ));

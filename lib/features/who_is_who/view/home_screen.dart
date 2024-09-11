@@ -19,6 +19,32 @@ class WhoIsWhoHomeScreen extends StatefulWidget {
 
 class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
   WhoIsWhoBloc? whoIsWhoBloc;
+  final ScrollController _scrollController = ScrollController();
+  late double currentLevel = 0.0;
+
+  scrollToCurrentGameLevel() {
+    final double maxScrollExtent = _scrollController.position.maxScrollExtent;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double userOffset = (currentLevel - 1) * 180.h;
+
+    double targetOffset = userOffset;
+    if (userOffset + screenHeight > maxScrollExtent) {
+      targetOffset = maxScrollExtent;
+    }
+    print('targetoffset $targetOffset');
+    _scrollController.jumpTo(targetOffset);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -34,6 +60,9 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
       backgroundColor: Color(0xFF014AA0),
       body: BlocBuilder<WhoIsWhoBloc, WhoIsWhoState>(
         builder: (context, state) {
+          final index = state.wiwGameLevels
+              .indexWhere((level) => level.isUnlocked == false);
+          currentLevel = index / 2;
           return Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -101,43 +130,76 @@ class _WhoIsWhoHomeScreenState extends State<WhoIsWhoHomeScreen> {
                   height: 20.h,
                 ),
                 state.isLoadingGameLevels!
-                    ? Center(
+                    ? Container(
+                        margin: EdgeInsets.only(top: 20.h),
                         child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ))
+                          color: Colors.white,
+                        ))
                     : SizedBox(
                         height: screenHeight - (150.h + 20.h),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          itemCount: state.wiwGameLevels.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 30.0.w,
-                            crossAxisSpacing: 10.0.w, // spacing between columns
-                          ),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: [
-                                WhoIsWhoLevel(
-                                  isUnLocked:
-                                      state.wiwGameLevels[index].isUnlocked,
-                                  level: (index + 1).toString(),
-                                  backgroundUrl: state
-                                      .wiwGameLevels[index].backgroundImage,
-                                  isSpecialLevel:
-                                      state.wiwGameLevels[index].isSpecialLevel,
-                                  playTime: state.wiwGameLevels[index].playTime,
-                                  reward: state.wiwGameLevels[index].reward,
-                                  nextLevelIsLocked:
-                                      (index + 1) < state.wiwGameLevels.length
+                        child: Stack(
+                          children: [
+                            GridView.builder(
+                              controller: _scrollController,
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: state.wiwGameLevels.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 30.0.w,
+                                crossAxisSpacing:
+                                    10.0.w, // spacing between columns
+                              ),
+                              itemBuilder: (BuildContext context, int index) {
+                                return Column(
+                                  children: [
+                                    WhoIsWhoLevel(
+                                      isUnLocked:
+                                          state.wiwGameLevels[index].isUnlocked,
+                                      level: (index + 1).toString(),
+                                      backgroundUrl: state
+                                          .wiwGameLevels[index].backgroundImage,
+                                      isSpecialLevel: state
+                                          .wiwGameLevels[index].isSpecialLevel,
+                                      playTime:
+                                          state.wiwGameLevels[index].playTime,
+                                      reward: state.wiwGameLevels[index].reward,
+                                      nextLevelIsLocked: (index + 1) <
+                                              state.wiwGameLevels.length
                                           ? state.wiwGameLevels[index + 1]
                                               .isUnlocked
                                           : false,
-                                ),
-                              ],
-                            );
-                          },
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            GestureDetector(
+                              onTap:() {
+                                scrollToCurrentGameLevel();
+                              },
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Container(
+                                    height: 28.h,
+                                    width: 100.w,
+                                    decoration: BoxDecoration(
+                                        color: Color(0xFF363636CC),
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        border:
+                                            Border.all(color: Color(0xFF949494))),
+                                    child: Center(
+                                      child: Text(
+                                        'Current Level',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                    )),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
               ],

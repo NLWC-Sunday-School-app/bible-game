@@ -11,6 +11,7 @@ import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:the_bible_game/shared/utils/network_connection.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:the_bible_game/shared/widgets/modal/network_modal.dart';
+import '../../features/global_challenge/bloc/global_challenge_bloc.dart';
 import '../constants/image_routes.dart';
 import '../features/authentication/bloc/authentication_bloc.dart';
 
@@ -44,16 +45,16 @@ class _SplashScreenState extends State<SplashScreen> {
                   final route = ModalRoute.of(context);
                   final isCurrentRoute = route?.isCurrent ?? false;
                   if (isCurrentRoute) {
+                    print('my route');
                     if (state.user.id != 0) {
+                      print('our route');
                       BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
                       BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
                       Navigator.pushNamedAndRemoveUntil(context,
                           AppRoutes.home, (Route<dynamic> route) => false);
-                    } else if (state.isUnauthenticated) {
-
                     }
-
                   }else{
+                    print('no route');
                      // Navigator.pushReplacementNamed(context, AppRoutes.home);
                   }
                 },
@@ -64,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         lineHeight: 15.h,
                         percent: 1,
                         animation: true,
-                        animationDuration: 500,
+                        animationDuration: 3500,
                         barRadius: const Radius.circular(10),
                         progressColor: const Color(0xFFFECF75),
                         onAnimationEnd: () {
@@ -89,6 +90,8 @@ class _SplashScreenState extends State<SplashScreen> {
     final String? refreshToken = prefs.getString('refreshToken');
     NetworkConnection networkConnection = NetworkConnection();
     if (await networkConnection.hasInternetConnection()) {
+      BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
+      BlocProvider.of<SettingsBloc>(context).add(FetchAds());
       if (userToken != null) {
         print('userToken $userToken');
         bool tokenHasExpired = JwtDecoder.isExpired(userToken);
@@ -98,15 +101,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
         } else {
           // print('RESET APP');
+          prefs.remove('user_token');
         }
         print('still have good token');
         BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
-
+        BlocProvider.of<GlobalChallengeBloc>(context).add(FetchGlobalChallengeGames());
+       // await Navigator.pushNamedAndRemoveUntil(context,
+       //      AppRoutes.home, (Route<dynamic> route) => false);
       } else {
-        Navigator.pushNamed(context, AppRoutes.home);
+        Navigator.pushNamedAndRemoveUntil(context,
+            AppRoutes.home, (Route<dynamic> route) => false);
       }
-     BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
-     BlocProvider.of<SettingsBloc>(context).add(FetchAds());
+
     }else{
         showNetworkModal(context);
     }

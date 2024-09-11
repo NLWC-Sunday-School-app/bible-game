@@ -15,7 +15,7 @@ class WhoIsWhoState extends Equatable {
   final String? correctAnswer;
   final bool? isCorrectAnswer;
   final int? selectedOptionIndex;
-  final bool? hasAnswered;
+  final bool hasAnswered;
   final int? noOfCorrectAnswers;
   final bool completedSelectedLevel;
   final int? selectedGameLevel;

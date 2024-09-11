@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
+import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:the_bible_game/shared/features/user/model/user.dart';
 
@@ -37,16 +38,18 @@ class _BgStreakModalState extends State<BgStreakModal> {
   late DateTime expiryTime;
   late Duration timeLeft;
   late Timer timer;
+  bool showTimer = false;
+  bool lostStreakAfterRestoreTime = false;
 
   @override
   @override
   void initState() {
     super.initState();
     timeLeft = Duration(hours: 0, minutes: 0, seconds: 0);
-    final streakDetails =
-        BlocProvider.of<UserBloc>(context).state.userStreakDetails;
+    final streakDetails = BlocProvider.of<UserBloc>(context).state.userStreakDetails;
     final lastStreakTime = streakDetails['lastStreakTime'];
-    if(lastStreakTime != null){
+     print('streakDetails: $streakDetails');
+    if (lastStreakTime != null) {
       if (streakDetails['restoreTimeExpiry'] == null) {
         DateTime startTime = DateTime.parse(streakDetails['lastStreakTime']);
         print('start time ${startTime}');
@@ -55,6 +58,9 @@ class _BgStreakModalState extends State<BgStreakModal> {
         timeLeft = expiryTime.difference(DateTime.now());
         print('Now Time ${DateTime.now()}');
         print('time left ${timeLeft}');
+        setState(() {
+          showTimer = true;
+        });
         timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
           setState(() {
             timeLeft = expiryTime.difference(DateTime.now());
@@ -64,20 +70,24 @@ class _BgStreakModalState extends State<BgStreakModal> {
           });
         });
       } else {
-        DateTime restoreTime = DateTime.parse(streakDetails['restoreTimeExpiry']);
+        DateTime restoreTime =
+            DateTime.parse(streakDetails['restoreTimeExpiry']);
         DateTime lastStreakTime = DateTime.parse(streakDetails['lastStreakTime']);
-        timeLeft = restoreTime.difference(lastStreakTime);
+        timeLeft = restoreTime.difference(DateTime.now());
+        print('time is negative $timeLeft');
         timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
           setState(() {
             timeLeft = restoreTime.difference(DateTime.now());
             if (timeLeft.isNegative) {
+              showTimer = true;
+              lostStreakAfterRestoreTime = true;
+              timeLeft = Duration.zero;
               timer.cancel();
             }
           });
         });
       }
     }
-
   }
 
   String formatDuration(Duration duration) {
@@ -133,7 +143,12 @@ class _BgStreakModalState extends State<BgStreakModal> {
                     GestureDetector(
                       onTap: () {
                         soundManager.playClickSound();
+                        setState(() {
+                          lostStreakAfterRestoreTime = false;
+                          showTimer = false;
+                        });
                         Navigator.pop(context);
+
                       },
                       child: Image.asset(
                         IconImageRoutes.blueCircleCancel,
@@ -148,7 +163,8 @@ class _BgStreakModalState extends State<BgStreakModal> {
                 SizedBox(
                   height: 20.h,
                 ),
-                Container(
+               showTimer ?
+               lostStreakAfterRestoreTime ? SizedBox() : Container(
                   width: state.userStreakDetails['restoreTimeExpiry'] != null
                       ? 220.w
                       : 160.w,
@@ -183,7 +199,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                             )
                     ],
                   ),
-                ),
+                ) : SizedBox(),
                 SizedBox(
                   height: 20.h,
                 ),
@@ -232,7 +248,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                                 offset: const Offset(0, -30),
                                 // Adjust offset for subscript
                                 child: Text(
-                                  'Days',
+                                  state.userStreakDetails['streak'] == 1 ? 'Day' : 'Days',
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     color: Color(0xFF925B58),
@@ -312,7 +328,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                                             color: Color(0xFF436B98))),
                                     TextSpan(
                                         text:
-                                            'streak!\nYou can restore it with a gem.'),
+                                            lostStreakAfterRestoreTime ? 'streak!\nPlay a game to start your streak' : 'streak!\nYou can restore it with a gem.'),
                                   ])),
                             ),
                           ),
@@ -331,21 +347,29 @@ class _BgStreakModalState extends State<BgStreakModal> {
                 SizedBox(
                   height: 20.h,
                 ),
-                GestureDetector(
+               showTimer ? lostStreakAfterRestoreTime ? SizedBox() : GestureDetector(
                   onTap: () {
                     soundManager.playClickSound();
                     if (state.userStreakDetails['isLost'] &&
                         state.userStreakDetails['restoreTimeExpiry'] != null) {
-                      context.read<UserBloc>().add(RestoreStreak());
-                      context.read<UserBloc>().add(FetchUserStreakDetails());
-                    } else {
-                      Flushbar(
-                        message: 'Not enough gems',
-                        flushbarPosition: FlushbarPosition.TOP,
-                        flushbarStyle: FlushbarStyle.GROUNDED,
-                        backgroundColor: Colors.red,
-                        duration: Duration(seconds: 3),
-                      ).show(context);
+                      if (BlocProvider.of<AuthenticationBloc>(context)
+                              .state
+                              .user
+                              .gems <=
+                          1) {
+                        Flushbar(
+                          message: 'Not enough gems',
+                          flushbarPosition: FlushbarPosition.TOP,
+                          flushbarStyle: FlushbarStyle.GROUNDED,
+                          backgroundColor: Colors.red,
+                          duration: Duration(seconds: 3),
+                        ).show(context);
+                      } else {
+                        context.read<UserBloc>().add(RestoreStreak());
+                        Future.delayed(Duration(seconds: 2), (){
+                          context.read<UserBloc>().add(FetchUserStreakDetails());
+                        });
+                      }
                     }
                   },
                   child: Padding(
@@ -422,7 +446,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                             ),
                     ),
                   ),
-                ),
+                ): SizedBox(),
                 SizedBox(
                   height: 20.h,
                 ),

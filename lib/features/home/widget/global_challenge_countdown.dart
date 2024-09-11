@@ -5,7 +5,11 @@ import '../../../shared/constants/image_routes.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 class GlobalChallengeCountDown extends StatelessWidget {
-  const GlobalChallengeCountDown({super.key});
+  const GlobalChallengeCountDown({super.key, required this.days, required this.hours, required this.minutes, required this.seconds});
+  final int days;
+  final int hours;
+  final int minutes;
+  final int seconds;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,7 @@ class GlobalChallengeCountDown extends StatelessWidget {
                     strokeWidth: 3,
                   ),
                   StrokeText(
-                    text: '22D:07H:23M:56S',
+                    text: '${days}D:${hours}H:${minutes}M:${seconds}s',
                     textStyle: TextStyle(
                         letterSpacing: 4,
                         color: AppColors.accentColor,

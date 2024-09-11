@@ -15,5 +15,4 @@ class AppRoutes {
   static const String arcadeScreen = 'arcade_screen';
   static const String myLeagueScreen = 'my_league_screen';
   static const String fantasyBibleLeagueHomeScreen = 'fbl_home_screen';
-
 }

@@ -349,22 +349,25 @@ class _MyLeagueScreenState extends State<MyLeagueScreen> {
                                                         ),
                                                         children: [
                                                           TextSpan(
-                                                              text: state
-                                                                      .leagueData
-                                                                      .league
-                                                                      .isOpen
-                                                                  ? ' • Open'
-                                                                  : ' • Closed',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Mikado',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w900,
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontSize:
-                                                                      14.sp))
+                                                            text:
+
+                                                          state.leagueData.league.status.toLowerCase() == 'active' ? state
+                                                                    .leagueData
+                                                                    .league
+                                                                    .isOpen
+                                                                ? ' • Open'
+                                                                : ' • Closed' : ' Ended',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Mikado',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w900,
+                                                                color:
+                                                                 state.leagueData.league.status.toLowerCase() == 'active'  ?  state.leagueData.league.isOpen ? Color(0xFF1A7E1C) : Colors.red :  Colors.red,
+                                                                fontSize:
+                                                                    14.sp),
+                                                          )
                                                         ]),
                                                   )
                                                 ],

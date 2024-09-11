@@ -82,12 +82,12 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
               break;
             case InternetConnectionStatus.disconnected:
               print('You are disconnected from the internet.');
+              if (!mounted) return;
               showNetworkModal(context);
               break;
           }
         });
   }
-
 
 
 
@@ -169,11 +169,11 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                     _selectedArcadeTab = false;
                     _selectedTabIndex = 2;
                   });
-                  if(BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0){
-                    BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
-                    BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
-                    BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
-                  }
+                  // if(BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0){
+                  //   BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+                  //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
+                  //   BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+                  // }
                 },
               ),
               BottomTabItem(

@@ -140,7 +140,7 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
                   coinsGained: state.coinsGained!,
                   skipQuestion: () => _moveToNextPage(),
                   durationPerQuestion: durationPerQuestion,
-                  isWhoIsWho: false,
+                  isWhoIsWho: false, gameMode: '',
                 );
               },
             ),

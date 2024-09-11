@@ -21,6 +21,7 @@ import 'package:the_bible_game/shared/utils/user_badge.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/modal/network_modal.dart';
+import '../../global_challenge/bloc/global_challenge_bloc.dart';
 import '../../pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
 import '../widget/user_profile_info.dart';
 import 'package:intl/intl.dart';
@@ -33,7 +34,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
+  Timer? _timer;
+  Duration _duration = Duration();
+  bool _globalChallengeIsComingSoon = false;
 
   Future<void> setSoundState() async {
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
@@ -47,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   initializeWallet() {
     final userState = BlocProvider.of<AuthenticationBloc>(context).state;
     if (userState.user.id != 0) {
@@ -59,9 +61,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
   fetchGameData() {
     final userState = BlocProvider.of<AuthenticationBloc>(context).state;
-    if(userState.user.id != 0){
-      BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
+    if (userState.user.id != 0) {
+      BlocProvider.of<PilgrimProgressBloc>(context)
+          .add(FetchPilgrimProgressLevelData());
       BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+      BlocProvider.of<AuthenticationBloc>(context)
+          .add(FetchUserDataRequested());
+      BlocProvider.of<GlobalChallengeBloc>(context)
+          .add(FetchGlobalChallengeGames());
+    }
+  }
+
+  setGlobalChallengeTimer() {
+    final globalChallenge = BlocProvider.of<GlobalChallengeBloc>(context)
+        .state
+        .globalChallengeGames;
+    final topGlobalChallenge = globalChallenge[0];
+    if (topGlobalChallenge.isComingSoon!) {
+      setState(() {
+        _globalChallengeIsComingSoon = true;
+      });
+      DateTime targetDate = DateTime.parse(topGlobalChallenge.startDate!);
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        final now = DateTime.now();
+        final difference = targetDate.difference(now);
+        if (difference.isNegative) {
+          timer.cancel();
+        } else {
+          setState(() {
+            _duration = difference;
+          });
+        }
+      });
     }
   }
 
@@ -71,6 +102,13 @@ class _HomeScreenState extends State<HomeScreen> {
     setSoundState();
     initializeWallet();
     fetchGameData();
+    setGlobalChallengeTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -79,6 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
     final soundManager = settingsBloc.soundManager;
+    final days = _duration.inDays;
+    final hours = _duration.inHours.remainder(24);
+    final minutes = _duration.inMinutes.remainder(60);
+    final seconds = _duration.inSeconds.remainder(60);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFF548CD7),
@@ -124,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 10.h,
                       ),
                       SizedBox(
-                        height: screenHeight - (200.h + 10.h),
+                        height: screenHeight - (200.h + 10.h ),
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
@@ -162,7 +204,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(
                                 height: 10.h,
                               ),
-                              GlobalChallengeCountDown(),
+                              _globalChallengeIsComingSoon
+                                  ? GlobalChallengeCountDown(
+                                      days: days,
+                                      hours: hours,
+                                      minutes: minutes,
+                                      seconds: seconds,
+                                    )
+                                  : SizedBox(),
                               SizedBox(
                                 height: 10.h,
                               ),
@@ -174,13 +223,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 gameImageWidth: 100.w,
                                 onTap: () {
                                   soundManager.playClickSound();
-                                  if(state.user.id != 0){
+                                  if (state.user.id != 0) {
                                     Navigator.pushNamed(
                                         context, AppRoutes.quickGameHomeScreen);
-                                  }else{
-                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  } else {
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.profileScreen);
                                   }
-
                                 },
                               ),
                               GameCard(
@@ -191,13 +240,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 gameImageWidth: 90.w,
                                 onTap: () {
                                   soundManager.playClickSound();
-                                  if(state.user.id != 0){
+                                  if (state.user.id != 0) {
                                     Navigator.pushNamed(
                                         context, AppRoutes.whoIsWhoHomeScreen);
-                                  }else{
-                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  } else {
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.profileScreen);
                                   }
-
                                 },
                               ),
                               GameCard(
@@ -208,13 +257,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 gameImageWidth: 75.w,
                                 onTap: () {
                                   soundManager.playClickSound();
-                                  if(state.user.id != 0){
+                                  if (state.user.id != 0) {
                                     Navigator.pushNamed(context,
                                         AppRoutes.pilgrimProgressHomeScreen);
-                                  }else{
-                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  } else {
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.profileScreen);
                                   }
-
                                 },
                               ),
                               GameCard(
@@ -225,16 +274,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 gameImageWidth: 80.w,
                                 onTap: () {
                                   soundManager.playClickSound();
-                                  if(state.user.id != 0){
-                                    Navigator.pushNamed(
-                                        context, AppRoutes.questionLoadingScreen,
+                                  if (state.user.id != 0) {
+                                    Navigator.pushNamed(context,
+                                        AppRoutes.questionLoadingScreen,
                                         arguments: {
                                           'gameType': 'four_scriptures_game'
                                         });
-                                  }else{
-                                    Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                  } else {
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.profileScreen);
                                   }
-
                                 },
                               ),
                               SizedBox(

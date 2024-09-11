@@ -5,7 +5,11 @@ import '../constants/image_routes.dart';
 
 class QuestionClock extends StatelessWidget {
   const QuestionClock(
-      {super.key, required this.animationController, this.isWhoIsWho, this.whoIsWhoGameDuration, this.durationPerQuestion});
+      {super.key,
+      required this.animationController,
+      this.isWhoIsWho,
+      this.whoIsWhoGameDuration,
+      this.durationPerQuestion});
 
   final AnimationController animationController;
   final bool? isWhoIsWho;
@@ -21,9 +25,10 @@ class QuestionClock extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(5.w),
         decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Color(0xFFD77A61), width: 2.w),
-            shape: BoxShape.circle),
+          color: Colors.white,
+          border: Border.all(color: Color(0xFFD77A61), width: 2.w),
+          shape: BoxShape.circle,
+        ),
         child: Stack(
           children: [
             Image.asset(
@@ -35,9 +40,11 @@ class QuestionClock extends StatelessWidget {
               left: 12.w,
               child: ValueListenableBuilder(
                 builder: (context, value, child) {
-                  int gameDuration = isWhoIsWho! ? (whoIsWhoGameDuration! * 60) : durationPerQuestion!;
+                  int gameDuration = isWhoIsWho!
+                      ? (whoIsWhoGameDuration! * 60)
+                      : durationPerQuestion!;
                   int totalSeconds = (gameDuration * (1 - value)).toInt();
-                  int remainingMinute = totalSeconds ~/ 60 ;
+                  int remainingMinute = totalSeconds ~/ 60;
                   int remainingSeconds = totalSeconds % 60;
                   return isWhoIsWho!
                       ? Text(
@@ -57,7 +64,7 @@ class QuestionClock extends StatelessWidget {
                 },
                 valueListenable: animationController,
               ),
-            )
+            ),
           ],
         ),
       ),

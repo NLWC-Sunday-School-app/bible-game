@@ -59,9 +59,9 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
         state.coinsGained!,
         state.totalBonusCoinsGained!,
         (state.totalTimeSpent! ~/ state.quickGameQuestions!.length),
-        authenticationState.user!.rank,
+        authenticationState.user.rank,
         state.noOfCorrectAnswers,
-        authenticationState.user!.id,
+        authenticationState.user.id,
         null,
         5,
       );
@@ -93,6 +93,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
         quickGameQuestionLoaded: true,
         isLoadingGameQuestions: false,
       ));
+      emit(state.copyWith(quickGameQuestionLoaded: false));
     } catch (_) {
       emit(state.copyWith(
           isLoadingGameQuestions: false, quickGameQuestionLoaded: false));
@@ -114,54 +115,56 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
         emit(state.copyWith(hasReachedMaximumTopicSelection: true));
       }
     }
-    emit(state.copyWith(selectedGameTopics: selectedTopics));
+    emit(state.copyWith(selectedGameTopics: selectedTopics, hasReachedMaximumTopicSelection: false));
   }
 
   void _onOptionSelected(OptionSelected event, Emitter<QuickGameState> emit) {
     final soundManager = _settingsBloc.soundManager;
     final settingsState = _settingsBloc.state;
+    if(!state.hasAnswered){
+      int coinsGained = state.coinsGained ?? 0;
+      int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
+      int noOfCorrectAnswers = state.noOfCorrectAnswers;
+      final pointsPerQuestion = int.parse(settingsState.gamePlaySettings['base_score_pilgrim_progress']);
+      final durationPerQuestion = int.parse(settingsState.gamePlaySettings['normal_game_speed']);
+      final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
+      final totalTimeSpent = state.totalTimeSpent!  + (durationPerQuestion - event.remainingTime);
+      final isCorrect = event.gameQuestion.answer == event.gameQuestion.options[event.selectedOptionIndex];
+      if (isCorrect) {
+        noOfCorrectAnswers++;
+        soundManager.playCorrectAnswerSound();
+        dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
+            halfOfTotalPointPerQuestion;
+        coinsGained = state.coinsGained! +
+            (halfOfTotalPointPerQuestion + timeBonusPoint).round();
+        totalBonusCoinsGained =
+            (state.totalBonusCoinsGained! + timeBonusPoint).round();
 
-    int coinsGained = state.coinsGained ?? 0;
-    int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
-    int noOfCorrectAnswers = state.noOfCorrectAnswers;
-    final pointsPerQuestion = int.parse(settingsState.gamePlaySettings['base_score_pilgrim_progress']);
-    final durationPerQuestion = int.parse(settingsState.gamePlaySettings['normal_game_speed']);
-    final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
-    final totalTimeSpent = state.totalTimeSpent!  + (durationPerQuestion - event.remainingTime);
-    final isCorrect = event.gameQuestion.answer == event.gameQuestion.options[event.selectedOptionIndex];
-    if (isCorrect) {
-      noOfCorrectAnswers++;
-      soundManager.playCorrectAnswerSound();
-      dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
-          halfOfTotalPointPerQuestion;
-      coinsGained = state.coinsGained! +
-          (halfOfTotalPointPerQuestion + timeBonusPoint).round();
-      totalBonusCoinsGained =
-          (state.totalBonusCoinsGained! + timeBonusPoint).round();
+      } else {
+        soundManager.playWrongAnswerSound();
+      }
 
-    } else {
-      soundManager.playWrongAnswerSound();
+      emit(state.copyWith(
+          hasAnswered: true,
+          isCorrectAnswer: isCorrect,
+          correctAnswer: event.gameQuestion.answer,
+          selectedOptionIndex: event.selectedOptionIndex,
+          coinsGained: coinsGained,
+          totalBonusCoinsGained: totalBonusCoinsGained,
+          totalTimeSpent: totalTimeSpent,
+          noOfCorrectAnswers: noOfCorrectAnswers
+      ));
+      Future.delayed(Duration(seconds: 1), (){
+        add(MoveToNextPage());
+      });
+
     }
-
-    emit(state.copyWith(
-        hasAnswered: true,
-        isCorrectAnswer: isCorrect,
-        correctAnswer: event.gameQuestion.answer,
-        selectedOptionIndex: event.selectedOptionIndex,
-        coinsGained: coinsGained,
-        totalBonusCoinsGained: totalBonusCoinsGained,
-        totalTimeSpent: totalTimeSpent,
-        noOfCorrectAnswers: noOfCorrectAnswers
-    ));
-   Future.delayed(Duration(seconds: 1), (){
-     add(MoveToNextPage());
-   });
 
   }
 
   void _onMoveToNextPage(MoveToNextPage event, Emitter<QuickGameState> emit) {
     emit(state.copyWith(hasAnswered: false,));
-      if ((state.quickGameQuestions?.length ?? 0) >
+    if ((state.quickGameQuestions?.length ?? 0) >
           (state.selectedOptionIndex ?? 0) + 1) {
         emit(state.copyWith(
           selectedOptionIndex: null,

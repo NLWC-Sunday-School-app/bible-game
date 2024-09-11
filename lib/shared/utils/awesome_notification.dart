@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 class AwesomeNotification{
 
-
   static Future<void> initializeRemoteNotifications(
       {required bool debug}) async {
     await Firebase.initializeApp();
@@ -55,3 +54,4 @@ class AwesomeNotification{
   }
 
 }
+
