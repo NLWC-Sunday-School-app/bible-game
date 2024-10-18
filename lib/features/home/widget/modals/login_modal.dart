@@ -1,16 +1,17 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/home/widget/modals/reset_password_modal.dart';
-import 'package:the_bible_game/features/home/widget/modals/successful_login_modal.dart';
-import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/features/home/widget/modals/reset_password_modal.dart';
+import 'package:bible_game/features/home/widget/modals/successful_login_modal.dart';
+import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import '../../../../app.dart';
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -18,6 +19,8 @@ import '../../../../shared/utils/token_notifier.dart';
 import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
+
+import '../../../global_challenge/bloc/global_challenge_bloc.dart';
 
 void showLoginModal(BuildContext context) {
   showDialog(
@@ -219,16 +222,13 @@ class _LoginModalState extends State<LoginModal> {
                   }
 
                   if(state.token != null){
-                    print('token accepted');
+                    BlocProvider.of<GlobalChallengeBloc>(context)
+                        .add(FetchGlobalChallengeGames());
                   final tokenNotifier =
                       Provider.of<TokenNotifier>(context, listen: false);
                   tokenNotifier.setToken(state.token);
-                  final prefs = SharedPreferences.getInstance();
-                  prefs.then((sharedPreferences) {
-                    sharedPreferences.setString('userToken', state.token!);
-                    sharedPreferences.setString(
-                        'refreshToken', state.refreshToken!);
-                  });
+                    GetStorage().write('user_token', state.token!);
+                    GetStorage().write('refresh_token', state.refreshToken!);
                    Navigator.pop(context);
                    showSuccessfulLoginModal(context);
                   }
@@ -249,9 +249,9 @@ class _LoginModalState extends State<LoginModal> {
                   //   tokenNotifier.setToken(state.token);
                   //   final prefs = SharedPreferences.getInstance();
                   //   prefs.then((sharedPreferences) {
-                  //     sharedPreferences.setString('userToken', state.token!);
+                  //     sharedPreferences.setString('user_token', state.token!);
                   //     sharedPreferences.setString(
-                  //         'refreshToken', state.refreshToken!);
+                  //         'refresh_token', state.refresh_token!);
                   //   });
                   //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
                   // } else if (state.isUnauthenticated) {

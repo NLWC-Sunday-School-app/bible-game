@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 
 import '../../features/settings/bloc/settings_bloc.dart';
 

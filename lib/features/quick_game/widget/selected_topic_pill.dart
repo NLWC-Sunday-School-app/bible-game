@@ -17,39 +17,17 @@ class SelectedTopicPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final QuickGameBloc bloc = BlocProvider.of<QuickGameBloc>(context);
     final soundManager = context.read<SettingsBloc>().soundManager;
-    return  GestureDetector(
-      onTap: () {
-        soundManager.playClickSound();
-      bloc.add(SelectQuickGameTopic(QuickGameTopic(id: id, tag: topic)));
-    },
-      child: Container(
-        constraints: new BoxConstraints(
-          maxWidth: 120.w,
+    return   Chip(label: Text(topic, style: TextStyle(color: Color(0xFF2A539E)),),
+        deleteIcon: Icon(Icons.close, color: Color(0xFF2A539E),),
+        onDeleted: () {
+          soundManager.playClickSound();
+          bloc.add(SelectQuickGameTopic(QuickGameTopic(id: id, tag: topic)));
+        },
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24.r),
+          side: BorderSide(color: Color(0xFF38AECC)),
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: 8.w,
-          vertical: 5.h,
-        ),
-        decoration: BoxDecoration(
-            color: Color(0xFFFDFFF7),
-            borderRadius: BorderRadius.circular(24.r),
-            border: Border.all(color: Color(0xFF38AECC), width: 1.5.w)
-        ),
-        child: Row(
-          children: [
-            Text(
-              topic,
-              style: TextStyle(
-                fontSize: 13.sp,
-                color: Color(0xFF2A539E),
-                fontWeight: FontWeight.w500
-              ),
-            ),
-            Spacer(),
-            Image.asset(IconImageRoutes.blueCancel, width: 16.w,)
-          ],
-        ),
-      ),
-    );
+      );
   }
 }

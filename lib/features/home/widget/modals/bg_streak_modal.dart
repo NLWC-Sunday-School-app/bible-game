@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:another_flushbar/flushbar.dart';
+import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
-import 'package:the_bible_game/shared/features/user/model/user.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/shared/features/user/model/user.dart';
 
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -46,43 +47,47 @@ class _BgStreakModalState extends State<BgStreakModal> {
   void initState() {
     super.initState();
     timeLeft = Duration(hours: 0, minutes: 0, seconds: 0);
+    manageStreakTime();
+  }
+
+  manageStreakTime(){
     final streakDetails = BlocProvider.of<UserBloc>(context).state.userStreakDetails;
     final lastStreakTime = streakDetails['lastStreakTime'];
-     print('streakDetails: $streakDetails');
     if (lastStreakTime != null) {
       if (streakDetails['restoreTimeExpiry'] == null) {
         DateTime startTime = DateTime.parse(streakDetails['lastStreakTime']);
-        print('start time ${startTime}');
         expiryTime = startTime.add(Duration(hours: 24));
-        print('expiry time ${expiryTime}');
         timeLeft = expiryTime.difference(DateTime.now());
-        print('Now Time ${DateTime.now()}');
-        print('time left ${timeLeft}');
-        setState(() {
-          showTimer = true;
-        });
         timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
           setState(() {
             timeLeft = expiryTime.difference(DateTime.now());
             if (timeLeft.isNegative) {
               timer.cancel();
+            }else{
+              setState(() {
+                showTimer = true;
+              });
             }
           });
         });
       } else {
         DateTime restoreTime =
-            DateTime.parse(streakDetails['restoreTimeExpiry']);
+        DateTime.parse(streakDetails['restoreTimeExpiry']);
         DateTime lastStreakTime = DateTime.parse(streakDetails['lastStreakTime']);
         timeLeft = restoreTime.difference(DateTime.now());
-        print('time is negative $timeLeft');
+
         timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
           setState(() {
             timeLeft = restoreTime.difference(DateTime.now());
             if (timeLeft.isNegative) {
-              showTimer = true;
+              showTimer = false;
               lostStreakAfterRestoreTime = true;
               timeLeft = Duration.zero;
               timer.cancel();
+            }else{
+              setState(() {
+                showTimer = true;
+              });
             }
           });
         });
@@ -366,8 +371,11 @@ class _BgStreakModalState extends State<BgStreakModal> {
                         ).show(context);
                       } else {
                         context.read<UserBloc>().add(RestoreStreak());
+                        showCustomToast(context, 'Restored Successfully');
                         Future.delayed(Duration(seconds: 2), (){
+                          context.read<AuthenticationBloc>().add(FetchUserDataRequested());
                           context.read<UserBloc>().add(FetchUserStreakDetails());
+                          manageStreakTime();
                         });
                       }
                     }
@@ -403,7 +411,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 StrokeText(
-                                  text: 'Restore for',
+                                  text: 'Restore  for',
                                   textStyle: TextStyle(
                                     color: !state.userStreakDetails['isLost'] &&
                                             state.userStreakDetails[

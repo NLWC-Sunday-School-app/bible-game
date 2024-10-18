@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 
 void showNotEnoughCoinsModal(BuildContext context, {required VoidCallback onTap}) {
   showDialog(
@@ -28,12 +28,18 @@ class NotEnoughCoinsModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
       child: SizedBox(
-        height: 400.h,
-        width: 500.h,
+        height: screenWidth >= 500
+            ? 400.h
+            : screenHeight >= 800
+            ? 450.h
+            : 500.h,
+        width: screenWidth >= 500 ? 400.h : 500.h,
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(

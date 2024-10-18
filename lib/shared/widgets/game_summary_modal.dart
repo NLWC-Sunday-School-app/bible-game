@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
 import 'package:stroke_text/stroke_text.dart';
 import '../constants/image_routes.dart';
 
@@ -66,8 +66,10 @@ class GameSummaryModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: 500.h,
+      height: screenHeight <= 700 ? 550.h : 500.h,
       child: Container(
         height: 450.h,
         width: double.infinity,

@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
-import 'package:the_bible_game/features/pilgrim_progress/repository/pilgrim_progress_repository.dart';
-import 'package:the_bible_game/features/pilgrim_progress/widget/modal/retry_modal.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/widgets/question_container.dart';
+import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:bible_game/features/pilgrim_progress/repository/pilgrim_progress_repository.dart';
+import 'package:bible_game/features/pilgrim_progress/widget/modal/retry_modal.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/widgets/question_container.dart';
 
 import '../../../shared/constants/app_routes.dart';
+import '../../../shared/constants/colors.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/widgets/game_summary_modal.dart';
 import '../widget/modal/new_rank_modal.dart';
 
@@ -94,6 +96,7 @@ class _PilgrimQuestionScreenState extends State<PilgrimQuestionScreen> with Sing
       BlocProvider.of<PilgrimProgressBloc>(context).add(CalculateGameScore());
       Timer(Duration(seconds: 2), (){
         BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+        BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
       });
     }
   }
@@ -117,34 +120,41 @@ class _PilgrimQuestionScreenState extends State<PilgrimQuestionScreen> with Sing
   },
   builder: (context, state) {
     return Scaffold(
-      backgroundColor: Colors.red,
-      body: PageView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: _pageController,
-          itemCount: state.pilgrimProgressQuestions!.length,
-        itemBuilder: (BuildContext context, int index) {
-          return QuestionContainer(
-            gameQuestion: state.pilgrimProgressQuestions![index],
-            animationController: _animationController,
-              currentPage: _currentPage + 1,
-            totalQuestions: state.pilgrimProgressQuestions!.length,
-            optionSelectedCallback: (selectedOptionIndex){
-              final remainingTime = (30 * (1 - _animationController.value)).toInt();
-              context.read<PilgrimProgressBloc>().add(OptionSelected(
-                selectedOptionIndex: selectedOptionIndex,
-                gameQuestion: state.pilgrimProgressQuestions![index],
-                remainingTime: remainingTime,
-              ));
-            },
-            selectedOptionIndex: state.selectedOptionIndex ?? -1,
-            isCorrectAnswer: state.isCorrectAnswer ?? false,
-            hasAnswered: state.hasAnswered,
-            coinsGained: state.coinsGained,
-            skipQuestion: () => _moveToNextPage(),
-            durationPerQuestion: durationPerQuestion, gameMode: 'pilgrimProgress',
-
-          );
-        }
+      appBar: AppBar(
+        elevation: 0,
+        toolbarHeight: 0,
+        backgroundColor: Color(0xFF998BBC), // Set background color to transparent
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: PageView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            controller: _pageController,
+            itemCount: state.pilgrimProgressQuestions!.length,
+          itemBuilder: (BuildContext context, int index) {
+            return QuestionContainer(
+              gameQuestion: state.pilgrimProgressQuestions![index],
+              animationController: _animationController,
+                currentPage: _currentPage + 1,
+              totalQuestions: state.pilgrimProgressQuestions!.length,
+              optionSelectedCallback: (selectedOptionIndex){
+                final remainingTime = (30 * (1 - _animationController.value)).toInt();
+                context.read<PilgrimProgressBloc>().add(OptionSelected(
+                  selectedOptionIndex: selectedOptionIndex,
+                  gameQuestion: state.pilgrimProgressQuestions![index],
+                  remainingTime: remainingTime,
+                ));
+              },
+              selectedOptionIndex: state.selectedOptionIndex ?? -1,
+              isCorrectAnswer: state.isCorrectAnswer ?? false,
+              hasAnswered: state.hasAnswered,
+              coinsGained: state.coinsGained,
+              skipQuestion: () => _moveToNextPage(),
+              durationPerQuestion: durationPerQuestion, gameMode: 'pilgrimProgress',
+        
+            );
+          }
+        ),
       ),
     );
   },

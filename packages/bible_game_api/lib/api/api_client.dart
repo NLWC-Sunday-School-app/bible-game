@@ -20,7 +20,7 @@ class ApiClient {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         options.headers = {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
           'accept': '*/*',
           'Authorization': 'Bearer $token'
         };

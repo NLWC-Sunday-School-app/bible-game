@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
 
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 
 void showQuickGameTipsModal(BuildContext context, bool hasTimer) {
+  double screenHeight = MediaQuery.of(context).size.height;
+  double screenWidth = MediaQuery.of(context).size.width;
   final soundManager = context
       .read<SettingsBloc>()
       .soundManager;
@@ -22,8 +24,8 @@ void showQuickGameTipsModal(BuildContext context, bool hasTimer) {
           insetAnimationCurve: Curves.bounceInOut,
           insetAnimationDuration: const Duration(milliseconds: 500),
           child: SizedBox(
-            height: 400.h,
-            width: 400.w,
+            height: screenHeight <= 700 ? 480.h : 420.h,
+            width: screenWidth <= 400 ? 450.w : 400.w,
             child: Container(
               decoration: BoxDecoration(
                   image: DecorationImage(

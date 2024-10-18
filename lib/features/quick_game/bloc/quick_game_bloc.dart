@@ -3,7 +3,7 @@ import 'package:bible_game_api/model/quick_game_topic.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/quick_game_repository.dart';
 

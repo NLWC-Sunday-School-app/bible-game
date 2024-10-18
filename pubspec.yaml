@@ -1,5 +1,5 @@
-name: the_bible_game
-description: Bible Game for all men
+name: bible_game
+description: Bible Game for all men to know God
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 3.0.0+18
+version: 2.1.0+18
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -68,7 +68,6 @@ dependencies:
   tutorial_coach_mark: ^1.2.4
   cupertino_will_pop_scope: ^1.2.1
   upgrader: ^10.3.0
-  package_info_plus: ^5.0.1
   dio: ^5.3.3
   #  new_version_plus: ^0.0.3
   launch_review: ^3.0.1
@@ -93,8 +92,6 @@ dependencies:
   countries_flag: ^0.0.1
   countries_world_map: ^1.0.2
   url_launcher: ^6.3.0
-
-
 
 dev_dependencies:
   flutter_test:

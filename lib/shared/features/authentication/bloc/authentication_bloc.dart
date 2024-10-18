@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bible_game_api/model/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/awesome_notification.dart';
 import '../../user/repository/user_repository.dart';
@@ -34,6 +35,7 @@ class AuthenticationBloc
     on<SendForgotPasswordMail>(_onSendForgotPasswordEmail);
     on<VerifyOTP>(_onVerifyOTP);
     on<ResetPassword>(_onResetPassword);
+    on<DeleteAccount>(_onDeleteAccount);
   }
 
   Future<void> _onAuthenticationStatusChanged(
@@ -53,18 +55,17 @@ class AuthenticationBloc
         final loggedOut = await _authenticationRepository.logOut();
         if (loggedOut) {
           emit(state.copyWith(
-            isUnauthenticated: true,
-            isLoadingLogin: false,
-            isLoggingOut: false,
-            user: emptyUser,
-            token: null,
-            refreshToken: null,
-            isLoggedIn: false,
-            hasLoggedOut:true
-          ));
+              isUnauthenticated: true,
+              isLoadingLogin: false,
+              isLoggingOut: false,
+              user: emptyUser,
+              token: null,
+              refreshToken: null,
+              isLoggedIn: false,
+              hasLoggedOut: true));
           emit(state.copyWith(hasLoggedOut: false));
           // final SharedPreferences prefs = await SharedPreferences.getInstance();
-          // await prefs.remove('userToken');
+          // await prefs.remove('user_token');
         }
       } catch (_) {
         emit(state.copyWith(isLoggingOut: false, hasLoggedOut: false));
@@ -81,11 +82,14 @@ class AuthenticationBloc
         await _authenticationRepository.logIn(event.email, event.password);
     if (response.containsKey('token')) {
       emit(state.copyWith(
-          isLoggedIn: true,
-          isLoadingLogin: false,
-          token: response['token'],
-          refreshToken: response['refreshToken'],
-          failedToLogin: false));
+        isLoggedIn: true,
+        isLoadingLogin: false,
+        token: response['token'],
+        refreshToken: response['refreshToken'],
+        failedToLogin: false,
+      ));
+      GetStorage().write('user_token', state.token!);
+      GetStorage().write('refresh_token', state.refreshToken!);
       add(FetchUserDataRequested());
       add(UpdateFCMToken());
       emit(state.copyWith(isLoadingLogin: false, failedToLogin: false));
@@ -112,7 +116,7 @@ class AuthenticationBloc
           isLoadingLogin: false,
           token: response['token'],
           refreshToken: response['refreshToken'],
-          failedToRegister: false
+          failedToRegister: false,
         ));
         Future.delayed(Duration(seconds: 1), () {
           add(FetchUserDataRequested());
@@ -151,15 +155,26 @@ class AuthenticationBloc
     Emitter<AuthenticationState> emit,
   ) async {
     try {
-      final newTokens = await _authenticationRepository.refreshToken('');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final newTokens =
+          await _authenticationRepository.refreshToken(event.refreshToken);
+      print('new Tokens $newTokens');
       emit(state.copyWith(
         token: newTokens['token'],
         refreshToken: newTokens['refreshToken'],
       ));
-      add(FetchUserDataRequested());
+      GetStorage().write('user_token', newTokens['token']);
+      GetStorage().write('refresh_token', newTokens['refreshToken']);
+
+      Future.delayed(Duration(seconds: 2), () {
+        add(FetchUserDataRequested());
+      });
     } catch (_) {
       emit(state.copyWith(
-          isUnauthenticated: true, token: null, refreshToken: null));
+        isUnauthenticated: true,
+        token: null,
+        refreshToken: null,
+      ));
     }
   }
 
@@ -202,4 +217,20 @@ class AuthenticationBloc
       emit(state.copyWith(isResettingPassword: false));
     }
   }
+
+  Future<void> _onDeleteAccount(
+      DeleteAccount event, Emitter<AuthenticationState> emit) async {
+    try {
+      emit(state.copyWith(isDeletingAccount: true));
+       add(AuthenticationLogoutRequested());
+      await _authenticationRepository.deleteAccount(state.user.id);
+      emit(state.copyWith(isDeletingAccount: false, hasDeletedAccount: true));
+      emit(state.copyWith(isDeletingAccount: false, hasDeletedAccount: false));
+    } catch (_) {
+      emit(state.copyWith(isDeletingAccount: false, hasDeletedAccount: false));
+    }
+  }
+
 }
+
+

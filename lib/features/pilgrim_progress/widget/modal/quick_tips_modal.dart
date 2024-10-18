@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
 
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
 
 void showPilgrimProgressTipsModal(BuildContext context) {
   showDialog(
@@ -24,7 +24,9 @@ class PilgrimProgressTipsModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     final settingsState = BlocProvider.of<SettingsBloc>(context).state;
+    final soundManager = context.read<SettingsBloc>().soundManager;
     var formatter = NumberFormat('#,##,###');
     return BlocBuilder<PilgrimProgressBloc, PilgrimProgressState>(
       builder: (context, state) {
@@ -34,7 +36,8 @@ class PilgrimProgressTipsModal extends StatelessWidget {
           insetAnimationCurve: Curves.bounceInOut,
           insetAnimationDuration: const Duration(milliseconds: 500),
           child: SizedBox(
-            height: 500.h,
+            height: screenHeight <= 700 ? 550.h : 510.h,
+            width: screenWidth <= 400 ? 450.w : 400.w,
             child: Container(
               decoration: BoxDecoration(
                   image: DecorationImage(
@@ -244,10 +247,13 @@ class PilgrimProgressTipsModal extends StatelessWidget {
                   BlueButton(
                     buttonText: 'Play Now',
                     buttonIsLoading: false,
-                    onTap: () => Navigator.pushReplacementNamed(
-                      context,
-                      AppRoutes.pilgrimProgressQuestionScreen,
-                    ),
+                    onTap: () {
+                      soundManager.playClickSound();
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.pilgrimProgressQuestionScreen,
+                      );
+                    },
                     width: 280.w,
                   )
                 ],

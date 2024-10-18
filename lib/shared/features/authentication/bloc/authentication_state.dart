@@ -17,6 +17,8 @@ class AuthenticationState extends Equatable {
   final bool failedToLogin;
   final bool failedToRegister;
   final bool hasLoggedOut;
+  final bool isDeletingAccount;
+  final bool hasDeletedAccount;
 
   const AuthenticationState(
       {this.isLoggedIn = false,
@@ -35,26 +37,28 @@ class AuthenticationState extends Equatable {
       this.failedToLogin = false,
       this.failedToRegister = false,
       this.hasLoggedOut = false,
-      });
+      this.isDeletingAccount = false,
+      this.hasDeletedAccount = false});
 
-  AuthenticationState copyWith({
-    bool? isLoggedIn,
-    bool? isUnauthenticated,
-    bool? isLoadingLogin,
-    bool? isLoggingOut,
-    bool? isSendingForgotPasswordCode,
-    bool? hasVerifiedCode,
-    bool? forgotPasswordMailSent,
-    bool? isResettingPassword,
-    bool? hasResetPassword,
-    bool? isVerifyingCode,
-    User? user,
-    String? token,
-    String? refreshToken,
-    bool? failedToLogin,
-    bool? failedToRegister,
-    bool? hasLoggedOut
-  }) {
+  AuthenticationState copyWith(
+      {bool? isLoggedIn,
+      bool? isUnauthenticated,
+      bool? isLoadingLogin,
+      bool? isLoggingOut,
+      bool? isSendingForgotPasswordCode,
+      bool? hasVerifiedCode,
+      bool? forgotPasswordMailSent,
+      bool? isResettingPassword,
+      bool? isDeletingAccount,
+      bool? hasDeletedAccount,
+      bool? hasResetPassword,
+      bool? isVerifyingCode,
+      User? user,
+      String? token,
+      String? refreshToken,
+      bool? failedToLogin,
+      bool? failedToRegister,
+      bool? hasLoggedOut}) {
     return AuthenticationState(
         isLoggedIn: isLoggedIn ?? this.isLoggedIn,
         isUnauthenticated: isUnauthenticated ?? this.isUnauthenticated,
@@ -68,13 +72,13 @@ class AuthenticationState extends Equatable {
         hasResetPassword: hasResetPassword ?? this.hasResetPassword,
         isVerifyingCode: isVerifyingCode ?? this.isVerifyingCode,
         isLoggingOut: isLoggingOut ?? this.isLoggingOut,
+        hasDeletedAccount: hasDeletedAccount ?? this.hasDeletedAccount,
         user: user ?? this.user,
         token: token ?? null,
         refreshToken: refreshToken ?? null,
         failedToLogin: failedToLogin ?? this.failedToLogin,
         failedToRegister: failedToRegister ?? this.failedToRegister,
-        hasLoggedOut:  hasLoggedOut ?? this.hasLoggedOut
-    );
+        hasLoggedOut: hasLoggedOut ?? this.hasLoggedOut);
   }
 
   @override
@@ -89,6 +93,7 @@ class AuthenticationState extends Equatable {
         isResettingPassword,
         hasResetPassword,
         isVerifyingCode,
+        hasDeletedAccount,
         user,
         token,
         refreshToken,

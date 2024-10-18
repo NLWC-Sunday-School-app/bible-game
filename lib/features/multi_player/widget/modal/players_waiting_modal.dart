@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/features/multi_player/widget/player_waiting_card.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
-import 'package:the_bible_game/shared/widgets/game_summary_modal.dart';
+import 'package:bible_game/features/multi_player/widget/player_waiting_card.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/widgets/game_summary_modal.dart';
 import '../../../../shared/constants/image_routes.dart';
 
 void showHostWaitingModal(BuildContext context) {

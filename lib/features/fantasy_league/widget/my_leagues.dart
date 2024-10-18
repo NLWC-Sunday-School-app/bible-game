@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
-import 'package:the_bible_game/features/fantasy_league/widget/league_card.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
+import 'package:bible_game/features/fantasy_league/widget/league_card.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
 
 import '../../../shared/constants/image_routes.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -42,7 +42,7 @@ class _MyLeaguesState extends State<MyLeagues> {
               : state.userLeagues.isNotEmpty
                   ? SizedBox(
                       height:
-                          widget.screenHeight - (150.h + 20.h + 72.h + 125.h),
+                          widget.screenHeight - (80.h + 20.h + 72.h + 125.h),
                       child: ListView.builder(
                         padding: EdgeInsets.zero,
                         itemCount: state.userLeagues.length,

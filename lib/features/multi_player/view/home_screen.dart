@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:the_bible_game/features/multi_player/widget/game_play_card.dart';
-import 'package:the_bible_game/features/multi_player/widget/game_request_card.dart';
-import 'package:the_bible_game/features/multi_player/widget/modal/create_gameplay_modal.dart';
-import 'package:the_bible_game/features/multi_player/widget/modal/game_request_modal.dart';
-import 'package:the_bible_game/features/multi_player/widget/modal/join_gameplay_modal.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/features/multi_player/widget/game_play_card.dart';
+import 'package:bible_game/features/multi_player/widget/game_request_card.dart';
+import 'package:bible_game/features/multi_player/widget/modal/create_gameplay_modal.dart';
+import 'package:bible_game/features/multi_player/widget/modal/game_request_modal.dart';
+import 'package:bible_game/features/multi_player/widget/modal/join_gameplay_modal.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MultiplayerHomeScreen extends StatelessWidget {

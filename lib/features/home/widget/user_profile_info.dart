@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:the_bible_game/features/home/widget/modals/game_settings_modal.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/utils/formatter.dart';
+import 'package:bible_game/features/home/widget/modals/game_settings_modal.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/utils/formatter.dart';
 import 'package:bible_game_api/bible_game_api.dart';
 
 import '../../../shared/features/settings/bloc/settings_bloc.dart';

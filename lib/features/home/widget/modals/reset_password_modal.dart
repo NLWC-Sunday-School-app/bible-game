@@ -2,8 +2,8 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/features/home/widget/modals/enter_reset_password_code_modal.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/features/home/widget/modals/enter_reset_password_code_modal.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../../shared/constants/image_routes.dart';
 import 'package:stroke_text/stroke_text.dart';
 

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
-import 'package:the_bible_game/features/global_challenge/repository/global_challenge_repository.dart';
+import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
+import 'package:bible_game/features/global_challenge/repository/global_challenge_repository.dart';
 
 import '../../../shared/constants/app_routes.dart';
+import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/widgets/game_summary_modal.dart';
 import '../../../shared/widgets/question_container.dart';
 import '../../../shared/widgets/quit_modal.dart';
@@ -66,8 +68,12 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
               AppRoutes.home, (Route<dynamic> route) => false);
         },
       );
-
       BlocProvider.of<GlobalChallengeBloc>(context).add(SubmitGlobalChallengeScore());
+      Future.delayed(Duration(seconds: 2), () {
+        BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+        BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+      });
+
     }
   }
 
@@ -115,34 +121,42 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
         },
         builder: (context, state) {
           return Scaffold(
-            body: PageView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: _pageController,
-              itemCount: state.globalChallengeQuestions!.length,
-              itemBuilder: (BuildContext context, int index) {
-                return QuestionContainer(
-                  gameQuestion: state.globalChallengeQuestions![index],
-                  animationController: _animationController,
-                  currentPage: _currentPage + 1,
-                  totalQuestions: state.globalChallengeQuestions!.length,
-                  optionSelectedCallback: (selectedOptionIndex) {
-                    final remainingTime =
-                    (durationPerQuestion * (1 - _animationController.value)).toInt();
-                    context.read<GlobalChallengeBloc>().add(OptionSelected(
-                      selectedOptionIndex: selectedOptionIndex,
-                      gameQuestion: state.globalChallengeQuestions![index],
-                      remainingTime: remainingTime,
-                    ));
-                  },
-                  selectedOptionIndex: state.selectedOptionIndex ?? -1,
-                  isCorrectAnswer: state.isCorrectAnswer ?? false,
-                  hasAnswered: state.hasAnswered,
-                  coinsGained: state.coinsGained!,
-                  skipQuestion: () => _moveToNextPage(),
-                  durationPerQuestion: durationPerQuestion,
-                  isWhoIsWho: false, gameMode: '',
-                );
-              },
+            appBar: AppBar(
+              elevation: 0,
+              toolbarHeight: 0,
+              backgroundColor: Color(0xFF998BBC), // Set background color to transparent
+            ),
+            body: SafeArea(
+              bottom: false,
+              child: PageView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _pageController,
+                itemCount: state.globalChallengeQuestions!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return QuestionContainer(
+                    gameQuestion: state.globalChallengeQuestions![index],
+                    animationController: _animationController,
+                    currentPage: _currentPage + 1,
+                    totalQuestions: state.globalChallengeQuestions!.length,
+                    optionSelectedCallback: (selectedOptionIndex) {
+                      final remainingTime =
+                      (durationPerQuestion * (1 - _animationController.value)).toInt();
+                      context.read<GlobalChallengeBloc>().add(OptionSelected(
+                        selectedOptionIndex: selectedOptionIndex,
+                        gameQuestion: state.globalChallengeQuestions![index],
+                        remainingTime: remainingTime,
+                      ));
+                    },
+                    selectedOptionIndex: state.selectedOptionIndex ?? -1,
+                    isCorrectAnswer: state.isCorrectAnswer ?? false,
+                    hasAnswered: state.hasAnswered,
+                    coinsGained: state.coinsGained!,
+                    skipQuestion: () => _moveToNextPage(),
+                    durationPerQuestion: durationPerQuestion,
+                    isWhoIsWho: false, gameMode: '',
+                  );
+                },
+              ),
             ),
           );
         },

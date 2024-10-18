@@ -1,13 +1,14 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:get/get.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
 
 import '../../constants/image_routes.dart';
 
@@ -159,13 +160,8 @@ class _CountryUpdateModalState extends State<CountryUpdateModal> {
                       listener: (context, state) {
                         if (state.hasUpdatedCountry) {
                           Navigator.pop(context);
-                          Flushbar(
-                            message: 'Updated successfully',
-                            flushbarPosition: FlushbarPosition.TOP,
-                            flushbarStyle: FlushbarStyle.GROUNDED,
-                            backgroundColor: Colors.green,
-                            duration: Duration(seconds: 3),
-                          ).show(context);
+                          showCustomToast(context, 'Updated successfully');
+
                           context
                               .read<AuthenticationBloc>()
                               .add(FetchUserDataRequested());

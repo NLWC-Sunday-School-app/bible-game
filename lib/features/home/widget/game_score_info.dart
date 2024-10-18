@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/features/home/widget/modals/coins_modal.dart';
-import 'package:the_bible_game/features/home/widget/modals/gems_modal.dart';
-import 'package:the_bible_game/features/home/widget/score_info.dart';
-import 'package:the_bible_game/shared/constants/colors.dart';
+import 'package:bible_game/features/home/widget/modals/coins_modal.dart';
+import 'package:bible_game/features/home/widget/modals/gems_modal.dart';
+import 'package:bible_game/features/home/widget/score_info.dart';
+import 'package:bible_game/shared/constants/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import 'modals/bg_streak_modal.dart';

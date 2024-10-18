@@ -40,5 +40,9 @@ class AuthenticationRepository {
     return await authenticationAPI.resetPassword(newPassword, email);
   }
 
+  Future<dynamic> deleteAccount(userId) async {
+    return await authenticationAPI.deleteAccount(userId);
+  }
+
 
 }

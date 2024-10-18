@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
+
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 
 void showGlobalChallengeTipsModal(BuildContext context) {
+  final soundManager = context.read<SettingsBloc>().soundManager;
   showDialog(
       context: context,
       barrierDismissible: false,
@@ -39,7 +43,8 @@ void showGlobalChallengeTipsModal(BuildContext context) {
                       child: Row(
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(left: 10.w, top: 10.h, bottom: 10.h),
+                            padding: EdgeInsets.only(
+                                left: 10.w, top: 10.h, bottom: 10.h),
                             child: Text(
                               'Bonus point for when you \nget all questions right!',
                               style: TextStyle(
@@ -57,7 +62,9 @@ void showGlobalChallengeTipsModal(BuildContext context) {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20.h,),
+                  SizedBox(
+                    height: 20.h,
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40.w),
                     child: Container(
@@ -89,11 +96,17 @@ void showGlobalChallengeTipsModal(BuildContext context) {
                       ),
                     ),
                   ),
-                  SizedBox(height: 40.h,),
+                  SizedBox(
+                    height: 40.h,
+                  ),
                   BlueButton(
                     buttonText: 'Play Now',
                     buttonIsLoading: false,
-                    onTap: () => Navigator.pushNamed(context, AppRoutes.globalChallengeQuestionScreen),
+                    onTap: () {
+                       soundManager.playClickSound();
+                      Navigator.pushNamed(
+                          context, AppRoutes.globalChallengeQuestionScreen);
+                    },
                     width: 280.w,
                   )
                 ],

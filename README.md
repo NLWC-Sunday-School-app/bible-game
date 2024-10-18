@@ -1,4 +1,4 @@
-# the_bible_game
+# bible_game
 
 Bible Game for all men
 

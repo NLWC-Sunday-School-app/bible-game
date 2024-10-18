@@ -12,6 +12,7 @@ class LeaguePreview extends Equatable {
     required this.playerCount,
     required this.icon,
   });
+  // 200
 
   factory LeaguePreview.fromJson(Map<String, dynamic> json) => LeaguePreview(
       name: json["name"],

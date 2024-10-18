@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/home/widget/modals/successful_registration_modal.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/features/home/widget/modals/successful_registration_modal.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../../shared/constants/image_routes.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,8 @@ import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
 import 'package:provider/provider.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
+
+import '../../../global_challenge/bloc/global_challenge_bloc.dart';
 
 void showCreateProfileModal(BuildContext context) {
   showDialog(
@@ -316,26 +319,21 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                           ApiException.showSnackBar(context);
                         }
                         if (state.token != null) {
+                          BlocProvider.of<GlobalChallengeBloc>(context)
+                              .add(FetchGlobalChallengeGames());
                           final tokenNotifier = Provider.of<TokenNotifier>(
                               context,
                               listen: false);
                           tokenNotifier.setToken(state.token);
 
                           //save refresh token
-                          final prefs = SharedPreferences.getInstance();
-                          prefs.then((sharedPreferences) {
-                            sharedPreferences.setString(
-                                'userToken', state.token!);
-                            sharedPreferences.setString(
-                                'refreshToken', state.refreshToken!);
-                          });
+                          GetStorage().write('user_token', state.token!);
+                          GetStorage().write('refresh_token', state.refreshToken!);
+
                           Navigator.pop(context);
                           showSuccessfulRegistrationModal(context);
                         }
 
-                        // if (state.isUnauthenticated) {
-                        //   ApiException.showSnackBar(context);
-                        // }
                       },
                       builder: (context, state) {
                         return BlueButton(

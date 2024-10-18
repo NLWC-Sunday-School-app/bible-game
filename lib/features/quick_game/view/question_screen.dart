@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:the_bible_game/shared/widgets/game_summary_modal.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/shared/widgets/game_summary_modal.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/widgets/question_container.dart';
 import '../../../shared/widgets/quit_modal.dart';
@@ -104,13 +105,14 @@ class _QuickGameQuestionScreenState extends State<QuickGameQuestionScreen>
             AppRoutes.quickGameHomeScreen,
             ModalRoute.withName('/home'),
           );
-
         },
       );
 
       BlocProvider.of<QuickGameBloc>(context).add(SubmitQuickGameScore());
-      Timer(Duration(seconds: 2), (){
-        BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+      Timer(Duration(seconds: 2), () {
+        BlocProvider.of<AuthenticationBloc>(context)
+            .add(FetchUserDataRequested());
+        BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
       });
     }
   }
@@ -148,39 +150,49 @@ class _QuickGameQuestionScreenState extends State<QuickGameQuestionScreen>
         },
         builder: (context, state) {
           return Scaffold(
-              body: PageView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: _pageController,
-            itemCount: state.quickGameQuestions!.length,
-            itemBuilder: (BuildContext context, int index) {
-              return QuestionContainer(
-                gameQuestion: state.quickGameQuestions![index],
-                animationController: _animationController,
-                currentPage: _currentPage + 1,
-                totalQuestions: state.quickGameQuestions!.length,
-                optionSelectedCallback: (selectedOptionIndex) {
-                  final remainingTime =
-                      (durationPerQuestion * (1 - _animationController.value))
-                          .toInt();
-                  context.read<QuickGameBloc>().add(OptionSelected(
-                        selectedOptionIndex: selectedOptionIndex,
-                        gameQuestion: state.quickGameQuestions![index],
-                        remainingTime: remainingTime,
-                      ));
-                },
-                selectedOptionIndex: state.selectedOptionIndex ?? -1,
-                isCorrectAnswer: state.isCorrectAnswer ?? false,
-                hasAnswered: state.hasAnswered,
-                coinsGained: state.coinsGained!,
-                skipQuestion: () {
-                  _moveToNextPage();
-                  soundManager.playClickSound();
-                },
-                durationPerQuestion: durationPerQuestion,
-                hasTimer: hasTimer, gameMode: 'quickGame',
-              );
-            },
-          ));
+              appBar: AppBar(
+                elevation: 0,
+                toolbarHeight: 0,
+                backgroundColor:
+                    Color(0xFF998BBC), // Set background color to transparent
+              ),
+              body: SafeArea(
+                bottom: false,
+                child: PageView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: _pageController,
+                  itemCount: state.quickGameQuestions!.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return QuestionContainer(
+                      gameQuestion: state.quickGameQuestions![index],
+                      animationController: _animationController,
+                      currentPage: _currentPage + 1,
+                      totalQuestions: state.quickGameQuestions!.length,
+                      optionSelectedCallback: (selectedOptionIndex) {
+                        final remainingTime = (durationPerQuestion *
+                                (1 - _animationController.value))
+                            .toInt();
+                        context.read<QuickGameBloc>().add(OptionSelected(
+                              selectedOptionIndex: selectedOptionIndex,
+                              gameQuestion: state.quickGameQuestions![index],
+                              remainingTime: remainingTime,
+                            ));
+                      },
+                      selectedOptionIndex: state.selectedOptionIndex ?? -1,
+                      isCorrectAnswer: state.isCorrectAnswer ?? false,
+                      hasAnswered: state.hasAnswered,
+                      coinsGained: state.coinsGained!,
+                      skipQuestion: () {
+                        _moveToNextPage();
+                        soundManager.playClickSound();
+                      },
+                      durationPerQuestion: durationPerQuestion,
+                      hasTimer: hasTimer,
+                      gameMode: 'quickGame',
+                    );
+                  },
+                ),
+              ));
         },
       ),
     );

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
-import 'package:the_bible_game/features/who_is_who/widget/modal/wiw_try_again_modal.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
+import 'package:bible_game/features/who_is_who/widget/modal/wiw_try_again_modal.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
 
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 
@@ -37,10 +37,16 @@ class WiwTimeUpModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     final soundManager = context.read<SettingsBloc>().soundManager;
     return SizedBox(
-      height: 450.h,
-      width: 400.h,
+      height: screenWidth >= 500
+          ? 400.h
+          : screenHeight >= 800
+          ? 450.h
+          : 500.h,
+      width: screenWidth >= 500 ? 400.h : 500.h,
       child: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

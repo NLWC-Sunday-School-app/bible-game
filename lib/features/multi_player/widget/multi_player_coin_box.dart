@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 
 class MultiplayerCoinBox extends StatelessWidget {
   const MultiplayerCoinBox({super.key, required this.createdChallenge, required this.userName, required this.pointsGained, required this.userAvatar});

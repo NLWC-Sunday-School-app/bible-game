@@ -89,6 +89,7 @@ class LeaguePlayerCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(2.w),
             decoration: BoxDecoration(
+               color: Colors.white,
                 border: Border.all(color: AppColors.primaryColor),
                 shape: BoxShape.circle),
             child:

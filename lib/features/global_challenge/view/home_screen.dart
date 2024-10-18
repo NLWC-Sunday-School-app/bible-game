@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
-import 'package:the_bible_game/features/global_challenge/widget/global_challenge_card.dart';
+import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
+import 'package:bible_game/features/global_challenge/widget/global_challenge_card.dart';
 
 class GlobalChallengeHomeScreen extends StatefulWidget {
   const GlobalChallengeHomeScreen({super.key});
@@ -29,7 +29,6 @@ class _GlobalChallengeHomeScreenState extends State<GlobalChallengeHomeScreen> {
             itemCount: state.globalChallengeGames.length,
             itemBuilder: (BuildContext context, int index) {
               return GlobalChallengeCard(
-
                 id: state.globalChallengeGames[index].id,
                 imageUrl: state.globalChallengeGames[index].imageUrl,
                 title: state.globalChallengeGames[index].title,

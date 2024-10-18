@@ -86,3 +86,5 @@ class ResetPassword extends AuthenticationEvent {
   @override
   List<Object> get props => [this.newPassword];
 }
+
+class DeleteAccount extends AuthenticationEvent {}

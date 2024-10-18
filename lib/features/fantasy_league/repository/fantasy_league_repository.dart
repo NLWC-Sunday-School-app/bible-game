@@ -14,6 +14,19 @@ class FantasyLeagueRepository {
         name, goal, isOpen, seasonEnd);
   }
 
+  Future<Map<String, dynamic>> editFantasyBibleLeague(
+     name,  isOpen,  leagueId, ) async {
+    return await gameAPI.editFantasyBibleLeague(
+       name,  isOpen, leagueId,);
+  }
+
+  Future<Map<String, dynamic>> endFantasyBibleLeague(
+      name,  isOpen,  leagueId, ) async {
+    return await gameAPI.endFantasyBibleLeague(
+      name,  isOpen, leagueId,);
+  }
+
+
   Future<List<LeaguePreview>> getOpenLeagues() async {
     return await gameAPI.getOpenLeagues();
   }
@@ -35,6 +48,10 @@ class FantasyLeagueRepository {
 
   Future<void> joinLeague(leagueId) async {
     return await gameAPI.joinLeague(leagueId);
+  }
+
+  Future<Map<String, dynamic>> joinLeagueWithCode(leagueCode) async {
+    return await gameAPI.joinLeagueWithCode(leagueCode);
   }
 
   Future<void> leaveLeague(leagueId) async {

@@ -2,20 +2,21 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bible_game_api/api/game_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:the_bible_game/features/fantasy_league/repository/fantasy_league_repository.dart';
-import 'package:the_bible_game/features/four_scriptures/repository/four_scriptures_repository.dart';
-import 'package:the_bible_game/features/global_challenge/repository/global_challenge_repository.dart';
-import 'package:the_bible_game/features/pilgrim_progress/repository/pilgrim_progress_repository.dart';
-import 'package:the_bible_game/features/quick_game/repository/quick_game_repository.dart';
-import 'package:the_bible_game/features/who_is_who/repository/wiw_repository.dart';
-import 'package:the_bible_game/shared/features/authentication/repository/authentication_repository.dart';
-import 'package:the_bible_game/shared/features/settings/sound_manager.dart';
-import 'package:the_bible_game/shared/features/user/repository/user_repository.dart';
+import 'package:bible_game/features/fantasy_league/repository/fantasy_league_repository.dart';
+import 'package:bible_game/features/four_scriptures/repository/four_scriptures_repository.dart';
+import 'package:bible_game/features/global_challenge/repository/global_challenge_repository.dart';
+import 'package:bible_game/features/pilgrim_progress/repository/pilgrim_progress_repository.dart';
+import 'package:bible_game/features/quick_game/repository/quick_game_repository.dart';
+import 'package:bible_game/features/who_is_who/repository/wiw_repository.dart';
+import 'package:bible_game/shared/features/authentication/repository/authentication_repository.dart';
+import 'package:bible_game/shared/features/settings/sound_manager.dart';
+import 'package:bible_game/shared/features/user/repository/user_repository.dart';
 import 'package:bible_game_api/api/user_api.dart';
-import 'package:the_bible_game/shared/utils/app_bloc_observer.dart';
-import 'package:the_bible_game/shared/utils/awesome_notification.dart';
-import 'package:the_bible_game/shared/utils/token_notifier.dart';
+import 'package:bible_game/shared/utils/app_bloc_observer.dart';
+import 'package:bible_game/shared/utils/awesome_notification.dart';
+import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'app.dart';
 import 'package:bible_game_api/api/api_client.dart';
 import 'package:bible_game_api/api/authentication_api.dart';
@@ -34,15 +35,14 @@ void main() async {
       importance: NotificationImportance.Max,
     ),
   ]);
+  await GetStorage.init();
   await AwesomeNotification.initializeRemoteNotifications(
     debug: true,);
 
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final String? token = prefs.getString('userToken');
-
+  final String? userToken = await GetStorage().read('user_token');
   final ApiClient apiClient = ApiClient(
       baseUrl: 'https://plankton-app-ikxuv.ondigitalocean.app',
-      token: token ?? '');
+      token: userToken ?? '');
   final TokenNotifier tokenNotifier = TokenNotifier();
 
   tokenNotifier.addListener(() {

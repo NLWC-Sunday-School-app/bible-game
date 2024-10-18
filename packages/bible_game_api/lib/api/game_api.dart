@@ -383,10 +383,47 @@ class GameAPI {
     }
   }
 
+  Future<Map<String, dynamic>> joinLeagueWithCode(leagueCode) async {
+    try {
+      final response =  await apiClient.get('/leagues/join?code=$leagueCode');
+      return response.data;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
   Future<void> leaveLeague(leagueId) async {
     try {
       await apiClient.delete('/leagues/$leagueId/leave');
     } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<Map<String, dynamic>> editFantasyBibleLeague(name, isOpen, leagueId,) async{
+    try{
+      final response =  await apiClient.patch('/leagues/$leagueId ', data: {
+         "name": name,
+         "isOpen": isOpen,
+       });
+       return response.data;
+    }on ApiException catch (e){
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<Map<String, dynamic>> endFantasyBibleLeague(name, isOpen, leagueId,) async{
+    try{
+      final response =  await apiClient.patch('/leagues/$leagueId ', data: {
+        "name": name,
+        "isOpen": isOpen,
+         "status": "ENDED"
+      });
+      return response.data;
+    }on ApiException catch (e){
       final errorMessage = e.toString();
       throw errorMessage;
     }

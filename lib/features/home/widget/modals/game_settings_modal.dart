@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 
 import '../../../../shared/utils/avatar_credentials.dart';
 import '../../../../shared/widgets/blue_button.dart';
@@ -230,11 +231,8 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                 listener: (context, state) {
                   if (!state.isLoggedIn) {
                     Navigator.pop(context);
-                    final prefs = SharedPreferences.getInstance();
-                    prefs.then((sharedPreferences) {
-                      sharedPreferences.remove('userToken');
-                      sharedPreferences.remove('refreshToken');
-                    });
+                    GetStorage().remove('user_token');
+                    GetStorage().remove('refresh_token');
                   }
                 },
                 builder: (context, state) {

@@ -3,14 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/colors.dart';
 
 class ScreenAppBar extends StatelessWidget {
-  const ScreenAppBar({super.key, required this.widgets});
+   ScreenAppBar({super.key, required this.widgets, this.height = 100});
 
   final List<Widget> widgets;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 140.h,
+      height: height,
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.primaryColorShade,

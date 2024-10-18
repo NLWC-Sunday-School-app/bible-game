@@ -101,11 +101,12 @@ class ProductImageRoutes {
    static const String fblModalBg = 'assets/images/product/league/fbl_modal_bg.png';
    static const String multiplayerComingSoon = 'assets/images/product/multi_player/multiplayer_coming_soon.png';
    static const String storeGemCard = 'assets/images/product/store/gem_card.png';
-   static const String theBibleGame = 'assets/images/product/shared/the_bible_game.png';
+   static const String theBibleGame = 'assets/images/product/shared/bible_game.png';
    static const String rocket = 'assets/images/product/shared/rocket.png';
    static const String welcomeModalBg = 'assets/images/product/shared/welcome_modal_bg.png';
    static const String broLukeIntro = 'assets/images/product/shared/bro_luke_intro.svg';
    static const String tryAgainModalBg = 'assets/images/product/who_is_who/try_again_bg.png';
+   static const String inviteBtnBg = 'assets/images/product/league/invite_btn.png';
 }
 
 class IconImageRoutes{
@@ -118,6 +119,9 @@ class IconImageRoutes{
   static const String personIcon = 'assets/images/icons/user/person.png';
   static const String coinIcon = 'assets/images/icons/user/coins.png';
   static const String gemIcon = 'assets/images/icons/user/gem.png';
+  static const String bigGemIcon = 'assets/images/icons/user/big_gem.png';
+  static const String blueCopyIcon = 'assets/images/icons/user/blue_copy.png';
+
   static const String streakIcon = 'assets/images/icons/user/streak.png';
   static const String whiteCancelIcon = 'assets/images/icons/user/white_cancel.png';
   static const String closeModal = 'assets/images/icons/user/close_modal.png';

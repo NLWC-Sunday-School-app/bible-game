@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:the_bible_game/features/multi_player/widget/multi_player_coin_box.dart';
-import 'package:the_bible_game/features/multi_player/widget/question_timer.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/widgets/option_button.dart';
-import 'package:the_bible_game/shared/widgets/question_box.dart';
+import 'package:bible_game/features/multi_player/widget/multi_player_coin_box.dart';
+import 'package:bible_game/features/multi_player/widget/question_timer.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/widgets/option_button.dart';
+import 'package:bible_game/shared/widgets/question_box.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MultiplayerQuestionScreen extends StatelessWidget {

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 
 import '../../../../shared/constants/app_routes.dart';
 import '../../../../shared/constants/image_routes.dart';
@@ -37,11 +38,8 @@ class LogoutModal extends StatelessWidget {
           Navigator.pop(context);
           Navigator.pushNamedAndRemoveUntil(context,
               AppRoutes.home, (Route<dynamic> route) => false);
-          final prefs = SharedPreferences.getInstance();
-          prefs.then((sharedPreferences) {
-            sharedPreferences.remove('userToken');
-            sharedPreferences.remove('refreshToken');
-          });
+          GetStorage().remove('user_token');
+          GetStorage().remove('refresh_token');
         }
       },
       builder: (context, state) {

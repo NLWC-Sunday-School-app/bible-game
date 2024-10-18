@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 
 void showFourScripturesOneWordInfo(BuildContext context){
    showModalBottomSheet(

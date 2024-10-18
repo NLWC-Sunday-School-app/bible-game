@@ -24,6 +24,36 @@ class CreateFantasyLeague extends FantasyLeagueEvent {
       ];
 }
 
+class EditFantasyLeague extends FantasyLeagueEvent {
+  final String name;
+  final bool isOpen;
+  final int leagueId;
+
+  EditFantasyLeague(this.name,  this.isOpen, this.leagueId);
+
+  @override
+  List<Object> get props => [
+    name,
+    isOpen,
+    leagueId,
+  ];
+}
+
+class EndFantasyLeague extends FantasyLeagueEvent {
+  final String name;
+  final bool isOpen;
+  final int leagueId;
+
+  EndFantasyLeague(this.name,  this.isOpen, this.leagueId);
+
+  @override
+  List<Object> get props => [
+    name,
+    isOpen,
+    leagueId,
+  ];
+}
+
 class FetchOpenLeagues extends FantasyLeagueEvent {}
 
 class FindLeague extends FantasyLeagueEvent {
@@ -52,6 +82,15 @@ class JoinLeague extends FantasyLeagueEvent {
 
   @override
   List<Object> get props => [leagueId];
+}
+
+class JoinLeagueWithCode extends FantasyLeagueEvent {
+  final String leagueCode;
+
+  JoinLeagueWithCode(this.leagueCode);
+
+  @override
+  List<Object> get props => [leagueCode];
 }
 
 class LeaveLeague extends FantasyLeagueEvent {

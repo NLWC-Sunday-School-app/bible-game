@@ -3,7 +3,7 @@ import 'package:bible_game_api/model/game_question.dart';
 import 'package:bible_game_api/model/pilgrim_progress_level_data.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/pilgrim_progress_repository.dart';
@@ -183,9 +183,9 @@ class PilgrimProgressBloc
         int.parse(settingsState.gamePlaySettings['father_to_elder_total'])
       ];
       final selectedLevel = event.selectedLevel;
-      final userRank = _authenticationBloc.state.user!.rank;
+      final userRank = _authenticationBloc.state.user.rank;
       final questions = await _pilgrimProgressRepository
-          .getPilgrimProgressQuestions('PILGRIM_PROGRESS', userRank, null);
+          .getPilgrimProgressQuestions('PILGRIM_PROGRESS', selectedLevel, null);
       final roundsLeftForSelectedLevel = state
           .pilgrimProgressLevelData[getLevelIndex(selectedLevel)]
           .numberOfRounds;
@@ -325,6 +325,7 @@ class PilgrimProgressBloc
                     state.totalCoinsAvailableForSelectedLevel! ||
                 coinsGained < state.passOnFirstTrialScore)) {
           emit(state.copyWith(userHasToRetry: true));
+          emit(state.copyWith(userHasToRetry: false));
         }
         if (userRank == 'babe' &&
             (totalPointsGainedInBabe + coinsGained >=
@@ -378,7 +379,7 @@ class PilgrimProgressBloc
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
-              : 5,
+              : 4,
         );
 
         if (roundsLeft < 1 &&
@@ -386,6 +387,7 @@ class PilgrimProgressBloc
                     state.totalCoinsAvailableForSelectedLevel! ||
                 coinsGained < state.passOnFirstTrialScore)) {
           emit(state.copyWith(userHasToRetry: true));
+          emit(state.copyWith(userHasToRetry: false));
         }
         if (userRank == 'child' &&
             (totalPointsGainedInChild + coinsGained >=
@@ -440,7 +442,7 @@ class PilgrimProgressBloc
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
-              : 5,
+              : 3,
         );
 
         if (roundsLeft < 1 &&
@@ -448,6 +450,7 @@ class PilgrimProgressBloc
                     state.totalCoinsAvailableForSelectedLevel! ||
                 coinsGained < state.passOnFirstTrialScore)) {
           emit(state.copyWith(userHasToRetry: true));
+          emit(state.copyWith(userHasToRetry: false));
         }
         if (userRank == 'young believer' &&
             (totalPointsGainedInYB + coinsGained >=
@@ -502,7 +505,7 @@ class PilgrimProgressBloc
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
-              : 5,
+              : 2,
         );
 
         if (roundsLeft < 1 &&
@@ -510,6 +513,7 @@ class PilgrimProgressBloc
                     state.totalCoinsAvailableForSelectedLevel! ||
                 coinsGained < state.passOnFirstTrialScore)) {
           emit(state.copyWith(userHasToRetry: true));
+          emit(state.copyWith(userHasToRetry: false));
         }
         if (userRank == 'charity' &&
             (totalPointsGainedInCharity + coinsGained >=
@@ -564,7 +568,7 @@ class PilgrimProgressBloc
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
-              : 5,
+              : 2,
         );
 
         if (roundsLeft < 1 &&
@@ -572,6 +576,7 @@ class PilgrimProgressBloc
                     state.totalCoinsAvailableForSelectedLevel! ||
                 coinsGained < state.passOnFirstTrialScore)) {
           emit(state.copyWith(userHasToRetry: true));
+          emit(state.copyWith(userHasToRetry: false));
         }
         if (userRank == 'father' &&
             (totalPointsGainedInFather + coinsGained >=
@@ -622,7 +627,7 @@ class PilgrimProgressBloc
                           state.totalCoinsAvailableForSelectedLevel! ||
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
-              : 5,
+              : 2,
         );
 
         if (roundsLeft < 1 &&
@@ -630,6 +635,7 @@ class PilgrimProgressBloc
                     state.totalCoinsAvailableForSelectedLevel! ||
                 coinsGained < state.passOnFirstTrialScore)) {
           emit(state.copyWith(userHasToRetry: true));
+          emit(state.copyWith(userHasToRetry: false));
         }
     }
   }

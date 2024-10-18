@@ -1,23 +1,27 @@
+import 'package:another_flushbar/flushbar.dart';
+import 'package:bible_game_api/utils/api_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
-import 'package:the_bible_game/features/fantasy_league/view/home_screen.dart';
-import 'package:the_bible_game/features/fantasy_league/widget/league_card.dart';
-import 'package:the_bible_game/features/fantasy_league/widget/modal/open_leagues.dart';
-import 'package:the_bible_game/features/quick_game/widget/search_box.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
-import 'package:the_bible_game/shared/widgets/green_button.dart';
+import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
+import 'package:bible_game/features/fantasy_league/view/home_screen.dart';
+import 'package:bible_game/features/fantasy_league/widget/league_card.dart';
+import 'package:bible_game/features/fantasy_league/widget/modal/open_leagues.dart';
+import 'package:bible_game/features/fantasy_league/widget/modal/successfully_joined_league_modal.dart';
+import 'package:bible_game/features/quick_game/widget/search_box.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/widgets/green_button.dart';
 
 import '../../../shared/constants/image_routes.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 
 class JoinLeague extends StatefulWidget {
-  const JoinLeague({super.key, required this.screenHeight});
+  const JoinLeague({super.key, required this.screenHeight, required this.showCreateLeague});
 
   final double screenHeight;
+  final VoidCallback showCreateLeague;
 
   @override
   State<JoinLeague> createState() => _JoinLeagueState();
@@ -25,6 +29,7 @@ class JoinLeague extends StatefulWidget {
 
 class _JoinLeagueState extends State<JoinLeague> {
   String searchText = "";
+  final textController = TextEditingController();
 
   void handleSearchTextChanged(String text) {
     setState(() {
@@ -44,26 +49,137 @@ class _JoinLeagueState extends State<JoinLeague> {
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
-    return BlocBuilder<FantasyLeagueBloc, FantasyLeagueState>(
+    return BlocConsumer<FantasyLeagueBloc, FantasyLeagueState>(
+      listener: (context, state) {
+        if( state.failedToJoin){
+          ApiException.showSnackBar(context);
+        }
+        if(state.hasJoinedLeague){
+          textController.text = '';
+          showSuccessfullyJoinedLeagueModal(context);
+          Future.delayed(Duration(seconds: 4), (){
+            Navigator.pop(context);
+          });
+        }
+      },
       builder: (context, state) {
         return Container(
           child: Column(
             children: [
-              SearchBox(
-                onTap: () {
-                  soundManager.playClickSound();
-                  if (searchText.isNotEmpty) {
-                    context
-                        .read<FantasyLeagueBloc>()
-                        .add(FindLeague(searchText));
-                  }
-                },
-                isActive: searchText.isNotEmpty,
-                onTextChanged: handleSearchTextChanged,
-                hintPlaceholder: 'Search with code/name',
+              // SearchBox(
+              //   onTap: () {
+              //     soundManager.playClickSound();
+              //     if (searchText.isNotEmpty) {
+              //       context
+              //           .read<FantasyLeagueBloc>()
+              //           .add(FindLeague(searchText));
+              //     }
+              //   },
+              //   isActive: searchText.isNotEmpty,
+              //   onTextChanged: handleSearchTextChanged,
+              //   hintPlaceholder: 'Search with code/name',
+              // ),
+              SizedBox(
+                height: 10.h,
+              ),
+              Text(
+                'Input league code',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFFFFFAD3),
+                ),
               ),
               SizedBox(
-                height: 40.h,
+                height: 20.h,
+              ),
+              SizedBox(
+                width: 357.w,
+                height: 56.h,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.circular(4.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                      ),
+                      BoxShadow(
+                        color: Color(0xFFFFFAD3),
+                        offset: Offset(0, 1),
+                        // spreadRadius: 1.0,
+                        blurRadius: 1.0,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: TextField(
+                      controller: textController,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF0C70DB),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Enter league code here',
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.h) ,
+                        hintStyle: TextStyle(
+                            color: Color(0xFF627F8F),
+                            fontWeight: FontWeight.w700),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4.r),
+                          borderSide: const BorderSide(
+                              color: Color(0xFFFFFFAD3), width: 0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4.r),
+                          borderSide: const BorderSide(
+                              color: Color(0xFFFFFAD3), width: 0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
+              GreenButton(
+                buttonIsLoading: state.isLeavingLeague,
+                width: 357.w,
+                onTap: () {
+                  soundManager.playClickSound();
+                  if (textController.text.isNotEmpty) {
+                    context
+                        .read<FantasyLeagueBloc>()
+                        .add(JoinLeagueWithCode(textController.text));
+                  }
+                },
+                customWidget: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                   state.isJoiningLeague ? SizedBox(
+                       height: 20.h,
+                       width: 20.w,
+                       child:
+                       CircularProgressIndicator(
+                         color: Colors.white,
+                         strokeWidth: 2,
+                       )) : StrokeText(
+                      text: 'Join league',
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      strokeColor: const Color(0xFF272D39),
+                      strokeWidth: 1,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 65.h,
               ),
               Row(
                 children: [
@@ -102,7 +218,13 @@ class _JoinLeagueState extends State<JoinLeague> {
                   : state.openLeagues.isNotEmpty
                       ? SizedBox(
                           height: widget.screenHeight -
-                              (150.h + 20.h + 72.h + 60.h + 60.h + 140.h),
+                              (80.h +
+                                  20.h +
+                                  72.h +
+                                  60.h +
+                                  60.h +
+                                  140.h +
+                                  91.h),
                           child: ListView.builder(
                               padding: EdgeInsets.zero,
                               itemCount: state.openLeagues.length,
@@ -125,8 +247,7 @@ class _JoinLeagueState extends State<JoinLeague> {
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: Container(
                             width: double.infinity,
-                            height: widget.screenHeight -
-                                (150.h + 20.h + 72.h + 60.h + 60.h + 170.h),
+                            height: 200.h,
                             margin: EdgeInsets.only(top: 20.h, bottom: 10.h),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12.r),
@@ -136,11 +257,11 @@ class _JoinLeagueState extends State<JoinLeague> {
                             child: Column(
                               children: [
                                 SizedBox(
-                                  height: 30.h,
+                                  height: 10.h,
                                 ),
                                 Image.asset(
                                   ProductImageRoutes.broLukeInfo,
-                                  width: 65.w,
+                                  width: 45.w,
                                 ),
                                 SizedBox(
                                   height: 10.h,
@@ -150,7 +271,7 @@ class _JoinLeagueState extends State<JoinLeague> {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 18.sp,
+                                      fontSize: 16.sp,
                                       color: Colors.white),
                                 ),
                                 SizedBox(
@@ -161,9 +282,7 @@ class _JoinLeagueState extends State<JoinLeague> {
                                   width: 260.w,
                                   onTap: () {
                                     soundManager.playClickSound();
-                                    Navigator.pushNamed(context, AppRoutes.fantasyBibleLeagueHomeScreen);
-                                    // Navigator.pushNamed(context,
-                                    //     AppRoutes.fantasyBibleLeagueHomeScreen);
+                                    widget.showCreateLeague();
                                   },
                                   customWidget: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

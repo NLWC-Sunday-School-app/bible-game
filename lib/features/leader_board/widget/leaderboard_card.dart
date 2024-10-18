@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/utils/country_iso_3.dart';
-import 'package:the_bible_game/shared/utils/formatter.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/utils/country_iso_3.dart';
+import 'package:bible_game/shared/utils/formatter.dart';
 import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
 import 'package:intl/intl.dart';
@@ -38,7 +38,7 @@ class LeaderboardCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       child: Container(
-        height: 70.h,
+        height: 73.h,
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
         decoration: BoxDecoration(

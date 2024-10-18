@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:the_bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/utils/avatar_credentials.dart';
+import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/utils/avatar_credentials.dart';
 
 import '../leaderboard_card.dart';
 

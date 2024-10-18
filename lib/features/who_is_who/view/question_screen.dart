@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
-import 'package:the_bible_game/features/who_is_who/widget/modal/not_enough_coins_modal.dart';
-import 'package:the_bible_game/features/who_is_who/widget/modal/wiw_time_up_modal.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:the_bible_game/shared/widgets/question_container.dart';
+import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
+import 'package:bible_game/features/who_is_who/widget/modal/not_enough_coins_modal.dart';
+import 'package:bible_game/features/who_is_who/widget/modal/wiw_time_up_modal.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/widgets/question_container.dart';
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import '../../../shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/widgets/game_summary_modal.dart';
 import '../../../shared/widgets/quit_modal.dart';
 
@@ -98,8 +99,11 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
           },
         );
         wiwGameBloc.add(SubmitWhoIsWhoScore());
+        Future.delayed(Duration(seconds: 2), () {
+          authenticationBloc.add(FetchUserDataRequested());
+        });
       } else {
-        wiwGameBloc.add(SetUserCompletedLeveLState(wiwGameBloc.state.completedSelectedLevel ? true : false));
+        wiwGameBloc.add(SetUserCompletedLeveLState(false));
         showWhoIsWhoTimeUpModal(context,
             gameTimePurchasePrice: gameTimePurchasePrice, onTap: () {
           if (authenticationBloc.state.user.coinWalletBalance >=
@@ -111,7 +115,6 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
                 authenticationBloc.state.user.id, gameTimePurchasePrice));
             Future.delayed(Duration(seconds: 2), () {
               authenticationBloc.add(FetchUserDataRequested());
-              context.read<WhoIsWhoBloc>().add(ClearWhoIsWhoGameData());
             });
           } else {
             Navigator.pop(context);
@@ -124,11 +127,11 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
               wiwGameBloc.add(SubmitWhoIsWhoScore());
               Future.delayed(Duration(seconds: 2), () {
                 authenticationBloc.add(FetchUserDataRequested());
+                BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
               });
             });
           }
         });
-        print('not passed');
       }
     }
   }
@@ -165,34 +168,42 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
         },
         builder: (context, state) {
           return Scaffold(
-              body: PageView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: _pageController,
-            itemCount: state.wiwGameQuestions!.length,
-            itemBuilder: (BuildContext context, int index) {
-              return QuestionContainer(
-                gameQuestion: state.wiwGameQuestions![index],
-                animationController: _animationController,
-                currentPage: _currentPage + 1,
-                totalQuestions: state.wiwGameQuestions!.length,
-                optionSelectedCallback: (selectedOptionIndex) {
-                  context.read<WhoIsWhoBloc>().add(OptionSelected(
-                        selectedOptionIndex: selectedOptionIndex,
-                        gameQuestion: state.wiwGameQuestions![index],
-                        // remainingTime: remainingTime,
-                      ));
-                },
-                selectedOptionIndex: state.selectedOptionIndex ?? -1,
-                isCorrectAnswer: state.isCorrectAnswer ?? false,
-                hasAnswered: state.hasAnswered!,
-                coinsGained: state.coinsGained!,
-                skipQuestion: () => _moveToNextPage(),
-                isWhoIsWho: true,
-                noOfCorrectAnswers: state.noOfCorrectAnswers,
-                whoIsWhoGameDuration: gameDuration, gameMode: 'whoIsWho',
-              );
-            },
-          ));
+              appBar: AppBar(
+                elevation: 0,
+                toolbarHeight: 0,
+                backgroundColor: Color(0xFF998BBC), // Set background color to transparent
+              ),
+              body: SafeArea(
+                bottom: false,
+                child: PageView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            controller: _pageController,
+                            itemCount: state.wiwGameQuestions!.length,
+                            itemBuilder: (BuildContext context, int index) {
+                return QuestionContainer(
+                  gameQuestion: state.wiwGameQuestions![index],
+                  animationController: _animationController,
+                  currentPage: _currentPage + 1,
+                  totalQuestions: state.wiwGameQuestions!.length,
+                  optionSelectedCallback: (selectedOptionIndex) {
+                    context.read<WhoIsWhoBloc>().add(OptionSelected(
+                          selectedOptionIndex: selectedOptionIndex,
+                          gameQuestion: state.wiwGameQuestions![index],
+                          // remainingTime: remainingTime,
+                        ));
+                  },
+                  selectedOptionIndex: state.selectedOptionIndex ?? -1,
+                  isCorrectAnswer: state.isCorrectAnswer ?? false,
+                  hasAnswered: state.hasAnswered!,
+                  coinsGained: state.coinsGained!,
+                  skipQuestion: () => _moveToNextPage(),
+                  isWhoIsWho: true,
+                  noOfCorrectAnswers: state.noOfCorrectAnswers,
+                  whoIsWhoGameDuration: gameDuration, gameMode: 'whoIsWho',
+                );
+                            },
+                          ),
+              ));
         },
       ),
     );

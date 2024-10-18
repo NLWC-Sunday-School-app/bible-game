@@ -28,7 +28,7 @@ class QuestionBox extends StatelessWidget {
                 padding: EdgeInsets.only(
                   left: 10.w,
                   right: 10.w,
-                  top: 30.h,
+                  top: 35.h,
                   bottom: 5.h,
                 ),
                 height: 200.h,
@@ -77,7 +77,7 @@ class QuestionBox extends StatelessWidget {
                     width: instruction.contains('verse') ? 250.w  : 230.w,
                   ),
                   Positioned(
-                    top: 10.h,
+                    top: 14.h,
                     left: 25.w,
                     right: 25.w,
                     child: Text(

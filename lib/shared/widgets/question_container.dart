@@ -1,13 +1,13 @@
 import 'package:bible_game_api/bible_game_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/widgets/option_button.dart';
-import 'package:the_bible_game/shared/widgets/question_box.dart';
-import 'package:the_bible_game/shared/widgets/question_clock.dart';
-import 'package:the_bible_game/shared/widgets/question_number_box.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/widgets/option_button.dart';
+import 'package:bible_game/shared/widgets/question_box.dart';
+import 'package:bible_game/shared/widgets/question_clock.dart';
+import 'package:bible_game/shared/widgets/question_number_box.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/shared/widgets/quit_modal.dart';
+import 'package:bible_game/shared/widgets/quit_modal.dart';
 import '../../../shared/widgets/coins_number_box.dart';
 import '../features/settings/bloc/settings_bloc.dart';
 
@@ -60,13 +60,11 @@ class QuestionContainer extends StatelessWidget {
       decoration: BoxDecoration(
           image: DecorationImage(
         image: AssetImage(ProductImageRoutes.questionScreenBg),
-        fit: BoxFit.cover,
+        fit: BoxFit.fill,
       )),
       child: Column(
         children: [
-          SizedBox(
-            height: 50.h,
-          ),
+
           Container(
               child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

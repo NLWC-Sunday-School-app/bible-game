@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
-import 'package:the_bible_game/features/four_scriptures/widget/question_container.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
+import 'package:bible_game/features/four_scriptures/widget/question_container.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/quit_modal.dart';
@@ -69,7 +69,7 @@ class _FourScriptureQuestionScreenState
                 scriptureFour:  state.fourScripturesOneWordQuestions![index].scriptureFour,
                 answer: state.fourScripturesOneWordQuestions![index].answer,
                 totalQuestions: state.totalNoOfQuestions!,
-                gameLevel: BlocProvider.of<AuthenticationBloc>(context).state.user!.fourScriptsLevel,
+                gameLevel: BlocProvider.of<AuthenticationBloc>(context).state.user.fourScriptsLevel,
                 onTap: (){
                   soundManager.playClickSound();
                   Navigator.pop(context);

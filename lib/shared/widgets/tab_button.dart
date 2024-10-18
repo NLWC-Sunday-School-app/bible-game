@@ -24,12 +24,12 @@ class TabButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(color: Color(0xFF1E242A)),
             boxShadow: [
-              BoxShadow(
+              buttonSelected ?  BoxShadow(
                 color: Color(0xFF364865),
-                offset: Offset(2, 4),
+                offset: Offset(3, 3),
                 blurRadius: 0,
                 spreadRadius: -2,
-              ),
+              ) : BoxShadow(),
             ]),
         child: Center(
           child: StrokeText(

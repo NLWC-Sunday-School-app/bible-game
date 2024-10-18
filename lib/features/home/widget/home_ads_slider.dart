@@ -3,8 +3,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 
 class HomeAdsSlider extends StatelessWidget {
   const HomeAdsSlider({super.key});
@@ -30,7 +30,10 @@ class HomeAdsSlider extends StatelessWidget {
                       child: CachedNetworkImage(
                         imageUrl: state.adContent![itemIndex].imageUrl,
                         placeholder: (context, String url) =>
-                        const CircularProgressIndicator(),
+                        SizedBox(
+                          height: 12.h,
+                          width: 12.h,
+                          child: Center(child: const CircularProgressIndicator()),),
                         errorWidget: (context, String url,
                             dynamic error) =>
                         const Icon(Icons.error),

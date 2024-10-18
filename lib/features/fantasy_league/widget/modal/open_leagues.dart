@@ -1,15 +1,17 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
-import 'package:the_bible_game/features/fantasy_league/widget/league_player_card.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
+import 'package:bible_game/features/fantasy_league/widget/league_player_card.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
 
 import '../../../../shared/constants/colors.dart';
 import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../../shared/utils/avatar_credentials.dart';
 import 'leave_league_modal.dart';
@@ -50,38 +52,32 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
+    final userId = BlocProvider.of<AuthenticationBloc>(context).state.user.id;
     return SizedBox(
         height: 630.h,
         width: 500.w,
         child: BlocConsumer<FantasyLeagueBloc, FantasyLeagueState>(
           listener: (context, state) {
-           if( state.failedToJoin){
-             ApiException.showSnackBar(context);
-           }
-           if(state.hasJoinedLeague){
-             Navigator.pop(context);
-             Flushbar(
-               message: 'Joined successfully',
-               flushbarPosition: FlushbarPosition.TOP,
-               flushbarStyle: FlushbarStyle.GROUNDED,
-               backgroundColor: Colors.green,
-               duration: Duration(seconds: 3),
-             ).show(context);
-           }
-           if(state.hasLeftLeague){
-             Navigator.pop(context);
-             Flushbar(
-               message: 'Left successfully',
-               flushbarPosition: FlushbarPosition.TOP,
-               flushbarStyle: FlushbarStyle.GROUNDED,
-               backgroundColor: Colors.green,
-               duration: Duration(seconds: 3),
-             ).show(context);
-           }
+            if (state.failedToJoin) {
+              ApiException.showSnackBar(context);
+            }
+            if (state.hasJoinedLeague) {
+              Navigator.pop(context);
+              showCustomToast(context, 'Joined Successfully');
+            }
+            if (state.hasLeftLeague) {
+              Navigator.pop(context);
+              if (userId == state.leagueData.league.adminId) {
+                showCustomToast(context, 'Ended successfully');
+              } else {
+                showCustomToast(context, 'Left successfully');
+              }
+            }
 
-           if(state.failedToLeave){
-             ApiException.showSnackBar(context);
-           }
+            if (state.failedToLeave) {
+              ApiException.showSnackBar(context);
+            }
           },
           builder: (context, state) {
             return Container(
@@ -94,7 +90,7 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                   : Column(
                       children: [
                         Container(
-                          height: 200.h,
+                          height: 212.h,
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(
                               horizontal: 10.w, vertical: 10.h),
@@ -117,6 +113,7 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
+                                      soundManager.playClickSound();
                                       Navigator.pop(context);
                                     },
                                     child: Image.asset(
@@ -128,7 +125,8 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                   FadeInImage.assetNetwork(
                                     placeholder:
                                         ProductImageRoutes.defaultAvatar,
-                                    image: state.leagueData.league.icon.toString(),
+                                    image:
+                                        state.leagueData.league.icon.toString(),
                                     width: 65.w,
                                     height: 65.h,
                                   ),
@@ -137,8 +135,13 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      soundManager.playClickSound();
                                       if (state.leagueData.isAuthUserMember) {
-                                        showLeaveLeagueModal(context, state.leagueData.league.id, state.leagueData.league.icon);
+                                        showLeaveLeagueModal(
+                                            context,
+                                            state.leagueData.league.id,
+                                            state.leagueData.league.icon,
+                                            state.leagueData.league.adminId);
                                       } else {
                                         context.read<FantasyLeagueBloc>().add(
                                             JoinLeague(
@@ -174,7 +177,11 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                                 !state.leagueData
                                                         .isAuthUserMember
                                                     ? 'Join league'
-                                                    : 'Leave',
+                                                    : userId ==
+                                                            state.leagueData
+                                                                .league.adminId
+                                                        ? 'End'
+                                                        : 'Leave',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                   color: Colors.white,
@@ -245,7 +252,7 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                         ),
                                         RichText(
                                           text: TextSpan(
-                                              text: 'Coins:',
+                                              text: 'League code:',
                                               style: TextStyle(
                                                 fontFamily: 'Mikado',
                                                 color: Color(0xFF4A5240),
@@ -255,7 +262,7 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                               children: [
                                                 TextSpan(
                                                     text:
-                                                        '${state.leagueData.metrics.coinTrack}',
+                                                        ' ${state.leagueData.league.code}',
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w900,
@@ -297,7 +304,7 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                         ),
                                         RichText(
                                           text: TextSpan(
-                                              text: 'Type:',
+                                              text: 'League type:',
                                               style: TextStyle(
                                                 fontFamily: 'Mikado',
                                                 color: Color(0xFF4A5240),
@@ -308,8 +315,8 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                                 TextSpan(
                                                     text: state.leagueData
                                                             .league.isOpen
-                                                        ? ' • Open'
-                                                        : ' • Closed',
+                                                        ? ' ● Open'
+                                                        : ' ● Closed',
                                                     style: TextStyle(
                                                         fontFamily: 'Mikado',
                                                         fontWeight:
@@ -348,8 +355,7 @@ class _OpenLeagueModalState extends State<OpenLeagueModal> {
                                 position: state
                                     .leagueData.leaderBoard[index].position
                                     .toString(),
-                                goal: state.leagueData.league.goal
-                                    .toString(),
+                                goal: state.leagueData.league.goal.toString(),
                               );
                             },
                           ),

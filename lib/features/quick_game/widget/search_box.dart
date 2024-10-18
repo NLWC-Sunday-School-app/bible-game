@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/app.dart';
-import 'package:the_bible_game/shared/constants/colors.dart';
-import 'package:the_bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/app.dart';
+import 'package:bible_game/shared/constants/colors.dart';
+import 'package:bible_game/shared/widgets/blue_button.dart';
 
 class SearchBox extends StatefulWidget {
   const SearchBox({super.key, required this.onTap, this.isActive = false, required this.onTextChanged, required this.hintPlaceholder});
@@ -73,9 +73,8 @@ class _SearchBoxState extends State<SearchBox> {
                     ),
                     borderRadius: BorderRadius.circular(6.r),
                   ),
-
                   contentPadding:
-                      EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
+                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
                   suffixIcon: IconButton(
                     icon: Icon(Icons.clear),
                     onPressed: () {

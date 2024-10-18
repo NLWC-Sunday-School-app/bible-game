@@ -89,8 +89,10 @@ class AuthenticationAPI {
   }
 
   Future<bool> deleteAccount(userId) async {
+
     try {
       final response = await apiClient.get('/users/$userId');
+      print('');
       return response.statusCode == 200;
     } on ApiException catch (e) {
       return false;

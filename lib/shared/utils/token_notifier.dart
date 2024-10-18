@@ -5,5 +5,6 @@ class TokenNotifier extends ValueNotifier<String?> {
 
   void setToken(String? newToken) {
     value = newToken;
+    print('I;m new, $newToken');
   }
 }

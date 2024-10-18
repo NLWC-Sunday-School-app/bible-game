@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
-import 'package:the_bible_game/shared/widgets/green_button.dart';
+import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
+import 'package:bible_game/shared/widgets/green_button.dart';
 
 import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 
-void showLeaveLeagueModal(BuildContext context, int leagueId, String icon) {
+void showLeaveLeagueModal(BuildContext context, int leagueId, String icon, int adminId) {
   showDialog(
       context: context,
       barrierColor: const Color.fromRGBO(40, 40, 40, 0.95),
@@ -21,6 +22,7 @@ void showLeaveLeagueModal(BuildContext context, int leagueId, String icon) {
           child: LeaveLeagueModal(
             leagueId: leagueId,
             leagueIcon: icon,
+            adminId: adminId,
           ),
         );
       });
@@ -28,14 +30,16 @@ void showLeaveLeagueModal(BuildContext context, int leagueId, String icon) {
 
 class LeaveLeagueModal extends StatelessWidget {
   const LeaveLeagueModal(
-      {super.key, required this.leagueId, required this.leagueIcon});
+      {super.key, required this.leagueId, required this.leagueIcon, required this.adminId});
 
   final int leagueId;
   final String leagueIcon;
+  final int adminId;
 
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final userId = BlocProvider.of<AuthenticationBloc>(context).state.user.id;
     return SizedBox(
       height: 350.h,
       width: 400.w,
@@ -103,9 +107,14 @@ class LeaveLeagueModal extends StatelessWidget {
                     buttonIsLoading: state.isLeavingLeague,
                     onTap: () {
                       Navigator.pop(context);
-                      BlocProvider.of<FantasyLeagueBloc>(context)
-                          .add(LeaveLeague(leagueId));
-                      Navigator.pop(context);
+                      if(userId == state.leagueData.league.adminId){
+                        context.read<FantasyLeagueBloc>().add(EndFantasyLeague(state.leagueData.league.name, state.leagueData.league.isOpen,state.leagueData.league.id ));
+                      }else{
+                        BlocProvider.of<FantasyLeagueBloc>(context)
+                            .add(LeaveLeague(leagueId));
+                      }
+
+                      // Navigator.pop(context);
                     },
                     width: 320.w,
                     customWidget: Center(

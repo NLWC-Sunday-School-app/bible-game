@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/features/home/widget/modals/auth_modal.dart';
-import 'package:the_bible_game/features/home/widget/modals/successful_login_modal.dart';
-import 'package:the_bible_game/shared/constants/colors.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/features/home/widget/modals/auth_modal.dart';
+import 'package:bible_game/features/home/widget/modals/successful_login_modal.dart';
+import 'package:bible_game/shared/constants/colors.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';

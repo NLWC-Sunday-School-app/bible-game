@@ -5,46 +5,47 @@ import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:the_bible_game/features/arcade/view/arcade_screen.dart';
-import 'package:the_bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
-import 'package:the_bible_game/features/fantasy_league/repository/fantasy_league_repository.dart';
-import 'package:the_bible_game/features/fantasy_league/view/home_screen.dart';
-import 'package:the_bible_game/features/fantasy_league/view/my_league.dart';
-import 'package:the_bible_game/features/fantasy_league/widget/my_leagues.dart';
-import 'package:the_bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
-import 'package:the_bible_game/features/four_scriptures/repository/four_scriptures_repository.dart';
-import 'package:the_bible_game/features/four_scriptures/view/four_scripture_question_screen.dart';
-import 'package:the_bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
-import 'package:the_bible_game/features/global_challenge/repository/global_challenge_repository.dart';
-import 'package:the_bible_game/features/home/view/home_screen.dart';
-import 'package:the_bible_game/features/home/view/profile_screen.dart';
-import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
-import 'package:the_bible_game/features/pilgrim_progress/repository/pilgrim_progress_repository.dart';
-import 'package:the_bible_game/features/pilgrim_progress/view/home_screen.dart';
-import 'package:the_bible_game/features/pilgrim_progress/view/question_screen.dart';
-import 'package:the_bible_game/features/quick_game/bloc/quick_game_bloc.dart';
-import 'package:the_bible_game/features/quick_game/repository/quick_game_repository.dart';
-import 'package:the_bible_game/features/quick_game/view/home_screen.dart';
-import 'package:the_bible_game/features/quick_game/view/question_screen.dart';
-import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
-import 'package:the_bible_game/features/who_is_who/repository/wiw_repository.dart';
-import 'package:the_bible_game/features/who_is_who/view/home_screen.dart';
-import 'package:the_bible_game/features/who_is_who/view/question_screen.dart';
-import 'package:the_bible_game/navigation/widget/bottom%20_tab_navigation.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/features/authentication/repository/authentication_repository.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:the_bible_game/shared/features/settings/sound_manager.dart';
-import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
-import 'package:the_bible_game/shared/features/user/model/user.dart';
-import 'package:the_bible_game/shared/features/user/repository/user_repository.dart';
-import 'package:the_bible_game/shared/screens/question_loading_screen.dart';
-import 'package:the_bible_game/shared/screens/splash_screen.dart';
+import 'package:bible_game/features/arcade/view/arcade_screen.dart';
+import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
+import 'package:bible_game/features/fantasy_league/repository/fantasy_league_repository.dart';
+import 'package:bible_game/features/fantasy_league/view/home_screen.dart';
+import 'package:bible_game/features/fantasy_league/view/my_league.dart';
+import 'package:bible_game/features/fantasy_league/widget/my_leagues.dart';
+import 'package:bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
+import 'package:bible_game/features/four_scriptures/repository/four_scriptures_repository.dart';
+import 'package:bible_game/features/four_scriptures/view/four_scripture_question_screen.dart';
+import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
+import 'package:bible_game/features/global_challenge/repository/global_challenge_repository.dart';
+import 'package:bible_game/features/home/view/home_screen.dart';
+import 'package:bible_game/features/home/view/profile_screen.dart';
+import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:bible_game/features/pilgrim_progress/repository/pilgrim_progress_repository.dart';
+import 'package:bible_game/features/pilgrim_progress/view/home_screen.dart';
+import 'package:bible_game/features/pilgrim_progress/view/question_screen.dart';
+import 'package:bible_game/features/quick_game/bloc/quick_game_bloc.dart';
+import 'package:bible_game/features/quick_game/repository/quick_game_repository.dart';
+import 'package:bible_game/features/quick_game/view/home_screen.dart';
+import 'package:bible_game/features/quick_game/view/question_screen.dart';
+import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
+import 'package:bible_game/features/who_is_who/repository/wiw_repository.dart';
+import 'package:bible_game/features/who_is_who/view/home_screen.dart';
+import 'package:bible_game/features/who_is_who/view/question_screen.dart';
+import 'package:bible_game/navigation/widget/bottom%20_tab_navigation.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/authentication/repository/authentication_repository.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/settings/sound_manager.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/shared/features/user/model/user.dart';
+import 'package:bible_game/shared/features/user/repository/user_repository.dart';
+import 'package:bible_game/shared/screens/question_loading_screen.dart';
+import 'package:bible_game/shared/screens/splash_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/shared/utils/token_notifier.dart';
+import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'package:provider/provider.dart';
-import 'package:the_bible_game/shared/widgets/modal/network_modal.dart';
+import 'package:bible_game/shared/widgets/modal/network_modal.dart';
+import 'package:upgrader/upgrader.dart';
 import 'features/global_challenge/view/question_screen.dart';
 import 'features/multi_player/view/question_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -154,50 +155,51 @@ class _AppState extends State<App> {
           ChangeNotifierProvider(create: (_) => widget.tokenNotifier),
         ],
         child: MaterialApp(
-          scaffoldMessengerKey: scaffoldMessengerKey,
-          theme: ThemeData(
-            fontFamily: 'Mikado',
-            useMaterial3: false,
+            scaffoldMessengerKey: scaffoldMessengerKey,
+            theme: ThemeData(
+              fontFamily: 'Mikado',
+              useMaterial3: false,
+            ),
+            initialRoute: '/',
+            routes: {
+              AppRoutes.splashScreen: (context) => SplashScreen(),
+              AppRoutes.home: (context) => BottomTabNavigation(),
+              AppRoutes.quickGameHomeScreen: (context) => QuickGameHomeScreen(),
+              AppRoutes.questionLoadingScreen: (context) =>
+                  QuestionLoadingScreen(),
+              AppRoutes.quickGameQuestionScreen: (context) =>
+                  QuickGameQuestionScreen(
+                    authenticationBloc:
+                        BlocProvider.of<AuthenticationBloc>(context),
+                    quickGameRepository: widget.quickGameRepository,
+                  ),
+              AppRoutes.multiplayerQuestionScreen: (context) =>
+                  MultiplayerQuestionScreen(),
+              AppRoutes.whoIsWhoHomeScreen: (context) => WhoIsWhoHomeScreen(),
+              AppRoutes.whoIsWhoQuestionScreen: (context) =>
+                  WhoIsWhoQuestionScreen(),
+              AppRoutes.pilgrimProgressHomeScreen: (context) =>
+                  PilgrimProgressHomeScreen(),
+              AppRoutes.pilgrimProgressQuestionScreen: (context) =>
+                  PilgrimQuestionScreen(
+                    authenticationBloc:
+                        BlocProvider.of<AuthenticationBloc>(context),
+                    pilgrimProgressRepository: widget.pilgrimProgressRepository,
+                  ),
+              AppRoutes.fourScriptureQuestionScreen: (context) =>
+                  FourScriptureQuestionScreen(),
+              AppRoutes.profileScreen: (context) => ProfileScreen(),
+              AppRoutes.globalChallengeQuestionScreen: (context) =>
+                  GlobalQuestionScreen(
+                    globalChallengeRepository: widget.globalChallengeRepository,
+                  ),
+              AppRoutes.arcadeScreen: (context) => ArcadeScreen(),
+              AppRoutes.fantasyBibleLeagueHomeScreen: (context) => BottomTabNavigation(),
+              AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
+            },
+            home: const SplashScreen(),
           ),
-          initialRoute: '/',
-          routes: {
-            AppRoutes.splashScreen: (context) => SplashScreen(),
-            AppRoutes.home: (context) => BottomTabNavigation(),
-            AppRoutes.quickGameHomeScreen: (context) => QuickGameHomeScreen(),
-            AppRoutes.questionLoadingScreen: (context) =>
-                QuestionLoadingScreen(),
-            AppRoutes.quickGameQuestionScreen: (context) =>
-                QuickGameQuestionScreen(
-                  authenticationBloc:
-                      BlocProvider.of<AuthenticationBloc>(context),
-                  quickGameRepository: widget.quickGameRepository,
-                ),
-            AppRoutes.multiplayerQuestionScreen: (context) =>
-                MultiplayerQuestionScreen(),
-            AppRoutes.whoIsWhoHomeScreen: (context) => WhoIsWhoHomeScreen(),
-            AppRoutes.whoIsWhoQuestionScreen: (context) =>
-                WhoIsWhoQuestionScreen(),
-            AppRoutes.pilgrimProgressHomeScreen: (context) =>
-                PilgrimProgressHomeScreen(),
-            AppRoutes.pilgrimProgressQuestionScreen: (context) =>
-                PilgrimQuestionScreen(
-                  authenticationBloc:
-                      BlocProvider.of<AuthenticationBloc>(context),
-                  pilgrimProgressRepository: widget.pilgrimProgressRepository,
-                ),
-            AppRoutes.fourScriptureQuestionScreen: (context) =>
-                FourScriptureQuestionScreen(),
-            AppRoutes.profileScreen: (context) => ProfileScreen(),
-            AppRoutes.globalChallengeQuestionScreen: (context) =>
-                GlobalQuestionScreen(
-                  globalChallengeRepository: widget.globalChallengeRepository,
-                ),
-            AppRoutes.arcadeScreen: (context) => ArcadeScreen(),
-            AppRoutes.fantasyBibleLeagueHomeScreen: (context) => BottomTabNavigation(),
-            AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
-          },
-          home: const SplashScreen(),
-        ),
+
       ),
     );
   }
@@ -207,7 +209,7 @@ class _AppState extends State<App> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
      await prefs.setString('fcmToken', firebaseAppToken);
     print('fb token: $firebaseAppToken');
-    // await prefs.remove('userToken');
+    // await prefs.remove('user_token');
   }
 
 

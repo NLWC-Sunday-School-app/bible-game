@@ -6,11 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/home/widget/modals/set_new_password_modal.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/features/home/widget/modals/set_new_password_modal.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/widgets/blue_button.dart';
+import '../../../../shared/widgets/custom_toast.dart';
 
 void showEnterResetPasswordCodeModal(BuildContext context) {
   showDialog(
@@ -132,13 +133,8 @@ class _EnterResetPasswordCodeModalState
                   listener: (context, state) {
                       if(state.hasVerifiedCode){
                         Navigator.pop(context);
-                        Flushbar(
-                          message: 'Verification successful',
-                          flushbarPosition: FlushbarPosition.TOP,
-                          flushbarStyle: FlushbarStyle.GROUNDED,
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 3),
-                        ).show(context);
+                        showCustomToast(context, 'Verification successful');
+
                         showSetNewPasswordModal(context);
                       }
                   },

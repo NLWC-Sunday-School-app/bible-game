@@ -34,6 +34,9 @@ class FantasyLeagueBloc extends Bloc<FantasyLeagueEvent, FantasyLeagueState> {
     on<LeaveLeague>(_onLeaveLeague);
     on<JoinLeague>(_onJoinLeague);
     on<FindLeague>(_onFindLeague);
+    on<JoinLeagueWithCode>(_onJoinLeagueWithCode);
+    on<EditFantasyLeague>(_onEditFantasyLeague);
+    on<EndFantasyLeague>(_onEndFantasyLeague);
   }
 
   Future<void> _onCreateFantasyLeague(
@@ -42,15 +45,65 @@ class FantasyLeagueBloc extends Bloc<FantasyLeagueEvent, FantasyLeagueState> {
       emit(state.copyWith(
           isCreatingLeague: true,
           hasCreatedLeague: false,
-          createdLeagueData: null));
+          createdLeagueData: null,
+          failedToCreate: false,
+      ));
       final response = await _fantasyLeagueRepository.createFantasyBibleLeague(
           event.name, event.goal, event.isOpen, event.seasonEnd);
+
       emit(state.copyWith(
           isCreatingLeague: false,
           hasCreatedLeague: true,
-          createdLeagueData: response));
+          createdLeagueData: response, failedToCreate: false));
     } catch (_) {
-      emit(state.copyWith(isCreatingLeague: false));
+      emit(state.copyWith(isCreatingLeague: false, failedToCreate: true));
+      emit(state.copyWith(isCreatingLeague: false, failedToCreate: false));
+    }
+  }
+
+  Future<void> _onEditFantasyLeague(
+      EditFantasyLeague event, Emitter<FantasyLeagueState> emit) async {
+    try {
+      emit(state.copyWith(
+        isEditingLeague: true,
+        hasEditedLeague: false,
+        failedToEdit: false,
+      ));
+     await _fantasyLeagueRepository.editFantasyBibleLeague(
+          event.name, event.isOpen, event.leagueId);
+      add(ViewLeagueData(event.leagueId));
+      add(FetchUserLeagues());
+      emit(state.copyWith(
+          isEditingLeague: false,
+          hasEditedLeague: true,
+          failedToEdit: false));
+      emit(state.copyWith(hasEditedLeague: false));
+    } catch (_) {
+      emit(state.copyWith(isEditingLeague: false, failedToEdit: true));
+      emit(state.copyWith(isEditingLeague: false, failedToEdit: false));
+    }
+  }
+
+  Future<void> _onEndFantasyLeague(
+      EndFantasyLeague event, Emitter<FantasyLeagueState> emit) async {
+    try {
+      emit(state.copyWith(
+          isLeavingLeague: true, failedToLeave: false, hasLeftLeague: false));
+      await _fantasyLeagueRepository.endFantasyBibleLeague(
+          event.name, event.isOpen, event.leagueId);
+      add(ViewLeagueData(event.leagueId));
+      add(FetchUserLeagues());
+      add(FetchOpenLeagues());
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: false, hasLeftLeague: true));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: false, hasLeftLeague: false));
+      emit(state.copyWith(hasEditedLeague: false));
+    } catch (_) {
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: true, hasLeftLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: false, hasLeftLeague: false));
     }
   }
 
@@ -69,7 +122,8 @@ class FantasyLeagueBloc extends Bloc<FantasyLeagueEvent, FantasyLeagueState> {
       FindLeague event, Emitter<FantasyLeagueState> emit) async {
     try {
       emit(state.copyWith(isFetchingOpenLeagues: true));
-      final response = await _fantasyLeagueRepository.findLeagues(event.code);;
+      final response = await _fantasyLeagueRepository.findLeagues(event.code);
+      ;
       emit(state.copyWith(openLeagues: response, isFetchingOpenLeagues: false));
     } catch (_) {
       emit(state.copyWith(isFetchingOpenLeagues: false));
@@ -88,14 +142,14 @@ class FantasyLeagueBloc extends Bloc<FantasyLeagueEvent, FantasyLeagueState> {
     }
   }
 
-
   Future<void> _onViewLeagueData(
       ViewLeagueData event, Emitter<FantasyLeagueState> emit) async {
     try {
       emit(state.copyWith(
           isFetchingLeagueData: true, leagueData: emptyLeagueData));
-      final response = await _fantasyLeagueRepository.viewLeagueData(event.leagueId);
-       print('response $response');
+      final response =
+          await _fantasyLeagueRepository.viewLeagueData(event.leagueId);
+      print('response $response');
       emit(state.copyWith(leagueData: response, isFetchingLeagueData: false));
     } catch (_) {
       emit(state.copyWith(isFetchingLeagueData: false));
@@ -105,14 +159,20 @@ class FantasyLeagueBloc extends Bloc<FantasyLeagueEvent, FantasyLeagueState> {
   Future<void> _onLeaveLeague(
       LeaveLeague event, Emitter<FantasyLeagueState> emit) async {
     try {
-      emit(state.copyWith(isLeavingLeague: true, failedToLeave: false, hasLeftLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: true, failedToLeave: false, hasLeftLeague: false));
       await _fantasyLeagueRepository.leaveLeague(event.leagueId);
-      emit(state.copyWith(isLeavingLeague: false, failedToLeave: false, hasLeftLeague: true));
-      emit(state.copyWith(isLeavingLeague: false, failedToLeave: false, hasLeftLeague: false));
       add(FetchOpenLeagues());
+      add(FetchUserLeagues());
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: false, hasLeftLeague: true));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: false, hasLeftLeague: false));
     } catch (_) {
-      emit(state.copyWith(isLeavingLeague: false, failedToLeave: true, hasLeftLeague: false));
-      emit(state.copyWith(isLeavingLeague: false, failedToLeave: false, hasLeftLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: true, hasLeftLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToLeave: false, hasLeftLeague: false));
     }
   }
 
@@ -121,14 +181,35 @@ class FantasyLeagueBloc extends Bloc<FantasyLeagueEvent, FantasyLeagueState> {
     try {
       emit(state.copyWith(isLeavingLeague: true, failedToJoin: false));
       await _fantasyLeagueRepository.joinLeague(event.leagueId);
-      emit(state.copyWith(isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: true));
-      emit(state.copyWith(isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: true));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: false));
       add(FetchOpenLeagues());
     } catch (_) {
-      emit(state.copyWith(isLeavingLeague: false, failedToJoin: true, hasJoinedLeague: false));
-      emit(state.copyWith(isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToJoin: true, hasJoinedLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: false));
     }
   }
 
-
+  Future<void> _onJoinLeagueWithCode(
+      JoinLeagueWithCode event, Emitter<FantasyLeagueState> emit) async {
+    try {
+      emit(state.copyWith(isLeavingLeague: true, failedToJoin: false));
+     final response = await _fantasyLeagueRepository.joinLeagueWithCode(event.leagueCode);
+      emit(state.copyWith(
+        joinedLeagueData: response,
+          isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: true));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: false));
+      add(FetchOpenLeagues());
+    } catch (_) {
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToJoin: true, hasJoinedLeague: false));
+      emit(state.copyWith(
+          isLeavingLeague: false, failedToJoin: false, hasJoinedLeague: false));
+    }
+  }
 }

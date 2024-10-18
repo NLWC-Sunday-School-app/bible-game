@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/four_scriptures_repository.dart';
@@ -724,11 +725,14 @@ class FourScripturesOneWordBloc
           0,
           0,
           0,
-          authenticationState.user!.rank,
+          authenticationState.user.rank,
           0,
-          authenticationState.user!.id,
+          authenticationState.user.id,
           0,
           0);
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('4ScripturesHintUsed', 0);
+      emit(state.copyWith(gameHintPurchasePrice: 0, noOfHintsUsed: 0));
     } catch (_) {}
   }
 
@@ -754,19 +758,18 @@ class FourScripturesOneWordBloc
 
   Future<void> _onPurchaseHint(
       PurchaseHint event, Emitter<FourScripturesOneWordState> emit) async {
-      try{
-        final authenticationState = _authenticationBloc.state;
-        await _fourScripturesOneWordRepository.purchaseHint(authenticationState.user!.id, event.purchasePrice);
-      }catch(_){
-
-      }
+    try {
+      final authenticationState = _authenticationBloc.state;
+      await _fourScripturesOneWordRepository.purchaseHint(
+          authenticationState.user!.id, event.purchasePrice);
+    } catch (_) {}
   }
 
-  void _onSetGameData(SetGameData event, Emitter<FourScripturesOneWordState> emit){
-     emit(state.copyWith(
-       gameHintPurchasePrice: event.gameHintPurchasePrice,
-       noOfHintsUsed:  event.noOfHintsUsed
-     ));
+  void _onSetGameData(
+      SetGameData event, Emitter<FourScripturesOneWordState> emit) {
+    emit(state.copyWith(
+        gameHintPurchasePrice: event.gameHintPurchasePrice,
+        noOfHintsUsed: event.noOfHintsUsed));
   }
 
   void _onClearFourScriptureOneWordGameData(

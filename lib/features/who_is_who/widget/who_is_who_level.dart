@@ -4,11 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
-import 'package:the_bible_game/features/who_is_who/widget/modal/freebies_modal.dart';
-import 'package:the_bible_game/features/who_is_who/widget/modal/wiw_time_up_modal.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
+import 'package:bible_game/features/who_is_who/widget/modal/freebies_modal.dart';
+import 'package:bible_game/features/who_is_who/widget/modal/wiw_time_up_modal.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 
 class WhoIsWhoLevel extends StatefulWidget {
   const WhoIsWhoLevel(
@@ -85,8 +87,10 @@ class _WhoIsWhoLevelState extends State<WhoIsWhoLevel> {
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return InkWell(
       onTap: () async {
+        soundManager.playClickSound();
         BlocProvider.of<WhoIsWhoBloc>(context).add(
           SetGameData(
             gameDuration: widget.playTime,

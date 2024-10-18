@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/features/home/widget/play_button.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/features/home/widget/play_button.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 import '../../../shared/constants/colors.dart';
 
 class GameCard extends StatelessWidget {
@@ -20,7 +20,7 @@ class GameCard extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            height: 120.h,
+            height: 125.h,
             margin: EdgeInsets.only(bottom: 20.h),
             decoration: BoxDecoration(
                 color: Colors.white,
@@ -65,7 +65,8 @@ class GameCard extends StatelessWidget {
                       )
                     ],
                   ),
-                )
+                ),
+                SizedBox(height: 5.h,)
               ],
             ),
           ),

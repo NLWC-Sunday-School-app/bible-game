@@ -1,19 +1,20 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:the_bible_game/features/four_scriptures/widget/modal/quick_tips_modal.dart';
-import 'package:the_bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
-import 'package:the_bible_game/features/global_challenge/widget/modal/quick_tips_modal.dart';
-import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
-import 'package:the_bible_game/features/pilgrim_progress/widget/modal/quick_tips_modal.dart';
-import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
-import 'package:the_bible_game/features/who_is_who/widget/modal/quick_tips_modal.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/features/four_scriptures/widget/modal/quick_tips_modal.dart';
+import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
+import 'package:bible_game/features/global_challenge/widget/modal/quick_tips_modal.dart';
+import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:bible_game/features/pilgrim_progress/widget/modal/quick_tips_modal.dart';
+import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
+import 'package:bible_game/features/who_is_who/widget/modal/quick_tips_modal.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 
 import '../../features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
 import '../../features/quick_game/bloc/quick_game_bloc.dart';
@@ -43,7 +44,7 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
         context.read<QuickGameBloc>().add(FetchQuickGameQuestions());
         context.read<QuickGameBloc>().stream.listen((state) {
           if (state.quickGameQuestionLoaded!) {
-            Timer(Duration(seconds: 3), () {
+            Timer(Duration(seconds: 5), () {
               if (mounted && !_isModalShown) {
                 showQuickGameTipsModal(context, hasTimer);
                 _isModalShown = true;
@@ -118,7 +119,7 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage(ProductImageRoutes.questionLoadingBg),
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
         ),
         child: BlocBuilder<SettingsBloc, SettingsState>(
@@ -136,7 +137,7 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(color: Colors.white, width: 2.w),
                       image: DecorationImage(
-                        image: NetworkImage(state.adContent![index].imageUrl),
+                        image: CachedNetworkImageProvider(state.adContent![index].imageUrl),
                         fit: BoxFit.fill,
                       ),
                     ),

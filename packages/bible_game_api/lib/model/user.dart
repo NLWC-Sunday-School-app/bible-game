@@ -25,22 +25,24 @@ class User extends Equatable {
   final int gems;
   final bool isWalletInitialized;
 
-  const User({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.profileUrl,
-    required this.rank,
-    required this.highScore,
-    required this.fourScripturesScore,
-    required this.fourScriptsLevel,
-    required this.coinWalletBalance,
-    required this.fcmToken,
-    required this.country,
-    required this.streak,
-    required this.gems,
-    required this.isWalletInitialized,
-  });
+  final String role;
+
+  const User(
+      {required this.id,
+      required this.name,
+      required this.email,
+      required this.profileUrl,
+      required this.rank,
+      required this.highScore,
+      required this.fourScripturesScore,
+      required this.fourScriptsLevel,
+      required this.coinWalletBalance,
+      required this.fcmToken,
+      required this.country,
+      required this.streak,
+      required this.gems,
+      required this.isWalletInitialized,
+      required this.role});
 
   // Factory constructor for creating a User instance from JSON
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -57,7 +59,8 @@ class User extends Equatable {
       country: json["country"],
       streak: json["streak"],
       gems: json["gems"],
-      isWalletInitialized: json["isWalletInitialized"]);
+      isWalletInitialized: json["isWalletInitialized"],
+      role: json["role"]);
 
   // Method to convert a User instance to JSON
   Map<String, dynamic> toJson() => {
@@ -74,7 +77,8 @@ class User extends Equatable {
         "country": country,
         "streak": streak,
         "gems": gems,
-        "isWalletInitialized": isWalletInitialized
+        "isWalletInitialized": isWalletInitialized,
+        "role": role
       };
 
   // Override props for Equatable
@@ -93,24 +97,25 @@ class User extends Equatable {
         country,
         streak,
         gems,
-        isWalletInitialized
+        isWalletInitialized,
+        role
       ];
 }
 
 // Example of an empty User instance
 const emptyUser = User(
-  id: 0,
-  name: '',
-  email: '',
-  profileUrl: '',
-  rank: '',
-  highScore: 0,
-  fourScripturesScore: 0,
-  fourScriptsLevel: 0,
-  coinWalletBalance: 0,
-  fcmToken: '',
-  country: '',
-  streak: 0,
-  gems: 0,
-  isWalletInitialized: false,
-);
+    id: 0,
+    name: '',
+    email: '',
+    profileUrl: '',
+    rank: '',
+    highScore: 0,
+    fourScripturesScore: 0,
+    fourScriptsLevel: 0,
+    coinWalletBalance: 0,
+    fcmToken: '',
+    country: '',
+    streak: 0,
+    gems: 0,
+    isWalletInitialized: false,
+    role: '');

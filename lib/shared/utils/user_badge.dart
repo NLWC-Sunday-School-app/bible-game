@@ -1,4 +1,4 @@
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 
 String getBadgeUrl(rank) {
   if (rank == 'babe') {

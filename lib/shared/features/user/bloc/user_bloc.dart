@@ -3,7 +3,7 @@ import 'package:bible_game_api/model/pilgrim_progress_level_data.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:the_bible_game/shared/utils/awesome_notification.dart';
+import 'package:bible_game/shared/utils/awesome_notification.dart';
 
 import '../../authentication/bloc/authentication_bloc.dart';
 import '../repository/user_repository.dart';

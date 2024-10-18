@@ -4,14 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
-import 'package:the_bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
-import 'package:the_bible_game/features/quick_game/bloc/quick_game_bloc.dart';
-import 'package:the_bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
-import 'package:the_bible_game/shared/constants/app_routes.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
+import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import 'package:bible_game/features/quick_game/bloc/quick_game_bloc.dart';
+import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 
-void showQuitModal(BuildContext context, {String? gameMode }) {
+import '../features/settings/bloc/settings_bloc.dart';
+
+void showQuitModal(BuildContext context, {String? gameMode}) {
+  final soundManager = context.read<SettingsBloc>().soundManager;
   showDialog(
       barrierDismissible: true,
       barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
@@ -24,12 +27,12 @@ void showQuitModal(BuildContext context, {String? gameMode }) {
 }
 
 class QuitModal extends StatelessWidget {
-  const QuitModal({Key? key, this.gameMode = ''})
-      : super(key: key);
+  const QuitModal({Key? key, this.gameMode = ''}) : super(key: key);
   final String gameMode;
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
@@ -70,7 +73,10 @@ class QuitModal extends StatelessWidget {
                   height: 40,
                 ),
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    soundManager.playClickSound();
+                    Navigator.pop(context);
+                  },
                   child: Container(
                     width: 200.w,
                     padding: const EdgeInsets.symmetric(vertical: 15),
@@ -96,40 +102,40 @@ class QuitModal extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
+                    soundManager.playClickSound();
                     if (gameMode == 'fourScriptures') {
-                      Navigator.pushNamedAndRemoveUntil(context,
-                          AppRoutes.home, (Route<dynamic> route) => false);
+                      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home,
+                          (Route<dynamic> route) => false);
                       BlocProvider.of<FourScripturesOneWordBloc>(context)
                           .add(ClearFourScripturesOneWordData());
                     } else if (gameMode == 'pilgrimProgress') {
-                      BlocProvider.of<PilgrimProgressBloc>(context).add(
-                          ClearPilgrimProgressData());
+                      BlocProvider.of<PilgrimProgressBloc>(context)
+                          .add(ClearPilgrimProgressData());
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         AppRoutes.pilgrimProgressHomeScreen,
                         ModalRoute.withName('/home'),
                       );
                     } else if (gameMode == 'whoIsWho') {
-                      BlocProvider.of<WhoIsWhoBloc>(context).add(
-                          ClearWhoIsWhoGameData());
+                      BlocProvider.of<WhoIsWhoBloc>(context)
+                          .add(ClearWhoIsWhoGameData());
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         AppRoutes.whoIsWhoHomeScreen,
                         ModalRoute.withName('/home'),
                       );
                     } else if (gameMode == 'quickGame') {
-                      BlocProvider.of<QuickGameBloc>(context).add(
-                          ClearQuickGameData());
+                      BlocProvider.of<QuickGameBloc>(context)
+                          .add(ClearQuickGameData());
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         AppRoutes.quickGameHomeScreen,
                         ModalRoute.withName('/home'),
                       );
                     } else {
-                      Navigator.pushNamedAndRemoveUntil(context,
-                          AppRoutes.home, (Route<dynamic> route) => false);
+                      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home,
+                          (Route<dynamic> route) => false);
                     }
-
                   },
                   child: Container(
                     width: 200.w,

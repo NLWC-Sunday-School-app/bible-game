@@ -1,7 +1,10 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:the_bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 
 void showCorrectAnswerBottomSheetModal(
     BuildContext context, String answer, VoidCallback onTap) {
@@ -125,6 +128,8 @@ class _CorrectAnswerModalState extends State<CorrectAnswerModal> {
   @override
   void initState() {
     super.initState();
+    final soundManager =  BlocProvider.of<SettingsBloc>(context).soundManager;
+    soundManager.playAchievementSound();
     confettiController.play();
   }
 }

@@ -1,15 +1,16 @@
 import 'dart:ui';
 
+import 'package:bible_game_api/utils/api_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
-import 'package:the_bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
-import 'package:the_bible_game/features/fantasy_league/widget/modal/successfully_created_league_modal.dart';
+import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
+import 'package:bible_game/features/fantasy_league/widget/modal/successfully_created_league_modal.dart';
 import 'package:intl/intl.dart';
-import 'package:the_bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:the_bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:the_bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/constants/image_routes.dart';
 import '../../../shared/utils/validation.dart';
 import '../../../shared/widgets/green_button.dart';
@@ -33,7 +34,6 @@ class _CreateLeagueState extends State<CreateLeague> {
   String _leagueNameErrorMessage = '';
   String _coinsGoalErrorMessage = '';
   String createLeaguePrice = '';
-
 
   String _formatNumber(String s) {
     if (s.isEmpty) return '';
@@ -72,15 +72,23 @@ class _CreateLeagueState extends State<CreateLeague> {
     final soundManager = context.read<SettingsBloc>().soundManager;
     return BlocConsumer<FantasyLeagueBloc, FantasyLeagueState>(
       listener: (context, state) {
+
+        if( state.failedToCreate){
+          ApiException.showSnackBar(context);
+        }
+
         if (state.hasCreatedLeague) {
           showSuccessfullyCreatedModal(context);
           leagueNameController.text = '';
           leagueCoinsGoal.text = '';
+          BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
         }
+
+
       },
       builder: (context, state) {
         return SizedBox(
-          height: widget.screenHeight - (150.h + 15.h + 72.h + 5.h + 120.h),
+          height: widget.screenHeight - (80.h + 15.h + 72.h + 5.h + 120.h),
           child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -108,11 +116,11 @@ class _CreateLeagueState extends State<CreateLeague> {
                         ),
                       ),
                       SizedBox(
-                        height: 10.h,
+                        height: 8.h,
                       ),
                       SizedBox(
                         width: 320.w,
-                        height: 60.h,
+                        height: 56.h,
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.white),
@@ -129,35 +137,50 @@ class _CreateLeagueState extends State<CreateLeague> {
                               ),
                             ],
                           ),
-                          child: TextFormField(
-                            controller: leagueNameController,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFF0C70DB),
-                              fontWeight: FontWeight.w500,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Enter name',
-                              hintStyle: TextStyle(
-                                  color: Color(0xFF627F8F),
-                                  fontWeight: FontWeight.w700),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.r),
-                                borderSide: const BorderSide(
-                                    color: Color(0xFFFFFFAD3), width: 0),
+                          child: Center(
+                            child: TextFormField(
+                              controller: leagueNameController,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color(0xFF0C70DB),
+                                fontWeight: FontWeight.w500,
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.r),
-                                borderSide: const BorderSide(
-                                    color: Color(0xFFFFFAD3), width: 0),
+                              decoration: InputDecoration(
+                                hintText: 'Enter name',
+                                contentPadding: EdgeInsets.symmetric(vertical: 10.h) ,
+                                hintStyle: TextStyle(
+                                    color: Color(0xFF627F8F),
+                                    fontWeight: FontWeight.w700),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFFFFFFAD3), width: 0),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: BorderSide(color: Colors.transparent),  // Hide error border
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: BorderSide(color: Colors.transparent),
+                                ),
+                                errorStyle: TextStyle(height: 0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFFFFFAD3), width: 0),
+                                ),
                               ),
+                              validator: (text) {
+                                String? validationMessage =
+                                    Validator.validateLeagueName(text!);
+                                setState(() {
+                                  _leagueNameErrorMessage =
+                                      validationMessage ?? '';
+                                });
+                                return validationMessage != null ? '' : null;
+                              },
                             ),
-                            validator: (text) {
-                              setState(() {
-                                _leagueNameErrorMessage =
-                                    Validator.validateLeagueName(text!) ?? '';
-                              });
-                            },
                           ),
                         ),
                       ),
@@ -203,7 +226,7 @@ class _CreateLeagueState extends State<CreateLeague> {
                             ),
                             SizedBox(
                               width: 230.w,
-                              height: 60.h,
+                              height: 56.h,
                               child: Container(
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Colors.white),
@@ -237,6 +260,7 @@ class _CreateLeagueState extends State<CreateLeague> {
                             ),
                             InkWell(
                               onTap: () {
+                                soundManager.playClickSound();
                                 setState(() {
                                   isOpenToEveryone = !isOpenToEveryone;
                                 });
@@ -262,7 +286,7 @@ class _CreateLeagueState extends State<CreateLeague> {
                         height: 20.h,
                       ),
                       Text(
-                        'Amount of coins to win',
+                        'Coins target to win',
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
@@ -274,7 +298,7 @@ class _CreateLeagueState extends State<CreateLeague> {
                       ),
                       SizedBox(
                         width: 320.w,
-                        height: 60.h,
+                        height: 56.h,
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.white),
@@ -291,37 +315,52 @@ class _CreateLeagueState extends State<CreateLeague> {
                               ),
                             ],
                           ),
-                          child: TextFormField(
-                            textAlign: TextAlign.center,
-                            controller: leagueCoinsGoal,
-                            keyboardType: TextInputType.numberWithOptions(
-                                signed: true, decimal: true),
-                            style: TextStyle(
-                                color: Color(0xFF0C70DB),
-                                fontWeight: FontWeight.w500),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'What is the coins goal?',
-                              hintStyle: TextStyle(
-                                  color: Color(0xFF627F8F),
-                                  fontWeight: FontWeight.w700),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.r),
-                                borderSide: const BorderSide(
-                                    color: Color(0xFFFFFFAD3), width: 0),
+                          child: Center(
+                            child: TextFormField(
+                              textAlign: TextAlign.center,
+                              controller: leagueCoinsGoal,
+                              keyboardType: TextInputType.numberWithOptions(
+                                  signed: true, decimal: true),
+                              style: TextStyle(
+                                  color: Color(0xFF0C70DB),
+                                  fontWeight: FontWeight.w500),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'e.g. 100',
+                                contentPadding: EdgeInsets.symmetric(vertical: 10.h) ,
+                                hintStyle: TextStyle(
+                                    color: Color(0xFF627F8F),
+                                    fontWeight: FontWeight.w700),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFFFFFFAD3), width: 0),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: BorderSide(color: Colors.transparent),  // Hide error border
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: BorderSide(color: Colors.transparent),
+                                ),
+                                errorStyle: TextStyle(height: 0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFFFFFAD3), width: 0),
+                                ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.r),
-                                borderSide: const BorderSide(
-                                    color: Color(0xFFFFFAD3), width: 0),
-                              ),
+                              validator: (text) {
+                                String? validationMessage =
+                                    Validator.validateCoinsGoal(text!);
+                                setState(() {
+                                  _coinsGoalErrorMessage =
+                                      validationMessage ?? '';
+                                });
+                                return validationMessage != null ? '' : null;
+                              },
                             ),
-                            validator: (text) {
-                              setState(() {
-                                _coinsGoalErrorMessage =
-                                    Validator.validateCoinsGoal(text!) ?? '';
-                              });
-                            },
                           ),
                         ),
                       ),
@@ -356,6 +395,7 @@ class _CreateLeagueState extends State<CreateLeague> {
                           children: [
                             InkWell(
                               onTap: () {
+                                soundManager.playClickSound();
                                 setState(() {
                                   currentIndex =
                                       (currentIndex - 1) % duration.length;
@@ -368,7 +408,7 @@ class _CreateLeagueState extends State<CreateLeague> {
                             ),
                             SizedBox(
                               width: 230.w,
-                              height: 60.h,
+                              height: 56.h,
                               child: Container(
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Colors.white),
@@ -400,6 +440,7 @@ class _CreateLeagueState extends State<CreateLeague> {
                             ),
                             InkWell(
                               onTap: () {
+                                soundManager.playClickSound();
                                 setState(() {
                                   currentIndex =
                                       (currentIndex + 1) % duration.length;

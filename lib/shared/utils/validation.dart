@@ -43,13 +43,12 @@ class Validator {
   }
 
   static String? validateCoinsGoal(String goal) {
-    print('goal $goal');
     if (goal.isEmpty) {
       return 'Coins goal is required';
     }
 
-    if (int.parse(goal.replaceAll(',', '')) > 100000) {
-      return 'Coins goal maximum is 100,000';
+    if (int.parse(goal.replaceAll(',', '')) > 500000) {
+      return 'Coins goal maximum is 500,000';
     }
 
     if (int.parse(goal.replaceAll(',', '')) < 5000) {

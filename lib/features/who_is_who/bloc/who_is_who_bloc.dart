@@ -93,7 +93,6 @@ class WhoIsWhoBloc extends Bloc<WhoIsWhoEvent, WhoIsWhoState> {
       } else {
         soundManager.playWrongAnswerSound();
       }
-      print(state.noOfCorrectAnswers);
       emit(state.copyWith(
         hasAnswered: true,
         isCorrectAnswer: isCorrect,
