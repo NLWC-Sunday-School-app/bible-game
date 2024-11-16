@@ -50,6 +50,7 @@ class _CreateLeagueState extends State<CreateLeague> {
   @override
   void initState() {
     super.initState();
+
     createLeaguePrice = BlocProvider.of<SettingsBloc>(context)
         .state
         .gamePlaySettings['create_league_price'];

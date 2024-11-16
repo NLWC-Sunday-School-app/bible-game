@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
 import 'package:bible_game/shared/widgets/blue_button.dart';
-
+import 'package:intl/intl.dart';
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../../shared/widgets/custom_toast.dart';
@@ -27,13 +27,23 @@ void showSuccessfullyCreatedModal(BuildContext context) {
       });
 }
 
+ dynamic getWeeksLeft(seasonEndDate){
+   final leagueSeasonEndDate = DateFormat('yyyy-MM-dd').parse(seasonEndDate);
+   final currentDate = DateTime.now();
+   final differenceInDays = leagueSeasonEndDate.difference(currentDate).inDays;
+   final weeksLeft = (differenceInDays / 7).ceil();
+   return weeksLeft;
+ }
+
 class SuccessfullyCreatedLeague extends StatelessWidget {
   const SuccessfullyCreatedLeague({super.key});
 
-  void _copyText(BuildContext context, leagueGoal, leagueName, leagueDuration, leagueCode) {
+  void _copyText(BuildContext context, leagueGoal, leagueName, leagueDuration,
+      leagueCode) {
     showCustomToast(context, 'Copied');
-    Clipboard.setData(ClipboardData(text: 'Can you get $leagueGoal coins before me in $leagueDuration ${int.parse(leagueDuration) > 1 ? 'weeks' : 'week'}? Join my League ($leagueName) on the Bible game app using this code $leagueCode \n\nhttps://linktr.ee/biblegame_'));
-
+    Clipboard.setData(ClipboardData(
+        text:
+            'Can you get ${NumberFormat('#,##0').format(leagueGoal)} coins before me in $leagueDuration ${leagueDuration > 1 ? 'weeks' : 'week'}? Join my League ($leagueName) on the Bible game app using this code $leagueCode \n\nhttps://linktr.ee/biblegame_'));
   }
 
   @override
@@ -109,7 +119,13 @@ class SuccessfullyCreatedLeague extends StatelessWidget {
                       InkWell(
                         onTap: () {
                           soundManager.playClickSound();
-                          // _copyText(context, state.createdLeagueData!['code']);
+                          _copyText(
+                            context,
+                            state.createdLeagueData!['goal'],
+                            state.createdLeagueData!['name'],
+                            getWeeksLeft(state.createdLeagueData!['seasonEnd']),
+                            state.createdLeagueData!['code'],
+                          );
                         },
                         child: Icon(
                           Icons.copy,

@@ -10,7 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:bible_game/features/fantasy_league/widget/modal/fantasy_bible_league_guide.dart';
 import 'package:bible_game/features/fantasy_league/widget/modal/leave_league_modal.dart';
-
+import 'package:intl/intl.dart';
 import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -37,8 +37,7 @@ class _MyLeagueScreenState extends State<MyLeagueScreen> {
 
   void _copyText(BuildContext context, leagueGoal, leagueName, leagueDuration, leagueCode) {
     showCustomToast(context, 'Copied');
-    Clipboard.setData(ClipboardData(text: 'Can you get $leagueGoal coins before me in $leagueDuration ${int.parse(leagueDuration) > 1 ? 'weeks' : 'week'}? Join my League ($leagueName) on the Bible game app using this code $leagueCode \n\nhttps://linktr.ee/biblegame_'));
-
+    Clipboard.setData(ClipboardData(text: 'Can you get ${NumberFormat('#,##0').format(int.parse(leagueGoal))} coins before me in $leagueDuration ${int.parse(leagueDuration) > 1 ? 'weeks' : 'week'}? Join my League ($leagueName) on the Bible game app using this code $leagueCode \n\nhttps://linktr.ee/biblegame_'));
   }
 
   @override
@@ -467,7 +466,6 @@ class _MyLeagueScreenState extends State<MyLeagueScreen> {
                                                             ),
                                                             GestureDetector(
                                                               onTap: () {
-
                                                                 soundManager
                                                                     .playClickSound();
                                                                 _copyText(
