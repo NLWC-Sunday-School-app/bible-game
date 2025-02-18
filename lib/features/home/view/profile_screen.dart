@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:bible_game/features/home/widget/modals/log_out_modal.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
@@ -17,6 +18,7 @@ import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/utils/avatar_credentials.dart';
 import '../../../shared/utils/user_badge.dart';
 import '../../../shared/widgets/custom_toast.dart';
+import '../../../shared/widgets/multi_avatar.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
 import '../widget/modals/bg_streak_modal.dart';
 import '../widget/modals/create_profile_modal.dart';
@@ -145,16 +147,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         color: const Color(0xFF4A91FF),
                                       ),
                                     ),
-                                    child: SvgPicture.network(
-                                      '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
-                                      width: 70.w,
-                                      semanticsLabel: 'Logo',
-                                      placeholderBuilder:
-                                          (BuildContext context) => Image.asset(
-                                        ProductImageRoutes.defaultAvatar,
-                                        width: 70.w,
-                                      ),
-                                    ),
+                                    child:
+
+                                    // SvgPicture.network(
+                                    //   '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
+                                    //   width: 70.w,
+                                    //   semanticsLabel: 'Logo',
+                                    //   placeholderBuilder:
+                                    //       (BuildContext context) => Image.asset(
+                                    //     ProductImageRoutes.defaultAvatar,
+                                    //     width: 70.w,
+                                    //   ),
+                                    // ),
+                                    AvatarWidget(seed: state.user.id.toString(), width: 70.w, height: 70.h,)
                                   ),
                                   SizedBox(
                                     width: 10.w,

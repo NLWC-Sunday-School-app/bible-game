@@ -360,7 +360,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                       if (BlocProvider.of<AuthenticationBloc>(context)
                               .state
                               .user
-                              .gems <=
+                              .gems <
                           1) {
                         Flushbar(
                           message: 'Not enough gems',

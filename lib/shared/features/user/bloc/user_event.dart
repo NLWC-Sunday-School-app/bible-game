@@ -29,6 +29,8 @@ class FetchCountryLeaderBoard extends UserEvent {}
 
 class FetchUserStreakDetails extends UserEvent {}
 
+class FetchUserYearlyRecap extends UserEvent {}
+
 class UpdateUserProfile extends UserEvent {
   final newUserName;
 

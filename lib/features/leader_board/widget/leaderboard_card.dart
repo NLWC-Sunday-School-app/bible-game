@@ -11,6 +11,7 @@ import '../../../shared/constants/image_routes.dart';
 import 'package:intl/intl.dart';
 
 import '../../../shared/utils/avatar_credentials.dart';
+import '../../../shared/widgets/multi_avatar.dart';
 
 class LeaderboardCard extends StatelessWidget {
   const LeaderboardCard({
@@ -122,13 +123,15 @@ class LeaderboardCard extends StatelessWidget {
                   border: Border.all(color: AppColors.primaryColor),
                   shape: BoxShape.circle),
               child:
-              SvgPicture.network(
-                '${AvatarCredentials.BaseURL}/${userId}.svg?apikey=${AvatarCredentials.APIKey}/',
-                width: 35.w,
-                semanticsLabel: 'Logo',
-                placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 35.w,),
-              ),
+              // SvgPicture.network(
+              //   '${AvatarCredentials.BaseURL}/${userId}.svg?apikey=${AvatarCredentials.APIKey}/',
+              //   width: 35.w,
+              //   semanticsLabel: 'Logo',
+              //   placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 35.w,),
+              // ),
 
+              AvatarWidget(seed: userId.toString(), width: 35.w, height: 35.h,),
+              // Text(userId.toString()),
               // FadeInImage.assetNetwork(
               //   placeholder: ProductImageRoutes.defaultAvatar,
               //   image:

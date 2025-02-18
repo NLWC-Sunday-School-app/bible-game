@@ -114,7 +114,7 @@ class _GamesBottomSheetModalState extends State<LeaderboardModal> {
                                       .globalChallengeLeaderboard[index]
                                       .playerId,
                                   avatarUrl:
-                                      '${AvatarCredentials.BaseURL}/${state.globalChallengeLeaderboard[index].playerId}.png',
+                                      '${state.globalChallengeLeaderboard[index].playerId}',
                                 );
                               },
                               itemCount:

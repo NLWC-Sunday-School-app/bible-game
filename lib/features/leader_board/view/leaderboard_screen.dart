@@ -14,7 +14,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/widgets/tab_button.dart';
 import '../../../shared/constants/colors.dart';
 import 'package:countries_world_map/countries_world_map.dart';
-
+import 'package:intl/intl.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../home/widget/modals/create_profile_modal.dart';
 import '../../home/widget/modals/login_modal.dart';
@@ -38,7 +38,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
     final userState = BlocProvider.of<AuthenticationBloc>(context).state;
     if (userState.user.id != 0) {
       BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(true));
-      BlocProvider.of<UserBloc>(context).add(FetchCountryLeaderBoard());
+      // BlocProvider.of<UserBloc>(context).add(FetchCountryLeaderBoard());
     } else {
       BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(false));
     }
@@ -53,6 +53,10 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
 
   void scrollToTop() {
     _scrollController.jumpTo(0.0);
+  }
+
+  String getCurrentMonthFormatted() {
+    return DateFormat.MMMM().format(DateTime.now());
   }
 
   void scrollToCountryTop() {
@@ -143,8 +147,23 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 20.h,
-                        )
+                          height: 10.h,
+                        ),
+                        Center(
+                          child: StrokeText(
+                            text: '( ${getCurrentMonthFormatted()} )',
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            strokeColor: AppColors.titleDropShadowColor,
+                            strokeWidth: 6,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
                       ],
                     ),
                     SizedBox(
@@ -175,6 +194,15 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                               buttonText: 'Global',
                               buttonSelected: _selectedGlobal,
                               onTap: () {
+                                if (context
+                                    .read<AuthenticationBloc>()
+                                    .state
+                                    .user
+                                    .id !=
+                                    0) {
+                                  BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(true));
+
+                                }
                                 setState(() {
                                   _selectedGlobal = true;
                                 });
@@ -196,6 +224,15 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                   : 'Your country',
                               buttonSelected: !_selectedGlobal,
                               onTap: () {
+                                if (context
+                                        .read<AuthenticationBloc>()
+                                        .state
+                                        .user
+                                        .id !=
+                                    0) {
+                                  BlocProvider.of<UserBloc>(context)
+                                      .add(FetchCountryLeaderBoard());
+                                }
                                 setState(() {
                                   _selectedGlobal = false;
                                 });
@@ -278,126 +315,135 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                   ],
                                 ),
                               )
-                        : SizedBox(
-                            height: usableHeight -
-                                (100.h + 20.h + 72.h + 5.h + 120.h),
-                            child: context
-                                        .read<AuthenticationBloc>()
-                                        .state
-                                        .user
-                                        .id !=
-                                    0
-                                ? Stack(
-                                    children: [
-                                      ListView.builder(
-                                        controller: _scrollControllerTwo,
-                                        padding: EdgeInsets.zero,
-                                        itemCount:
-                                            state.countryLeaderboard!.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return LeaderboardCard(
-                                            userId: state
-                                                .countryLeaderboard![index]
-                                                .userId,
-                                            position: state
-                                                .countryLeaderboard![index]
-                                                .position,
-                                            userName: state
-                                                .countryLeaderboard![index]
-                                                .name,
-                                            userBadge:
-                                                ProductImageRoutes.defaultBadge,
-                                            userLevel: state
-                                                .countryLeaderboard![index]
-                                                .status,
-                                            noOfCoins: state
-                                                .countryLeaderboard![index]
-                                                .walletBalance,
-                                            countryName: context
-                                                .read<AuthenticationBloc>()
-                                                .state
-                                                .user
-                                                .country,
-                                          );
-                                        },
-                                      ),
-                                      Align(
-                                        alignment: Alignment.topCenter,
-                                        child: buildLeaderboardNavigator(
-                                            scrollToCountryTop, 'Top'),
-                                      ),
-                                      Positioned(
-                                        bottom: 60,
-                                        left: 155,
-                                        right: 155,
-                                        child: buildLeaderboardNavigator(
-                                            scrollToUserCountryPosition, 'You'),
-                                      ),
-                                    ],
-                                  )
-                                : Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 40.h,
-                                      ),
-                                      GreenButton(
-                                        onTap: () {
-                                          soundManager.playClickSound();
-                                          showLoginModal(context);
-                                        },
-                                        buttonIsLoading: false,
-                                        width: 350.w,
-                                        customWidget: Center(
-                                          child: StrokeText(
-                                            text: 'Log In',
-                                            textStyle: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18.sp,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                            strokeColor:
-                                                const Color(0xFF272D39),
-                                            strokeWidth: 3,
+                        : state.isFetchingCountryLeaderboard
+                            ? Container(
+                                margin: EdgeInsets.only(top: 40.h),
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              )
+                            : SizedBox(
+                                height: usableHeight -
+                                    (100.h + 20.h + 72.h + 5.h + 120.h),
+                                child: context
+                                            .read<AuthenticationBloc>()
+                                            .state
+                                            .user
+                                            .id !=
+                                        0
+                                    ? Stack(
+                                        children: [
+                                          ListView.builder(
+                                            controller: _scrollControllerTwo,
+                                            padding: EdgeInsets.zero,
+                                            itemCount: state
+                                                .countryLeaderboard!.length,
+                                            itemBuilder: (BuildContext context,
+                                                int index) {
+                                              return LeaderboardCard(
+                                                userId: state
+                                                    .countryLeaderboard![index]
+                                                    .userId,
+                                                position: state
+                                                    .countryLeaderboard![index]
+                                                    .position,
+                                                userName: state
+                                                    .countryLeaderboard![index]
+                                                    .name,
+                                                userBadge: ProductImageRoutes
+                                                    .defaultBadge,
+                                                userLevel: state
+                                                    .countryLeaderboard![index]
+                                                    .status,
+                                                noOfCoins: state
+                                                    .countryLeaderboard![index]
+                                                    .walletBalance,
+                                                countryName: context
+                                                    .read<AuthenticationBloc>()
+                                                    .state
+                                                    .user
+                                                    .country,
+                                              );
+                                            },
                                           ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 30.h,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          soundManager.playClickSound();
-                                          showCreateProfileModal(context);
-                                        },
-                                        child: Container(
-                                          width: 350.w,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 15.h),
-                                          decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                            image: AssetImage(ProductImageRoutes
-                                                .newBlueBtnBg),
-                                            fit: BoxFit.fill,
-                                          )),
-                                          child: Center(
-                                            child: StrokeText(
-                                              text: 'Create Profile',
-                                              textStyle: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 18.sp,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                              strokeColor:
-                                                  const Color(0xFF272D39),
-                                              strokeWidth: 3,
-                                            ),
+                                          Align(
+                                            alignment: Alignment.topCenter,
+                                            child: buildLeaderboardNavigator(
+                                                scrollToCountryTop, 'Top'),
                                           ),
-                                        ),
+                                          Positioned(
+                                            bottom: 60,
+                                            left: 155,
+                                            right: 155,
+                                            child: buildLeaderboardNavigator(
+                                                scrollToUserCountryPosition,
+                                                'You'),
+                                          ),
+                                        ],
                                       )
-                                    ],
-                                  ),
-                          ),
+                                    : Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 40.h,
+                                          ),
+                                          GreenButton(
+                                            onTap: () {
+                                              soundManager.playClickSound();
+                                              showLoginModal(context);
+                                            },
+                                            buttonIsLoading: false,
+                                            width: 350.w,
+                                            customWidget: Center(
+                                              child: StrokeText(
+                                                text: 'Log In',
+                                                textStyle: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18.sp,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                                strokeColor:
+                                                    const Color(0xFF272D39),
+                                                strokeWidth: 3,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 30.h,
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              soundManager.playClickSound();
+                                              showCreateProfileModal(context);
+                                            },
+                                            child: Container(
+                                              width: 350.w,
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 15.h),
+                                              decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                image: AssetImage(
+                                                    ProductImageRoutes
+                                                        .newBlueBtnBg),
+                                                fit: BoxFit.fill,
+                                              )),
+                                              child: Center(
+                                                child: StrokeText(
+                                                  text: 'Create Profile',
+                                                  textStyle: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18.sp,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                  strokeColor:
+                                                      const Color(0xFF272D39),
+                                                  strokeWidth: 3,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                              ),
                   ],
                 ),
               ),

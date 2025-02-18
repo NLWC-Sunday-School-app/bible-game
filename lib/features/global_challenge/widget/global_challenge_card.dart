@@ -60,7 +60,10 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
 
   getPlayedGameStatus() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    playedGame = await prefs.getBool('PLAYED_${widget.campaignTag}') ?? false;
+    var status = await prefs.getBool('PLAYED_${widget.campaignTag}') ?? false;
+    setState(() {
+      playedGame = status;
+    });
   }
 
   void _startGoLiveCountdown() {
@@ -71,16 +74,16 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
       if (difference.isNegative) {
         timer.cancel();
         context.read<GlobalChallengeBloc>().add(UpdateGlobalChallengeGame(
-          widget.id,
-          widget.title,
-          widget.text,
-          widget.imageUrl,
-          widget.campaignTag,
-          true,
-          false,
-          widget.startDate,
-          widget.endDate,
-        ));
+              widget.id,
+              widget.title,
+              widget.text,
+              widget.imageUrl,
+              widget.campaignTag,
+              true,
+              false,
+              widget.startDate,
+              widget.endDate,
+            ));
       } else {
         setState(() {
           _duration = difference;
@@ -97,16 +100,16 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
       if (difference.isNegative) {
         timer.cancel();
         context.read<GlobalChallengeBloc>().add(UpdateGlobalChallengeGame(
-          widget.id,
-          widget.title,
-          widget.text,
-          widget.imageUrl,
-          widget.campaignTag,
-          false,
-          false,
-          widget.startDate,
-          widget.endDate,
-        ));
+              widget.id,
+              widget.title,
+              widget.text,
+              widget.imageUrl,
+              widget.campaignTag,
+              false,
+              false,
+              widget.startDate,
+              widget.endDate,
+            ));
       } else {
         // setState(() {
         //   _duration = difference;
@@ -172,8 +175,8 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
                   width: 10.w,
                 ),
                 Container(
-                  padding: EdgeInsets.only(
-                      top: 10.h, bottom: 10.h, right: 10.w),
+                  padding:
+                      EdgeInsets.only(top: 10.h, bottom: 10.h, right: 10.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -205,79 +208,94 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
                         children: [
                           widget.gameIsLive
                               ? GestureDetector(
-                            onTap: () {
-                              soundManager.playClickSound();
-                              if(state.user.id != 0){
-                                Navigator.pushNamed(
-                                    context, AppRoutes.questionLoadingScreen,
-                                    arguments: { 'gameType': widget.campaignTag});
-                              }else{
-                                Navigator.pushNamed(context, AppRoutes.profileScreen);
-                              }
-
-                            },
-                            child: playedGame == false
-                                ? Container(
-                              padding: EdgeInsets.all(10.w),
-                              decoration: BoxDecoration(
-                                  borderRadius:
-                                  BorderRadius.circular(24.r),
-                                  color: const Color(0xFF558CD7)),
-                              child: Text(
-                                'Join Challenge',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12.sp),
-                              ),
-                            )
-                                : const GamesLockedButton(
-                              buttonText: 'Game Played',
-                            ),
-                          )
+                                  onTap: () async {
+                                    soundManager.playClickSound();
+                                    if (state.user.id != 0) {
+                                      if (!playedGame) {
+                                        final SharedPreferences prefs =
+                                            await SharedPreferences
+                                                .getInstance();
+                                        prefs.setBool(
+                                            'PLAYED_${widget.campaignTag}',
+                                            true);
+                                        setState(() {
+                                          playedGame = true;
+                                        });
+                                        print(
+                                            'new land ${prefs.getBool('PLAYED_${widget.campaignTag}')}');
+                                        Navigator.pushNamed(context,
+                                            AppRoutes.questionLoadingScreen,
+                                            arguments: {
+                                              'gameType': widget.campaignTag
+                                            });
+                                      }
+                                    } else {
+                                      Navigator.pushNamed(
+                                          context, AppRoutes.profileScreen);
+                                    }
+                                  },
+                                  child: !playedGame
+                                      ? Container(
+                                          padding: EdgeInsets.all(10.w),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(24.r),
+                                              color: const Color(0xFF558CD7)),
+                                          child: Text(
+                                            'Join Challenge',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12.sp),
+                                          ),
+                                        )
+                                      : const GamesLockedButton(
+                                          buttonText: 'Game Played',
+                                        ),
+                                )
                               : widget.isComingSoon
-                              ? GamesLockedButton(
-                            buttonText:
-                            '${days}D | ${hours}H:${minutes}M:${seconds}s',
-                          )
-                              : GamesLockedButton(
-                            buttonText: 'Ended',
-                          ),
+                                  ? GamesLockedButton(
+                                      buttonText:
+                                          '${days}D | ${hours}H:${minutes}M:${seconds}s',
+                                    )
+                                  : GamesLockedButton(
+                                      buttonText: 'Ended',
+                                    ),
                           SizedBox(
                             width: 10.w,
                           ),
                           widget.gameIsLive
                               ? GestureDetector(
-                            onTap: () {
-                              soundManager.playClickSound();
-                              if(state.user.id != 0){
-                                showGlobalChallengeLeaderboardModal(
-                                    context, widget.campaignTag);
-                              }else{
-                                Navigator.pushNamed(context, AppRoutes.profileScreen);
-                              }
-
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 30.w,
-                              width: 30.w,
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topRight,
-                                    end: Alignment.center,
-                                    colors: [
-                                      Color(0xFF598DE7),
-                                      Color(0xFF1861DE)
-                                    ],
-                                  )),
-                              child: SvgPicture.asset(
-                                IconImageRoutes.trophy,
-                                width: 20.w,
-                              ),
-                            ),
-                          )
+                                  onTap: () {
+                                    soundManager.playClickSound();
+                                    if (state.user.id != 0) {
+                                      showGlobalChallengeLeaderboardModal(
+                                          context, widget.campaignTag);
+                                    } else {
+                                      Navigator.pushNamed(
+                                          context, AppRoutes.profileScreen);
+                                    }
+                                  },
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: 30.w,
+                                    width: 30.w,
+                                    decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topRight,
+                                          end: Alignment.center,
+                                          colors: [
+                                            Color(0xFF598DE7),
+                                            Color(0xFF1861DE)
+                                          ],
+                                        )),
+                                    child: SvgPicture.asset(
+                                      IconImageRoutes.trophy,
+                                      width: 20.w,
+                                    ),
+                                  ),
+                                )
                               : const SizedBox()
                         ],
                       ),

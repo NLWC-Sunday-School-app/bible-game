@@ -54,6 +54,8 @@ class _SplashScreenState extends State<SplashScreen> {
                           .add(FetchPilgrimProgressLevelData());
                       BlocProvider.of<UserBloc>(context)
                           .add(FetchUserStreakDetails());
+                      BlocProvider.of<UserBloc>(context)
+                          .add(FetchUserYearlyRecap());
                       // Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home,
                       //     (Route<dynamic> route) => false);
                     }
@@ -111,6 +113,8 @@ class _SplashScreenState extends State<SplashScreen> {
                .add(FetchGlobalChallengeGames());
            BlocProvider.of<PilgrimProgressBloc>(context)
                .add(FetchPilgrimProgressLevelData());
+           BlocProvider.of<UserBloc>(context).add(FetchUserYearlyRecap());
+           // BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
            Navigator.pushNamedAndRemoveUntil(
                context, AppRoutes.home, (Route<dynamic> route) => false);
           });
@@ -119,8 +123,8 @@ class _SplashScreenState extends State<SplashScreen> {
               .add(FetchUserDataRequested());
           BlocProvider.of<GlobalChallengeBloc>(context)
               .add(FetchGlobalChallengeGames());
-          BlocProvider.of<PilgrimProgressBloc>(context)
-              .add(FetchPilgrimProgressLevelData());
+          // BlocProvider.of<PilgrimProgressBloc>(context)
+          //     .add(FetchPilgrimProgressLevelData());
           Future.delayed(Duration(seconds: 1), (){
             Navigator.pushNamedAndRemoveUntil(
                 context, AppRoutes.home, (Route<dynamic> route) => false);

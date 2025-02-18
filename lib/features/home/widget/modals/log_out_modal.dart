@@ -10,6 +10,7 @@ import 'package:bible_game/shared/features/authentication/bloc/authentication_bl
 import '../../../../shared/constants/app_routes.dart';
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/utils/avatar_credentials.dart';
+import '../../../../shared/widgets/multi_avatar.dart';
 
 void showLogoutModal(BuildContext context) {
   showDialog(
@@ -36,16 +37,14 @@ class LogoutModal extends StatelessWidget {
       listener: (context, state) {
         if (state.hasLoggedOut) {
           Navigator.pop(context);
-          Navigator.pushNamedAndRemoveUntil(context,
-              AppRoutes.home, (Route<dynamic> route) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, AppRoutes.home, (Route<dynamic> route) => false);
           GetStorage().remove('user_token');
           GetStorage().remove('refresh_token');
         }
       },
       builder: (context, state) {
-        return
-
-          SizedBox(
+        return SizedBox(
           height: 400.h,
           width: 350.h,
           child: Container(
@@ -92,23 +91,27 @@ class LogoutModal extends StatelessWidget {
                   height: 20.h,
                 ),
                 Container(
-                  padding: EdgeInsets.all(5.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      width: 4.w,
-                      color: const Color(0xFF4A91FF),
+                    padding: EdgeInsets.all(5.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        width: 4.w,
+                        color: const Color(0xFF4A91FF),
+                      ),
                     ),
-                  ),
-                  child:
-                  SvgPicture.network(
-                    '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
-                    width: 70.w,
-                    semanticsLabel: 'avatar',
-                    placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
-                  ),
-                ),
+                    child:
+                        // SvgPicture.network(
+                        //   '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
+                        //   width: 70.w,
+                        //   semanticsLabel: 'avatar',
+                        //   placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
+                        // ),
+                        AvatarWidget(
+                      seed: state.user.id.toString(),
+                      width: 70.w,
+                      height: 70.h,
+                    )),
                 SizedBox(
                   height: 20.h,
                 ),
@@ -145,13 +148,13 @@ class LogoutModal extends StatelessWidget {
                       child: Center(
                         child: state.isLoggingOut
                             ? SizedBox(
-                              height: 20.h,
-                              width: 20.w,
-                              child: CircularProgressIndicator(
+                                height: 20.h,
+                                width: 20.w,
+                                child: CircularProgressIndicator(
                                   color: Colors.white,
                                   strokeWidth: 3,
                                 ),
-                            )
+                              )
                             : StrokeText(
                                 text: 'Yes, log me out',
                                 textStyle: TextStyle(

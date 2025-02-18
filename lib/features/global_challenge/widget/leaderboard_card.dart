@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 
+import '../../../shared/widgets/multi_avatar.dart';
+
 class LeaderBoardCard extends StatelessWidget {
   final int playerPosition;
   final String playerName;
@@ -56,10 +58,12 @@ class LeaderBoardCard extends StatelessWidget {
                     ),
                     Container(
                       margin: EdgeInsets.only(right: 8.w, left: 50.w),
-                      child: Image.network(
-                        avatarUrl,
-                        width: 34.w,
-                      ),
+                      child:
+                      // Image.network(
+                      //   avatarUrl,
+                      //   width: 34.w,
+                      // ),
+                      AvatarWidget(seed: avatarUrl, width: 34.w, height: 34.h,)
                     ),
                     SizedBox(
                       width: 10.w,

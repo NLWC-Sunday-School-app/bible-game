@@ -1,6 +1,6 @@
 # Uncomment this line to define a global platform for your project
 platform :ios, '12.0'
-
+use_frameworks! :linkage => :static
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
@@ -63,3 +63,4 @@ target 'MyAppServiceExtension' do
 end
 update_awesome_fcm_service_target('MyAppServiceExtension', File.dirname(File.realpath(__FILE__)), flutter_root)
 ################  Awesome Notifications FCM pod mod  ###################
+

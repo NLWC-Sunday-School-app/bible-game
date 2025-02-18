@@ -9,6 +9,7 @@ class UserState extends Equatable {
   final bool isFetchingGlobalLeaderboard;
   final bool isFetchingCountryLeaderboard;
   final Map<String, dynamic> userStreakDetails;
+  final Map<String, dynamic> userYearlyRecap;
   final bool isUpdatingProfile;
   final bool updatedProfile;
   final bool failedToUpdate;
@@ -28,6 +29,7 @@ class UserState extends Equatable {
       this.isFetchingCountryLeaderboard = false,
       this.countryLeaderboard = const [],
       this.userStreakDetails = const {},
+      this.userYearlyRecap = const {},
       this.isUpdatingProfile = false,
       this.updatedProfile = false,
       this.failedToUpdate = false,
@@ -45,6 +47,7 @@ class UserState extends Equatable {
       bool? isFetchingCountryLeaderboard,
       List<Leaderboard>? countryLeaderboard,
       Map<String, dynamic>? userStreakDetails,
+      Map<String, dynamic>? userYearlyRecap,
       bool? isUpdatingProfile,
       bool? updatedProfile,
       bool? failedToUpdate,
@@ -64,6 +67,7 @@ class UserState extends Equatable {
             isFetchingCountryLeaderboard ?? this.isFetchingCountryLeaderboard,
         countryLeaderboard: countryLeaderboard ?? this.countryLeaderboard,
         userStreakDetails: userStreakDetails ?? this.userStreakDetails,
+        userYearlyRecap: userYearlyRecap ?? this.userYearlyRecap,
         isUpdatingProfile: isUpdatingProfile ?? this.isUpdatingProfile,
         updatedProfile: updatedProfile ?? this.updatedProfile,
         failedToUpdate: failedToUpdate ?? this.failedToUpdate,
@@ -74,8 +78,7 @@ class UserState extends Equatable {
         hasSentCollaboratorMail:
             hasSentCollaboratorMail ?? this.hasSentCollaboratorMail,
         isUpdatingCountry: isUpdatingCountry ?? this.isUpdatingCountry,
-      hasUpdatedCountry:  hasUpdatedCountry ?? this.hasUpdatedCountry
-    );
+        hasUpdatedCountry: hasUpdatedCountry ?? this.hasUpdatedCountry);
   }
 
   @override
@@ -86,6 +89,7 @@ class UserState extends Equatable {
         isFetchingCountryLeaderboard,
         countryLeaderboard,
         userStreakDetails,
+        userYearlyRecap,
         isUpdatingProfile,
         updatedProfile,
         failedToUpdate,

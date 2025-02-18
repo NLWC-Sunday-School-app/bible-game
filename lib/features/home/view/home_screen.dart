@@ -1,9 +1,8 @@
 import 'dart:async';
 
+import 'package:bible_game/features/recap/widget/recap_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
 import 'package:bible_game/features/home/widget/game_card.dart';
@@ -22,11 +21,15 @@ import 'package:upgrader/upgrader.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../shared/utils/multiavatar_generator.dart';
+import '../../../shared/utils/svg_drawer.dart';
 import '../../../shared/widgets/modal/network_modal.dart';
 import '../../global_challenge/bloc/global_challenge_bloc.dart';
 import '../../pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
+import '../../recap/home.dart';
 import '../widget/user_profile_info.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,6 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   Duration _duration = Duration();
   bool _globalChallengeIsComingSoon = false;
+  late DrawableRoot svgRoot;
+  MultiavatarGenerator generator = MultiavatarGenerator();
+
 
   Future<void> setSoundState() async {
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
@@ -67,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       BlocProvider.of<PilgrimProgressBloc>(context)
           .add(FetchPilgrimProgressLevelData());
       BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+      BlocProvider.of<UserBloc>(context).add(FetchUserYearlyRecap());
       BlocProvider.of<AuthenticationBloc>(context)
           .add(FetchUserDataRequested());
       BlocProvider.of<GlobalChallengeBloc>(context)
@@ -76,28 +83,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   setGlobalChallengeTimer() {
     final userState = BlocProvider.of<AuthenticationBloc>(context).state;
-    if(userState.user.id != 0){
+    if (userState.user.id != 0) {
       final globalChallenge = BlocProvider.of<GlobalChallengeBloc>(context)
           .state
           .globalChallengeGames;
-      final topGlobalChallenge = globalChallenge[0];
-      if (topGlobalChallenge.isComingSoon!) {
-        setState(() {
-          _globalChallengeIsComingSoon = true;
-        });
-        DateTime targetDate = DateTime.parse(topGlobalChallenge.startDate!);
-        _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-          final now = DateTime.now();
-          final difference = targetDate.difference(now);
-          if (difference.isNegative) {
-            timer.cancel();
-          } else {
+        if(globalChallenge.isNotEmpty){
+          final topGlobalChallenge = globalChallenge[0];
+          if (topGlobalChallenge.isComingSoon!) {
             setState(() {
-              _duration = difference;
+              _globalChallengeIsComingSoon = true;
+            });
+            DateTime targetDate = DateTime.parse(topGlobalChallenge.startDate!);
+            _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+              final now = DateTime.now();
+              final difference = targetDate.difference(now);
+              if (difference.isNegative) {
+                timer.cancel();
+              } else {
+                setState(() {
+                  _duration = difference;
+                });
+              }
             });
           }
-        });
-      }
+        }
+
     }
   }
 
@@ -119,10 +129,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -135,13 +152,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final hours = _duration.inHours.remainder(24);
     final minutes = _duration.inMinutes.remainder(60);
     final seconds = _duration.inSeconds.remainder(60);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFF548CD7),
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           return UpgradeAlert(
-           showIgnore: false,
+            showIgnore: false,
             showLater: false,
             child: Container(
               decoration: BoxDecoration(
@@ -190,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: 10.h,
                                 ),
+
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -200,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             badgeSrc:
                                                 getBadgeUrl(state.user.rank),
                                             avatarUrl:
-                                                '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
+                                                '${state.user.id.toString()}',
                                             displayBadgeInfo: () {},
                                           )
                                         : SignInProfile(),
@@ -229,6 +248,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                         seconds: seconds,
                                       )
                                     : SizedBox(),
+                                BlocBuilder<SettingsBloc, SettingsState>(
+                                  builder: (context, state) {
+                                    return SizedBox(
+                                        child:
+                                            state.gamePlaySettings[
+                                                            'show_recap'] ==
+                                                        "true" &&
+                                                    BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0
+                                                ? RecapButton()
+                                                : SizedBox());
+                                  },
+                                ),
                                 SizedBox(
                                   height: 10.h,
                                 ),
@@ -237,12 +268,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   gameType: 'Quick Game',
                                   gameText: 'Play on your own terms!',
                                   gameImage: ProductImageRoutes.crossBible,
-                                  gameImageWidth: screenWidth <= 380 ? 80.w : screenWidth > 380 && screenWidth < 430 ? 95.w : 100.w,
+                                  gameImageWidth: screenWidth <= 380
+                                      ? 80.w
+                                      : screenWidth > 380 && screenWidth < 430
+                                          ? 95.w
+                                          : 100.w,
                                   onTap: () {
                                     soundManager.playClickSound();
                                     if (state.user.id != 0) {
-                                      Navigator.pushNamed(
-                                          context, AppRoutes.quickGameHomeScreen);
+                                      Navigator.pushNamed(context,
+                                          AppRoutes.quickGameHomeScreen);
                                     } else {
                                       Navigator.pushNamed(
                                           context, AppRoutes.profileScreen);
@@ -254,12 +289,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   gameType: 'Who is Who',
                                   gameText: 'Learn Bible names & stories!',
                                   gameImage: ProductImageRoutes.wiwMask,
-                                  gameImageWidth: screenWidth <= 380 ? 70.w : screenWidth > 380 && screenWidth < 430 ? 84.w : 90.w,
+                                  gameImageWidth: screenWidth <= 380
+                                      ? 70.w
+                                      : screenWidth > 380 && screenWidth < 430
+                                          ? 84.w
+                                          : 90.w,
                                   onTap: () {
                                     soundManager.playClickSound();
                                     if (state.user.id != 0) {
-                                      Navigator.pushNamed(
-                                          context, AppRoutes.whoIsWhoHomeScreen);
+                                      Navigator.pushNamed(context,
+                                          AppRoutes.whoIsWhoHomeScreen);
                                     } else {
                                       Navigator.pushNamed(
                                           context, AppRoutes.profileScreen);
@@ -271,7 +310,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   gameType: 'Pilgrim Progress',
                                   gameText: 'Journey through the Bible!',
                                   gameImage: ProductImageRoutes.mountain,
-                                  gameImageWidth: screenWidth <= 380 ? 60.w : screenWidth > 380 && screenWidth < 430 ? 70.w : 90.w,
+                                  gameImageWidth: screenWidth <= 380
+                                      ? 60.w
+                                      : screenWidth > 380 && screenWidth < 430
+                                          ? 70.w
+                                          : 90.w,
                                   onTap: () {
                                     soundManager.playClickSound();
                                     if (state.user.id != 0) {
@@ -288,7 +331,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   gameType: '4 Scriptures, 1 Word',
                                   gameText: 'Journey through the Bible!',
                                   gameImage: ProductImageRoutes.scroll,
-                                  gameImageWidth: screenWidth <= 380 ? 70.w : screenWidth > 380 && screenWidth < 430 ? 75.w : 80.w,
+                                  gameImageWidth: screenWidth <= 380
+                                      ? 70.w
+                                      : screenWidth > 380 && screenWidth < 430
+                                          ? 75.w
+                                          : 80.w,
                                   onTap: () {
                                     soundManager.playClickSound();
                                     if (state.user.id != 0) {

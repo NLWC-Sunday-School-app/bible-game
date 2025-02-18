@@ -109,7 +109,7 @@ class GameAPI {
     try {
       final response = await apiClient.get(
           '/playlog/campaigns/leaderboards?campaign=$campaignType&limit=20');
-      print('leader: ${response.data['data']}');
+
       final leaderBoardData = (response.data['data'] as List)
           .map((e) => GlobalChallengeLeaderboard.fromJson(e))
           .toList();

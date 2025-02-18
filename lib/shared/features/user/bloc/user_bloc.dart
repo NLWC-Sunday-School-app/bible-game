@@ -31,6 +31,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<OnboardCollaborator>(_onOnboardCollaborator);
     on<InitializeWallet>(_onInitializeWallet);
     on<UpdateCountry>(_onUpdateCountry);
+    on<FetchUserYearlyRecap>(_onFetchUserYearlyRecap);
   }
 
   Future<void> _onFetchGlobalLeaderBoard(
@@ -47,9 +48,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   Future<void> _onFetchCountryLeaderBoard(
       FetchCountryLeaderBoard event, Emitter<UserState> emit) async {
     try {
-      emit(state.copyWith(isFetchingGlobalLeaderboard: true));
+      emit(state.copyWith(isFetchingCountryLeaderboard: true));
       var response = await _userRepository
-          .getCountryLeaderBoard(_authenticationBloc.state.user!.country);
+          .getCountryLeaderBoard(_authenticationBloc.state.user.country);
       print(response);
       emit(state.copyWith(
           countryLeaderboard: response, isFetchingCountryLeaderboard: false));
@@ -62,6 +63,15 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       var response = await _userRepository
           .getStreakDetails(_authenticationBloc.state.user.id);
       emit(state.copyWith(userStreakDetails: response));
+    } catch (_) {}
+  }
+
+  Future<void> _onFetchUserYearlyRecap(
+      FetchUserYearlyRecap event, Emitter<UserState> emit) async {
+    try {
+      var response = await _userRepository
+          .getUserYearlyRecap(_authenticationBloc.state.user.id);
+      emit(state.copyWith(userYearlyRecap: response));
     } catch (_) {}
   }
 

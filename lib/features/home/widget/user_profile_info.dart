@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/widgets/multi_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -145,12 +146,13 @@ class UserProfileInfo extends StatelessWidget {
                       ),
                     ),
                     child:
-                    SvgPicture.network(
-                     avatarUrl,
-                      width: 50.w,
-                      semanticsLabel: 'Logo',
-                      placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
-                    ),
+                        AvatarWidget( seed: avatarUrl, width: 50.w, height: 50.h,),
+                    // SvgPicture.string(
+                    //  avatarUrl,
+                    //   width: 50.w,
+                    //   semanticsLabel: 'Logo',
+                    //   placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
+                    // ),
 
                     // FadeInImage.assetNetwork(
                     //   placeholder: ProductImageRoutes.defaultAvatar,

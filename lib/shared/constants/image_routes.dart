@@ -107,6 +107,16 @@ class ProductImageRoutes {
    static const String broLukeIntro = 'assets/images/product/shared/bro_luke_intro.svg';
    static const String tryAgainModalBg = 'assets/images/product/who_is_who/try_again_bg.png';
    static const String inviteBtnBg = 'assets/images/product/league/invite_btn.png';
+
+   static const String recapOneBg = 'assets/images/product/recap/recap_one_bg.png';
+   static const String recapTwoBg = 'assets/images/product/recap/recap_two_bg.png';
+   static const String recapThreeBg = 'assets/images/product/recap/recap_three_bg.png';
+   static const String recapFourBg = 'assets/images/product/recap/recap_four_bg.png';
+   static const String recapFiveBg = 'assets/images/product/recap/recap_five_bg.png';
+   static const String recapSixBg = 'assets/images/product/recap/recap_six_bg.png';
+   static const String recapSevenBg = 'assets/images/product/recap/recap_seven_bg.png';
+   static const String recapEightBg = 'assets/images/product/recap/recap_eight_bg.png';
+   static const String recapHourGlass = 'assets/images/product/recap/recap_hour_bg.png';
 }
 
 class IconImageRoutes{
@@ -121,6 +131,8 @@ class IconImageRoutes{
   static const String gemIcon = 'assets/images/icons/user/gem.png';
   static const String bigGemIcon = 'assets/images/icons/user/big_gem.png';
   static const String blueCopyIcon = 'assets/images/icons/user/blue_copy.png';
+
+  static const String blueForwardArrowIcon = 'assets/images/icons/user/blue_arrow.png';
 
   static const String streakIcon = 'assets/images/icons/user/streak.png';
   static const String whiteCancelIcon = 'assets/images/icons/user/white_cancel.png';

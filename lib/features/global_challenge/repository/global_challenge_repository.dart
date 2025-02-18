@@ -23,7 +23,6 @@ class GlobalChallengeRepository {
   }
 
   Future<List<GlobalChallengeLeaderboard>> getGameLeaderBoard(campaignType)async{
-    print('heola');
     return await gameAPI.getGlobalGameLeaderBoard(campaignType);
   }
 

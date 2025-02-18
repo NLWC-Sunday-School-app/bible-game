@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:bible_game/shared/utils/web_socket.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,6 +47,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:bible_game/shared/widgets/modal/network_modal.dart';
+import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:upgrader/upgrader.dart';
 import 'features/global_challenge/view/question_screen.dart';
 import 'features/multi_player/view/question_screen.dart';
@@ -85,8 +88,12 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
 
+
+
   @override
   Widget build(BuildContext context) {
+
+
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       // useInheritedMediaQuery: true,
@@ -155,64 +162,63 @@ class _AppState extends State<App> {
           ChangeNotifierProvider(create: (_) => widget.tokenNotifier),
         ],
         child: MaterialApp(
-            scaffoldMessengerKey: scaffoldMessengerKey,
-            theme: ThemeData(
-              fontFamily: 'Mikado',
-              useMaterial3: false,
-            ),
-            initialRoute: '/',
-            routes: {
-              AppRoutes.splashScreen: (context) => SplashScreen(),
-              AppRoutes.home: (context) => BottomTabNavigation(),
-              AppRoutes.quickGameHomeScreen: (context) => QuickGameHomeScreen(),
-              AppRoutes.questionLoadingScreen: (context) =>
-                  QuestionLoadingScreen(),
-              AppRoutes.quickGameQuestionScreen: (context) =>
-                  QuickGameQuestionScreen(
-                    authenticationBloc:
-                        BlocProvider.of<AuthenticationBloc>(context),
-                    quickGameRepository: widget.quickGameRepository,
-                  ),
-              AppRoutes.multiplayerQuestionScreen: (context) =>
-                  MultiplayerQuestionScreen(),
-              AppRoutes.whoIsWhoHomeScreen: (context) => WhoIsWhoHomeScreen(),
-              AppRoutes.whoIsWhoQuestionScreen: (context) =>
-                  WhoIsWhoQuestionScreen(),
-              AppRoutes.pilgrimProgressHomeScreen: (context) =>
-                  PilgrimProgressHomeScreen(),
-              AppRoutes.pilgrimProgressQuestionScreen: (context) =>
-                  PilgrimQuestionScreen(
-                    authenticationBloc:
-                        BlocProvider.of<AuthenticationBloc>(context),
-                    pilgrimProgressRepository: widget.pilgrimProgressRepository,
-                  ),
-              AppRoutes.fourScriptureQuestionScreen: (context) =>
-                  FourScriptureQuestionScreen(),
-              AppRoutes.profileScreen: (context) => ProfileScreen(),
-              AppRoutes.globalChallengeQuestionScreen: (context) =>
-                  GlobalQuestionScreen(
-                    globalChallengeRepository: widget.globalChallengeRepository,
-                  ),
-              AppRoutes.arcadeScreen: (context) => ArcadeScreen(),
-              AppRoutes.fantasyBibleLeagueHomeScreen: (context) => BottomTabNavigation(),
-              AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
-            },
-            home: const SplashScreen(),
+          scaffoldMessengerKey: scaffoldMessengerKey,
+          theme: ThemeData(
+            fontFamily: 'Mikado',
+            useMaterial3: false,
           ),
-
+          initialRoute: '/',
+          routes: {
+            AppRoutes.splashScreen: (context) => SplashScreen(),
+            AppRoutes.home: (context) => BottomTabNavigation(),
+            AppRoutes.quickGameHomeScreen: (context) => QuickGameHomeScreen(),
+            AppRoutes.questionLoadingScreen: (context) =>
+                QuestionLoadingScreen(),
+            AppRoutes.quickGameQuestionScreen: (context) =>
+                QuickGameQuestionScreen(
+                  authenticationBloc:
+                      BlocProvider.of<AuthenticationBloc>(context),
+                  quickGameRepository: widget.quickGameRepository,
+                ),
+            AppRoutes.multiplayerQuestionScreen: (context) =>
+                MultiplayerQuestionScreen(),
+            AppRoutes.whoIsWhoHomeScreen: (context) => WhoIsWhoHomeScreen(),
+            AppRoutes.whoIsWhoQuestionScreen: (context) =>
+                WhoIsWhoQuestionScreen(),
+            AppRoutes.pilgrimProgressHomeScreen: (context) =>
+                PilgrimProgressHomeScreen(),
+            AppRoutes.pilgrimProgressQuestionScreen: (context) =>
+                PilgrimQuestionScreen(
+                  authenticationBloc:
+                      BlocProvider.of<AuthenticationBloc>(context),
+                  pilgrimProgressRepository: widget.pilgrimProgressRepository,
+                ),
+            AppRoutes.fourScriptureQuestionScreen: (context) =>
+                FourScriptureQuestionScreen(),
+            AppRoutes.profileScreen: (context) => ProfileScreen(),
+            AppRoutes.globalChallengeQuestionScreen: (context) =>
+                GlobalQuestionScreen(
+                  globalChallengeRepository: widget.globalChallengeRepository,
+                ),
+            AppRoutes.arcadeScreen: (context) => ArcadeScreen(),
+            AppRoutes.fantasyBibleLeagueHomeScreen: (context) =>
+                BottomTabNavigation(),
+            AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
+          },
+          home: const SplashScreen(),
+        ),
       ),
     );
   }
 
   getFcmToken() async {
-    var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+    var firebaseAppToken =
+        await AwesomeNotificationsFcm().requestFirebaseAppToken();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-     await prefs.setString('fcmToken', firebaseAppToken);
+    await prefs.setString('fcmToken', firebaseAppToken);
     print('fb token: $firebaseAppToken');
     // await prefs.remove('user_token');
   }
-
-
 
   @override
   void initState() {

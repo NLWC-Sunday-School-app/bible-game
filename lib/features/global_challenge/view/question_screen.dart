@@ -63,9 +63,14 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
             .round(),
         isWhoIsWho: false,
         onTap: () {
-          context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+          // context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
           Navigator.pushNamedAndRemoveUntil(context,
               AppRoutes.home, (Route<dynamic> route) => false);
+
+          context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+          // Future.delayed(Duration(seconds: 2), (){
+          //   context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+          // });
         },
       );
       BlocProvider.of<GlobalChallengeBloc>(context).add(SubmitGlobalChallengeScore());
