@@ -57,12 +57,11 @@ class FetchGlobalChallengeQuestions extends GlobalChallengeEvent {
 class OptionSelected extends GlobalChallengeEvent {
   final int selectedOptionIndex;
   final GameQuestion gameQuestion;
-  final int remainingTime;
 
-  const OptionSelected( {required this.selectedOptionIndex, required this.gameQuestion, required this.remainingTime,});
+  const OptionSelected( {required this.selectedOptionIndex, required this.gameQuestion});
 
   @override
-  List<Object> get props => [selectedOptionIndex, gameQuestion, remainingTime];
+  List<Object> get props => [selectedOptionIndex, gameQuestion];
 }
 
 class SubmitGlobalChallengeScore extends GlobalChallengeEvent {}

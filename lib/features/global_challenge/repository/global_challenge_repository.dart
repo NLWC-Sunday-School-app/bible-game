@@ -10,11 +10,13 @@ class GlobalChallengeRepository {
   GlobalChallengeRepository(this.gameAPI);
 
   Future<List<GlobalGame>> FetchGlobalChallengeGames() async {
-     return gameAPI.getGlobalGames();
+    return gameAPI.getGlobalGames();
   }
 
-  Future<void> updateGlobalChallengeGame (id, title, description, image, campaignTag, isActive, isComingSoon, startDate, endDate) async{
-    return gameAPI.updateGlobalChallengeGame(id, title, description, image, campaignTag, isActive, isComingSoon, startDate, endDate);
+  Future<void> updateGlobalChallengeGame(id, title, description, image,
+      campaignTag, isActive, isComingSoon, startDate, endDate) async {
+    return gameAPI.updateGlobalChallengeGame(id, title, description, image,
+        campaignTag, isActive, isComingSoon, startDate, endDate);
   }
 
   Future<List<GameQuestion>> getQuickGameQuestions(
@@ -22,22 +24,29 @@ class GlobalChallengeRepository {
     return await gameAPI.getQuestions(gameMode, userRank, tags);
   }
 
-  Future<List<GlobalChallengeLeaderboard>> getGameLeaderBoard(campaignType)async{
+  Future<List<GameQuestion>> getGlobalChallengeQuestions(
+    String gameTag,
+  ) async {
+    return await gameAPI.getGlobalChallengeQuestions(gameTag);
+  }
+
+  Future<List<GlobalChallengeLeaderboard>> getGameLeaderBoard(
+      campaignType) async {
     return await gameAPI.getGlobalGameLeaderBoard(campaignType);
   }
 
   Future<void> sendGameData(
-      gameMode,
-      totalScore,
-      baseScore,
-      bonusScore,
-      averageTimeSpent,
-      playerRank,
-      noOfCorrectAnswers,
-      playerId,
-      userProgress,
-      numberOfRoundsLeft,
-      ) async {
+    gameMode,
+    totalScore,
+    baseScore,
+    bonusScore,
+    averageTimeSpent,
+    playerRank,
+    noOfCorrectAnswers,
+    playerId,
+    userProgress,
+    numberOfRoundsLeft,
+  ) async {
     return await gameAPI.sendGameData(
       gameMode,
       totalScore,

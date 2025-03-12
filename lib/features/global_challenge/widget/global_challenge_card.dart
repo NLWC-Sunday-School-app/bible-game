@@ -60,7 +60,7 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
 
   getPlayedGameStatus() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var status = await prefs.getBool('PLAYED_${widget.campaignTag}') ?? false;
+    var status = await prefs.getBool('PLAYEassgD_${widget.campaignTag}') ?? false;
     setState(() {
       playedGame = status;
     });

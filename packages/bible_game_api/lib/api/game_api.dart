@@ -231,6 +231,18 @@ class GameAPI {
     }
   }
 
+  Future<List<GameQuestion>> getGlobalChallengeQuestions(gameTag) async {
+    try {
+      final response = await apiClient.get('/v2/global-challenge/game?tag=PEOPLE_OF_JOHN');
+      final questions =
+      (response.data as List).map((e) => GameQuestion.fromJson(e)).toList();
+      return questions;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
   Future<List<WhoIsWhoGameLevel>> getWhoIsWhoLevels() async {
     try {
       final response = await apiClient.get('/whoiswho/levels/user');

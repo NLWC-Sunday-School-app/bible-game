@@ -74,8 +74,8 @@ class GlobalChallengeBloc
     try {
       final userRank = _authenticationBloc.state.user.rank;
       emit(state.copyWith(isLoadingGameQuestions: true));
-      final questions = await _globalChallengeRepository.getQuickGameQuestions(
-          event.campaignType, userRank, null);
+      final questions = await _globalChallengeRepository
+          .getGlobalChallengeQuestions(event.campaignType);
       gameType = event.campaignType;
       emit(state.copyWith(
         globalChallengeQuestion: questions,
@@ -92,41 +92,29 @@ class GlobalChallengeBloc
       OptionSelected event, Emitter<GlobalChallengeState> emit) {
     final soundManager = _settingsBloc.soundManager;
     final settingsState = _settingsBloc.state;
-    if(!state.hasAnswered){
+    if (!state.hasAnswered) {
       int coinsGained = state.coinsGained ?? 0;
       int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
       int noOfCorrectAnswers = state.noOfCorrectAnswers;
-      final pointsPerQuestion = int.parse(
-          settingsState.gamePlaySettings['base_score_pilgrim_progress']);
-      final durationPerQuestion =
-      int.parse(settingsState.gamePlaySettings['normal_game_speed']);
-      final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
-      final totalTimeSpent =
-          state.totalTimeSpent! + (durationPerQuestion - event.remainingTime);
+      final pointsPerQuestion =
+          int.parse(settingsState.gamePlaySettings['num_whoiswho_plays']);
       final isCorrect = event.gameQuestion.answer ==
           event.gameQuestion.options[event.selectedOptionIndex];
       if (isCorrect) {
         noOfCorrectAnswers++;
         soundManager.playCorrectAnswerSound();
-        dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
-            halfOfTotalPointPerQuestion;
-        coinsGained = state.coinsGained! +
-            (halfOfTotalPointPerQuestion + timeBonusPoint).round();
-        totalBonusCoinsGained =
-            (state.totalBonusCoinsGained! + timeBonusPoint).round();
+        coinsGained = state.coinsGained! + pointsPerQuestion;
       } else {
         soundManager.playWrongAnswerSound();
       }
-
       emit(state.copyWith(
-          hasAnswered: true,
-          isCorrectAnswer: isCorrect,
-          correctAnswer: event.gameQuestion.answer,
-          selectedOptionIndex: event.selectedOptionIndex,
-          coinsGained: coinsGained,
-          totalBonusCoinsGained: totalBonusCoinsGained,
-          totalTimeSpent: totalTimeSpent,
-          noOfCorrectAnswers: noOfCorrectAnswers));
+        hasAnswered: true,
+        isCorrectAnswer: isCorrect,
+        correctAnswer: event.gameQuestion.answer,
+        selectedOptionIndex: event.selectedOptionIndex,
+        coinsGained: coinsGained,
+        noOfCorrectAnswers: noOfCorrectAnswers,
+      ));
       Future.delayed(Duration(seconds: 1), () {
         add(MoveToNextPage());
       });

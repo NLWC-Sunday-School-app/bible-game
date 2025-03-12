@@ -27,11 +27,12 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
   late PageController _pageController;
   late int _currentPage;
   late int durationPerQuestion;
+  late int gameDuration;
 
-  void _initializeAnimationController() {
+  void _initializeAnimationController(Duration duration) {
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: durationPerQuestion),
+      duration: duration,
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           _moveToNextPage();
@@ -41,16 +42,15 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
   }
 
   void _moveToNextPage() {
-    final globalChallengeState = BlocProvider.of<GlobalChallengeBloc>(context).state;
-    if(_currentPage < (globalChallengeState.globalChallengeQuestions?.length ?? 0) - 1){
+    final globalChallengeState =
+        BlocProvider.of<GlobalChallengeBloc>(context).state;
+    if (_animationController.isAnimating) {
       _currentPage++;
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
-      _animationController.reset();
-      _animationController.forward();
-    }else{
+    } else {
       _animationController.stop();
       showGameSummaryModal(
         context: context,
@@ -59,27 +59,68 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
         noOfCorrectQuestions: globalChallengeState.noOfCorrectAnswers,
         totalQuestions: globalChallengeState.globalChallengeQuestions!.length,
         averageTimeQuestion: (globalChallengeState.totalTimeSpent! ~/
-            globalChallengeState.globalChallengeQuestions!.length)
+                globalChallengeState.globalChallengeQuestions!.length)
             .round(),
         isWhoIsWho: false,
         onTap: () {
           // context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
-          Navigator.pushNamedAndRemoveUntil(context,
-              AppRoutes.home, (Route<dynamic> route) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, AppRoutes.home, (Route<dynamic> route) => false);
 
-          context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+          context
+              .read<GlobalChallengeBloc>()
+              .add(ClearGlobalChallengeGameData());
           // Future.delayed(Duration(seconds: 2), (){
           //   context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
           // });
         },
       );
-      BlocProvider.of<GlobalChallengeBloc>(context).add(SubmitGlobalChallengeScore());
+      BlocProvider.of<GlobalChallengeBloc>(context)
+          .add(SubmitGlobalChallengeScore());
       Future.delayed(Duration(seconds: 2), () {
-        BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+        BlocProvider.of<AuthenticationBloc>(context)
+            .add(FetchUserDataRequested());
         BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
       });
-
     }
+    // if(_currentPage < (globalChallengeState.globalChallengeQuestions?.length ?? 0) - 1){
+    //   _currentPage++;
+    //   _pageController.nextPage(
+    //     duration: const Duration(milliseconds: 300),
+    //     curve: Curves.easeInOut,
+    //   );
+    //   _animationController.reset();
+    //   _animationController.forward();
+    // }else{
+    //   _animationController.stop();
+    //   showGameSummaryModal(
+    //     context: context,
+    //     pointEarned: globalChallengeState.coinsGained!,
+    //     bonusPoint: globalChallengeState.totalBonusCoinsGained!,
+    //     noOfCorrectQuestions: globalChallengeState.noOfCorrectAnswers,
+    //     totalQuestions: globalChallengeState.globalChallengeQuestions!.length,
+    //     averageTimeQuestion: (globalChallengeState.totalTimeSpent! ~/
+    //         globalChallengeState.globalChallengeQuestions!.length)
+    //         .round(),
+    //     isWhoIsWho: false,
+    //     onTap: () {
+    //       // context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+    //       Navigator.pushNamedAndRemoveUntil(context,
+    //           AppRoutes.home, (Route<dynamic> route) => false);
+    //
+    //       context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+    //       // Future.delayed(Duration(seconds: 2), (){
+    //       //   context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+    //       // });
+    //     },
+    //   );
+    //   BlocProvider.of<GlobalChallengeBloc>(context).add(SubmitGlobalChallengeScore());
+    //   Future.delayed(Duration(seconds: 2), () {
+    //     BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+    //     BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+    //   });
+    //
+    // }
   }
 
   @override
@@ -87,11 +128,11 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
     super.initState();
     _pageController = PageController();
     _currentPage = 0;
-
+      gameDuration = 2;
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
     durationPerQuestion =
         int.parse(settingsBloc.state.gamePlaySettings['normal_game_speed']);
-    _initializeAnimationController();
+    _initializeAnimationController(Duration(minutes: gameDuration));
   }
 
   @override
@@ -129,7 +170,8 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
             appBar: AppBar(
               elevation: 0,
               toolbarHeight: 0,
-              backgroundColor: Color(0xFF998BBC), // Set background color to transparent
+              backgroundColor:
+                  Color(0xFF998BBC), // Set background color to transparent
             ),
             body: SafeArea(
               bottom: false,
@@ -144,13 +186,14 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
                     currentPage: _currentPage + 1,
                     totalQuestions: state.globalChallengeQuestions!.length,
                     optionSelectedCallback: (selectedOptionIndex) {
-                      final remainingTime =
-                      (durationPerQuestion * (1 - _animationController.value)).toInt();
+                      // final remainingTime =
+                      // (durationPerQuestion * (1 - _animationController.value)).toInt();
                       context.read<GlobalChallengeBloc>().add(OptionSelected(
-                        selectedOptionIndex: selectedOptionIndex,
-                        gameQuestion: state.globalChallengeQuestions![index],
-                        remainingTime: remainingTime,
-                      ));
+                            selectedOptionIndex: selectedOptionIndex,
+                            gameQuestion:
+                                state.globalChallengeQuestions![index],
+                            // remainingTime: remainingTime,
+                          ));
                     },
                     selectedOptionIndex: state.selectedOptionIndex ?? -1,
                     isCorrectAnswer: state.isCorrectAnswer ?? false,
@@ -158,7 +201,9 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
                     coinsGained: state.coinsGained!,
                     skipQuestion: () => _moveToNextPage(),
                     durationPerQuestion: durationPerQuestion,
-                    isWhoIsWho: false, gameMode: '',
+                    isWhoIsWho: true,
+                    gameMode: 'whoIsWho',
+                    whoIsWhoGameDuration: gameDuration,
                   );
                 },
               ),
