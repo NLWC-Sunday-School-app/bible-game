@@ -14,7 +14,8 @@ void showGameSummaryModal(
     int? totalQuestions,
     int? noOfAnsweredQuestions,
     int? averageTimeQuestion,
-    bool? isWhoIsWho,
+    required bool isWhoIsWho,
+    required bool isGlobalChallenge,
     required VoidCallback onTap}) {
   showDialog(
       barrierDismissible: true,
@@ -36,6 +37,7 @@ void showGameSummaryModal(
             noOfAnsweredQuestions: noOfAnsweredQuestions.toString(),
             onTap: onTap,
             isWhoIsWhoGame: isWhoIsWho,
+            isGlobalChallenge: isGlobalChallenge,
           ),
         );
       });
@@ -52,6 +54,7 @@ class GameSummaryModal extends StatelessWidget {
       this.averageTimePerQuestion,
       required this.onTap,
       this.isWhoIsWhoGame = false,
+      this.isGlobalChallenge = false,
       this.questionsRequiredToPass});
 
   final String? pointsEarned;
@@ -61,7 +64,8 @@ class GameSummaryModal extends StatelessWidget {
   final String? noOfAnsweredQuestions;
   final String? totalQuestions;
   final String? averageTimePerQuestion;
-  final bool? isWhoIsWhoGame;
+  final bool isWhoIsWhoGame;
+  final bool isGlobalChallenge;
   final VoidCallback onTap;
 
   @override
@@ -118,7 +122,6 @@ class GameSummaryModal extends StatelessWidget {
                       SizedBox(
                         width: 10.w,
                       ),
-
                       StrokeText(
                         text: pointsEarned!,
                         textStyle: TextStyle(
@@ -134,7 +137,7 @@ class GameSummaryModal extends StatelessWidget {
                 ],
               ),
             ),
-            isWhoIsWhoGame!
+            isWhoIsWhoGame || isGlobalChallenge
                 ? SizedBox()
                 : Container(
                     padding:
@@ -173,15 +176,25 @@ class GameSummaryModal extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        Text(
-                          isWhoIsWhoGame!
-                              ? '${noOfCorrectionQuestions}/$noOfAnsweredQuestions'
-                              : '$noOfCorrectionQuestions/$totalQuestions',
-                          style: TextStyle(
-                              fontSize: 18.sp,
-                              color: const Color(0xFF0155AF),
-                              fontWeight: FontWeight.w700),
-                        ),
+                        isGlobalChallenge!
+                            ? Text(
+                                '${noOfCorrectionQuestions}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 18.sp,
+                                    color: const Color(0xFF0155AF),
+                                    fontWeight: FontWeight.w700
+                                ),
+                              )
+                            : Text(
+                                isWhoIsWhoGame!
+                                    ? '${noOfCorrectionQuestions}/$noOfAnsweredQuestions'
+                                    : '$noOfCorrectionQuestions/$totalQuestions',
+                                style: TextStyle(
+                                    fontSize: 18.sp,
+                                    color: const Color(0xFF0155AF),
+                                    fontWeight: FontWeight.w700),
+                              ),
                         Text(
                           'questions',
                           style: TextStyle(
@@ -192,38 +205,44 @@ class GameSummaryModal extends StatelessWidget {
                     SizedBox(
                       width: 10.w,
                     ),
-                    isWhoIsWhoGame! ? SizedBox() :  VerticalDivider(
-                      color: const Color(0xFF0B5DB0),
-                      thickness: 2.w,
-                    ),
-                    SizedBox(
-                      width: 10.w,
-                    ),
-                    isWhoIsWhoGame! ? SizedBox() : Image.asset(
-                      IconImageRoutes.timer,
-                      width: 24.w,
-                    ),
-                    SizedBox(
-                      width: 10.w,
-                    ),
-                    isWhoIsWhoGame! ? SizedBox() : Column(
-                      children: [
-                        Text(
-                          ': ${averageTimePerQuestion}s',
-                          style: TextStyle(
-                              fontSize: 18.sp,
-                              color: const Color(0xFF0155AF),
-                              fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          'per question',
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: const Color(0xFF0155AF),
+                    isWhoIsWhoGame! || isGlobalChallenge!
+                        ? SizedBox()
+                        : VerticalDivider(
+                            color: const Color(0xFF0B5DB0),
+                            thickness: 2.w,
                           ),
-                        )
-                      ],
+                    SizedBox(
+                      width: 10.w,
                     ),
+                    isWhoIsWhoGame! || isGlobalChallenge!
+                        ? SizedBox()
+                        : Image.asset(
+                            IconImageRoutes.timer,
+                            width: 24.w,
+                          ),
+                    SizedBox(
+                      width: 10.w,
+                    ),
+                    isWhoIsWhoGame! || isGlobalChallenge!
+                        ? SizedBox()
+                        : Column(
+                            children: [
+                              Text(
+                                ': ${averageTimePerQuestion}s',
+                                style: TextStyle(
+                                    fontSize: 18.sp,
+                                    color: const Color(0xFF0155AF),
+                                    fontWeight: FontWeight.w700),
+                              ),
+                              Text(
+                                'per question',
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: const Color(0xFF0155AF),
+                                ),
+                              )
+                            ],
+                          ),
                   ],
                 ),
               ),

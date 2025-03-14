@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
 import 'package:bible_game/features/global_challenge/repository/global_challenge_repository.dart';
 
+import '../../../navigation/cubit/navigation_cubit.dart';
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -61,11 +62,15 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
         averageTimeQuestion: (globalChallengeState.totalTimeSpent! ~/
                 globalChallengeState.globalChallengeQuestions!.length)
             .round(),
+        isGlobalChallenge: true,
         isWhoIsWho: false,
         onTap: () {
-          // context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
-          Navigator.pushNamedAndRemoveUntil(
-              context, AppRoutes.home, (Route<dynamic> route) => false);
+          context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
+          Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.home
+          );
+          context.read<NavigationCubit>().selectTab(3);
 
           context
               .read<GlobalChallengeBloc>()
@@ -202,7 +207,8 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
                     skipQuestion: () => _moveToNextPage(),
                     durationPerQuestion: durationPerQuestion,
                     isWhoIsWho: true,
-                    gameMode: 'whoIsWho',
+                    gameMode: 'globalchallenge',
+                    noOfCorrectAnswers: state.noOfCorrectAnswers,
                     whoIsWhoGameDuration: gameDuration,
                   );
                 },

@@ -98,6 +98,7 @@ class _QuickGameQuestionScreenState extends State<QuickGameQuestionScreen>
                 quickGameState.quickGameQuestions!.length)
             .round(),
         isWhoIsWho: false,
+        isGlobalChallenge: false,
         onTap: () {
           BlocProvider.of<QuickGameBloc>(context).add(ClearQuickGameData());
           Navigator.pushNamedAndRemoveUntil(

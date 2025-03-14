@@ -19,6 +19,7 @@ import '../../features/home/view/home_screen.dart';
 import '../../shared/constants/image_routes.dart';
 import '../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../shared/widgets/modal/network_modal.dart';
+import '../cubit/navigation_cubit.dart';
 import 'bottom_tab_item.dart';
 
 
@@ -33,7 +34,9 @@ class BottomTabNavigation extends StatefulWidget {
 
 class _BottomTabNavigationState extends State<BottomTabNavigation> {
   late StreamSubscription<InternetConnectionStatus> connectivitySubscription;
-  int _selectedTabIndex = 2;
+  // int _selectedTabIndex = 2;
+
+
   bool _selectedHomeTab = true;
   bool _selectedLeaderboardTab = false;
   bool _selectedStoreTab = false;
@@ -108,7 +111,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
    checkInternet(context);
   }
 
-  Widget  _bottomNavigationBar(BuildContext context) {
+  Widget  _bottomNavigationBar(BuildContext context, int _selectedTabIndex) {
     final soundManager = context.read<SettingsBloc>().soundManager;
     return SizedBox(
       child: Container(
@@ -126,49 +129,30 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
               BottomTabItem(
                 itemLabel: 'Store',
                 itemIcon: IconImageRoutes.storeTabIcon,
-                itemIsSelected: _selectedStoreTab,
+                itemIsSelected: _selectedTabIndex == 0,
                 onTap: () {
                   soundManager.playTabClickSound();
-                 setState(() {
-                   _selectedLeagueTab = false;
-                   _selectedStoreTab = true;
-                   _selectedLeaderboardTab = false;
-                   _selectedHomeTab = false;
-                   _selectedArcadeTab = false;
-                   _selectedTabIndex = 0;
-                 });
+                  context.read<NavigationCubit>().selectTab(0);
                 },
               ),
               BottomTabItem(
                 itemLabel: 'Board',
                 itemIcon: IconImageRoutes.trophyTabICon,
-                itemIsSelected: _selectedLeaderboardTab,
+                itemIsSelected: _selectedTabIndex == 1,
                 onTap: () {
                   soundManager.playTabClickSound();
-                  setState(() {
-                    _selectedLeagueTab = false;
-                    _selectedStoreTab = false;
-                    _selectedLeaderboardTab = true;
-                    _selectedHomeTab = false;
-                    _selectedArcadeTab = false;
-                    _selectedTabIndex = 1;
-                  });
+                  context.read<NavigationCubit>().selectTab(1);
+
                 },
               ),
               BottomTabItem(
                 itemLabel: 'Home',
                 itemIcon: IconImageRoutes.homeTabIcon,
-                itemIsSelected: _selectedHomeTab,
+                itemIsSelected: _selectedTabIndex == 2,
                 onTap: () {
                   soundManager.playTabClickSound();
-                  setState(() {
-                    _selectedLeagueTab = false;
-                    _selectedStoreTab = false;
-                    _selectedHomeTab = true;
-                    _selectedLeaderboardTab = false;
-                    _selectedArcadeTab = false;
-                    _selectedTabIndex = 2;
-                  });
+                  context.read<NavigationCubit>().selectTab(2);
+
                   // if(BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0){
                   //   BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
                   //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
@@ -179,34 +163,22 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
               BottomTabItem(
                 itemLabel: 'Arcade',
                 itemIcon: IconImageRoutes.swordTabIcon,
-                itemIsSelected: _selectedArcadeTab,
+                itemIsSelected: _selectedTabIndex == 3,
                 onTap: () {
                   soundManager.playTabClickSound();
-                  setState(() {
-                    _selectedLeagueTab = false;
-                    _selectedStoreTab = false;
-                    _selectedHomeTab = false;
-                    _selectedLeaderboardTab = false;
-                    _selectedArcadeTab = true;
-                    _selectedTabIndex = 3;
-                  });
+                  context.read<NavigationCubit>().selectTab(3);
+
                 }
                 ,
               ),
               BottomTabItem(
                 itemLabel: 'League',
                 itemIcon: IconImageRoutes.leagueTabIcon,
-                itemIsSelected: _selectedLeagueTab,
+                itemIsSelected: _selectedTabIndex == 4,
                 onTap: () {
                   soundManager.playTabClickSound();
-                 setState(() {
-                   _selectedLeagueTab = true;
-                   _selectedStoreTab = false;
-                   _selectedHomeTab = false;
-                   _selectedLeaderboardTab = false;
-                   _selectedArcadeTab = false;
-                   _selectedTabIndex = 4;
-                 });
+                  context.read<NavigationCubit>().selectTab(4);
+
                 },
               ),
             ],
@@ -219,9 +191,10 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final int _selectedTabIndex = context.watch<NavigationCubit>().state;
     return Scaffold(
       body: _pages[_selectedTabIndex]['page'],
-      bottomNavigationBar: _bottomNavigationBar(context),
+      bottomNavigationBar: _bottomNavigationBar(context, _selectedTabIndex),
     );
   }
 }

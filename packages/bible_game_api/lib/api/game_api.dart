@@ -78,7 +78,7 @@ class GameAPI {
       campaignType) async {
     try {
       final response = await apiClient.get(
-          '/playlog/campaigns/leaderboards?campaign=$campaignType&limit=20');
+          '/playlog/campaigns/leaderboards?campaign=$campaignType');
       final leaderBoardData = (response.data['data'] as List)
           .map((e) => Leaderboard.fromJson(e))
           .toList();
@@ -108,7 +108,7 @@ class GameAPI {
       campaignType) async {
     try {
       final response = await apiClient.get(
-          '/playlog/campaigns/leaderboards?campaign=$campaignType&limit=20');
+          '/playlog/campaigns/leaderboards?campaign=$campaignType&limit=50');
 
       final leaderBoardData = (response.data['data'] as List)
           .map((e) => GlobalChallengeLeaderboard.fromJson(e))
@@ -233,7 +233,7 @@ class GameAPI {
 
   Future<List<GameQuestion>> getGlobalChallengeQuestions(gameTag) async {
     try {
-      final response = await apiClient.get('/v2/global-challenge/game?tag=PEOPLE_OF_JOHN');
+      final response = await apiClient.get('/v2/global-challenge/game?tag=${gameTag}');
       final questions =
       (response.data as List).map((e) => GameQuestion.fromJson(e)).toList();
       return questions;

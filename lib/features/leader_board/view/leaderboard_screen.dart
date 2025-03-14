@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/utils/device_info.dart';
 import 'package:bible_game_api/model/leaderboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,10 +32,23 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
   final ScrollController _scrollController = ScrollController();
   final ScrollController _scrollControllerTwo = ScrollController();
   late int userPosition = 0;
+  final DeviceInfoService _deviceInfoService = DeviceInfoService();
+  Map<String, String> _deviceInfo = {};
+
+
+  Future<void> _loadDeviceInfo() async {
+    final info = await _deviceInfoService.getDeviceInfo();
+    setState(() {
+      _deviceInfo = info;
+    });
+    print('device info, ${_deviceInfo}');
+  }
 
   @override
   void initState() {
     super.initState();
+    getBasicOsInfo();
+    _loadDeviceInfo();
     final userState = BlocProvider.of<AuthenticationBloc>(context).state;
     if (userState.user.id != 0) {
       BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(true));

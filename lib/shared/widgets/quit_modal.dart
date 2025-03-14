@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,7 @@ import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
 import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 
+import '../../navigation/cubit/navigation_cubit.dart';
 import '../features/settings/bloc/settings_bloc.dart';
 
 void showQuitModal(BuildContext context, {String? gameMode}) {
@@ -132,6 +134,14 @@ class QuitModal extends StatelessWidget {
                         AppRoutes.quickGameHomeScreen,
                         ModalRoute.withName('/home'),
                       );
+                    } else if (gameMode == 'globalchallenge') {
+                      BlocProvider.of<GlobalChallengeBloc>(context)
+                          .add(ClearGlobalChallengeGameData());
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.home
+                      );
+                      context.read<NavigationCubit>().selectTab(3);
                     } else {
                       Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home,
                           (Route<dynamic> route) => false);

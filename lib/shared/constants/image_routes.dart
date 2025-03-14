@@ -101,7 +101,7 @@ class ProductImageRoutes {
    static const String fblModalBg = 'assets/images/product/league/fbl_modal_bg.png';
    static const String multiplayerComingSoon = 'assets/images/product/multi_player/multiplayer_coming_soon.png';
    static const String storeGemCard = 'assets/images/product/store/gem_card.png';
-   static const String theBibleGame = 'assets/images/product/shared/bible_game.png';
+   static const String theBibleGame = 'assets/images/product/shared/the_bible_game.png';
    static const String rocket = 'assets/images/product/shared/rocket.png';
    static const String welcomeModalBg = 'assets/images/product/shared/welcome_modal_bg.png';
    static const String broLukeIntro = 'assets/images/product/shared/bro_luke_intro.svg';

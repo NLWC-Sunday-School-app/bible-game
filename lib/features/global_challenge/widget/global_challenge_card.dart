@@ -60,7 +60,7 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
 
   getPlayedGameStatus() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var status = await prefs.getBool('PLAYEassgD_${widget.campaignTag}') ?? false;
+    var status = await prefs.getBool('PLAYED_${widget.campaignTag}') ?? false;
     setState(() {
       playedGame = status;
     });
@@ -211,7 +211,7 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
                                   onTap: () async {
                                     soundManager.playClickSound();
                                     if (state.user.id != 0) {
-                                      if (!playedGame) {
+
                                         final SharedPreferences prefs =
                                             await SharedPreferences
                                                 .getInstance();
@@ -221,14 +221,13 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
                                         setState(() {
                                           playedGame = true;
                                         });
-                                        print(
-                                            'new land ${prefs.getBool('PLAYED_${widget.campaignTag}')}');
+
                                         Navigator.pushNamed(context,
                                             AppRoutes.questionLoadingScreen,
                                             arguments: {
                                               'gameType': widget.campaignTag
                                             });
-                                      }
+
                                     } else {
                                       Navigator.pushNamed(
                                           context, AppRoutes.profileScreen);
@@ -249,9 +248,20 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
                                                 fontSize: 12.sp),
                                           ),
                                         )
-                                      : const GamesLockedButton(
-                                          buttonText: 'Game Played',
-                                        ),
+                                      : Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.w),
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(24.r),
+                                        color: const Color(0xFF558CD7)),
+                                    child: Text(
+                                      'Play Again',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12.sp),
+                                    ),
+                                  )
                                 )
                               : widget.isComingSoon
                                   ? GamesLockedButton(

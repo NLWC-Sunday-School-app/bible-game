@@ -54,6 +54,8 @@ import 'features/multi_player/view/question_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io' show Platform;
 
+import 'navigation/cubit/navigation_cubit.dart';
+
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
@@ -100,6 +102,7 @@ class _AppState extends State<App> {
       splitScreenMode: false,
       builder: (BuildContext context, Widget? child) => MultiBlocProvider(
         providers: [
+          BlocProvider(create: (_) => NavigationCubit()),
           BlocProvider<AuthenticationBloc>(
             create: (context) => AuthenticationBloc(
               authenticationRepository: widget.authenticationRepository,

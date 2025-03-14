@@ -87,6 +87,7 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
                   wiwGameBloc.state.wiwGameQuestions!.length)
               .round(),
           isWhoIsWho: true,
+          isGlobalChallenge: false,
           noOfAnsweredQuestions: wiwGameBloc.state.noOfQuestionsAnswered,
           questionsRequiredToPass: questionsRequiredToPass,
           onTap: () {

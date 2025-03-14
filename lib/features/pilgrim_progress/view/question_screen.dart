@@ -83,6 +83,7 @@ class _PilgrimQuestionScreenState extends State<PilgrimQuestionScreen> with Sing
             pilgrimProgressState.pilgrimProgressQuestions!.length)
             .round(),
         isWhoIsWho: false,
+        isGlobalChallenge: false,
         onTap:  () {
           context.read<PilgrimProgressBloc>().add(FetchPilgrimProgressLevelData());
           Navigator.pushNamedAndRemoveUntil(
