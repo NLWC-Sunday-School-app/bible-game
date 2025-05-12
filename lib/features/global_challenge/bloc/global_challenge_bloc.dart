@@ -3,6 +3,7 @@ import 'package:bible_game_api/model/global_game.dart';
 import 'package:bible_game_api/model/global_leaderboard.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -140,6 +141,9 @@ class GlobalChallengeBloc
   ) async {
     try {
       final authenticationState = _authenticationBloc.state;
+      final prefs = await SharedPreferences.getInstance();
+      final deviceName = prefs.getString('deviceName');
+      final deviceOs = prefs.getString('deviceOs');
       final response = await _globalChallengeRepository.sendGameData(
         gameType,
         state.coinsGained!,
@@ -151,12 +155,15 @@ class GlobalChallengeBloc
         authenticationState.user.id,
         null,
         5,
+        deviceName,
+        deviceOs
       );
     } catch (_) {}
   }
 
   void _onMoveToNextPage(
       MoveToNextPage event, Emitter<GlobalChallengeState> emit) {
+
     if ((state.globalChallengeQuestions?.length ?? 0) >
         (state.selectedOptionIndex ?? 0) + 1) {
       emit(state.copyWith(

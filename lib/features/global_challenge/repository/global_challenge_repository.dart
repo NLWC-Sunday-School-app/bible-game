@@ -46,6 +46,8 @@ class GlobalChallengeRepository {
     playerId,
     userProgress,
     numberOfRoundsLeft,
+      deviceName,
+      deviceOs
   ) async {
     return await gameAPI.sendGameData(
       gameMode,
@@ -58,6 +60,8 @@ class GlobalChallengeRepository {
       playerId,
       userProgress,
       numberOfRoundsLeft,
+      deviceName,
+      deviceOs
     );
   }
 }

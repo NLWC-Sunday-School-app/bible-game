@@ -31,6 +31,8 @@ class PilgrimProgressRepository {
       playerId,
       userProgress,
       numberOfRoundsLeft,
+      deviceName,
+      deviceOs
       ) async {
     return await gameAPI.sendGameData(
       gameMode,
@@ -43,6 +45,8 @@ class PilgrimProgressRepository {
       playerId,
       userProgress,
       numberOfRoundsLeft,
+      deviceName,
+      deviceOs
     );
   }
 

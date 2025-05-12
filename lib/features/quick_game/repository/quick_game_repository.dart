@@ -29,6 +29,8 @@ class QuickGameRepository {
     playerId,
     userProgress,
     numberOfRoundsLeft,
+      deviceName,
+      deviceOs
   ) async {
     return await gameAPI.sendGameData(
       gameMode,
@@ -41,6 +43,8 @@ class QuickGameRepository {
       playerId,
       userProgress,
       numberOfRoundsLeft,
+      deviceName,
+      deviceOs
     );
   }
 }

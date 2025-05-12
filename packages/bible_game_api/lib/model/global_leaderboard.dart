@@ -12,9 +12,10 @@ class GlobalChallengeLeaderboard extends Equatable {
   final int playerScore;
   final String playerName;
   final int playerPosition;
+  final String country;
 
   const GlobalChallengeLeaderboard(
-      {required this.playerId,
+      {required this.country,  required this.playerId,
       required this.playerScore,
       required this.playerPosition,
       required this.playerName});
@@ -24,7 +25,8 @@ class GlobalChallengeLeaderboard extends Equatable {
           playerId: json["playerId"],
           playerScore: json["totalScore"],
           playerName: json["playerName"],
-          playerPosition: json["position"]);
+          playerPosition: json["position"],
+          country: json["country"]);
 
   @override
   List<Object?> get props => [
@@ -32,5 +34,6 @@ class GlobalChallengeLeaderboard extends Equatable {
         playerScore,
         playerName,
         playerPosition,
+       country
       ];
 }

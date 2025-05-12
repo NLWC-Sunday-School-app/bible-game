@@ -287,10 +287,10 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                               .position,
                                           userName: state
                                               .globalLeaderboard![index].name,
-                                          userBadge:
-                                              ProductImageRoutes.defaultBadge,
-                                          userLevel: state
-                                              .globalLeaderboard![index].status,
+                                          // userBadge:
+                                          //     ProductImageRoutes.defaultBadge,
+                                          // userLevel: state
+                                          //     .globalLeaderboard![index].status,
                                           noOfCoins: state
                                               .globalLeaderboard![index]
                                               .walletBalance,
@@ -364,11 +364,11 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                                 userName: state
                                                     .countryLeaderboard![index]
                                                     .name,
-                                                userBadge: ProductImageRoutes
-                                                    .defaultBadge,
-                                                userLevel: state
-                                                    .countryLeaderboard![index]
-                                                    .status,
+                                                // userBadge: ProductImageRoutes
+                                                //     .defaultBadge,
+                                                // userLevel: state
+                                                //     .countryLeaderboard![index]
+                                                //     .status,
                                                 noOfCoins: state
                                                     .countryLeaderboard![index]
                                                     .walletBalance,

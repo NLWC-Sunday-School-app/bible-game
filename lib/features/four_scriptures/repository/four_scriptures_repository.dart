@@ -24,6 +24,8 @@ class FourScripturesOneWordRepository {
       playerId,
       userProgress,
       numberOfRoundsLeft,
+      deviceName,
+      deviceOs
       ) async {
     return await gameAPI.sendGameData(
       gameMode,
@@ -36,6 +38,8 @@ class FourScripturesOneWordRepository {
       playerId,
       userProgress,
       numberOfRoundsLeft,
+      deviceName,
+      deviceOs
     );
   }
 

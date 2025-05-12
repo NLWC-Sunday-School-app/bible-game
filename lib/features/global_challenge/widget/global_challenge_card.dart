@@ -211,23 +211,19 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
                                   onTap: () async {
                                     soundManager.playClickSound();
                                     if (state.user.id != 0) {
+                                      final SharedPreferences prefs =
+                                          await SharedPreferences.getInstance();
+                                      prefs.setBool(
+                                          'PLAYED_${widget.campaignTag}', true);
+                                      setState(() {
+                                        playedGame = true;
+                                      });
 
-                                        final SharedPreferences prefs =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        prefs.setBool(
-                                            'PLAYED_${widget.campaignTag}',
-                                            true);
-                                        setState(() {
-                                          playedGame = true;
-                                        });
-
-                                        Navigator.pushNamed(context,
-                                            AppRoutes.questionLoadingScreen,
-                                            arguments: {
-                                              'gameType': widget.campaignTag
-                                            });
-
+                                      Navigator.pushNamed(context,
+                                          AppRoutes.questionLoadingScreen,
+                                          arguments: {
+                                            'gameType': widget.campaignTag
+                                          });
                                     } else {
                                       Navigator.pushNamed(
                                           context, AppRoutes.profileScreen);
@@ -249,27 +245,28 @@ class _GlobalChallengeCardState extends State<GlobalChallengeCard> {
                                           ),
                                         )
                                       : Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.w),
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                        BorderRadius.circular(24.r),
-                                        color: const Color(0xFF558CD7)),
-                                    child: Text(
-                                      'Play Again',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 12.sp),
-                                    ),
-                                  )
-                                )
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20.w, vertical: 8.w),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(24.r),
+                                              color: const Color(0xFF558CD7)),
+                                          child: Text(
+                                            'Play Again',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12.sp,
+                                            ),
+                                          ),
+                                        ))
                               : widget.isComingSoon
                                   ? GamesLockedButton(
                                       buttonText:
                                           '${days}D | ${hours}H:${minutes}M:${seconds}s',
                                     )
                                   : GamesLockedButton(
-                                      buttonText: 'Ended',
+                                      buttonText: 'Ended'
                                     ),
                           SizedBox(
                             width: 10.w,

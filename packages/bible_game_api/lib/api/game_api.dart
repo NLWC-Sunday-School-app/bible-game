@@ -131,7 +131,7 @@ class GameAPI {
       noOfCorrectAnswers,
       playerId,
       userProgress,
-      numberOfRoundsLeft) async {
+      numberOfRoundsLeft, deviceName, deviceOs) async {
     var gameData = {
       'game_mode': gameMode,
       'total_score': totalScore,
@@ -142,7 +142,9 @@ class GameAPI {
       'number_of_correct_answers': noOfCorrectAnswers,
       'player_id': playerId,
       'user_progress': userProgress,
-      'number_of_rounds': numberOfRoundsLeft
+      'number_of_rounds': numberOfRoundsLeft,
+      'deviceName': deviceName,
+      'deviceOs': deviceOs
     };
     try {
       final response = await apiClient.post('/playlog', data: gameData);

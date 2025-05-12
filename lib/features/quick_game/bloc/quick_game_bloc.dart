@@ -4,6 +4,7 @@ import 'package:bible_game_api/model/quick_game_topic.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/quick_game_repository.dart';
 
@@ -53,6 +54,9 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
       ) async {
     try {
       final authenticationState = _authenticationBloc.state;
+      final prefs = await SharedPreferences.getInstance();
+      final deviceName = prefs.getString('deviceName');
+      final deviceOs = prefs.getString('deviceOs');
       final response = await _quickGameRepository.sendGameData(
         'QUICK_GAME',
         state.coinsGained!,
@@ -64,6 +68,8 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
         authenticationState.user.id,
         null,
         5,
+        deviceName,
+        deviceOs
       );
 
     } catch (_) {

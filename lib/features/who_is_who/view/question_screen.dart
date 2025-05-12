@@ -43,6 +43,7 @@ class _WhoIsWhoQuestionScreenState extends State<WhoIsWhoQuestionScreen>
         settingsBloc.state.gamePlaySettings['whoiswho_questions_passmark']);
     gameTimePurchasePrice = int.parse(
         settingsBloc.state.gamePlaySettings['game_time_purchase_price']);
+
     _initializeAnimationController(Duration(minutes: gameDuration));
   }
 

@@ -21,6 +21,7 @@ import 'package:upgrader/upgrader.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../shared/utils/device_info.dart';
 import '../../../shared/utils/multiavatar_generator.dart';
 import '../../../shared/utils/svg_drawer.dart';
 import '../../../shared/widgets/modal/network_modal.dart';
@@ -44,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _globalChallengeIsComingSoon = false;
   late DrawableRoot svgRoot;
   MultiavatarGenerator generator = MultiavatarGenerator();
-
+  final DeviceInfoService _deviceInfoService = DeviceInfoService();
+  Map<String, String> _deviceInfo = {};
 
   Future<void> setSoundState() async {
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
@@ -56,6 +58,17 @@ class _HomeScreenState extends State<HomeScreen> {
     if (isMusicOn) {
       soundManager.playGameMusic();
     }
+  }
+
+  Future<void> _loadDeviceInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final info = await _deviceInfoService.getDeviceInfo();
+    setState(() {
+      _deviceInfo = info;
+    });
+    prefs.setString('deviceName', _deviceInfo['deviceName']!);
+    prefs.setString('deviceOs', _deviceInfo['osVersion']!);
+
   }
 
   initializeWallet() {
@@ -126,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
     initializeWallet();
     fetchGameData();
     setGlobalChallengeTimer();
+    _loadDeviceInfo();
   }
 
   @override

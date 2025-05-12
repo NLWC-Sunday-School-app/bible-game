@@ -1,3 +1,4 @@
+import 'package:bible_game/features/leader_board/widget/leaderboard_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +8,6 @@ import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/utils/avatar_credentials.dart';
 
-import '../leaderboard_card.dart';
 
 void showGlobalChallengeLeaderboardModal(BuildContext context, String gameType) {
   showModalBottomSheet(
@@ -100,21 +100,21 @@ class _GamesBottomSheetModalState extends State<LeaderboardModal> {
                       ? state.globalChallengeLeaderboard.isNotEmpty
                           ? ListView.builder(
                               itemBuilder: (context, index) {
-                                return LeaderBoardCard(
-                                  playerPosition: state
+                                return LeaderboardCard(
+                                  position: state
                                       .globalChallengeLeaderboard[index]
-                                      .playerPosition,
-                                  playerName: state
+                                      .playerPosition, userName: state
+                                    .globalChallengeLeaderboard[index]
+                                    .playerName, countryName: state
+                                    .globalChallengeLeaderboard[index]
+                                    .country,
+                                  noOfCoins: state
                                       .globalChallengeLeaderboard[index]
-                                      .playerName,
-                                  playerPoint: state
-                                      .globalChallengeLeaderboard[index]
-                                      .playerScore,
-                                  playerId: state
-                                      .globalChallengeLeaderboard[index]
-                                      .playerId,
-                                  avatarUrl:
-                                      '${state.globalChallengeLeaderboard[index].playerId}',
+                                      .playerScore, userId: state
+                                    .globalChallengeLeaderboard[index]
+                                    .playerId,
+
+
                                 );
                               },
                               itemCount:

@@ -79,7 +79,7 @@ class AuthenticationBloc
   ) async {
     emit(state.copyWith(isLoadingLogin: true, failedToLogin: false));
     final response =
-        await _authenticationRepository.logIn(event.email, event.password);
+        await _authenticationRepository.logIn(event.email, event.password, event.deviceName, event.deviceOs);
     if (response.containsKey('token')) {
       emit(state.copyWith(
         isLoggedIn: true,
@@ -106,10 +106,10 @@ class AuthenticationBloc
     emit(state.copyWith(isLoadingLogin: true, failedToRegister: false));
 
     final success = await _authenticationRepository.register(
-        event.name, event.email, event.password, event.fcmToken, event.country);
+        event.name, event.email, event.password, event.fcmToken, event.country, event.deviceName, event.deviceOs);
     if (success) {
       final response =
-          await _authenticationRepository.logIn(event.email, event.password);
+      await _authenticationRepository.logIn(event.email, event.password, event.deviceName, event.deviceOs);
       if (response.containsKey('token')) {
         emit(state.copyWith(
           isLoggedIn: true,

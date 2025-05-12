@@ -19,8 +19,7 @@ class LeaderboardCard extends StatelessWidget {
     required this.position,
     required this.userName,
     required this.countryName,
-    required this.userLevel,
-    required this.userBadge,
+    // required this.userBadge,
     required this.noOfCoins,
     required this.userId,
   });
@@ -29,8 +28,7 @@ class LeaderboardCard extends StatelessWidget {
   final int position;
   final String userName;
   final String? countryName;
-  final String userLevel;
-  final String userBadge;
+  // final String userBadge;
   final int noOfCoins;
 
   @override
@@ -179,23 +177,23 @@ class LeaderboardCard extends StatelessWidget {
                     SizedBox(
                       width: 5.w,
                     ),
-                    Image.asset(
-                      userBadge,
-                      width: 14.sp,
-                    ),
-                    SizedBox(
-                      width: 5.w,
-                    ),
-                    Text(
-                      userLevel == 'young believer'
-                          ? 'YB'
-                          : capitalizeText(userLevel),
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF5047C4),
-                        fontSize: 13.sp,
-                      ),
-                    ),
+                    // Image.asset(
+                    //   userBadge,
+                    //   width: 14.sp,
+                    // ),
+                    // SizedBox(
+                    //   width: 5.w,
+                    // ),
+                    // Text(
+                    //   userLevel == 'young believer'
+                    //       ? 'YB'
+                    //       : capitalizeText(userLevel),
+                    //   style: TextStyle(
+                    //     fontWeight: FontWeight.w700,
+                    //     color: Color(0xFF5047C4),
+                    //     fontSize: 13.sp,
+                    //   ),
+                    // ),
                   ],
                 ),
               ],

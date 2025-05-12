@@ -19,11 +19,14 @@ class AuthenticationStatusChanged extends AuthenticationEvent {
 class AuthenticationLoginRequested extends AuthenticationEvent {
   final email;
   final password;
+  final deviceName;
+  final deviceOs;
 
-  AuthenticationLoginRequested(this.email, this.password);
+  AuthenticationLoginRequested(
+      this.email, this.password, this.deviceName, this.deviceOs);
 
   @override
-  List<Object> get props => [email, password];
+  List<Object> get props => [email, password, deviceName, deviceOs];
 }
 
 class AuthenticationRefreshTokenRequested extends AuthenticationEvent {
@@ -43,17 +46,15 @@ class AuthenticationRegisterRequested extends AuthenticationEvent {
   final String password;
   final String fcmToken;
   final String country;
+  final deviceName;
+  final deviceOs;
 
-  AuthenticationRegisterRequested(
-    this.name,
-    this.email,
-    this.password,
-    this.fcmToken,
-    this.country,
-  );
+  AuthenticationRegisterRequested(this.name, this.email, this.password,
+      this.fcmToken, this.country, this.deviceName, this.deviceOs);
 
   @override
-  List<Object> get props => [name, email, password, fcmToken, country];
+  List<Object> get props =>
+      [name, email, password, fcmToken, country, deviceName, deviceOs];
 }
 
 class FetchUserDataRequested extends AuthenticationEvent {}

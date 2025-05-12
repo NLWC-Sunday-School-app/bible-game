@@ -6,18 +6,20 @@ class AuthenticationRepository {
   AuthenticationRepository(this.authenticationAPI);
 
   Future<bool> register(String name, String email, String password,
-      String fcmToken, String country) async {
+      String fcmToken, String country, String deviceName, String deviceOs) async {
     return await authenticationAPI.register(
       name,
       email,
       password,
       fcmToken,
       country,
+      deviceName,
+      deviceOs,
     );
   }
 
-  Future<Map<String, dynamic>> logIn(String email, String password) async {
-    return await authenticationAPI.login(email.trim(), password.trim());
+  Future<Map<String, dynamic>> logIn(String email, String password, String deviceName, String deviceOs) async {
+    return await authenticationAPI.login(email.trim(), password.trim(), deviceName, deviceOs);
   }
 
   Future<Map<String, dynamic>> refreshToken(refreshToken) async {

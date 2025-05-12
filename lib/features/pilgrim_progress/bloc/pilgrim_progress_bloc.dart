@@ -4,6 +4,7 @@ import 'package:bible_game_api/model/pilgrim_progress_level_data.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/pilgrim_progress_repository.dart';
@@ -274,6 +275,9 @@ class PilgrimProgressBloc
     final userRank = _authenticationBloc.state.user!.rank;
     final settingsState = _settingsBloc.state;
     final authenticationState = _authenticationBloc.state;
+    final prefs = await SharedPreferences.getInstance();
+    final deviceName = prefs.getString('deviceName');
+    final deviceOs = prefs.getString('deviceOs');
     switch (state.selectedGameLevel) {
       case 'babe':
         final averageTimeSpent =
@@ -318,6 +322,8 @@ class PilgrimProgressBloc
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
               : 5,
+            deviceName,
+          deviceOs
         );
 
         if (roundsLeft < 1 &&
@@ -357,6 +363,7 @@ class PilgrimProgressBloc
                 state.coinsGained >= state.passOnFirstTrialScore
             ? youngBelieversLevelIsLocked = false
             : youngBelieversLevelIsLocked = true;
+
         await _pilgrimProgressRepository.sendGameData(
           'PILGRIM_PROGRESS',
           state.coinsGained,
@@ -380,6 +387,8 @@ class PilgrimProgressBloc
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
               : 4,
+             deviceName,
+             deviceOs
         );
 
         if (roundsLeft < 1 &&
@@ -420,6 +429,7 @@ class PilgrimProgressBloc
                 state.coinsGained >= state.passOnFirstTrialScore
             ? charityLevelIsLocked = false
             : charityLevelIsLocked = true;
+
         await _pilgrimProgressRepository.sendGameData(
           'PILGRIM_PROGRESS',
           state.coinsGained,
@@ -443,6 +453,8 @@ class PilgrimProgressBloc
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
               : 3,
+             deviceName,
+             deviceOs
         );
 
         if (roundsLeft < 1 &&
@@ -506,6 +518,8 @@ class PilgrimProgressBloc
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
               : 2,
+             deviceName,
+             deviceOs
         );
 
         if (roundsLeft < 1 &&
@@ -546,6 +560,7 @@ class PilgrimProgressBloc
                 state.coinsGained >= state.passOnFirstTrialScore
             ? elderLevelIsLocked = false
             : elderLevelIsLocked = true;
+
         await _pilgrimProgressRepository.sendGameData(
           'PILGRIM_PROGRESS',
           state.coinsGained,
@@ -569,6 +584,9 @@ class PilgrimProgressBloc
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
               : 2,
+          deviceName,
+          deviceOs
+
         );
 
         if (roundsLeft < 1 &&
@@ -628,6 +646,8 @@ class PilgrimProgressBloc
                       coinsGained >= state.passOnFirstTrialScore)
               ? roundsLeft
               : 2,
+             deviceName,
+          deviceOs
         );
 
         if (roundsLeft < 1 &&
@@ -655,6 +675,9 @@ class PilgrimProgressBloc
   ) async {
     try {
       final authenticationState = _authenticationBloc.state;
+      final prefs = await SharedPreferences.getInstance();
+      final deviceName = prefs.getString('deviceName');
+      final deviceOs = prefs.getString('deviceOs');
       final response = await _pilgrimProgressRepository.sendGameData(
         'PILGRIM_PROGRESS',
         state.coinsGained,
@@ -666,6 +689,8 @@ class PilgrimProgressBloc
         authenticationState.user!.id,
         null,
         5,
+        deviceName,
+        deviceOs
       );
     } catch (_) {}
   }

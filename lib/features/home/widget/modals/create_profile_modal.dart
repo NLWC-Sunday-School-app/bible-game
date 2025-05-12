@@ -10,6 +10,7 @@ import '../../../../shared/constants/image_routes.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../../shared/utils/device_info.dart';
 import '../../../../shared/utils/token_notifier.dart';
 import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
@@ -40,6 +41,26 @@ class CreateProfileModal extends StatefulWidget {
 
 class _CreateProfileModalState extends State<CreateProfileModal> {
   final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
+  final DeviceInfoService _deviceInfoService = DeviceInfoService();
+  Map<String, String> _deviceInfo = {};
+
+  Future<void> _loadDeviceInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final info = await _deviceInfoService.getDeviceInfo();
+    setState(() {
+      _deviceInfo = info;
+    });
+    prefs.setString('deviceName', _deviceInfo['deviceName']!);
+    prefs.setString('deviceOs', _deviceInfo['osVersion']!);
+    print('device info, ${_deviceInfo}');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDeviceInfo();
+  }
+
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -354,6 +375,8 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                                 passwordController.text,
                                 fcmToken!,
                                 countryName,
+                                _deviceInfo['deviceName']!,
+                                _deviceInfo['osVersion']!,
                               ));
                             }
                           },

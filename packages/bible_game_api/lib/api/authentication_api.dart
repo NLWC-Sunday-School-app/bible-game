@@ -6,7 +6,7 @@ class AuthenticationAPI {
 
   AuthenticationAPI(this.apiClient);
 
-  Future<bool> register(name, email, password, fcmToken, country) async {
+  Future<bool> register(name, email, password, fcmToken, country, String deviceName, String deviceOs) async {
     try {
       final response = await apiClient.post('/auth/register', data: {
         'name': name,
@@ -21,13 +21,15 @@ class AuthenticationAPI {
     }
   }
 
-  Future<Map<String, dynamic>> login(email, password) async {
+  Future<Map<String, dynamic>> login(email, password, deviceName, deviceOs) async {
     try {
       final response = await apiClient.post(
         '/auth/login',
         data: {
           'email': email,
           'password': password,
+          'deviceName': deviceName,
+          'deviceOs': deviceOs
         },
       );
       return response.data;

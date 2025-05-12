@@ -715,8 +715,11 @@ class FourScripturesOneWordBloc
   Future<void> _onSendGameData(
       SendGameData event, Emitter<FourScripturesOneWordState> emit) async {
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
       final authenticationState = _authenticationBloc.state;
       final settingsState = _settingsBloc.state;
+      final deviceName = prefs.getString('deviceName');
+      final deviceOs = prefs.getString('deviceOs');
       await _fourScripturesOneWordRepository.sendGameData(
           'FOUR_SCRIPTURES',
           int.parse(
@@ -729,8 +732,11 @@ class FourScripturesOneWordBloc
           0,
           authenticationState.user.id,
           0,
-          0);
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
+          0,
+          deviceName,
+          deviceOs
+      );
+
       await prefs.setInt('4ScripturesHintUsed', 0);
       emit(state.copyWith(gameHintPurchasePrice: 0, noOfHintsUsed: 0));
     } catch (_) {}

@@ -15,6 +15,7 @@ import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import '../../../../app.dart';
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../../shared/utils/device_info.dart';
 import '../../../../shared/utils/token_notifier.dart';
 import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
@@ -52,6 +53,8 @@ class _LoginModalState extends State<LoginModal> {
   bool _hasToggledPasswordVisibility = true;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
+  final DeviceInfoService _deviceInfoService = DeviceInfoService();
+  Map<String, String> _deviceInfo = {};
 
   void togglePasswordVisibility() {
     setState(() {
@@ -272,7 +275,7 @@ class _LoginModalState extends State<LoginModal> {
                         print('Validated');
                         // BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
                         BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginRequested(emailController.text,
-                          passwordController.text,));
+                          passwordController.text, _deviceInfo['deviceName']!, _deviceInfo['osVersion']!));
 
                       }
                     },
@@ -303,5 +306,22 @@ class _LoginModalState extends State<LoginModal> {
         ),
       ),
     );
+  }
+
+  Future<void> _loadDeviceInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final info = await _deviceInfoService.getDeviceInfo();
+    setState(() {
+      _deviceInfo = info;
+    });
+    prefs.setString('deviceName', _deviceInfo['deviceName']!);
+    prefs.setString('deviceOs', _deviceInfo['osVersion']!);
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDeviceInfo();
   }
 }

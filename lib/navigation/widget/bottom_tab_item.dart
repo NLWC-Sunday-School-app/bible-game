@@ -10,10 +10,11 @@ class BottomTabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return  GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        width: itemIsSelected ? 120.w :  (Get.width - 120.w) / 4 ,
+        width: itemIsSelected ? 120.w :  (screenWidth - 120.w) / 4 ,
         decoration: BoxDecoration(
           gradient: !itemIsSelected ? const LinearGradient(
             begin: Alignment.topLeft,
