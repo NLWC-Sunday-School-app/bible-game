@@ -18,7 +18,7 @@ void showGameSummaryTabletViewModal(
       required bool isGlobalChallenge,
     required VoidCallback onTap}) {
   showDialog(
-      barrierDismissible: true,
+      barrierDismissible: false,
       barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
       context: context!,
       builder: (BuildContext context) {
