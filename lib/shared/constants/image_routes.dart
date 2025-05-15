@@ -1,6 +1,7 @@
 class ProductImageRoutes {
    static const String defaultSplashScreen = 'assets/images/product/splash_screen/splash_screen_bg.png';
    static const String splashScreenLoaderBg = 'assets/images/product/splash_screen/splash_screen.png';
+   static const String splashScreenLoaderBgTabletView = 'assets/images/product/splash_screen/splash_screen_tablet_view.png';
    static const String homeScreenBg = 'assets/images/product/home/screen_bg.png';
    static const String homeScreenPlayButtonBg = 'assets/images/product/home/play_button_bg.png';
    static const String crossBible = 'assets/images/product/home/cross_bible.png';
@@ -17,7 +18,9 @@ class ProductImageRoutes {
    static const String inactiveQuickGameTag = 'assets/images/product/quick_game/inactive_topic_tag.png';
    static const String activeQuickGameTag = 'assets/images/product/quick_game/active_topic_tag.png';
    static const String questionLoadingBg = 'assets/images/product/shared/question_loading_bg.png';
+   static const String questionLoadingBgTabletView = 'assets/images/product/shared/question_loading_bg_tablet_view.png';
    static const String quickTipsBg = 'assets/images/product/shared/quick_tips_bg.png';
+   static const String quickTipsTabletView = 'assets/images/product/shared/quick_tip_banner_tablet_view.png';
    static const String quickTipsBigBg = 'assets/images/product/shared/quick_tips_big_bg.png';
    static const String questionScreenBg = 'assets/images/product/shared/question_screen_bg.png';
    static const String clockBg = 'assets/images/product/shared/clock_bg.png';
@@ -44,6 +47,7 @@ class ProductImageRoutes {
    static const String speedChest = 'assets/images/product/multi_player/speed_chest.png';
    static const String waitingForHostBg = 'assets/images/product/multi_player/waiting_for_host_bg.png';
    static const String gameSummaryBg = 'assets/images/product/shared/game_summary_bg.png';
+   static const String gameSummaryBgTabletView = 'assets/images/product/shared/game_summary_bg_tablet_view.png';
    static const String threeStars = 'assets/images/product/shared/three_stars.png';
    static const String vs = 'assets/images/product/multi_player/vs.png';
    static const String storeComingSoon = 'assets/images/product/store/store_coming_soon.png';
@@ -84,6 +88,7 @@ class ProductImageRoutes {
    static const String arrowThree = 'assets/images/product/four_scripture/arrow_three.png';
    static const String broLukeThree = 'assets/images/product/four_scripture/bro_luke_three.svg';
    static const String streakModalBg = 'assets/images/product/home/streak_modal_bg.png';
+   static const String streakModalBgTabletView = 'assets/images/product/home/streak_modal_bg_tablet_view.png';
    static const String streakBoardBg = 'assets/images/product/home/streak_board_bg.png';
    static const String streakRestoreButtonBg = 'assets/images/product/home/restore_button_bg.png';
    static const String streakRestoreButtonInactiveBg = 'assets/images/product/home/restore_button_inactive_bg.png';
@@ -98,6 +103,7 @@ class ProductImageRoutes {
    static const String joinBtnBg = 'assets/images/product/shared/join_btn_bg.png';
    static const String leaveBtnBg = 'assets/images/product/shared/leave_btn_bg.png';
    static const String leagueSuccessModalBg = 'assets/images/product/league/success_modal_bg.png';
+   static const String leagueSuccessModalBgTabletView = 'assets/images/product/league/success_modal_bg_tablet_view.png';
    static const String fblModalBg = 'assets/images/product/league/fbl_modal_bg.png';
    static const String multiplayerComingSoon = 'assets/images/product/multi_player/multiplayer_coming_soon.png';
    static const String storeGemCard = 'assets/images/product/store/gem_card.png';

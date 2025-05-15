@@ -3,6 +3,18 @@ import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:bible_game/features/four_scriptures/view/tablet_view/four_scripture_question_screen_tablet_view.dart';
+import 'package:bible_game/features/global_challenge/view/tablet_view/question_screen_tablet_view.dart';
+import 'package:bible_game/features/home/view/tablet_view/profile_screen_tablet_view.dart';
+import 'package:bible_game/features/pilgrim_progress/view/tablet_view/home_screen_tablet_view.dart';
+import 'package:bible_game/features/pilgrim_progress/view/tablet_view/question_screen_tablet_view.dart';
+import 'package:bible_game/features/quick_game/view/tablet_view/home_screen_tablet_view.dart';
+import 'package:bible_game/features/quick_game/view/tablet_view/question_screen_tablet_view.dart';
+import 'package:bible_game/features/who_is_who/view/tablet_view/home_screen_tablet_view.dart';
+import 'package:bible_game/features/who_is_who/view/tablet_view/question_screen_tablet_view.dart';
+import 'package:bible_game/navigation/widget/tablet_view_widget/bottom%20_tab_navigation_tablet_view.dart';
+import 'package:bible_game/shared/screens/tablet_view/question_loading_screen_tablet_view.dart';
+import 'package:bible_game/shared/screens/tablet_view/splash_screen_tablet_view.dart';
 import 'package:bible_game/shared/utils/web_socket.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -94,10 +106,9 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-
-
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: isTablet?const Size(834, 1194):const Size(375, 812),
       // useInheritedMediaQuery: true,
       splitScreenMode: false,
       builder: (BuildContext context, Widget? child) => MultiBlocProvider(
@@ -172,43 +183,58 @@ class _AppState extends State<App> {
           ),
           initialRoute: '/',
           routes: {
-            AppRoutes.splashScreen: (context) => SplashScreen(),
-            AppRoutes.home: (context) => BottomTabNavigation(),
-            AppRoutes.quickGameHomeScreen: (context) => QuickGameHomeScreen(),
+            AppRoutes.splashScreen: (context) => isTablet?SplashScreenTabletView():SplashScreen(),
+            AppRoutes.home: (context) => isTablet?BottomTabNavigationTabletView():BottomTabNavigation(),
+            AppRoutes.quickGameHomeScreen: (context) => isTablet?QuickGameHomeScreenTabletView():QuickGameHomeScreen(),
             AppRoutes.questionLoadingScreen: (context) =>
-                QuestionLoadingScreen(),
+            isTablet?QuestionLoadingScreenTabletView():QuestionLoadingScreen(),
             AppRoutes.quickGameQuestionScreen: (context) =>
-                QuickGameQuestionScreen(
-                  authenticationBloc:
-                      BlocProvider.of<AuthenticationBloc>(context),
-                  quickGameRepository: widget.quickGameRepository,
-                ),
+            isTablet?
+            QuickGameQuestionScreenTabletView(
+              authenticationBloc:
+              BlocProvider.of<AuthenticationBloc>(context),
+              quickGameRepository: widget.quickGameRepository,
+            )
+                :
+            QuickGameQuestionScreen(
+              authenticationBloc:
+              BlocProvider.of<AuthenticationBloc>(context),
+              quickGameRepository: widget.quickGameRepository,
+            ),
             AppRoutes.multiplayerQuestionScreen: (context) =>
                 MultiplayerQuestionScreen(),
-            AppRoutes.whoIsWhoHomeScreen: (context) => WhoIsWhoHomeScreen(),
+            AppRoutes.whoIsWhoHomeScreen: (context) => isTablet?WhoIsWhoHomeScreenTabletView():WhoIsWhoHomeScreen(),
             AppRoutes.whoIsWhoQuestionScreen: (context) =>
-                WhoIsWhoQuestionScreen(),
+            isTablet?WhoIsWhoQuestionScreenTabletView():WhoIsWhoQuestionScreen(),
+
             AppRoutes.pilgrimProgressHomeScreen: (context) =>
-                PilgrimProgressHomeScreen(),
+            isTablet?PilgrimProgressHomeScreenTabletView():PilgrimProgressHomeScreen(),
             AppRoutes.pilgrimProgressQuestionScreen: (context) =>
-                PilgrimQuestionScreen(
-                  authenticationBloc:
-                      BlocProvider.of<AuthenticationBloc>(context),
-                  pilgrimProgressRepository: widget.pilgrimProgressRepository,
-                ),
+            isTablet?
+            PilgrimQuestionScreenTabletView(
+              authenticationBloc:
+              BlocProvider.of<AuthenticationBloc>(context),
+              pilgrimProgressRepository: widget.pilgrimProgressRepository,
+            ):PilgrimQuestionScreen(
+              authenticationBloc:
+              BlocProvider.of<AuthenticationBloc>(context),
+              pilgrimProgressRepository: widget.pilgrimProgressRepository,
+            ),
             AppRoutes.fourScriptureQuestionScreen: (context) =>
-                FourScriptureQuestionScreen(),
-            AppRoutes.profileScreen: (context) => ProfileScreen(),
+            isTablet?FourScriptureQuestionScreenTabletView():FourScriptureQuestionScreen(),
+            AppRoutes.profileScreen: (context) => isTablet?ProfileScreenTabletView():ProfileScreen(),
             AppRoutes.globalChallengeQuestionScreen: (context) =>
-                GlobalQuestionScreen(
-                  globalChallengeRepository: widget.globalChallengeRepository,
-                ),
+            isTablet? GlobalQuestionScreenTabletView(
+              globalChallengeRepository: widget.globalChallengeRepository,
+            ):GlobalQuestionScreen(
+              globalChallengeRepository: widget.globalChallengeRepository,
+            ),
             AppRoutes.arcadeScreen: (context) => ArcadeScreen(),
             AppRoutes.fantasyBibleLeagueHomeScreen: (context) =>
                 BottomTabNavigation(),
             AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
           },
-          home: const SplashScreen(),
+          home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),
       ),
     );
@@ -216,7 +242,7 @@ class _AppState extends State<App> {
 
   getFcmToken() async {
     var firebaseAppToken =
-        await AwesomeNotificationsFcm().requestFirebaseAppToken();
+    await AwesomeNotificationsFcm().requestFirebaseAppToken();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('fcmToken', firebaseAppToken);
     print('fb token: $firebaseAppToken');

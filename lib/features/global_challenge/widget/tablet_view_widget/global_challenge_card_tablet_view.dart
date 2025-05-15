@@ -1,0 +1,324 @@
+import 'dart:async';
+
+import 'package:bible_game/features/global_challenge/widget/tablet_view_modal/leaderboard_modal_tablet_view.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../modal/leaderboard_modal.dart';
+import 'locked_button_tablet_view.dart';
+
+class GlobalChallengeCardTabletView extends StatefulWidget {
+  const GlobalChallengeCardTabletView({
+    super.key,
+    required this.id,
+    required this.imageUrl,
+    required this.title,
+    required this.text,
+    required this.gameIsLive,
+    required this.campaignTag,
+    this.isComingSoon = false,
+    this.startDate = '0000-00-00 00:00:00',
+    this.endDate = '0000-00-00 00:00:00',
+  });
+
+  final int id;
+  final String imageUrl;
+  final String title;
+  final String text;
+  final bool gameIsLive;
+  final bool isComingSoon;
+  final String campaignTag;
+  final String? startDate;
+  final String? endDate;
+
+  @override
+  State<GlobalChallengeCardTabletView> createState() => _GlobalChallengeCardTabletViewState();
+}
+
+class _GlobalChallengeCardTabletViewState extends State<GlobalChallengeCardTabletView> {
+  bool playedGame = false;
+  Timer? _timer;
+  Timer? _endGameTimer;
+  Duration _duration = Duration();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isComingSoon) {
+      _startGoLiveCountdown();
+    } else if (widget.gameIsLive) {
+      _startEndGameCountdown();
+    }
+    getPlayedGameStatus();
+  }
+
+  getPlayedGameStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var status = await prefs.getBool('PLAYED_${widget.campaignTag}') ?? false;
+    setState(() {
+      playedGame = status;
+    });
+  }
+
+  void _startGoLiveCountdown() {
+    DateTime targetDate = DateTime.parse(widget.startDate!);
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      final now = DateTime.now();
+      final difference = targetDate.difference(now);
+      if (difference.isNegative) {
+        timer.cancel();
+        context.read<GlobalChallengeBloc>().add(UpdateGlobalChallengeGame(
+              widget.id,
+              widget.title,
+              widget.text,
+              widget.imageUrl,
+              widget.campaignTag,
+              true,
+              false,
+              widget.startDate,
+              widget.endDate,
+            ));
+      } else {
+        setState(() {
+          _duration = difference;
+        });
+      }
+    });
+  }
+
+  void _startEndGameCountdown() {
+    DateTime targetDate = DateTime.parse(widget.endDate!);
+    _endGameTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      final now = DateTime.now();
+      final difference = targetDate.difference(now);
+      if (difference.isNegative) {
+        timer.cancel();
+        context.read<GlobalChallengeBloc>().add(UpdateGlobalChallengeGame(
+              widget.id,
+              widget.title,
+              widget.text,
+              widget.imageUrl,
+              widget.campaignTag,
+              false,
+              false,
+              widget.startDate,
+              widget.endDate,
+            ));
+      } else {
+        // setState(() {
+        //   _duration = difference;
+        // });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _endGameTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final days = _duration.inDays;
+    final hours = _duration.inHours.remainder(24);
+    final minutes = _duration.inMinutes.remainder(60);
+    final seconds = _duration.inSeconds.remainder(60);
+    final soundManager = context.read<SettingsBloc>().soundManager;
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
+          child: Container(
+            margin: EdgeInsets.only(bottom: 25.h),
+            height: 264.h,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.r),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0xFFDEC839),
+                  offset: Offset(-3, 15),
+                  blurRadius: 0,
+                  spreadRadius: -10,
+                ),
+                BoxShadow(
+                  color: Color(0xFFDEC839),
+                  offset: Offset(-3, -15),
+                  blurRadius: 0,
+                  spreadRadius: -10,
+                )
+              ],
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8.r),
+                    bottomLeft: Radius.circular(8.r),
+                  ),
+                  child: Image.network(
+                    widget.imageUrl,
+                    width: 182.w,
+                    height: 264.h,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(
+                  width: 10.w,
+                ),
+                Container(
+                  padding:
+                      EdgeInsets.only(top: 10.h, bottom: 10.h, right: 10.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: TextStyle(
+                            fontFamily: 'Mikado',
+                            color: const Color(0xFF0971C8),
+                            fontSize: 32.sp,
+                            fontWeight: FontWeight.w900),
+                      ),
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      SizedBox(
+                        width: 400.w,
+                        child: Text(
+                          widget.text,
+                          textAlign: TextAlign.left,
+                          softWrap: true,
+                          style: TextStyle(
+                              fontSize: 20.sp,
+                              fontFamily: 'Mikado',
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Spacer(),
+                      Row(
+                        children: [
+                          widget.gameIsLive
+                              ? GestureDetector(
+                            onTap: () async {
+                              soundManager.playClickSound();
+                              if (state.user.id != 0) {
+                                final SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                                prefs.setBool(
+                                    'PLAYED_${widget.campaignTag}', true);
+                                setState(() {
+                                  playedGame = true;
+                                });
+
+                                Navigator.pushNamed(context,
+                                    AppRoutes.questionLoadingScreen,
+                                    arguments: {
+                                      'gameType': widget.campaignTag
+                                    });
+                              } else {
+                                Navigator.pushNamed(
+                                    context, AppRoutes.profileScreen);
+                              }
+                            },
+                                  child: !playedGame
+                                      ? Container(
+                                          padding: EdgeInsets.all(15.w),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(24.r),
+                                              color: const Color(0xFF558CD7)),
+                                          child: Text(
+                                            'Join Challenge',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16.sp
+                                            ),
+                                          ),
+                                        )
+                                      : Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 20.w, vertical: 8.w),
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(24.r),
+                                        color: const Color(0xFF558CD7)),
+                                    child: Text(
+                                      'Play Again',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12.sp,
+                                      ),
+                                    ),
+                                  ))
+                              : widget.isComingSoon
+                                  ? GamesLockedButtonTabletView(
+                                      buttonText:
+                                          '${days}D | ${hours}H:${minutes}M:${seconds}s',
+                                    )
+                                  : GamesLockedButtonTabletView(
+                                      buttonText: 'Ended'
+                                    ),
+                          SizedBox(
+                            width: 10.w,
+                          ),
+                          widget.gameIsLive
+                              ? GestureDetector(
+                                  onTap: () {
+                                    soundManager.playClickSound();
+                                    if (state.user.id != 0) {
+                                      showGlobalChallengeLeaderboardModalTabletView(
+                                          context, widget.campaignTag);
+                                    } else {
+                                      Navigator.pushNamed(
+                                          context, AppRoutes.profileScreen);
+                                    }
+                                  },
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: 30.w,
+                                    width: 30.w,
+                                    decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topRight,
+                                          end: Alignment.center,
+                                          colors: [
+                                            Color(0xFF598DE7),
+                                            Color(0xFF1861DE)
+                                          ],
+                                        )),
+                                    child: SvgPicture.asset(
+                                      IconImageRoutes.trophy,
+                                      width: 20.w,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox()
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5.h,
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
