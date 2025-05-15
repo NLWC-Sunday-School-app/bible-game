@@ -22,11 +22,12 @@ class GlobalChallengeLeaderboard extends Equatable {
 
   factory GlobalChallengeLeaderboard.fromJson(Map<String, dynamic> json) =>
       GlobalChallengeLeaderboard(
-          playerId: json["playerId"],
-          playerScore: json["totalScore"],
-          playerName: json["playerName"],
-          playerPosition: json["position"],
-          country: json["country"]);
+        playerId: json["playerId"] ?? 0,
+        playerScore: json["totalScore"] ?? 0,
+        playerName: json["playerName"] ?? "Unknown",
+        playerPosition: json["position"] ?? 0,
+        country: json["country"] ?? "N/A",
+      );
 
   @override
   List<Object?> get props => [
@@ -34,6 +35,6 @@ class GlobalChallengeLeaderboard extends Equatable {
         playerScore,
         playerName,
         playerPosition,
-       country
+        country
       ];
 }

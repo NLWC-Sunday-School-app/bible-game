@@ -11,6 +11,7 @@ import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 
 void showWiwTryAgainModal(BuildContext context) {
   showDialog(
+    barrierDismissible: false,
     context: context,
     builder: (BuildContext context) {
       return WiwTryAgainModal();

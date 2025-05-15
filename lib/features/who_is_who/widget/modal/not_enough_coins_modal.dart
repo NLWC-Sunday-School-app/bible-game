@@ -5,7 +5,7 @@ import 'package:bible_game/shared/constants/image_routes.dart';
 
 void showNotEnoughCoinsModal(BuildContext context, {required VoidCallback onTap}) {
   showDialog(
-    barrierDismissible: true,
+    barrierDismissible: false,
     barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
     context: context,
     builder: (BuildContext context) {

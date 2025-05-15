@@ -15,6 +15,7 @@ void showWhoIsWhoTimeUpModal(BuildContext context, {
   showDialog(
       barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
           insetPadding: EdgeInsets.zero,

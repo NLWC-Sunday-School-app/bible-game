@@ -129,7 +129,7 @@ class GlobalChallengeBloc
       emit(state.copyWith(isFetchingGlobalChallengeLeaderboard: true));
       final response =
           await _globalChallengeRepository.getGameLeaderBoard(event.gameType);
-      emit(state.copyWith(
+       emit(state.copyWith(
           globalChallengeLeaderboard: response,
           isFetchingGlobalChallengeLeaderboard: false));
     } catch (_) {}
