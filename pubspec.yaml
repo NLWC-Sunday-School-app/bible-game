@@ -112,7 +112,7 @@ flutter_icons:
 
 flutter_native_splash:
   #  color: "#1896FD"
-  background_image: "assets/images/product/splash_screen/splash_screen_bg.png"
+  background_image: "assets/images/product/splash_screen/bg_splash_screen.png"
   android: true
   ios: true
 
