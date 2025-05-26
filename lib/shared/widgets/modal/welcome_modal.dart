@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 
 import '../../features/settings/bloc/settings_bloc.dart';
@@ -22,6 +20,8 @@ class WelcomeModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     final soundManager = context
         .read<SettingsBloc>()
         .soundManager;
@@ -29,8 +29,8 @@ class WelcomeModal extends StatelessWidget {
       insetPadding: EdgeInsets.symmetric(horizontal: 25.w),
       backgroundColor: Colors.transparent,
       child: SizedBox(
-        height: Get.width >= 500 ? 500.h : Get.height >= 800 ? 400.h : 450.h,
-        width: Get.width >= 500 ? 500.h : 400.h,
+        height: width >= 500 ? 500.h : height >= 800 ? 400.h : 450.h,
+        width: width >= 500 ? 500.w : 400.w,
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
