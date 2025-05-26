@@ -16,7 +16,7 @@ class BottomTabItemTabletView extends StatelessWidget {
       child: AnimatedContainer(
           curve: Curves.easeIn,
           duration: const Duration(milliseconds: 400),
-        width: itemIsSelected ? 200.w :  (Get.width - 200.w) / 4 ,
+        width: itemIsSelected ? 200.w :  (screenWidth - 200.w) / 4 ,
         child: Stack(
           children: [
             Align(

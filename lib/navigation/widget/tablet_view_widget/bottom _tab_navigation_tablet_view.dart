@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:bible_game/features/arcade/view/tablet_view/arcade_screen_tablet_view.dart';
@@ -74,7 +73,7 @@ class _BottomTabNavigationTabletViewState extends State<BottomTabNavigationTable
     var firstTime = prefs.getBool('first_time') ?? true;
     if (firstTime) {
       Timer(const Duration(seconds: 3), () {
-         showWelcomeModal(context);
+        showWelcomeModal(context);
       });
       prefs.setBool('first_time', false);
     }
@@ -110,9 +109,9 @@ class _BottomTabNavigationTabletViewState extends State<BottomTabNavigationTable
   @override
   void initState() {
     super.initState();
-   displayWelcomeModal();
-   displayCountryUpdateModal();
-   checkInternet(context);
+    displayWelcomeModal();
+    displayCountryUpdateModal();
+    checkInternet(context);
   }
 
   Widget  _bottomNavigationBar(BuildContext context, isTablet, int _selectedTabIndex) {
@@ -120,62 +119,62 @@ class _BottomTabNavigationTabletViewState extends State<BottomTabNavigationTable
     return Container(
       height: 160.h,
       child: Row(
-          children: [
-            BottomTabItemTabletView(
-              itemLabel: 'Store',
-              itemIcon: IconImageRoutes.storeTabIcon,
-              itemIsSelected: _selectedTabIndex == 0,
-              onTap: () {
-                soundManager.playTabClickSound();
-                context.read<NavigationCubit>().selectTab(0);
-              },
-            ),
-            BottomTabItemTabletView(
-              itemLabel: 'Board',
-              itemIcon: IconImageRoutes.trophyTabICon,
-              itemIsSelected: _selectedTabIndex == 1,
-              onTap: () {
-                soundManager.playTabClickSound();
-                context.read<NavigationCubit>().selectTab(1);
+        children: [
+          BottomTabItemTabletView(
+            itemLabel: 'Store',
+            itemIcon: IconImageRoutes.storeTabIcon,
+            itemIsSelected: _selectedTabIndex == 0,
+            onTap: () {
+              soundManager.playTabClickSound();
+              context.read<NavigationCubit>().selectTab(0);
+            },
+          ),
+          BottomTabItemTabletView(
+            itemLabel: 'Board',
+            itemIcon: IconImageRoutes.trophyTabICon,
+            itemIsSelected: _selectedTabIndex == 1,
+            onTap: () {
+              soundManager.playTabClickSound();
+              context.read<NavigationCubit>().selectTab(1);
 
-              },
-            ),
-            BottomTabItemTabletView(
-              itemLabel: 'Home',
-              itemIcon: IconImageRoutes.homeTabIcon,
-              itemIsSelected: _selectedTabIndex == 2,
-              onTap: () {
-                soundManager.playTabClickSound();
-                context.read<NavigationCubit>().selectTab(2);
+            },
+          ),
+          BottomTabItemTabletView(
+            itemLabel: 'Home',
+            itemIcon: IconImageRoutes.homeTabIcon,
+            itemIsSelected: _selectedTabIndex == 2,
+            onTap: () {
+              soundManager.playTabClickSound();
+              context.read<NavigationCubit>().selectTab(2);
 
-                // if(BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0){
-                //   BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
-                //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
-                //   BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
-                // }
-              },
-            ),
-            BottomTabItemTabletView(
-              itemLabel: 'Arcade',
-              itemIcon: IconImageRoutes.swordTabIcon,
-              itemIsSelected: _selectedTabIndex == 3,
-              onTap: () {
-                soundManager.playTabClickSound();
-                context.read<NavigationCubit>().selectTab(3);
-              }
-              ,
-            ),
-            BottomTabItemTabletView(
-              itemLabel: 'League',
-              itemIcon: IconImageRoutes.leagueTabIcon,
-              itemIsSelected: _selectedTabIndex == 4,
-              onTap: () {
-                soundManager.playTabClickSound();
-                context.read<NavigationCubit>().selectTab(4);
-              },
-            ),
-          ],
-        ),
+              // if(BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0){
+              //   BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
+              //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
+              //   BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+              // }
+            },
+          ),
+          BottomTabItemTabletView(
+            itemLabel: 'Arcade',
+            itemIcon: IconImageRoutes.swordTabIcon,
+            itemIsSelected: _selectedTabIndex == 3,
+            onTap: () {
+              soundManager.playTabClickSound();
+              context.read<NavigationCubit>().selectTab(3);
+            }
+            ,
+          ),
+          BottomTabItemTabletView(
+            itemLabel: 'League',
+            itemIcon: IconImageRoutes.leagueTabIcon,
+            itemIsSelected: _selectedTabIndex == 4,
+            onTap: () {
+              soundManager.playTabClickSound();
+              context.read<NavigationCubit>().selectTab(4);
+            },
+          ),
+        ],
+      ),
 
     );
   }
