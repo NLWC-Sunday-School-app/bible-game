@@ -35,13 +35,15 @@ class _CountryUpdateModalState extends State<CountryUpdateModal> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth =  MediaQuery.of(context).size.width;
+    final screenHeight =  MediaQuery.of(context).size.height;
     return Dialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
         backgroundColor: Colors.transparent,
         child: SingleChildScrollView(
           child: SizedBox(
-            height: Get.width >= 500 ? 450.h : 450.h,
-            width: Get.width >= 500 ? 600.w : 500.w,
+            height: screenWidth >= 500 ? 450.h : 450.h,
+            width: screenWidth >= 500 ? 600.w : 500.w,
             child: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
@@ -151,7 +153,7 @@ class _CountryUpdateModalState extends State<CountryUpdateModal> {
                       ),
                     ),
                     SizedBox(
-                      height: Get.height <= 670 ? 15.h : 20.h,
+                      height: screenHeight <= 670 ? 15.h : 20.h,
                     ),
                     SizedBox(
                       height: 18.h,

@@ -22,13 +22,14 @@ class ResetPasswordSuccessModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth =  MediaQuery.of(context).size.width;
     return Dialog(
       insetPadding: EdgeInsets.zero,
       backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         child: SizedBox(
-          height: Get.width >= 500 ? 450.h : 500.h,
-          width: Get.width >= 500 ? 600.h : 350.w,
+          height: screenWidth >= 500 ? 450.h : 500.h,
+          width: screenWidth >= 500 ? 600.h : 350.w,
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(

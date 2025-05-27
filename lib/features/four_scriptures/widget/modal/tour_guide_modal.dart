@@ -72,8 +72,9 @@ class _TourWelcomeModalState extends State<TourWelcomeModal> {
   Widget build(BuildContext context) {
     final authenticationState =
         BlocProvider.of<AuthenticationBloc>(context).state;
+    final screenHeight =  MediaQuery.of(context).size.height;
     return SizedBox(
-      height: Get.height,
+      height: screenHeight,
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -93,7 +94,7 @@ class _TourWelcomeModalState extends State<TourWelcomeModal> {
               vertical: isShowingFirstGuide
                   ? 100.h
                   : isShowingSecondGuide
-                      ? (Get.height < 700 ? 35.h : 80.h)
+                      ? (screenHeight < 700 ? 35.h : 80.h)
                       : 90.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,

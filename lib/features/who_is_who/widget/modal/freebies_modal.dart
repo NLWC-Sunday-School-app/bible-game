@@ -28,6 +28,8 @@ class WiwFreebiesModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth =  MediaQuery.of(context).size.width;
+    final screenHeight =  MediaQuery.of(context).size.height;
     final soundManager =  BlocProvider.of<SettingsBloc>(context).soundManager;
     if(soundManager.isSoundOn || soundManager.isMusicOn){
        soundManager.playAchievementSound();
@@ -35,8 +37,8 @@ class WiwFreebiesModal extends StatelessWidget {
     return Stack(
       children: [
         SizedBox(
-          height: Get.height,
-          width: Get.width,
+          height: screenHeight,
+          width: screenWidth,
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(

@@ -146,7 +146,7 @@ class _RecapHomeScreenState extends State<RecapHomeScreen> with SingleTickerProv
 
 
   void _onTapDown(TapDownDetails details, story) {
-     final double screenWidth = Get.width;
+     final double screenWidth = MediaQuery.of(context).size.width;;
      final dx = details.globalPosition.dx;
      if (dx < screenWidth / 3){
        setState(() {

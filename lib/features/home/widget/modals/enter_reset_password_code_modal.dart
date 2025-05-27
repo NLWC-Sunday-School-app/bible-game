@@ -35,12 +35,13 @@ class _EnterResetPasswordCodeModalState
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth =  MediaQuery.of(context).size.width;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
       backgroundColor: Colors.transparent,
       child: SizedBox(
-        height: Get.width >= 500 ? 450.h : 500.h,
-        width: Get.width >= 500 ? 600.w : 500.w,
+        height: screenWidth >= 500 ? 450.h : 500.h,
+        width: screenWidth >= 500 ? 600.w : 500.w,
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(

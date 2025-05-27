@@ -48,12 +48,13 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth =  MediaQuery.of(context).size.width;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       backgroundColor: Colors.transparent,
       child: SizedBox(
-        height: Get.width >= 500 ? 500.h : 600.h,
-        width: Get.width >= 500 ? 500.h : 400.h,
+        height: screenWidth >= 500 ? 500.h : 600.h,
+        width: screenWidth >= 500 ? 500.h : 400.h,
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(

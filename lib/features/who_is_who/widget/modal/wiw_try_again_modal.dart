@@ -30,16 +30,18 @@ class _WiwTryAgainModalState extends State<WiwTryAgainModal> {
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final screenWidth =  MediaQuery.of(context).size.width;
+    final screenHeight =  MediaQuery.of(context).size.height;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 0.w),
       backgroundColor: Colors.transparent,
       child: SizedBox(
-        height: Get.width >= 500
+        height: screenWidth >= 500
             ? 400.h
-            : Get.height >= 800
+            : screenHeight >= 800
                 ? 450.h
                 : 500.h,
-        width: Get.width >= 500 ? 400.h : 500.h,
+        width: screenWidth >= 500 ? 400.h : 500.h,
         child: BlocBuilder<WhoIsWhoBloc, WhoIsWhoState>(
           builder: (context, state) {
             return Container(
