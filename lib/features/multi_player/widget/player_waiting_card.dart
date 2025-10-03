@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
 import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
+import '../../../shared/widgets/multi_avatar.dart';
 
 class PlayerWaitingCard extends StatelessWidget {
   const PlayerWaitingCard({
@@ -14,7 +15,8 @@ class PlayerWaitingCard extends StatelessWidget {
     required this.userLevel,
     required this.userBadge,
     required this.noOfCoins,
-    required this.userAvatar,
+    required this.userId,
+    required this.isHost,
     required this.isWaitingForHost,
   });
 
@@ -25,7 +27,8 @@ class PlayerWaitingCard extends StatelessWidget {
   final String userLevel;
   final String userBadge;
   final String noOfCoins;
-  final String userAvatar;
+  final String userId;
+  final bool isHost;
   final bool isWaitingForHost;
 
   @override
@@ -68,18 +71,9 @@ class PlayerWaitingCard extends StatelessWidget {
             SizedBox(
               width: 30.w,
             ),
-            Container(
-              padding: EdgeInsets.all(2.w),
-              decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.primaryColor),
-                  shape: BoxShape.circle),
-              child: Image.network(
-                userAvatar,
-                width: 35.w,
-              ),
-            ),
+            AvatarWidget(seed: userId, width: 35.w, height: 35.h,),
             SizedBox(
-              width: 5.w,
+              width: 10.w,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,15 +127,26 @@ class PlayerWaitingCard extends StatelessWidget {
               ],
             ),
             Spacer(),
+            isHost
+                ?
+                Padding(
+                  padding: EdgeInsets.only(right: 20.w),
+                  child: Text(
+                      "Host",
+                    style: TextStyle(
+                      color: Color(0xFF1A7E1C),
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500
+                    ),
+                  ),
+                )
+                :
             isWaitingForHost
-                ? Image.asset(
-                    ProductImageRoutes.speedChest,
-                    width: 40.w,
-                  )
+                ? SizedBox.shrink()
                 : Image.asset(
-                    IconImageRoutes.redCircleClose,
-                    width: 60.w,
-                  )
+              IconImageRoutes.redCircleClose,
+              width: 60.w,
+            )
           ],
         ),
       ),

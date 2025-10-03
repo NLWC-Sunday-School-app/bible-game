@@ -123,6 +123,24 @@ class ProductImageRoutes {
    static const String recapSevenBg = 'assets/images/product/recap/recap_seven_bg.png';
    static const String recapEightBg = 'assets/images/product/recap/recap_eight_bg.png';
    static const String recapHourGlass = 'assets/images/product/recap/recap_hour_bg.png';
+
+   static const String groupGame = 'assets/images/product/multi_player/group_game.png';
+   static const String versusGame = 'assets/images/product/multi_player/versus_game.png';
+   static const String lightningMode = 'assets/images/product/multi_player/lightning_mode.png';
+   static const String xMode = 'assets/images/product/multi_player/x_mode.png';
+   static const String timeBasedMode = 'assets/images/product/multi_player/time_based_mode.png';
+   static const String survivalMode = 'assets/images/product/multi_player/survival_mode.png';
+   static const String groupCardButton = 'assets/images/product/multi_player/groupCardButton.png';
+   static const String completedUser = 'assets/images/product/multi_player/completed_user.png';
+   static const String survivalModeClockBg = 'assets/images/product/multi_player/survival_mode_clock_design.png';
+   static const String xPoint = 'assets/images/product/multi_player/first_to_x_point.png';
+   static const String dp = 'assets/images/product/multi_player/dp.png';
+   static const String dp2 = 'assets/images/product/multi_player/dp_2.png';
+   static const String dp3 = 'assets/images/product/multi_player/dp_3.png';
+   static const String dp4 = 'assets/images/product/multi_player/dp_4.jpg';
+   static const String copyIcon = 'assets/images/product/multi_player/copy_icon.png';
+   static const String glowIcon = 'assets/images/product/multi_player/glow.png';
+   static const String inviteBg = 'assets/images/product/multi_player/invite_bg.png';
 }
 
 class IconImageRoutes{

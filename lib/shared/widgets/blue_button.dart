@@ -42,6 +42,7 @@ class BlueButton extends StatelessWidget {
               isActive! ? ProductImageRoutes.blueButtonBg : ProductImageRoutes.inactiveBlueButtonBg,
             ),
             fit: BoxFit.fill,
+            colorFilter: ColorFilter.mode(Color(0xFFffffff).withOpacity(0.5), BlendMode.colorDodge)
           ),
         ),
         child: !hasCustomWidget!

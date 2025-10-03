@@ -1,5 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:bible_game/features/lightning_mode/repository/lightning_mode_repository.dart';
+import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
 import 'package:bible_game_api/api/game_api.dart';
+import 'package:bible_game_api/api/multiplayer_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_storage/get_storage.dart';
@@ -41,7 +44,8 @@ void main() async {
 
   final String? userToken = await GetStorage().read('user_token');
   final ApiClient apiClient = ApiClient(
-      baseUrl: 'https://plankton-app-ikxuv.ondigitalocean.app',
+      // baseUrl: 'https://plankton-app-ikxuv.ondigitalocean.app',
+      baseUrl: 'https://api.staging.biblegame.app',
       token: userToken ?? '');
   final TokenNotifier tokenNotifier = TokenNotifier();
 
@@ -55,6 +59,7 @@ void main() async {
   final UserAPI userAPI = UserAPI(apiClient);
   final AuthenticationAPI authenticationAPI = AuthenticationAPI(apiClient);
   final GameAPI gameAPI = GameAPI(apiClient);
+  final MultiplayerAPI multiplayerAPI = MultiplayerAPI(apiClient);
   final AuthenticationRepository authenticationRepository =
       AuthenticationRepository(authenticationAPI);
   final UserRepository userRepository = UserRepository(userAPI);
@@ -65,6 +70,8 @@ void main() async {
   final FourScripturesOneWordRepository fourScripturesOneWordRepository = FourScripturesOneWordRepository(gameAPI);
   final FantasyLeagueRepository fantasyLeagueRepository = FantasyLeagueRepository(gameAPI);
   final SoundManager soundManager = SoundManager();
+  final MultiplayerRepository multiplayerRepository = MultiplayerRepository(multiplayerAPI);
+  final LightningModeRepository lightningModeRepository = LightningModeRepository(multiplayerAPI);
   runApp(App(
     authenticationRepository: authenticationRepository,
     userRepository: userRepository,
@@ -76,5 +83,7 @@ void main() async {
     whoIsWhoRepository : whoIsWhoRepository,
     tokenNotifier: tokenNotifier,
     soundManager: soundManager,
+    multiplayerRepository: multiplayerRepository,
+    lightningModeRepository: lightningModeRepository,
   ));
 }

@@ -6,6 +6,14 @@ import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:bible_game/features/four_scriptures/view/tablet_view/four_scripture_question_screen_tablet_view.dart';
 import 'package:bible_game/features/global_challenge/view/tablet_view/question_screen_tablet_view.dart';
 import 'package:bible_game/features/home/view/tablet_view/profile_screen_tablet_view.dart';
+import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
+import 'package:bible_game/features/lightning_mode/repository/lightning_mode_repository.dart';
+import 'package:bible_game/features/lightning_mode/view/lightning_mode_question_screen.dart';
+import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
+import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
+import 'package:bible_game/features/multi_player/view/group_game_category.dart';
+import 'package:bible_game/features/multi_player/view/home_screen.dart';
+import 'package:bible_game/features/multiplayer/view/home_screen.dart';
 import 'package:bible_game/features/pilgrim_progress/view/tablet_view/home_screen_tablet_view.dart';
 import 'package:bible_game/features/pilgrim_progress/view/tablet_view/question_screen_tablet_view.dart';
 import 'package:bible_game/features/quick_game/view/tablet_view/home_screen_tablet_view.dart';
@@ -13,6 +21,7 @@ import 'package:bible_game/features/quick_game/view/tablet_view/question_screen_
 import 'package:bible_game/features/who_is_who/view/tablet_view/home_screen_tablet_view.dart';
 import 'package:bible_game/features/who_is_who/view/tablet_view/question_screen_tablet_view.dart';
 import 'package:bible_game/navigation/widget/tablet_view_widget/bottom%20_tab_navigation_tablet_view.dart';
+import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/shared/screens/tablet_view/question_loading_screen_tablet_view.dart';
 import 'package:bible_game/shared/screens/tablet_view/splash_screen_tablet_view.dart';
 import 'package:bible_game/shared/utils/web_socket.dart';
@@ -83,7 +92,10 @@ class App extends StatefulWidget {
       required this.fourScripturesOneWordRepository,
       required this.whoIsWhoRepository,
       required this.globalChallengeRepository,
-      required this.fantasyLeagueRepository});
+      required this.fantasyLeagueRepository,
+        required this.multiplayerRepository,
+        required this.lightningModeRepository,
+      });
 
   final SoundManager soundManager;
   final AuthenticationRepository authenticationRepository;
@@ -95,6 +107,8 @@ class App extends StatefulWidget {
   final GlobalChallengeRepository globalChallengeRepository;
   final FantasyLeagueRepository fantasyLeagueRepository;
   final TokenNotifier tokenNotifier;
+  final MultiplayerRepository multiplayerRepository;
+  final LightningModeRepository lightningModeRepository;
 
   @override
   State<App> createState() => _AppState();
@@ -174,6 +188,25 @@ class _AppState extends State<App> {
                 fantasyLeagueRepository: widget.fantasyLeagueRepository),
           ),
           ChangeNotifierProvider(create: (_) => widget.tokenNotifier),
+          BlocProvider<MultiplayerBloc>(
+            create: (context) => MultiplayerBloc(
+              authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
+              multiplayerRepository: widget.multiplayerRepository,
+            ),
+          ),
+          BlocProvider<LightningModeBloc>(
+            create: (context) => LightningModeBloc(
+              authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
+              lightningModeRepository: widget.lightningModeRepository,
+              multiplayerBloc: BlocProvider.of<MultiplayerBloc>(context),
+              settingsBloc: BlocProvider.of<SettingsBloc>(context),
+            ),
+          ),
+          BlocProvider<WebsocketCubit>(
+            create: (context) => WebsocketCubit(
+              multiplayerBloc:BlocProvider.of<MultiplayerBloc>(context),
+            ),
+          ),
         ],
         child: MaterialApp(
           scaffoldMessengerKey: scaffoldMessengerKey,
@@ -233,6 +266,10 @@ class _AppState extends State<App> {
             AppRoutes.fantasyBibleLeagueHomeScreen: (context) =>
                 BottomTabNavigation(),
             AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
+
+            AppRoutes.multiplayer: (context) => MultiplayerHomeScreen(),
+            AppRoutes.groupGameCategory: (context) => GroupGameCategory(),
+            AppRoutes.lightningModeQuestionScreen: (context) => LightningModeQuestionScreen()
           },
           home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 
 import '../../features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
+import '../../features/multi_player/widget/modal/multiplayer_tip_modal.dart';
 import '../../features/quick_game/bloc/quick_game_bloc.dart';
 import '../../features/quick_game/widget/modal/quick_tips_modal.dart';
 import '../constants/app_routes.dart';
@@ -90,7 +92,13 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
            });
          }
        });
-
+      }else if(gameType == "Lightning Mode"||gameType =="Time-based Mode"||gameType =="First to X" ||gameType =="Survival Mode"){
+        Timer(Duration(seconds: 3), () {
+          if(mounted && !_isModalShown){
+            showMultiplayerTipsModal(context, gameMode: gameType);
+            _isModalShown = true;
+          }
+        });
       }else {
         context.read<GlobalChallengeBloc>().add(FetchGlobalChallengeQuestions(gameType));
         context.read<GlobalChallengeBloc>().stream.listen((state){
