@@ -132,6 +132,7 @@ class ProductImageRoutes {
    static const String survivalMode = 'assets/images/product/multi_player/survival_mode.png';
    static const String groupCardButton = 'assets/images/product/multi_player/groupCardButton.png';
    static const String completedUser = 'assets/images/product/multi_player/completed_user.png';
+   static const String completedUserBall = 'assets/images/product/multi_player/completed_user_ball.png';
    static const String survivalModeClockBg = 'assets/images/product/multi_player/survival_mode_clock_design.png';
    static const String xPoint = 'assets/images/product/multi_player/first_to_x_point.png';
    static const String dp = 'assets/images/product/multi_player/dp.png';
@@ -141,6 +142,13 @@ class ProductImageRoutes {
    static const String copyIcon = 'assets/images/product/multi_player/copy_icon.png';
    static const String glowIcon = 'assets/images/product/multi_player/glow.png';
    static const String inviteBg = 'assets/images/product/multi_player/invite_bg.png';
+   static const String toastSuccess = 'assets/images/product/multi_player/toast_green_success.png';
+   static const String leaderboardBanner = 'assets/images/product/multi_player/leaderboard_banner.png';
+   static const String multiplayerActiveButton = 'assets/images/product/multi_player/multiplayer_active_btn.png';
+   static const String multiplayerInactiveButton = 'assets/images/product/multi_player/multiplayer_inactive_btn.png';
+   static const String inviteSuccessfulBg = 'assets/images/product/multi_player/invite_successful_bg.png';
+   static const String inviteErrorBg= 'assets/images/product/multi_player/invite_error_bg.png';
+   static const String inviteErrorIcon= 'assets/images/product/multi_player/invite_error_icon.png';
 }
 
 class IconImageRoutes{
@@ -198,6 +206,9 @@ class IconImageRoutes{
   static const String xIcon = 'assets/images/icons/user/x.png';
   static const String emptyLeaderboardIcon = 'assets/images/icons/user/empty_leaderboard_icon.png';
   static const String bottomHandle = 'assets/images/icons/user/bottom_handle.svg';
+  static const String greenSuccessIcon = 'assets/images/product/multi_player/green_success_icon.png';
+  static const String quickTipsIconOne = 'assets/images/product/multi_player/quick_tips_icon1.png';
+  static const String quickTipsIconTwo = 'assets/images/product/multi_player/quick_tip_icon2.png';
 }
 
 class LogoImageRoutes{

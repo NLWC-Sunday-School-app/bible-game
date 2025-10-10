@@ -3,8 +3,9 @@ import 'package:bible_game_api/model/game_invites_model.dart';
 
 class MultiplayerRepository {
   final MultiplayerAPI multiplayerAPI;
+  final GameAPI gameAPI;
 
-  MultiplayerRepository(this.multiplayerAPI);
+  MultiplayerRepository(this.multiplayerAPI, this.gameAPI);
 
   Future<CreateGameRoomModel> createGameRoom(hostId) async {
     return multiplayerAPI.createGameRoom(hostId);
@@ -12,6 +13,14 @@ class MultiplayerRepository {
 
   Future<CreateGameRoomModel> joinRoom(inviteCode, userId) async {
     return multiplayerAPI.joinRoom(inviteCode, userId);
+  }
+
+  Future<bool> leaveRoom(roomId, playerId) async {
+    return multiplayerAPI.leaveRoom(roomId, playerId);
+  }
+
+  Future<bool> kickOut(roomId, playerId) async {
+    return multiplayerAPI.kickOut(roomId, playerId);
   }
 
   Future<bool> configureGameRoom(roomId, hostId, gameType, questionType, conditionType, condition) async {
@@ -37,4 +46,35 @@ class MultiplayerRepository {
   Future<Map<String,dynamic>> countInvite() async {
     return multiplayerAPI.countInvite();
   }
+
+  Future<void> sendGameData(
+      gameMode,
+      totalScore,
+      baseScore,
+      bonusScore,
+      averageTimeSpent,
+      playerRank,
+      noOfCorrectAnswers,
+      playerId,
+      userProgress,
+      numberOfRoundsLeft,
+      deviceName,
+      deviceOs
+      ) async {
+    return await gameAPI.sendGameData(
+        gameMode,
+        totalScore,
+        baseScore,
+        bonusScore,
+        averageTimeSpent,
+        playerRank,
+        noOfCorrectAnswers,
+        playerId,
+        userProgress,
+        numberOfRoundsLeft,
+        deviceName,
+        deviceOs
+    );
+  }
+
 }

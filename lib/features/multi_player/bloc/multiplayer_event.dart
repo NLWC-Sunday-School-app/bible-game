@@ -9,6 +9,22 @@ class MultiplayerEvent extends Equatable{
 
 class CreateGameRoom extends MultiplayerEvent{}
 
+class KickOut extends MultiplayerEvent{
+  final String playerId;
+
+  KickOut(this.playerId);
+  @override
+  List<Object> get props => [playerId];
+}
+
+class LeaveRoom extends MultiplayerEvent{
+  final String playerId;
+
+  LeaveRoom(this.playerId);
+  @override
+  List<Object> get props => [playerId];
+}
+
 class JoinRoom extends MultiplayerEvent{
   final String inviteCode;
 

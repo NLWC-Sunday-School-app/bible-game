@@ -146,6 +146,7 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                         if(state.hasConfiguredGameRoom){
                           Navigator.pop(context);
                           showHostWaitingModal(context, selectedGroupGame: widget.selectedGroupGame, inviteCode: widget.inviteCode, questionType: selectedValue);
+
                         }
                       },
                       builder: (context, state) {
@@ -481,7 +482,7 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
     }else{
       BlocProvider.of<MultiplayerBloc>(context).add(ConfigureGameRoom(
           "LIGHTNING",
-          selectedValue == "Who is Who"?"WHO_IS_WHO":"",
+          selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
           int.parse(textController.text),
           "BEST_OF_ROUNDS"));
     }

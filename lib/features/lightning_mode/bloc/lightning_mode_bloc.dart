@@ -32,6 +32,7 @@ class LightningModeBloc extends Bloc<LightningModeEvent, LightningModeState> {
         _settingsBloc = settingsBloc,
         super(LightningModeState.initial()) {
     on<StartGame>(_onStartGame);
+    on<GameRestart>(_onGameRestart);
     on<OptionSelected>(_onOptionSelected);
     on<MoveToNextPage>(_onMoveToNextPage);
   }
@@ -51,6 +52,24 @@ class LightningModeBloc extends Bloc<LightningModeEvent, LightningModeState> {
       emit(state.copyWith(isLoadingStartGame: false, hasStartedGame: false));
     }
   }
+
+  Future<void> _onGameRestart(
+      GameRestart event,
+      Emitter<LightningModeState> emit) async {
+    try {
+      emit(state.copyWith(isLoadingGameRestart: true,));
+      final response =
+      await _lightningModeRepository.gameRestart(
+          _multiplayerBloc.state.createGameRoomResponse.id,
+          _authenticationBloc.state.user.id
+      );
+      emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: true));
+      emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: false));
+    } catch (_) {
+      emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: false));
+    }
+  }
+
 
   void _onOptionSelected(
       OptionSelected event,

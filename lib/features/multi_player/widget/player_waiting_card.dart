@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:stroke_text/stroke_text.dart';
 import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
+import '../../../shared/utils/country_iso_3.dart';
+import '../../../shared/utils/formatter.dart';
+import '../../../shared/utils/user_badge.dart';
 import '../../../shared/widgets/multi_avatar.dart';
 
 class PlayerWaitingCard extends StatelessWidget {
@@ -11,23 +15,19 @@ class PlayerWaitingCard extends StatelessWidget {
     required this.position,
     required this.userName,
     required this.countryName,
-    required this.countryLogo,
-    required this.userLevel,
-    required this.userBadge,
-    required this.noOfCoins,
+    required this.userRank,
     required this.userId,
     required this.isHost,
     required this.isWaitingForHost,
+    required this.onTap,
   });
 
   final int position;
   final String userName;
   final String countryName;
-  final String countryLogo;
-  final String userLevel;
-  final String userBadge;
-  final String noOfCoins;
+  final String userRank;
   final String userId;
+  final VoidCallback onTap;
   final bool isHost;
   final bool isWaitingForHost;
 
@@ -89,17 +89,58 @@ class PlayerWaitingCard extends StatelessWidget {
                   strokeColor: Color(0xFFF4FFCE),
                   strokeWidth: 4,
                 ),
+                // Row(
+                //   children: [
+                //     Image.network(
+                //       countryLogo,
+                //       width: 16.w,
+                //     ),
+                //     SizedBox(
+                //       width: 2.w,
+                //     ),
+                //     Text(
+                //       countryName,
+                //       style: TextStyle(
+                //           fontWeight: FontWeight.w700,
+                //           color: Color(0xFF082D5A)),
+                //     ),
+                //     SizedBox(
+                //       width: 5.w,
+                //     ),
+                //     Image.asset(
+                //       userBadge,
+                //       width: 14.sp,
+                //     ),
+                //     SizedBox(
+                //       width: 5.w,
+                //     ),
+                //     Text(
+                //       userRank,
+                //       style: TextStyle(
+                //         fontWeight: FontWeight.w700,
+                //         color: Color(0xFF5047C4),
+                //         fontSize: 13.sp,
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 Row(
                   children: [
-                    Image.network(
-                      countryLogo,
+                    countryName != null
+                        ? SvgPicture.asset(
+                      'assets/images/flags/${countryName!.replaceAll('/', ' ').toLowerCase()}.svg',
+                      width: 16.w,
+                    )
+                        : SizedBox(
                       width: 16.w,
                     ),
                     SizedBox(
                       width: 2.w,
                     ),
                     Text(
-                      countryName,
+                      countryName != null
+                          ? getIso3Code(countryName!.replaceAll('/', ' '))
+                          : '-',
                       style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF082D5A)),
@@ -108,19 +149,22 @@ class PlayerWaitingCard extends StatelessWidget {
                       width: 5.w,
                     ),
                     Image.asset(
-                      userBadge,
-                      width: 14.sp,
+                      getBadgeUrl(userRank),
+                      width: 13.sp,
                     ),
                     SizedBox(
                       width: 5.w,
                     ),
-                    Text(
-                      userLevel,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
+                    StrokeText(
+                      text:
+                      capitalizeText(userRank),
+                      textStyle: TextStyle(
                         color: Color(0xFF5047C4),
-                        fontSize: 13.sp,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w900,
                       ),
+                      strokeColor: Colors.white,
+                      strokeWidth: 2,
                     ),
                   ],
                 ),
@@ -143,10 +187,13 @@ class PlayerWaitingCard extends StatelessWidget {
                 :
             isWaitingForHost
                 ? SizedBox.shrink()
-                : Image.asset(
-              IconImageRoutes.redCircleClose,
-              width: 60.w,
-            )
+                : InkWell(
+                  onTap: onTap,
+                  child: Image.asset(
+                    IconImageRoutes.redCircleClose,
+                    width: 60.w,
+                  ),
+                )
           ],
         ),
       ),

@@ -43,7 +43,7 @@ class MultiplayerQuestionNumberBox extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.center,
                   child: Text(
-                    '$noOfCorrectQuestions',
+                    '$currentQuestionNumber/$totalQuestions',
                     style: TextStyle(
                       fontFamily: 'Mikado',
                       fontWeight: FontWeight.w700,

@@ -8,6 +8,7 @@ class WaitingRoomModel extends Equatable {
     required this.readyCount,
     required this.totalPlayers,
     required this.maxPlayers,
+    required this.totalQuestions,
     required this.gameMode,
   });
 
@@ -17,6 +18,7 @@ class WaitingRoomModel extends Equatable {
   final int? readyCount;
   final int? totalPlayers;
   final int? maxPlayers;
+  final String? totalQuestions;
   final String? gameMode;
 
   factory WaitingRoomModel.fromJson(Map<String, dynamic> json){
@@ -27,38 +29,48 @@ class WaitingRoomModel extends Equatable {
       readyCount: json["readyCount"],
       totalPlayers: json["totalPlayers"],
       maxPlayers: json["maxPlayers"],
+      totalQuestions: json["totalQuestions"],
       gameMode: json["gameMode"],
     );
   }
 
   @override
   List<Object?> get props => [
-    type, roomId, players, readyCount, totalPlayers, maxPlayers, gameMode, ];
+    type, roomId, players, readyCount, totalPlayers, maxPlayers, gameMode,totalQuestions ];
 }
 
 class Player extends Equatable {
   Player({
+    required this.id,
     required this.userId,
     required this.username,
     required this.isReady,
     required this.isHost,
+    required this.country,
+    required this.level,
   });
 
+  final String? id;
   final String? userId;
   final String? username;
   final bool? isReady;
   final bool? isHost;
+  final String? country;
+  final String? level;
 
   factory Player.fromJson(Map<String, dynamic> json){
     return Player(
+      id: json["id"],
       userId: json["userId"],
       username: json["username"],
       isReady: json["isReady"],
       isHost: json["isHost"],
+      country: json["country"],
+      level: json["level"],
     );
   }
 
   @override
   List<Object?> get props => [
-    userId, username, isReady, isHost, ];
+    id, userId, username, isReady, isHost, country, level, ];
 }

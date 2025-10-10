@@ -95,7 +95,9 @@ class SentGameRequestCard extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                BlocProvider.of<MultiplayerBloc>(context).add(AcceptAndJoin(inviteId));
+                BlocProvider.of<MultiplayerBloc>(context).add(
+                    AcceptAndJoin(inviteId)
+                );
               },
               child: Image.asset(
                 IconImageRoutes.greenCircleMark,

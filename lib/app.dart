@@ -205,6 +205,9 @@ class _AppState extends State<App> {
           BlocProvider<WebsocketCubit>(
             create: (context) => WebsocketCubit(
               multiplayerBloc:BlocProvider.of<MultiplayerBloc>(context),
+              settingsBloc: BlocProvider.of<SettingsBloc>(context),
+              authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
+              multiplayerRepository: widget.multiplayerRepository,
             ),
           ),
         ],

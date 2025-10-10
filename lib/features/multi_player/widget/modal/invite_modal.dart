@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/features/multi_player/widget/sent_game_request_card.dart';
 
 import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/utils/custom_toast.dart';
 import '../../../../shared/widgets/blue_button.dart';
 
 void showInviteModal(BuildContext context) {
@@ -151,6 +152,9 @@ class InviteModal extends StatelessWidget {
                               // TODO: implement listener
                               if(state.hasInvitedUser){
                                 Navigator.pop(context);
+                                CustomToast.showInviteToast(context, isInviteSuccessful: true);
+                              }else if(!state.hasInvitedUser && !state.isLoadingGameInvite){
+                                CustomToast.showInviteToast(context, isInviteSuccessful: false);
                               }
                             },
                             builder: (context, state) {

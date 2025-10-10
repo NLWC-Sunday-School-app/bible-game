@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/features/multi_player/widget/sent_game_request_card.dart';
 
 import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/features/multiplayer/cubit/websocket_cubit.dart';
 
 void showGameRequestModal(BuildContext context) {
   showDialog(
@@ -15,9 +16,20 @@ void showGameRequestModal(BuildContext context) {
       });
 }
 
-class GameRequestModal extends StatelessWidget {
+class GameRequestModal extends StatefulWidget {
   const GameRequestModal({super.key});
 
+  @override
+  State<GameRequestModal> createState() => _GameRequestModalState();
+}
+
+class _GameRequestModalState extends State<GameRequestModal> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<WebsocketCubit>().connect();
+  }
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -29,14 +41,24 @@ class GameRequestModal extends StatelessWidget {
         height: 400.h,
         child: BlocConsumer<MultiplayerBloc, MultiplayerState>(
           listener: (context, state) {
+            // if(state.hasAcceptedInvite){
+            //   Navigator.pop(context);
+            //   showPlayersWaitingForHostModal(context,
+            //       selectedGroupName: state.createGameRoomResponse.victoryCondition!.questionType!.toLowerCase() == "lightning"
+            //       ?
+            //       "lightning mode":"",
+            //       inviteCode: state.createGameRoomResponse.inviteCode,
+            //   );
+            // }
             if(state.hasAcceptedInvite){
               Navigator.pop(context);
-              showPlayersWaitingForHostModal(context,
-                  selectedGroupName: state.createGameRoomResponse.victoryCondition!.questionType!.toLowerCase() == "lightning"
-                  ?
-                  "lightning mode":"",
-                  inviteCode: state.createGameRoomResponse.inviteCode,
-                  questionType: ""
+              context.read<WebsocketCubit>().subscribeToWaitingRoom();
+              showPlayersWaitingForHostModal(
+                  context,
+                  selectedGroupName: state.createGameRoomResponse.victoryCondition!.type == "LIGHTNING"
+                      ?
+                  "Lightning Mode":"",
+                  inviteCode: state.createGameRoomResponse.inviteCode
               );
             }
           },

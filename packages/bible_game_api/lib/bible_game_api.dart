@@ -18,4 +18,6 @@ export 'model/who_is_who_level.dart';
 export 'model/who_is_who_question.dart';
 export 'model/create_game_room_model.dart';
 export 'model/start_game_room_model.dart';
+export 'model/position_update.dart';
+export 'model/game_finished_event.dart';
 export 'utils/api_exception.dart';

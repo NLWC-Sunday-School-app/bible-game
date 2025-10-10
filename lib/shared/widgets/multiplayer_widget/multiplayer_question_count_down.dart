@@ -3,10 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 
 class MultiplayerQuestionCountDown extends StatelessWidget {
-  const MultiplayerQuestionCountDown({super.key});
+  const MultiplayerQuestionCountDown(
+      {super.key, this.durationPerQuestion, required this.animationController});
+
+  final int? durationPerQuestion;
+  final AnimationController animationController;
+
   @override
   Widget build(BuildContext context) {
-
     return
       SizedBox(
         height: 50.h,
@@ -30,19 +34,25 @@ class MultiplayerQuestionCountDown extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.only(right: 5.w),
                     decoration: BoxDecoration(
-                        color: Color(0xFF6AACE8),
+                      color: Color(0xFF6AACE8),
                       borderRadius: BorderRadius.circular(26.r),
                     ),
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(
-                        '00:15',
-                        style: TextStyle(
-                          fontFamily: 'Mikado',
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontSize: 13.sp,
-                        ),
+                      child: ValueListenableBuilder(
+                        valueListenable: animationController,
+                        builder: (context, value, child) {
+                          int totalSeconds = (durationPerQuestion! * (1 - value)).toInt();
+                          return Text(
+                            '00:${totalSeconds.toString().padLeft(2, '0')}',
+                            style: TextStyle(
+                              fontFamily: 'Mikado',
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              fontSize: 13.sp,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

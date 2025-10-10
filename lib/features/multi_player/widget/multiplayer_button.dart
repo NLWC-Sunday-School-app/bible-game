@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 
-class BlueButton extends StatelessWidget {
-  const BlueButton({
+class MultiplayerButton extends StatelessWidget {
+  const MultiplayerButton({
     super.key,
     required this.buttonText,
     this.onTap,
@@ -35,14 +35,13 @@ class BlueButton extends StatelessWidget {
         height:  height,
         padding: EdgeInsets.symmetric(horizontal: 15.w),
         decoration: BoxDecoration(
-          border: Border.all(color: isActive! ? const Color(0xFF1E62D4) : const Color(0xFF8E8E8E) , width: 3.w),
+          // border: Border.all(color: isActive! ? const Color(0xFF1E62D4) : const Color(0xFF8E8E8E) , width: 3.w),
           borderRadius: BorderRadius.all(Radius.circular(10.r)),
           image: DecorationImage(
             image: AssetImage(
-              isActive! ? ProductImageRoutes.blueButtonBg : ProductImageRoutes.inactiveBlueButtonBg,
+              isActive! ? ProductImageRoutes.multiplayerActiveButton : ProductImageRoutes.multiplayerInactiveButton,
             ),
-            fit: BoxFit.fill,
-            
+            // fit: BoxFit.fill,
             // colorFilter: ColorFilter.mode(Color(0xFFffffff).withOpacity(0.5), BlendMode.colorDodge)
           ),
         ),

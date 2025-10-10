@@ -70,7 +70,7 @@ void main() async {
   final FourScripturesOneWordRepository fourScripturesOneWordRepository = FourScripturesOneWordRepository(gameAPI);
   final FantasyLeagueRepository fantasyLeagueRepository = FantasyLeagueRepository(gameAPI);
   final SoundManager soundManager = SoundManager();
-  final MultiplayerRepository multiplayerRepository = MultiplayerRepository(multiplayerAPI);
+  final MultiplayerRepository multiplayerRepository = MultiplayerRepository(multiplayerAPI, gameAPI);
   final LightningModeRepository lightningModeRepository = LightningModeRepository(multiplayerAPI);
   runApp(App(
     authenticationRepository: authenticationRepository,

@@ -3,6 +3,8 @@ part of 'lightning_mode_bloc.dart';
 class LightningModeState extends Equatable{
   final bool isLoadingStartGame;
   final bool hasStartedGame;
+  final bool isLoadingGameRestart;
+  final bool hasRestartedGame;
   final StartGameRoomModel startGameRoomModel;
   final String? correctAnswer;
   final int? selectedOptionIndex;
@@ -22,6 +24,8 @@ class LightningModeState extends Equatable{
         required this.isCorrectAnswer,
         required this.coinsGained,
         required this.noOfCorrectAnswers,
+        required this.isLoadingGameRestart,
+        required this.hasRestartedGame,
       });
 
   factory LightningModeState.initial(){
@@ -34,7 +38,9 @@ class LightningModeState extends Equatable{
         hasAnswered: false,
         isCorrectAnswer: null,
         coinsGained: 0,
-        noOfCorrectAnswers: 0
+        noOfCorrectAnswers: 0,
+        isLoadingGameRestart:false,
+        hasRestartedGame:false,
     );
   }
 
@@ -49,6 +55,8 @@ class LightningModeState extends Equatable{
         bool? isCorrectAnswer,
         int? coinsGained,
         int? noOfCorrectAnswers,
+        bool? isLoadingGameRestart,
+        bool? hasRestartedGame,
       }) {
     return LightningModeState(
       isLoadingStartGame: isLoadingStartGame ?? this.isLoadingStartGame,
@@ -60,6 +68,8 @@ class LightningModeState extends Equatable{
       isCorrectAnswer: isCorrectAnswer ?? this.isCorrectAnswer,
       coinsGained: coinsGained ?? this.coinsGained,
       noOfCorrectAnswers: noOfCorrectAnswers ?? this.noOfCorrectAnswers,
+      isLoadingGameRestart: isLoadingGameRestart ?? this.isLoadingGameRestart,
+      hasRestartedGame: hasRestartedGame ?? this.hasRestartedGame,
     );
   }
 
@@ -74,5 +84,7 @@ class LightningModeState extends Equatable{
     isCorrectAnswer,
     coinsGained,
     noOfCorrectAnswers,
+    isLoadingGameRestart,
+    hasRestartedGame
   ];
 }

@@ -148,6 +148,21 @@ class MultiplayerAPI {
     }
   }
 
+  Future<bool> kickOut(roomId, playerId) async {
+    try {
+      final response = await apiClient.post(
+          '/multiplayer/rooms/${roomId}/kick-out',
+          data: {
+            "playerId": playerId
+          }
+      );
+      return response.statusCode == 200;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
 
   Future<StartGameRoomModel> startGame(roomId, hostId) async {
     try {
@@ -163,6 +178,22 @@ class MultiplayerAPI {
       throw errorMessage;
     }
   }
+
+  Future<bool> gameRestart(roomId, hostId) async {
+    try {
+      final response = await apiClient.post(
+          '/multiplayer/rooms/$roomId/restart',
+          data: {
+            "hostId": hostId
+          }
+      );
+      return response.statusCode == 200;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
 
 
 }

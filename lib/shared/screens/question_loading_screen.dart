@@ -119,7 +119,9 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-
+    final arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+    final gameType = arguments['gameType'];
     return Scaffold(
       body: Container(
         height: screenHeight,
@@ -130,7 +132,8 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
             fit: BoxFit.fill,
           ),
         ),
-        child: BlocBuilder<SettingsBloc, SettingsState>(
+        child: !(gameType == "Lightning Mode"||gameType =="Time-based Mode"||gameType =="First to X" ||gameType =="Survival Mode")?
+        BlocBuilder<SettingsBloc, SettingsState>(
           builder: (context, state) {
             return Align(
               alignment: Alignment.center,
@@ -169,7 +172,7 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
               ),
             );
           },
-        ),
+        ):Container()
       ),
     );
   }

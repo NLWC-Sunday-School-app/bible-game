@@ -2,6 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/features/multi_player/widget/modal/invite_modal.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,11 @@ import 'package:bible_game/features/multi_player/widget/player_waiting_card.dart
 import 'package:bible_game/shared/widgets/blue_button.dart';
 import '../../../../shared/constants/app_routes.dart';
 import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/utils/custom_toast.dart';
+import '../../../../shared/widgets/custom_toast.dart';
+import '../../../../shared/widgets/green_button.dart';
 import '../../../lightning_mode/bloc/lightning_mode_bloc.dart';
+import '../multiplayer_button.dart';
 
 void showHostWaitingModal(BuildContext context, {required selectedGroupGame, required inviteCode, required questionType}) {
   showDialog(
@@ -27,7 +32,7 @@ void showHostWaitingModal(BuildContext context, {required selectedGroupGame, req
       });
 }
 
-void showPlayersWaitingForHostModal(BuildContext context, {required selectedGroupName, required inviteCode, required questionType}) {
+void showPlayersWaitingForHostModal(BuildContext context, {required selectedGroupName, required inviteCode}) {
 
   //4DW7FP
   showDialog(
@@ -37,7 +42,7 @@ void showPlayersWaitingForHostModal(BuildContext context, {required selectedGrou
           isWaitingForHost: true,
           selectedGroupGame: selectedGroupName,
           inviteCode: inviteCode,
-          questionType: questionType,
+          questionType: null,
         );
       });
 }
@@ -47,7 +52,7 @@ class PlayersWaitingModal extends StatefulWidget {
 
   final bool isWaitingForHost;
   final String selectedGroupGame;
-  final String questionType;
+  final String? questionType;
   final String inviteCode;
 
   @override
@@ -89,17 +94,22 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                         ),
                       ],
                       color: Color(0xFFFFEED6),
-                      image: DecorationImage(
-                        image: AssetImage(ProductImageRoutes.glowIcon),
-                        fit: BoxFit.contain,
-                      ),
                     ),
                     child: Column(
                       children: [
                         Align(
                           alignment: Alignment.topRight,
                           child: InkWell(
-                            onTap: () => Navigator.pop(context),
+                            onTap: (){
+                              context.read<WebsocketCubit>().closeWebsocket();
+                              final userId = context.read<AuthenticationBloc>().state.user.id;
+                              // BlocProvider.of<MultiplayerBloc>(context).add(
+                              //     LeaveRoom(
+                              //         context.read<WebsocketCubit>().state.playersJoined.players.firstWhere((element) => element.userId == userId).id!
+                              //     )
+                              // );
+                              Navigator.pop(context);
+                            },
                             child: Image.asset(
                               IconImageRoutes.redCircleClose,
                               width: 40.w,
@@ -199,6 +209,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                         fontWeight: FontWeight.w400
                                     )
                                 ),
+
                                 SizedBox(height: 10.h,),
                                 widget.selectedGroupGame == "Time-based Mode"||widget.selectedGroupGame == "Survival Mode"?
                                 Text(
@@ -218,19 +229,26 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                     )
                                 )
                                     :
-                                SizedBox.shrink()
+                                Text(
+                                    "No of Questions:   ",
+                                    style: TextStyle(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w400
+                                    )
+                                ),
                               ],
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    widget.questionType.isEmpty?"${context.read<WebsocketCubit>().state.playersJoined.gameMode}":widget.questionType,
+                                    widget.questionType == null?"${context.watch<WebsocketCubit>().state.playersJoined.gameMode}":widget.questionType!,
                                     style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500
                                     )
                                 ),
+
                                 SizedBox(height: 10.h,),
                                 widget.selectedGroupGame == "Time-based Mode"||widget.selectedGroupGame == "Survival Mode"?
                                 Text(
@@ -250,7 +268,13 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                     )
                                 )
                                     :
-                                SizedBox.shrink()
+                                Text(
+                                    "${context.watch<WebsocketCubit>().state.playersJoined.totalQuestions}",
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500
+                                    )
+                                ),
                               ],
                             ),
                           ],
@@ -280,7 +304,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 children: [
                                   Spacer(),
                                   Text(
-                                    widget.inviteCode,
+                                    "${widget.inviteCode}",
                                     style: TextStyle(
                                       fontSize: 24.sp,
                                       fontWeight: FontWeight.w900,
@@ -326,6 +350,13 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             if(state.eventType == "GAME_STARTED"){
                               Navigator.pop(context);
                               Navigator.pushNamed(context, AppRoutes.questionLoadingScreen, arguments:{ 'gameType': widget.selectedGroupGame});
+                            }
+                            if(state.newPlayerJoined == true){
+                              CustomToast.show(
+                                  context,
+                                  "${state.playersJoined.players.last.username} has joined",
+                                isTriggerFromWaitingRoom: true
+                              );
                             }
                         },
                         builder: (context, state) {
@@ -410,18 +441,19 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                   itemCount: state.playersJoined.players.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     return PlayerWaitingCard(
+                                      onTap: (){
+                                        BlocProvider.of<MultiplayerBloc>(context).add(
+                                            KickOut(state.playersJoined.players[index].id!)
+                                        );
+                                      },
                                       position: index+1,
                                       userName: state.playersJoined.players[index].username??"",
-                                      countryName: "NGA",
-                                      countryLogo:
-                                        'https://res.cloudinary.com/dd3hfa9ug/image/upload/v1714750941/Nigeria_NG_q4jizd.png',
-                                      userLevel: 'Babe',
-                                      userBadge: ProductImageRoutes.defaultBadge,
-                                      noOfCoins: '100',
+                                      countryName: state.playersJoined.players[index].country??"N",
+                                      userRank: state.playersJoined.players[index].level??"",
                                       userId: state.playersJoined.players[index].userId??"",
                                       isWaitingForHost: widget.isWaitingForHost,
                                       isHost:state.playersJoined.players[index].isHost??false,
-                                      );
+                                    );
                                   },
                                 ),
                               ),
@@ -433,27 +465,31 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                   ),
                 ],
               ),
+              Positioned(
+                top: 60,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                    child: Image.asset(
+                  ProductImageRoutes.glowIcon,
+                  fit: BoxFit.contain ,
+                  width: 273.w,
+                  height: 165.h,
+                )
+                ),
+              ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: BlueButton(
+                child: MultiplayerButton(
                   onTap: () {
                     if(widget.isWaitingForHost == false){
                       BlocProvider.of<LightningModeBloc>(context).add(StartGame());
                     }
-                    // showDialog(
-                    //     context: context,
-                    //     builder: (BuildContext context) {
-                    //       return GameSummaryModal(
-                    //         onTap: () =>{},
-                    //         pointsEarned: '230',
-                    //         bonusPoint: '10',
-                    //         noOfCorrectionQuestions: '10',
-                    //         totalQuestions: '20',
-                    //         averageTimePerQuestion: '5',
-                    //       );
-                    //     });
                   },
                   buttonText: widget.isWaitingForHost == false ?'Start Game':'Waiting for Host',
+                  isActive: BlocProvider.of<WebsocketCubit>(context).state.playersJoined.players.length <=0?false:widget.isWaitingForHost == false?true:false,
                   buttonIsLoading: false,
                   width: 280.w,
                 ),

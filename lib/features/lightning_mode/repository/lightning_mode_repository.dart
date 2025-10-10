@@ -9,6 +9,7 @@ class LightningModeRepository {
     return multiplayerAPI.startGame(roomId, hostId);
   }
 
-
-
+  Future<bool> gameRestart(roomId, hostId) async {
+    return multiplayerAPI.gameRestart(roomId, hostId);
+  }
 }

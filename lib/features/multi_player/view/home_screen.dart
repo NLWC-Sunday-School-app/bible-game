@@ -1,5 +1,9 @@
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
+import 'package:bible_game/features/multi_player/widget/modal/game_leaderboard.dart';
+import 'package:bible_game/features/multi_player/widget/modal/multiplayer_tip_modal.dart';
+import 'package:bible_game/shared/utils/custom_toast.dart';
+import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:bible_game/features/multi_player/widget/game_play_card.dart';
 import 'package:bible_game/features/multi_player/widget/game_request_card.dart';
@@ -9,11 +13,14 @@ import 'package:bible_game/features/multi_player/widget/modal/join_gameplay_moda
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/utils.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/constants/colors.dart';
+import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
+import '../../who_is_who/widget/who_is_who_guide.dart';
 
 class MultiplayerHomeScreen extends StatelessWidget {
   const MultiplayerHomeScreen({super.key});
@@ -25,6 +32,7 @@ class MultiplayerHomeScreen extends StatelessWidget {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
     final selectedCategory = arguments['selectedCategory'];
+    final soundManager = context.read<SettingsBloc>().soundManager;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -44,17 +52,34 @@ class MultiplayerHomeScreen extends StatelessWidget {
             ScreenAppBar(
               height: 70.h,
               widgets: [
-                Center(
-                  child: StrokeText(
-                    text: 'Multiplayer',
-                    textStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 26.sp,
-                      fontWeight: FontWeight.w900,
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        soundManager.playClickSound();
+                        Navigator.pushReplacementNamed(
+                            context,
+                            AppRoutes.home
+                        );
+                      },
+                      child: Image.asset(
+                        IconImageRoutes.arrowCircleBack,
+                        width: 40.w,
+                      ),
                     ),
-                    strokeColor: AppColors.titleDropShadowColor,
-                    strokeWidth: 6,
-                  ),
+                    Spacer(),
+                    StrokeText(
+                      text: 'Multiplayer',
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 26.sp,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      strokeColor: AppColors.titleDropShadowColor,
+                      strokeWidth: 6,
+                    ),
+                    Spacer(),
+                  ],
                 ),
                 SizedBox(
                   height: 20.h,

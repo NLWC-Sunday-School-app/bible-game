@@ -9,6 +9,8 @@ class LightningModeEvent extends Equatable{
 
 class StartGame extends LightningModeEvent{}
 
+class GameRestart extends LightningModeEvent{}
+
 
 class OptionSelected extends LightningModeEvent {
   final int selectedOptionIndex;

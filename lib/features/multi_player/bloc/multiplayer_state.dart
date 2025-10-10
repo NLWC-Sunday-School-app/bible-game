@@ -15,6 +15,10 @@ class MultiplayerState extends Equatable{
   final bool hasAcceptedInvite;
   final bool isLoadingRejectInvite;
   final bool hasRejectedInvite;
+  final bool isLeavingRoom;
+  final bool hasLeaveRoom;
+  final bool isLoadingKickOut;
+  final bool hasKickedOut;
   final dynamic inviteCount;
 
   final CreateGameRoomModel createGameRoomResponse;
@@ -39,7 +43,10 @@ class MultiplayerState extends Equatable{
         required this.isLoadingRejectInvite,
         required this.hasRejectedInvite,
         required this.inviteCount,
-
+        required this.isLeavingRoom,
+        required this.hasLeaveRoom,
+        required this.isLoadingKickOut,
+        required this.hasKickedOut,
       });
 
   factory MultiplayerState.initial(){
@@ -60,6 +67,10 @@ class MultiplayerState extends Equatable{
       hasAcceptedInvite: false,
       isLoadingRejectInvite: false,
       hasRejectedInvite: false,
+      isLeavingRoom: false,
+      hasLeaveRoom: false,
+      isLoadingKickOut: false,
+      hasKickedOut: false,
       inviteCount: 0,
     );
   }
@@ -81,6 +92,10 @@ MultiplayerState copyWith(
         bool? hasAcceptedInvite,
         bool? isLoadingRejectInvite,
         bool? hasRejectedInvite,
+        bool? isLeavingRoom,
+        bool? hasLeaveRoom,
+        bool? isLoadingKickOut,
+        bool? hasKickedOut,
         int? inviteCount,
         CreateGameRoomModel? createGameRoomResponse
       }) {
@@ -101,6 +116,10 @@ MultiplayerState copyWith(
         hasAcceptedInvite: hasAcceptedInvite ?? this.hasAcceptedInvite,
         isLoadingRejectInvite: isLoadingRejectInvite ?? this.isLoadingRejectInvite,
         hasRejectedInvite: hasRejectedInvite ?? this.hasRejectedInvite,
+        isLeavingRoom: isLeavingRoom ?? this.isLeavingRoom,
+        hasLeaveRoom: hasLeaveRoom ?? this.hasLeaveRoom,
+        isLoadingKickOut: isLoadingKickOut ?? this.isLoadingKickOut,
+        hasKickedOut: hasKickedOut ?? this.hasKickedOut,
         inviteCount: inviteCount ?? this.inviteCount,
     );
   }
@@ -123,6 +142,10 @@ MultiplayerState copyWith(
     hasAcceptedInvite,
     isLoadingRejectInvite,
     hasRejectedInvite,
+    isLeavingRoom,
+    hasLeaveRoom,
+    isLoadingKickOut,
+    hasKickedOut,
     inviteCount,
   ];
 }
