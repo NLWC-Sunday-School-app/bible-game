@@ -18,7 +18,7 @@ import '../../../../shared/widgets/green_button.dart';
 import '../../../lightning_mode/bloc/lightning_mode_bloc.dart';
 import '../multiplayer_button.dart';
 
-void showHostWaitingModal(BuildContext context, {required selectedGroupGame, required inviteCode, required questionType}) {
+void showHostWaitingModal(BuildContext context, {required selectedGroupGame, required inviteCode, required questionType, required noOfQuestion}) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -27,7 +27,7 @@ void showHostWaitingModal(BuildContext context, {required selectedGroupGame, req
           selectedGroupGame: selectedGroupGame,
           inviteCode: inviteCode,
           questionType: questionType,
-
+          noOfQuestion: noOfQuestion,
         );
       });
 }
@@ -43,17 +43,19 @@ void showPlayersWaitingForHostModal(BuildContext context, {required selectedGrou
           selectedGroupGame: selectedGroupName,
           inviteCode: inviteCode,
           questionType: null,
+          noOfQuestion: null,
         );
       });
 }
 
 class PlayersWaitingModal extends StatefulWidget {
-  const PlayersWaitingModal({super.key, required this.isWaitingForHost, required this.selectedGroupGame, required this.inviteCode, required this.questionType});
+  const PlayersWaitingModal({super.key, required this.isWaitingForHost, required this.selectedGroupGame, required this.inviteCode, required this.questionType, this.noOfQuestion});
 
   final bool isWaitingForHost;
   final String selectedGroupGame;
   final String? questionType;
   final String inviteCode;
+  final int? noOfQuestion;
 
   @override
   State<PlayersWaitingModal> createState() => _PlayersWaitingModalState();
@@ -269,7 +271,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 )
                                     :
                                 Text(
-                                    "${context.watch<WebsocketCubit>().state.playersJoined.totalQuestions}",
+                                    "${widget.noOfQuestion??context.watch<WebsocketCubit>().state.playersJoined.totalQuestions}",
                                     style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500
@@ -350,6 +352,11 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             if(state.eventType == "GAME_STARTED"){
                               Navigator.pop(context);
                               Navigator.pushNamed(context, AppRoutes.questionLoadingScreen, arguments:{ 'gameType': widget.selectedGroupGame});
+                              CustomToast.showInviteToast(
+                                  context,
+                                  message: "Game has started",
+                                  isInviteSuccessful: true
+                              );
                             }
                             if(state.newPlayerJoined == true){
                               CustomToast.show(
@@ -436,7 +443,19 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 ),
                               ),
                               Expanded(
-                                child: ListView.builder(
+                                child: state.playersJoined.players.length == 0?
+                                    Center(
+                                      child: Text(
+                                        'Waiting for players',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF122F52),
+                                        ),
+                                      ),
+                                    )
+                                    :
+                                ListView.builder(
                                   padding: EdgeInsets.zero,
                                   itemCount: state.playersJoined.players.length,
                                   itemBuilder: (BuildContext context, int index) {
@@ -482,16 +501,20 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: MultiplayerButton(
-                  onTap: () {
-                    if(widget.isWaitingForHost == false){
-                      BlocProvider.of<LightningModeBloc>(context).add(StartGame());
-                    }
-                  },
-                  buttonText: widget.isWaitingForHost == false ?'Start Game':'Waiting for Host',
-                  isActive: BlocProvider.of<WebsocketCubit>(context).state.playersJoined.players.length <=0?false:widget.isWaitingForHost == false?true:false,
-                  buttonIsLoading: false,
-                  width: 280.w,
+                child: BlocBuilder<WebsocketCubit, WebsocketState>(
+                  builder: (context, state) {
+                    return MultiplayerButton(
+                      onTap: () {
+                        if(widget.isWaitingForHost == false){
+                          BlocProvider.of<LightningModeBloc>(context).add(StartGame());
+                        }
+                      },
+                      buttonText: widget.isWaitingForHost == false ?'Start Game':'Waiting for Host',
+                      isActive: state.playersJoined.players.length <=0?false:widget.isWaitingForHost == false?true:false,
+                      buttonIsLoading: false,
+                      width: 280.w,
+                    );
+                  }
                 ),
               ),
             ],

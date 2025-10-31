@@ -279,7 +279,7 @@ class _CreateGamePlayModalState extends State<CreateGamePlayModal> {
                     BlueButton(
                       onTap: () {
                         Navigator.pop(context);
-                        showHostWaitingModal(context,selectedGroupGame: "", inviteCode: "", questionType: "");
+                        showHostWaitingModal(context,selectedGroupGame: "", inviteCode: "", questionType: "", noOfQuestion: null);
                       },
                       buttonText: 'Create a gameplay',
                       buttonIsLoading: false,

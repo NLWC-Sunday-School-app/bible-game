@@ -15,7 +15,7 @@ class QuestionBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Container(
-        height: isWhoIsWho! ? 150.h : 200.h,
+        // height: isWhoIsWho! ? 150.h : 200.h,
         width: 350.w,
         child: Stack(
           children: [
@@ -29,9 +29,9 @@ class QuestionBox extends StatelessWidget {
                   left: 10.w,
                   right: 10.w,
                   top: 35.h,
-                  bottom: 5.h,
+                  bottom: 10.h,
                 ),
-                height: 200.h,
+                // height: 200.h,
                 width: 350.w,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),

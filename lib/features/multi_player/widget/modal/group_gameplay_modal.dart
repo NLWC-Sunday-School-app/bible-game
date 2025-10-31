@@ -145,7 +145,13 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                       listener: (context, state) {
                         if(state.hasConfiguredGameRoom){
                           Navigator.pop(context);
-                          showHostWaitingModal(context, selectedGroupGame: widget.selectedGroupGame, inviteCode: widget.inviteCode, questionType: selectedValue);
+                          showHostWaitingModal(
+                              context,
+                              selectedGroupGame: widget.selectedGroupGame,
+                              inviteCode: widget.inviteCode,
+                              questionType: selectedValue,
+                              noOfQuestion: int.parse(textController.text),
+                          );
 
                         }
                       },

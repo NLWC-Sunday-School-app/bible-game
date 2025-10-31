@@ -18,6 +18,9 @@ class CustomToast {
 
   static void show(BuildContext context, String message,
       {Duration duration = const Duration(seconds: 2), bool? isTriggerFromWaitingRoom}) {
+    // Remove any existing overlay first
+    removeOverlay();
+
     final overlay = Overlay.of(context);
     final animationDuration = const Duration(milliseconds: 300);
 
@@ -27,7 +30,7 @@ class CustomToast {
           message: message,
           duration: duration,
           animationDuration: animationDuration,
-          onDismissed: () => overlayEntry!.remove(),
+          onDismissed: () => removeOverlay(), // ✅ Use removeOverlay instead
           isTriggerFromWaitingRoom: isTriggerFromWaitingRoom,
         );
       },
@@ -38,6 +41,9 @@ class CustomToast {
 
   static void showInviteToast(BuildContext context,
       {Duration duration = const Duration(seconds: 2), required bool isInviteSuccessful, String? message}) {
+    // Remove any existing overlay first
+    removeOverlay();
+
     final overlay = Overlay.of(context);
     final animationDuration = const Duration(milliseconds: 300);
 
@@ -46,7 +52,7 @@ class CustomToast {
         return _InviteToastWidget(
           duration: duration,
           animationDuration: animationDuration,
-          onDismissed: () => overlayEntry!.remove(),
+          onDismissed: () => removeOverlay(), // ✅ Use removeOverlay instead
           isInviteSuccessful: isInviteSuccessful,
           message: message,
         );
@@ -81,6 +87,7 @@ class _ToastWidget extends StatefulWidget {
 
 class _ToastWidgetState extends State<_ToastWidget> {
   double _opacity = 0.0;
+  bool _isDismissed = false; // ✅ Track if already dismissed
 
   @override
   void initState() {
@@ -98,8 +105,20 @@ class _ToastWidgetState extends State<_ToastWidget> {
       if (mounted) {
         setState(() => _opacity = 0.0);
       }
-      Future.delayed(widget.animationDuration, widget.onDismissed);
+      Future.delayed(widget.animationDuration, () {
+        // ✅ Only dismiss once
+        if (!_isDismissed && mounted) {
+          _isDismissed = true;
+          widget.onDismissed();
+        }
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _isDismissed = true; // ✅ Mark as dismissed on dispose
+    super.dispose();
   }
 
   @override
@@ -117,16 +136,9 @@ class _ToastWidgetState extends State<_ToastWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(ProductImageRoutes.toastSuccess)
+                  image: AssetImage(ProductImageRoutes.toastSuccess)
               ),
               borderRadius: BorderRadius.circular(12),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.black26,
-              //     blurRadius: 6,
-              //     offset: Offset(0, 3),
-              //   )
-              // ],
             ),
             child: widget.isTriggerFromWaitingRoom != null?
             Row(
@@ -161,7 +173,7 @@ class _ToastWidgetState extends State<_ToastWidget> {
                   TextStyle(
                       color: Colors.white,
                       fontSize: 14.sp,
-                    fontWeight: FontWeight.bold
+                      fontWeight: FontWeight.bold
                   ),
                 ),
                 SizedBox(width: 5.w,),
@@ -201,6 +213,7 @@ class _InviteToastWidget extends StatefulWidget {
 
 class _InviteToastWidgetState extends State<_InviteToastWidget> {
   double _opacity = 0.0;
+  bool _isDismissed = false; // ✅ Track if already dismissed
 
   @override
   void initState() {
@@ -218,8 +231,20 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
       if (mounted) {
         setState(() => _opacity = 0.0);
       }
-      Future.delayed(widget.animationDuration, widget.onDismissed);
+      Future.delayed(widget.animationDuration, () {
+        // ✅ Only dismiss once
+        if (!_isDismissed && mounted) {
+          _isDismissed = true;
+          widget.onDismissed();
+        }
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _isDismissed = true; // ✅ Mark as dismissed on dispose
+    super.dispose();
   }
 
   @override
@@ -234,107 +259,100 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: widget.isInviteSuccessful?AssetImage(ProductImageRoutes.inviteSuccessfulBg):AssetImage(ProductImageRoutes.inviteErrorBg),
-                fit: BoxFit.fill
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: widget.isInviteSuccessful?AssetImage(ProductImageRoutes.inviteSuccessfulBg):AssetImage(ProductImageRoutes.inviteErrorBg),
+                    fit: BoxFit.fill
+                ),
+                borderRadius: BorderRadius.circular(12),
               ),
-              borderRadius: BorderRadius.circular(12),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.black26,
-              //     blurRadius: 6,
-              //     offset: Offset(0, 3),
-              //   )
-              // ],
-            ),
-            child: widget.isInviteSuccessful?
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(width: 5,),
-                widget.message == null?
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Invite Sent Successfully!",
-                      style:
-                      TextStyle(
-                          color: Color(0xFF014CA3),
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w900
+              child: widget.isInviteSuccessful?
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(width: 5,),
+                  widget.message == null?
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Invite Sent Successfully!",
+                        style:
+                        TextStyle(
+                            color: Color(0xFF014CA3),
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w900
+                        ),
                       ),
-                    ),
-                    Text(
-                      "Your Friend has been sent a Game Invite",
-                      style:
-                      TextStyle(
-                          color: Colors.black,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w500
+                      Text(
+                        "Your Friend has been sent a Game Invite",
+                        style:
+                        TextStyle(
+                            color: Colors.black,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w500
+                        ),
                       ),
+                    ],
+                  )
+                      :
+                  Text(
+                    widget.message!,
+                    style:
+                    TextStyle(
+                        color: Color(0xFF014CA3),
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w900
                     ),
-                  ],
-                )
-                    :
-                Text(
-                  widget.message!,
-                  style:
-                  TextStyle(
-                      color: Color(0xFF014CA3),
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w900
                   ),
-                ),
 
-                SizedBox(width: 12.w,),
-                Image.asset(
-                  IconImageRoutes.greenSuccessIcon,
-                  height: 24,
-                  width: 24,
-                ),
-              ],
-            )
-                :
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(width: 5.w,),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "ERROR!",
-                      style:
-                      TextStyle(
-                          color: Color(0xFFB71111),
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w900
+                  SizedBox(width: 12.w,),
+                  Image.asset(
+                    IconImageRoutes.greenSuccessIcon,
+                    height: 24,
+                    width: 24,
+                  ),
+                ],
+              )
+                  :
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(width: 5.w,),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "ERROR!",
+                        style:
+                        TextStyle(
+                            color: Color(0xFFB71111),
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w900
+                        ),
                       ),
-                    ),
-                    Text(
-                      "No invite was sent",
-                      style:
-                      TextStyle(
-                          color: Colors.black,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w500
+                      Text(
+                        "No invite was sent",
+                        style:
+                        TextStyle(
+                            color: Colors.black,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w500
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(width: 12.w,),
-                Image.asset(
-                  ProductImageRoutes.inviteErrorIcon,
-                  height: 24,
-                  width: 24,
-                ),
-              ],
-            )
+                    ],
+                  ),
+                  SizedBox(width: 12.w,),
+                  Image.asset(
+                    ProductImageRoutes.inviteErrorIcon,
+                    height: 24,
+                    width: 24,
+                  ),
+                ],
+              )
           ),
         ),
       ),

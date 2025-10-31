@@ -1,31 +1,55 @@
+import 'dart:async';
+
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
-import 'package:bible_game/features/multi_player/widget/modal/game_leaderboard.dart';
-import 'package:bible_game/features/multi_player/widget/modal/multiplayer_tip_modal.dart';
-import 'package:bible_game/shared/utils/custom_toast.dart';
-import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:bible_game/features/multi_player/widget/game_play_card.dart';
 import 'package:bible_game/features/multi_player/widget/game_request_card.dart';
-import 'package:bible_game/features/multi_player/widget/modal/create_gameplay_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_request_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/join_gameplay_modal.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/utils.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/constants/colors.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
-import '../../who_is_who/widget/who_is_who_guide.dart';
 
-class MultiplayerHomeScreen extends StatelessWidget {
+class MultiplayerHomeScreen extends StatefulWidget {
   const MultiplayerHomeScreen({super.key});
 
+  @override
+  State<MultiplayerHomeScreen> createState() => _MultiplayerHomeScreenState();
+}
 
+class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with WidgetsBindingObserver{
+  Timer? _timer;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _startPeriodicCall();
+    super.initState();
+  }
+
+  void _startPeriodicCall() {
+    BlocProvider.of<MultiplayerBloc>(context).add(CountInvite());
+
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      print("called");
+      BlocProvider.of<MultiplayerBloc>(context).add(CountInvite());
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+    print("TIMER DISPOSED");// Cancel when widget is disposed
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +57,7 @@ class MultiplayerHomeScreen extends StatelessWidget {
         <String, dynamic>{}) as Map;
     final selectedCategory = arguments['selectedCategory'];
     final soundManager = context.read<SettingsBloc>().soundManager;
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -57,9 +82,10 @@ class MultiplayerHomeScreen extends StatelessWidget {
                     InkWell(
                       onTap: () {
                         soundManager.playClickSound();
-                        Navigator.pushReplacementNamed(
+                        Navigator.pushNamedAndRemoveUntil(
                             context,
-                            AppRoutes.home
+                            AppRoutes.home,
+                            (Route)=>false
                         );
                       },
                       child: Image.asset(
@@ -102,6 +128,7 @@ class MultiplayerHomeScreen extends StatelessWidget {
             ),
             GamePlayCard(
               onTap: (){
+                dispose();
                 BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
                 Navigator.pushNamed(context,
                     AppRoutes.groupGameCategory,
@@ -122,7 +149,7 @@ class MultiplayerHomeScreen extends StatelessWidget {
               backgroundImage: ProductImageRoutes.joinGameCardBg,
               swordImage: ProductImageRoutes.joinSword,
             ),
-            SizedBox(height: 120.h,),
+            Spacer(),
             BlocBuilder<MultiplayerBloc, MultiplayerState>(
               builder: (context, state) {
                 return GameRequestCard(
@@ -135,7 +162,7 @@ class MultiplayerHomeScreen extends StatelessWidget {
                 },
             ),
             SizedBox(
-              height: 20.h,
+              height: 100.h,
             )
           ],
         ),

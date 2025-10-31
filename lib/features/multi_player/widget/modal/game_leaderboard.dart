@@ -22,6 +22,7 @@ import '../../../lightning_mode/bloc/lightning_mode_bloc.dart';
 void showLeaderboardModal(BuildContext context,selectedGroupGame) {
   showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return GameLeaderboardModal(selectedGroupGame: selectedGroupGame);
       });
@@ -208,7 +209,8 @@ class _GameLeaderboardModalState extends State<GameLeaderboardModal> {
               BlocListener<WebsocketCubit, WebsocketState>(
                 listener: (context, state){
                   if(state.eventType == "GAME_RESTARTED"){
-                    Navigator.pushNamedAndRemoveUntil(context, AppRoutes.multiplayer,
+                    Navigator.pushNamedAndRemoveUntil(context,
+                        AppRoutes.multiplayer,
                             (Route<dynamic> route) => false,
                         arguments: {
                           'selectedCategory': "Group Game"
@@ -217,7 +219,8 @@ class _GameLeaderboardModalState extends State<GameLeaderboardModal> {
                     showHostWaitingModal(context,
                         selectedGroupGame: widget.selectedGroupGame,
                         inviteCode: "${context.read<MultiplayerBloc>().state.createGameRoomResponse.inviteCode}",
-                        questionType: "${context.read<WebsocketCubit>().state.playersJoined.gameMode}"
+                        questionType: "${context.read<WebsocketCubit>().state.playersJoined.gameMode}",
+                        noOfQuestion: null
                     );
                     CustomToast.showInviteToast(context, isInviteSuccessful: true);
                   }

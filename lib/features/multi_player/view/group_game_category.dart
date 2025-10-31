@@ -62,12 +62,6 @@ class GroupGameCategory extends StatelessWidget {
                  listener: (context, state){
                    if(state.hasCreatedGameRoom){
                      context.read<WebsocketCubit>().connect();
-                     // Timer.periodic(Duration(seconds: 30), (timer) {
-                     //   _stompClient.send(
-                     //       destination: '/app/heartbeat.ping',
-                     //       body: "{}"
-                     //   );
-                     // });
                    }
                  },
                  builder: (context, state) {

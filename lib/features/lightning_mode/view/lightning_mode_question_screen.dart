@@ -71,11 +71,13 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
   }
 
   void _initializeAnimationController(bool hasTimer) {
-    print("DURATION: $durationPerQuestion");
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: durationPerQuestion),
     )..addStatusListener((status) {
+      if(status == AnimationStatus.dismissed){
+        return;
+      }
       if (status == AnimationStatus.completed) {
         if (context.read<WebsocketCubit>().state.hasAnswered == false) {
           context.read<WebsocketCubit>().sendGameAnswer(
@@ -110,10 +112,9 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
       _animationController.forward();
     } else {
       _animationController.stop();
-      showLeaderboardModal(context, "Lightning Mode");
-      // Navigator.push(context, MaterialPageRoute(
-      //   builder: (BuildContext context) => const GameLeaderboardModal(),
-      // ),);
+      gameFinished();
+      // showLeaderboardModal(context, "Lightning Mode");
+
     }
   }
 
@@ -124,16 +125,22 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
     super.dispose();
   }
 
+  void gameFinished() {
+    _animationController.dispose();
+    _pageController.dispose();
+  }
+
+  Future<bool?> showWarning(BuildContext context) async => showDialog(
+      barrierDismissible: true,
+      barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
+      context: context,
+      builder: (BuildContext context) {
+        return QuitModal();
+      });
+
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
-    Future<bool?> showWarning(BuildContext context) async => showDialog(
-        barrierDismissible: true,
-        barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
-        context: context,
-        builder: (BuildContext context) {
-          return QuitModal();
-        });
     return WillPopScope(
       onWillPop: () async {
         final displayDialog = await showWarning(context);
@@ -142,6 +149,13 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
       child: BlocConsumer<WebsocketCubit, WebsocketState>(
         listener: (context, websocketState) {
           ///change newPlayerJoined variable to notification alert
+          if(websocketState.eventType == "GAME_FINISHED"){
+            // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+            //   builder: (BuildContext context) => const GameLeaderboardModal(selectedGroupGame: 'Lightning Mode',),
+            // ), (Route)=>false
+            // );
+            showLeaderboardModal(context, "Lightning Mode");
+          }
           if((websocketState.eventType == "POSITION_UPDATED" && websocketState.newPlayerJoined)){
             CustomToast.removeOverlay();
             ToastManager.showCustomToast(
@@ -197,7 +211,7 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
                       hasTimer: false,
                       coinsGained:websocketState.coinsGained,
                       noOfCorrectAnswers: websocketState.noOfCorrectAnswers,
-                      durationPerQuestion: 9,
+                      durationPerQuestion: 6,
                       skipQuestion: () {
                         _moveToNextPage();
                         soundManager.playClickSound();
