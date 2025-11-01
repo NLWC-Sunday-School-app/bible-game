@@ -107,11 +107,6 @@ class GroupGameCategory extends StatelessWidget {
                                        selectedGroupGame: "Time-based Mode",
                                        inviteCode: state.createGameRoomResponse.inviteCode
                                    ),
-                                   // onTap: (){
-                                   //   Navigator.pushNamed(context,
-                                   //       AppRoutes.lightningModeQuestionScreen,
-                                   //   );
-                                   // }
                                  ),
                                )
                              ],

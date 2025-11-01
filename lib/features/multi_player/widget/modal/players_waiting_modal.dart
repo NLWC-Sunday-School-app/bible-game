@@ -263,7 +263,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                     :
                                 widget.selectedGroupGame == "First to X"?
                                 Text(
-                                    "100 pts",
+                                    "${widget.noOfQuestion??context.watch<WebsocketCubit>().state.playersJoined.totalQuestions}",
                                     style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500

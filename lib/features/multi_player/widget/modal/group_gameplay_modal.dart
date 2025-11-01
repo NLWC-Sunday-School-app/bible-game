@@ -325,6 +325,7 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                                       TextField(
                                         keyboardType: TextInputType.number,
                                         textAlign: TextAlign.center,
+                                        controller: textController,
                                         style: TextStyle(
                                             color: Color(0xFF014CA3),
                                             fontWeight: FontWeight.w500),
@@ -446,7 +447,11 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                               Spacer(),
                               BlueButton(
                                 onTap: () {
-                                  lightningModeValidation();
+                                  if(widget.selectedGroupGame == ""){
+                                    lightningModeValidation();
+                                  }else if(widget.selectedGroupGame == "First to X"){
+                                    firstToXValidation();
+                                  }
                                 },
                                 buttonText: 'Create a gameplay',
                                 buttonIsLoading: false,
@@ -488,6 +493,32 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
     }else{
       BlocProvider.of<MultiplayerBloc>(context).add(ConfigureGameRoom(
           "LIGHTNING",
+          selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
+          int.parse(textController.text),
+          "BEST_OF_ROUNDS"));
+    }
+  }
+
+  void firstToXValidation(){
+    if(textController.text.isEmpty){
+      Flushbar(
+        message: 'fill up field',
+        flushbarPosition: FlushbarPosition.TOP,
+        flushbarStyle: FlushbarStyle.GROUNDED,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ).show(context);
+    }else if(int.parse(textController.text)<1000 || int.parse(textController.text) > 5000){
+      Flushbar(
+        message: 'coins is between 1000-3000',
+        flushbarPosition: FlushbarPosition.TOP,
+        flushbarStyle: FlushbarStyle.GROUNDED,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ).show(context);
+    }else{
+      BlocProvider.of<MultiplayerBloc>(context).add(ConfigureGameRoom(
+          "FIRST_TO_X",
           selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
           int.parse(textController.text),
           "BEST_OF_ROUNDS"));

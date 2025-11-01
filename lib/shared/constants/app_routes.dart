@@ -17,6 +17,7 @@ class AppRoutes {
   static const String multiplayer = 'multiplayer_home_screen';
   static const String groupGameCategory = 'group_game_category';
   static const String lightningModeQuestionScreen = 'lightning_mode_question_screen';
+  static const String firstToXQuestionScreen = 'first_to_x_question_screen';
 
   static const String myLeagueScreen = 'my_league_screen';
   static const String fantasyBibleLeagueHomeScreen = 'fbl_home_screen';

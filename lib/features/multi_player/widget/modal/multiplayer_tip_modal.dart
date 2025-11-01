@@ -18,9 +18,16 @@ void showMultiplayerTipsModal(BuildContext context, {required String gameMode}) 
       barrierColor: Colors.transparent,
       builder: (BuildContext context) {
         Timer(Duration(seconds: 3), () {
-              Navigator.pushNamed(
-                  context, AppRoutes.lightningModeQuestionScreen
-              );
+          if(gameMode == "Lightning Mode"){
+            Navigator.pushNamed(
+                context, AppRoutes.lightningModeQuestionScreen
+            );
+          }
+          if(gameMode == "First to X"){
+            Navigator.pushNamed(
+                context, AppRoutes.firstToXQuestionScreen
+            );
+          }
         });
         return Dialog(
           insetPadding: EdgeInsets.symmetric(horizontal: 10.w),

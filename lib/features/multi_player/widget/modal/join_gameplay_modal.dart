@@ -114,7 +114,17 @@ class _JoinGamePlayModalState extends State<JoinGamePlayModal> {
                     if(state.hasJoinedRoom){
                       Navigator.pop(context);
                       context.read<WebsocketCubit>().subscribeToWaitingRoom();
-                      showPlayersWaitingForHostModal(context, selectedGroupName: "Lightning Mode", inviteCode: savedInviteCode);
+                      showPlayersWaitingForHostModal(
+                          context,
+                          selectedGroupName: state.createGameRoomResponse.victoryCondition!.type == "LIGHTNING"
+                              ?
+                          "Lightning Mode"
+                              :
+                          state.createGameRoomResponse.victoryCondition!.type == "FIRST_TO_X"?
+                          "First to X":
+                          "",
+                          inviteCode: state.createGameRoomResponse.inviteCode
+                      );
                     }
                   },
                   builder: (context, state) {

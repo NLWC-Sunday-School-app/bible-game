@@ -83,6 +83,48 @@ class MultiplayerQuestionContainer extends StatelessWidget {
                   CoinsNumberBox(
                     noOfCoins: coinsGained,
                   ),
+                  SizedBox(width: 10.w,),
+                  gameMode == "First to X"?
+                  Container(
+                    height: 60.h,
+                    width: 60.h,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(ProductImageRoutes.xPoint)
+                      )
+                    ),
+                    child: Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            height: 24.h,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                              border: Border.all(
+                                color: Color(0xFFF0C38A),
+                                width: 2
+                              ),
+                              borderRadius: BorderRadius.circular(20)
+                            ),
+                            child: Center(
+                              child: Text(
+                                "100 pts",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  )
+                  :
+                  SizedBox.shrink(),
+
                   // hasTimer!
                   //     ?
                   // MultiplayerQuestionClock(
@@ -237,12 +279,17 @@ class MultiplayerQuestionContainer extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+
+                          gameMode == "First to X"?
+                          SizedBox.shrink()
+                          :
                           MultiplayerQuestionNumberBox(
                             isWhoIsWho: isWhoIsWho,
                             currentQuestionNumber: currentPage.toString(),
                             totalQuestions: totalQuestions.toString(),
                             noOfCorrectQuestions: noOfCorrectAnswers.toString(),
-                          ),
+                          )
+                          ,
 
                           MultiplayerQuestionCountDown(
                             animationController: animationController!,

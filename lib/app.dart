@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:bible_game/features/first_to_x_mode/first_to_x_question_screen.dart';
 import 'package:bible_game/features/four_scriptures/view/tablet_view/four_scripture_question_screen_tablet_view.dart';
 import 'package:bible_game/features/global_challenge/view/tablet_view/question_screen_tablet_view.dart';
 import 'package:bible_game/features/home/view/tablet_view/profile_screen_tablet_view.dart';
@@ -272,7 +273,8 @@ class _AppState extends State<App> {
 
             AppRoutes.multiplayer: (context) => MultiplayerHomeScreen(),
             AppRoutes.groupGameCategory: (context) => GroupGameCategory(),
-            AppRoutes.lightningModeQuestionScreen: (context) => LightningModeQuestionScreen()
+            AppRoutes.lightningModeQuestionScreen: (context) => LightningModeQuestionScreen(),
+            AppRoutes.firstToXQuestionScreen: (context) => FirstToXQuestionScreen()
           },
           home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),

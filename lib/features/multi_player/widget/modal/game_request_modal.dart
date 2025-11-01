@@ -57,7 +57,11 @@ class _GameRequestModalState extends State<GameRequestModal> {
                   context,
                   selectedGroupName: state.createGameRoomResponse.victoryCondition!.type == "LIGHTNING"
                       ?
-                  "Lightning Mode":"",
+                  "Lightning Mode"
+                      :
+                  state.createGameRoomResponse.victoryCondition!.type == "FIRST_TO_X"?
+                  "First to X":
+                  "",
                   inviteCode: state.createGameRoomResponse.inviteCode
               );
             }

@@ -51,6 +51,11 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with Widg
     super.dispose();
   }
 
+  void cancelTimer() {
+    _timer?.cancel();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
@@ -128,7 +133,7 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with Widg
             ),
             GamePlayCard(
               onTap: (){
-                dispose();
+                cancelTimer();
                 BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
                 Navigator.pushNamed(context,
                     AppRoutes.groupGameCategory,
