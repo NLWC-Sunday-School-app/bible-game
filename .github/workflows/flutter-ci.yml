@@ -22,11 +22,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Android APK
-        run: flutter build apk --release
-
-      - name: Build Android App Bundle
-        run: flutter build appbundle --release
 
       - name: Build iOS IPA
         run: |
