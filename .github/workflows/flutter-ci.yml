@@ -22,6 +22,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Setup CocoaPods
+        run: |
+          cd ios
+          pod repo update
+          pod install --repo-update
+          cd ..
 
       - name: Build iOS IPA
         run: |
