@@ -31,6 +31,8 @@ class FetchUserStreakDetails extends UserEvent {}
 
 class FetchUserYearlyRecap extends UserEvent {}
 
+class FetchUserInsightYearlyRecap extends UserEvent {}
+
 class UpdateUserProfile extends UserEvent {
   final newUserName;
 

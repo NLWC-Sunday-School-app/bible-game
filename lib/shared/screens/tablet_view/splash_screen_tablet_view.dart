@@ -57,6 +57,8 @@ class _SplashScreenTabletViewState extends State<SplashScreenTabletView> {
                           .add(FetchUserStreakDetails());
                       BlocProvider.of<UserBloc>(context)
                           .add(FetchUserYearlyRecap());
+                      BlocProvider.of<UserBloc>(context)
+                          .add(FetchUserInsightYearlyRecap());
                       // Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home,
                       //     (Route<dynamic> route) => false);
                     }
@@ -115,6 +117,7 @@ class _SplashScreenTabletViewState extends State<SplashScreenTabletView> {
            BlocProvider.of<PilgrimProgressBloc>(context)
                .add(FetchPilgrimProgressLevelData());
            BlocProvider.of<UserBloc>(context).add(FetchUserYearlyRecap());
+           BlocProvider.of<UserBloc>(context).add(FetchUserInsightYearlyRecap());
            // BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
            Navigator.pushNamedAndRemoveUntil(
                context, AppRoutes.home, (Route<dynamic> route) => false);

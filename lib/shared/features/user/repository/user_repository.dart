@@ -1,4 +1,5 @@
 import 'package:bible_game_api/bible_game_api.dart';
+import 'package:bible_game_api/model/insight_recap.dart';
 import 'package:bible_game_api/model/pilgrim_progress_level_data.dart';
 
 class UserRepository {
@@ -43,6 +44,10 @@ class UserRepository {
 
   Future<Map<String, dynamic>> getUserYearlyRecap(userId) async {
     return await userAPI.getYearRecap(userId);
+  }
+
+  Future<InsightRecap> getUserInsightYearlyRecap(userId) async {
+    return await userAPI.getYearInsightRecap(userId);
   }
 
   Future<List<Leaderboard>>getGlobalLeaderBoard(bool isLoggedIn) async{

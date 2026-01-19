@@ -1,26 +1,17 @@
 import 'dart:async';
 
 import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
-import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_leaderboard.dart';
-import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/shared/utils/custom_toast.dart';
 import 'package:bible_game/shared/widgets/multiplayer_widget/multiply_question_container.dart';
-import 'package:bible_game_api/bible_game_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
-import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
-import 'package:bible_game/shared/widgets/game_summary_modal.dart';
-import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/widgets/custom_toast.dart';
-import '../../../shared/widgets/question_container.dart';
 import '../../../shared/widgets/quit_modal.dart';
-import '../../global_challenge/widget/modal/leaderboard_modal.dart';
 
 class LightningModeQuestionScreen extends StatefulWidget {
 
@@ -34,46 +25,103 @@ class LightningModeQuestionScreen extends StatefulWidget {
 }
 
 class _LightningModeQuestionScreenState extends State<LightningModeQuestionScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver  {
   late AnimationController _animationController;
   late PageController _pageController;
-  late int _currentPage;
+  int _currentPage =0;
   late int durationPerQuestion;
   bool hasTimer = true;
   int count = 0;
   DateTime? startTime;
   bool toastFlag = false;
+  bool _isInitialized = false;
 
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //
+  //   // final arguments = (ModalRoute.of(context)?.settings.arguments ??
+  //   //     <String, dynamic>{}) as Map;
+  //   // setState(() {
+  //   //   hasTimer = arguments['hasTimer'];
+  //   // });
+  //
+  //   // final settingsBloc = BlocProvider.of<SettingsBloc>(context);
+  //   // durationPerQuestion = 8;
+  //       // int.parse(settingsBloc.state.gamePlaySettings['normal_game_speed']);
+  //
+  // }
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
 
-    // final arguments = (ModalRoute.of(context)?.settings.arguments ??
-    //     <String, dynamic>{}) as Map;
     // setState(() {
-    //   hasTimer = arguments['hasTimer'];
+    //   _lifecycleState = state.toString();
     // });
 
-    // final settingsBloc = BlocProvider.of<SettingsBloc>(context);
-    durationPerQuestion = 8;
-        // int.parse(settingsBloc.state.gamePlaySettings['normal_game_speed']);
+    switch (state) {
+      case AppLifecycleState.resumed:
+      // App is visible and responding to user input
+        print('App resumed - User is back!');
+        _onAppResumed();
+        break;
 
-    _initializeAnimationController(hasTimer);
+      case AppLifecycleState.inactive:
+      // App is inactive (transitioning or interrupted)
+      // e.g., phone call, app switcher
+        print('App inactive - Transitioning state');
+        break;
+
+      case AppLifecycleState.paused:
+      // App is not visible, running in background
+        print('App paused - Save your data here!');
+        _onAppPaused();
+        break;
+
+      case AppLifecycleState.detached:
+      // App is still in memory but detached from view
+        print('App detached - About to be terminated');
+        break;
+
+      case AppLifecycleState.hidden:
+      // App is hidden (iOS specific mostly)
+        print('App hidden');
+        break;
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     ToastManager.init(context);
-    _pageController = PageController();
-    _currentPage = 0;
+    _loadSavedStateAndInitialize(); // Load state first, then initialize
+    print("I AM INITSTATE BEING CALLED");
+  }
+
+  Future<void> _loadSavedStateAndInitialize() async {
+    // Load saved state BEFORE initializing controllers
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? savedPage = prefs.getInt('currentPage');
+
+    if (savedPage != null) {
+      _currentPage = savedPage;
+    }
+
+    // Now initialize with the correct page
+    _pageController = PageController(initialPage: _currentPage);
+    _initializeAnimationController(hasTimer);
     startTime = DateTime.now();
+
+    setState(() {
+      _isInitialized = true;
+    });
   }
 
   void _initializeAnimationController(bool hasTimer) {
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: durationPerQuestion),
+      duration: Duration(seconds: 8),
     )..addStatusListener((status) {
       if(status == AnimationStatus.dismissed){
         return;
@@ -93,6 +141,58 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
     });
     _animationController.forward();
   }
+
+  void _onAppPaused() async {
+    print('Saving data: current_page = $_currentPage');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('currentPage', _currentPage);
+    _animationController.stop();
+  }
+
+  void _onAppResumed() async {
+    print('App resumed - Refreshing data');
+
+    // Just resume the animation - state is already loaded
+    if (_animationController.status != AnimationStatus.completed) {
+      _animationController.forward();
+    }
+  }
+
+  // @override
+  // void initState() {
+  //   WidgetsBinding.instance.addObserver(this);
+  //   _initializeAnimationController(hasTimer);
+  //   super.initState();
+  //   ToastManager.init(context);
+  //   _pageController = PageController();
+  //   startTime = DateTime.now();
+  //   print("I AM INITSTATE BEING CALLED");
+  // }
+  //
+  // void _initializeAnimationController(bool hasTimer) {
+  //   _animationController = AnimationController(
+  //     vsync: this,
+  //     duration: Duration(seconds: 8),
+  //     // duration: Duration(seconds: durationPerQuestion),
+  //   )..addStatusListener((status) {
+  //     if(status == AnimationStatus.dismissed){
+  //       return;
+  //     }
+  //     if (status == AnimationStatus.completed) {
+  //       if (context.read<WebsocketCubit>().state.hasAnswered == false) {
+  //         context.read<WebsocketCubit>().sendGameAnswer(
+  //             _currentPage,
+  //             "Skipped",
+  //             startTime
+  //         );
+  //         _moveToNextPage();
+  //       }else{
+  //         _moveToNextPage();
+  //       }
+  //     }
+  //   });
+  //   _animationController.forward();
+  // }
 
   void _moveToNextPage() {
     final lightningGameState = BlocProvider.of<LightningModeBloc>(context).state;
@@ -120,14 +220,17 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _animationController.dispose();
     _pageController.dispose();
     super.dispose();
   }
 
-  void gameFinished() {
+  void gameFinished()async{
     _animationController.dispose();
     _pageController.dispose();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('currentPage');
   }
 
   Future<bool?> showWarning(BuildContext context) async => showDialog(

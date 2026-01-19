@@ -87,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .add(FetchPilgrimProgressLevelData());
       BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
       BlocProvider.of<UserBloc>(context).add(FetchUserYearlyRecap());
+      BlocProvider.of<UserBloc>(context).add(FetchUserInsightYearlyRecap());
       BlocProvider.of<AuthenticationBloc>(context)
           .add(FetchUserDataRequested());
       BlocProvider.of<GlobalChallengeBloc>(context)
@@ -268,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child:
                                             state.gamePlaySettings[
                                                             'show_recap'] ==
-                                                        "true" &&
+                                                        "false" &&
                                                     BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0
                                                 ? RecapButton()
                                                 : SizedBox());

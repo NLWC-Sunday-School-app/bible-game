@@ -1,4 +1,5 @@
 import 'package:bible_game_api/bible_game_api.dart';
+import 'package:bible_game_api/model/insight_recap.dart';
 import 'package:bible_game_api/model/pilgrim_progress_level_data.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -32,6 +33,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<InitializeWallet>(_onInitializeWallet);
     on<UpdateCountry>(_onUpdateCountry);
     on<FetchUserYearlyRecap>(_onFetchUserYearlyRecap);
+    on<FetchUserInsightYearlyRecap>(_onFetchUserInsightYearlyRecap);
   }
 
   Future<void> _onFetchGlobalLeaderBoard(
@@ -72,6 +74,15 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       var response = await _userRepository
           .getUserYearlyRecap(_authenticationBloc.state.user.id);
       emit(state.copyWith(userYearlyRecap: response));
+    } catch (_) {}
+  }
+
+  Future<void> _onFetchUserInsightYearlyRecap(
+      FetchUserInsightYearlyRecap event, Emitter<UserState> emit) async {
+    try {
+      var response = await _userRepository
+          .getUserInsightYearlyRecap(_authenticationBloc.state.user.id);
+      emit(state.copyWith(userInsightYearlyRecap: response));
     } catch (_) {}
   }
 

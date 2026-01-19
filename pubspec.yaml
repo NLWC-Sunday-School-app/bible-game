@@ -49,6 +49,7 @@ dependencies:
   get_storage: ^2.0.3
 #  assets_audio_player: ^3.0.5
   confetti: ^0.7.0
+  intl: ^0.19.0
   http: ^0.13.5
   firebase_core: ^2.25.4
   firebase_crashlytics: ^3.4.15
@@ -155,6 +156,7 @@ flutter:
    - assets/images/product/pilgrim_progress/
    - assets/images/product/four_scripture/
    - assets/images/product/recap/
+   - assets/images/product/recap/2025/
    - assets/images/flags/
    - assets/sounds/
    - assets/js/
