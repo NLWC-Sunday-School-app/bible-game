@@ -269,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child:
                                             state.gamePlaySettings[
                                                             'show_recap'] ==
-                                                        "false" &&
+                                                        "true" &&
                                                     BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0
                                                 ? RecapButton()
                                                 : SizedBox());

@@ -374,33 +374,33 @@ class _RecapHomeScreenState extends State<RecapHomeScreen> with SingleTickerProv
                           return RecapFiveScreen();
                         case 5:
                           return const RecapSixScreen();
+                        // case 6:
+                        //   return const RecapSevenScreen();
                         case 6:
-                          return const RecapSevenScreen();
-                        case 7:
                           return const RecapEightScreen();
-                        case 8:
+                        case 7:
                           return const RecapNineScreen();
-                        case 9:
+                        case 8:
                           return const RecapTenScreen();
-                        case 10:
+                        case 9:
                           return const RecapElevenScreen();
-                        case 11:
+                        case 10:
                           return const RecapTwelveScreen();
-                        case 12:
+                        case 11:
                           return const RecapThirteenScreen();
-                        case 13:
+                        case 12:
                           return const RecapFourteenScreen();
-                        case 14:
+                        case 13:
                           return const RecapFifteenScreen();
-                        case 15:
+                        case 14:
                           return const RecapSixteenScreen();
-                        case 16:
+                        case 15:
                           return const RecapSeventeenScreen();
-                        case 17:
+                        case 16:
                           return const RecapEighteenScreen();
-                        case 18:
+                        case 17:
                           return const RecapNineteenScreen();
-                        case 19:
+                        case 18:
                           return const RecapTwentyScreen();
                       }
                       return const SizedBox.shrink();

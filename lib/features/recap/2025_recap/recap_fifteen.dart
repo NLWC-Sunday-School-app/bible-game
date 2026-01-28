@@ -136,8 +136,8 @@ class RecapFifteenScreen extends StatelessWidget {
                     angle: -pi/40,
                     child: LeaderboardCard(
                       userId: BlocProvider.of<AuthenticationBloc>(context).state.user.id,
-                      position: state
-                          .countryLeaderboard!.indexWhere((board) => board.userId == BlocProvider.of<AuthenticationBloc>(context).state.user.id),
+                      position: (state
+                          .countryLeaderboard!.indexWhere((board) => board.userId == BlocProvider.of<AuthenticationBloc>(context).state.user.id) + 1),
                       userName: BlocProvider.of<AuthenticationBloc>(context).state.user.name,
                       // userBadge:
                       //     ProductImageRoutes.defaultBadge,

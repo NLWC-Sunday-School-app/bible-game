@@ -101,7 +101,7 @@ class RecapFiveScreen extends StatelessWidget {
                   children: [
                     Spacer(),
                     Text(
-                      '${formatUserTopGameMode(state.userYearlyRecap['user_top_game_mode'])} was your\nbattlefield',
+                      '${formatUserTopGameMode(state.userInsightYearlyRecap!.userTopGameMode!)} was your\nbattlefield',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20.sp,
@@ -111,18 +111,28 @@ class RecapFiveScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 36.h,),
+                    // Text(
+                    //   '65%',
+                    //   textAlign: TextAlign.center,
+                    //   style: TextStyle(
+                    //     fontSize: 64.sp,
+                    //     fontFamily: 'Mikado',
+                    //     color: Colors.white,
+                    //     fontWeight: FontWeight.w900,
+                    //   ),
+                    // ),
                     Text(
-                      '65%',
+                      'in most',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 64.sp,
+                        fontSize: 44.sp,
                         fontFamily: 'Mikado',
                         color: Colors.white,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                     Text(
-                      '0f games',
+                      'games',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 32.sp,

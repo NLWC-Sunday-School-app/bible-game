@@ -45,7 +45,8 @@ void main() async {
   final String? userToken = await GetStorage().read('user_token');
   final ApiClient apiClient = ApiClient(
       // baseUrl: 'https://plankton-app-ikxuv.ondigitalocean.app',
-      baseUrl: 'https://api.staging.biblegame.app',
+      // baseUrl: 'https://api.staging.biblegame.app',
+      baseUrl: 'https://api.biblegame.nlwc.church',
       token: userToken ?? '');
   final TokenNotifier tokenNotifier = TokenNotifier();
 

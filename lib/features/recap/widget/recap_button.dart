@@ -19,6 +19,8 @@ class RecapButton extends StatelessWidget {
             .add(FetchUserYearlyRecap());
         BlocProvider.of<UserBloc>(context)
             .add(FetchUserInsightYearlyRecap());
+        BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(true));
+        BlocProvider.of<UserBloc>(context).add(FetchCountryLeaderBoard());
       },
       child: Container(
         height: 65.h,

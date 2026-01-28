@@ -80,7 +80,7 @@ class RecapFourScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 36.h,),
                     Text(
-                      '...that is ${state.userInsightYearlyRecap!.totalMinutesSpent!/60} hours\ngrowing in faith!',
+                      '...that is ${(state.userInsightYearlyRecap!.totalMinutesSpent!/60).toStringAsFixed(2)} hours\ngrowing in faith!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20.sp,
