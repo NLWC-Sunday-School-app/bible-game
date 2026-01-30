@@ -4,6 +4,7 @@ import 'package:bible_game_api/model/pilgrim_progress_level_data.dart';
 import 'package:bible_game_api/model/user.dart';
 import 'package:bible_game_api/model/user_recap.dart';
 import '../model/game_ads.dart';
+import '../model/insight_recap.dart';
 import '../utils/api_exception.dart';
 
 class UserAPI {
@@ -98,7 +99,19 @@ class UserAPI {
   Future<Map<String, dynamic>> getYearRecap(userId) async {
     try {
       final response = await apiClient.get('/users/recap?id=$userId');
+      print("YEARLY_RECAP: ${response.data}");
       return response.data;
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
+  Future<InsightRecap> getYearInsightRecap(userId) async {
+    try {
+      final response = await apiClient.get('/insights/recap/2025?id=$userId');
+      print("INSIGHTRECAP: ${response.data}");
+      return InsightRecap.fromJson(response.data);
     } on ApiException catch (e) {
       final errorMessage = e.toString();
       throw errorMessage;

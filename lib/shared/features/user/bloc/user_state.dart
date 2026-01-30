@@ -10,6 +10,7 @@ class UserState extends Equatable {
   final bool isFetchingCountryLeaderboard;
   final Map<String, dynamic> userStreakDetails;
   final Map<String, dynamic> userYearlyRecap;
+  final InsightRecap? userInsightYearlyRecap;
   final bool isUpdatingProfile;
   final bool updatedProfile;
   final bool failedToUpdate;
@@ -30,6 +31,7 @@ class UserState extends Equatable {
       this.countryLeaderboard = const [],
       this.userStreakDetails = const {},
       this.userYearlyRecap = const {},
+      this.userInsightYearlyRecap,
       this.isUpdatingProfile = false,
       this.updatedProfile = false,
       this.failedToUpdate = false,
@@ -38,7 +40,8 @@ class UserState extends Equatable {
       this.isOnboardingCollaborator = false,
       this.hasSentCollaboratorMail = false,
       this.isUpdatingCountry = false,
-      this.hasUpdatedCountry = false});
+      this.hasUpdatedCountry = false
+      });
 
   UserState copyWith(
       {List<PilgrimProgressLevelData>? pilgrimProgressDetails,
@@ -48,6 +51,7 @@ class UserState extends Equatable {
       List<Leaderboard>? countryLeaderboard,
       Map<String, dynamic>? userStreakDetails,
       Map<String, dynamic>? userYearlyRecap,
+      InsightRecap? userInsightYearlyRecap,
       bool? isUpdatingProfile,
       bool? updatedProfile,
       bool? failedToUpdate,
@@ -68,6 +72,7 @@ class UserState extends Equatable {
         countryLeaderboard: countryLeaderboard ?? this.countryLeaderboard,
         userStreakDetails: userStreakDetails ?? this.userStreakDetails,
         userYearlyRecap: userYearlyRecap ?? this.userYearlyRecap,
+        userInsightYearlyRecap: userInsightYearlyRecap??this.userInsightYearlyRecap,
         isUpdatingProfile: isUpdatingProfile ?? this.isUpdatingProfile,
         updatedProfile: updatedProfile ?? this.updatedProfile,
         failedToUpdate: failedToUpdate ?? this.failedToUpdate,
@@ -90,6 +95,7 @@ class UserState extends Equatable {
         countryLeaderboard,
         userStreakDetails,
         userYearlyRecap,
+        userInsightYearlyRecap,
         isUpdatingProfile,
         updatedProfile,
         failedToUpdate,

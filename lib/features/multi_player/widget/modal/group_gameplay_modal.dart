@@ -447,7 +447,7 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                               Spacer(),
                               BlueButton(
                                 onTap: () {
-                                  if(widget.selectedGroupGame == ""){
+                                  if(widget.selectedGroupGame == "Lightning Mode"){
                                     lightningModeValidation();
                                   }else if(widget.selectedGroupGame == "First to X"){
                                     firstToXValidation();

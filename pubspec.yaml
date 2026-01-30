@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 2.2.10+29
+version: 2.2.12+31
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -37,7 +37,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   device_info_plus: ^9.1.2
-  carousel_slider: ^4.2.1
+  carousel_slider: ^5.0.0
   cached_network_image: ^3.3.1
   another_flushbar: ^1.12.30
   shared_preferences: ^2.2.3
@@ -49,30 +49,31 @@ dependencies:
   get_storage: ^2.0.3
 #  assets_audio_player: ^3.0.5
   confetti: ^0.7.0
-  http: ^0.13.5
-  firebase_core: ^2.25.4
-  firebase_crashlytics: ^3.4.15
+  intl: ^0.20.0
+  http: ^1.0.0
+  firebase_core: ^3.8.0
+  firebase_crashlytics: ^4.2.0
   flutter_native_splash: ^2.2.16
   shimmer: ^2.0.0
   show_up_animation: ^2.0.0
   percent_indicator: ^4.2.2
   animated_digit: ^3.2.1
   flutter_launcher_icons: ^0.11.0
-  fluttertoast: ^8.1.2
+  fluttertoast: ^9.0.0
   just_audio: ^0.9.30
   internet_connection_checker: ^0.0.1+4
   flutter_staggered_grid_view: ^0.6.2
   #  new_version: ^0.3.1
-  pin_code_fields: ^7.4.0
-  screenshot: ^2.1.0
+  pin_code_fields: ^8.0.1
+  screenshot: ^3.0.0
   share_plus: ^7.2.2
-  path_provider: ^2.0.13
+  path_provider: ^2.1.0
   tutorial_coach_mark: ^1.2.4
   cupertino_will_pop_scope: ^1.2.1
   upgrader: ^10.3.0
   dio: ^5.3.3
   #  new_version_plus: ^0.0.3
-  launch_review: ^3.0.1
+
   dropdown_search: ^5.0.3
   animated_svg: ^1.1.2
   lottie: ^2.3.2
@@ -89,19 +90,21 @@ dependencies:
   bible_game_api:
     path: './packages/bible_game_api'
   badges: ^3.1.2
-  awesome_notifications: ^0.9.3
-  awesome_notifications_fcm: ^0.9.3
+  awesome_notifications: ^0.10.1
+  awesome_notifications_fcm: ^0.10.1
   countries_flag: ^0.0.1
   countries_world_map: ^1.0.2
   url_launcher: ^6.3.0
   stomp_dart_client: ^2.0.0
-  flutter_js: ^0.7.0
+  flutter_js: ^0.8.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+dependency_overrides:
+  win32: ^5.5.0
 
 flutter_icons:
   android: "launcher_icon"
@@ -155,6 +158,7 @@ flutter:
    - assets/images/product/pilgrim_progress/
    - assets/images/product/four_scripture/
    - assets/images/product/recap/
+   - assets/images/product/recap/2025/
    - assets/images/flags/
    - assets/sounds/
    - assets/js/

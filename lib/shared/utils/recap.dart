@@ -1,3 +1,5 @@
+import 'package:bible_game/shared/constants/image_routes.dart';
+
 String formatUserTopGameMode (String word){
   if(word == 'WHOISWHO'){
     return 'Who is Who';
@@ -7,6 +9,30 @@ String formatUserTopGameMode (String word){
     return 'Pilgrim Progress';
   }else {
     return '4 Scriptures 1 Word';
+  }
+}
+
+String formatUser2025TopGameModeImageBck(String word){
+  if(word == 'WHOISWHO'){
+    return ProductImageRoutes.recapFiveWiwBlur;
+  }else if(word == 'QUICK_GAME'){
+    return ProductImageRoutes.recapFiveQgBlur;
+  }else if (word == 'PILGRIM_PROGRESS'){
+    return ProductImageRoutes.recapFivePgBlur;
+  }else {
+    return ProductImageRoutes.recapFiveSowBlur;
+  }
+}
+
+String formatUser2025TopGameModeImageContainer(String word){
+  if(word == 'WHOISWHO'){
+    return ProductImageRoutes.recapFiveWiw;
+  }else if(word == 'QUICK_GAME'){
+    return ProductImageRoutes.recapFiveQg;
+  }else if (word == 'PILGRIM_PROGRESS'){
+    return ProductImageRoutes.recapFivePg;
+  }else {
+    return ProductImageRoutes.recapFiveSow;
   }
 }
 
