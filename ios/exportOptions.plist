@@ -17,7 +17,7 @@
     <key>provisioningProfiles</key>
     <dict>
         <key>com.nlwc.bible.game</key>
-        <string>YOUR_PROVISIONING_PROFILE_NAME</string>
+        <string>Xcode Managed Profile</string>
     </dict>
 </dict>
 </plist>

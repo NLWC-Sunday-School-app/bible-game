@@ -115,30 +115,68 @@ When you push a version tag, the builds will automatically:
 - Run `dart format .` to fix formatting
 - Ensure all tests pass with `flutter test`
 
-## Advanced: Deploy to Stores
+## Automated Deployment to Stores
 
-### Android - Google Play
+Both Android and iOS workflows now include **automatic deployment** when you push version tags.
 
-Add Fastlane or use Google Play Console API:
-```yaml
-- name: Deploy to Play Store
-  uses: r0adkll/upload-google-play@v1
-  with:
-    serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
-    packageName: com.nlwc.bible.game
-    releaseFiles: build/app/outputs/bundle/release/app-release.aab
-    track: internal
-```
+### Android - Google Play Store
 
-### iOS - App Store
+**Status**: ✅ Enabled and configured
 
-Use Fastlane:
-```yaml
-- name: Deploy to App Store
-  run: |
-    cd ios
-    fastlane release
-```
+The workflow automatically deploys to Google Play's **internal testing track** after a successful build.
+
+**Required Secrets** (already configured):
+- `PLAY_STORE_SERVICE_ACCOUNT_JSON`: Service account JSON from Google Play Console
+
+**How it works**:
+1. Push a version tag: `git tag v2.2.14 && git push origin v2.2.14`
+2. Workflow builds the AAB with auto-incremented version code
+3. Automatically uploads to Play Store internal track
+4. Build appears in Google Play Console → Internal testing
+
+### iOS - TestFlight
+
+**Status**: ⚠️ Requires setup (see below)
+
+The workflow automatically deploys to TestFlight after a successful build.
+
+**Required Secrets** (need to be added):
+- `APP_STORE_CONNECT_ISSUER_ID`: From App Store Connect → Users and Access → Integrations
+- `APP_STORE_CONNECT_KEY_ID`: API Key ID from App Store Connect
+- `APP_STORE_CONNECT_KEY_BASE64`: Base64-encoded .p8 API key file
+
+**Setup Instructions**:
+
+1. **Create App Store Connect API Key**:
+   - Go to [App Store Connect](https://appstoreconnect.apple.com)
+   - Navigate to **Users and Access** → **Integrations** tab
+   - Click **+** to generate a new API key
+   - Name: `GitHub Actions CI/CD`
+   - Access: **App Manager**
+   - Download the `.p8` file (you can only do this once!)
+   - Note the **Issuer ID** and **Key ID**
+
+2. **Convert .p8 to Base64**:
+   ```bash
+   base64 -i ~/Downloads/AuthKey_XXXXXXXXXX.p8 | pbcopy
+   ```
+
+3. **Add GitHub Secrets**:
+   - Go to repository Settings → Secrets and variables → Actions
+   - Add the three secrets listed above
+
+4. **Update Provisioning Profile Name**:
+   - Open `ios/ExportOptions.plist`
+   - Replace `YOUR_PROVISIONING_PROFILE_NAME` with your actual profile name
+   - Find your profile name in Xcode (Signing & Capabilities) or Apple Developer Portal
+
+**How it works**:
+1. Push a version tag: `git tag v2.2.14 && git push origin v2.2.14`
+2. Workflow builds the IPA with auto-incremented build number
+3. Automatically uploads to TestFlight
+4. Build appears in App Store Connect → TestFlight (processing takes 5-10 minutes)
+
+**Detailed Setup Guide**: See the comprehensive [iOS Setup Guide](ios-setup-guide.md) for step-by-step instructions.
 
 ## Security Notes
 
@@ -147,6 +185,7 @@ Use Fastlane:
 - Keystore files (.jks, .keystore)
 - Certificates (.p12)
 - Provisioning profiles (.mobileprovision)
+- App Store Connect API keys (.p8)
 - API keys or secrets
 
 ✅ **Always:**

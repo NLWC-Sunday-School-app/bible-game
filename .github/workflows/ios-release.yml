@@ -1,0 +1,106 @@
+name: iOS Release Build
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.0.0
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'  # Match your local version
+          channel: 'stable'
+          
+      - name: Get dependencies
+        run: flutter pub get
+        
+      - name: Extract and increment version
+        id: version
+        run: |
+          # Extract version from pubspec.yaml (e.g., "2.2.14+32")
+          VERSION_LINE=$(grep "^version:" pubspec.yaml | head -n 1)
+          VERSION_FULL=$(echo $VERSION_LINE | sed 's/version: //')
+          
+          # Split into version name and version code
+          VERSION_NAME=$(echo $VERSION_FULL | cut -d'+' -f1)
+          VERSION_CODE=$(echo $VERSION_FULL | cut -d'+' -f2)
+          
+          # Increment version code
+          NEW_VERSION_CODE=$((VERSION_CODE + 1))
+          
+          echo "Original version: $VERSION_NAME+$VERSION_CODE"
+          echo "New version: $VERSION_NAME+$NEW_VERSION_CODE"
+          
+          # Export for use in subsequent steps
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "full_version=$VERSION_NAME+$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+        
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+          cd ..
+          
+      - name: Import Code Signing Certificates
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          p12-password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          
+      - name: Download Provisioning Profile
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          
+      - name: Build iOS IPA
+        run: |
+          flutter build ipa --release \
+            --build-name=${{ steps.version.outputs.version_name }} \
+            --build-number=${{ steps.version.outputs.version_code }} \
+            --export-options-plist=ios/ExportOptions.plist
+        
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release
+          path: build/ios/ipa/*.ipa
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: build/ios/ipa/*.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-to-testflight:
+    needs: build-ios
+    runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-release
+          
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-path: '*.ipa'
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_KEY_BASE64 }}
