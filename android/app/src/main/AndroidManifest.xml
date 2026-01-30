@@ -22,6 +22,12 @@
         android:label="Bible Game"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
+        
+        <!-- Support for 16KB page size (required by Google Play) -->
+        <property
+            android:name="android.app.property.SUPPORTS_16KB_PAGE_SIZES"
+            android:value="true" />
+            
         <activity
             android:name=".MainActivity"
             android:exported="true"
