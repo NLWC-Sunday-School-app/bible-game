@@ -29,6 +29,28 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
         
+      - name: Extract and increment version
+        id: version
+        run: |
+          # Extract version from pubspec.yaml (e.g., "2.2.12+32")
+          VERSION_LINE=$(grep "^version:" pubspec.yaml | head -n 1)
+          VERSION_FULL=$(echo $VERSION_LINE | sed 's/version: //')
+          
+          # Split into version name and version code
+          VERSION_NAME=$(echo $VERSION_FULL | cut -d'+' -f1)
+          VERSION_CODE=$(echo $VERSION_FULL | cut -d'+' -f2)
+          
+          # Increment version code
+          NEW_VERSION_CODE=$((VERSION_CODE + 1))
+          
+          echo "Original version: $VERSION_NAME+$VERSION_CODE"
+          echo "New version: $VERSION_NAME+$NEW_VERSION_CODE"
+          
+          # Export for use in subsequent steps
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "full_version=$VERSION_NAME+$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+        
       - name: Decode keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > game-keystore.jks
@@ -44,7 +66,10 @@ jobs:
           EOF
           
       - name: Build Android App Bundle
-        run: flutter build appbundle --release
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.version_name }} \
+            --build-number=${{ steps.version.outputs.version_code }}
         
       - name: Upload App Bundle
         uses: actions/upload-artifact@v4
