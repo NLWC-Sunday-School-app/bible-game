@@ -9,6 +9,8 @@ import 'package:bible_game/shared/widgets/question_number_box.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/widgets/quit_modal.dart';
 import '../../../shared/widgets/coins_number_box.dart';
+import '../../../shared/widgets/power_up_button.dart';
+import '../../../shared/widgets/streak_counter.dart';
 import '../features/settings/bloc/settings_bloc.dart';
 
 typedef OptionSelectedCallback = void Function(int selectedOption);
@@ -32,6 +34,12 @@ class QuestionContainer extends StatelessWidget {
     this.durationPerQuestion = 0,
     this.noOfCorrectAnswers = 0,
     required this.gameMode,
+    this.streakCount = 0,
+    this.fiftyFiftyUsed = false,
+    this.eliminatedOptionIndices = const [],
+    this.onFiftyFiftyTap,
+    this.fiftyFiftyCost = 20,
+    this.fiftyFiftyIsFree = false,
   });
 
   final GameQuestion gameQuestion;
@@ -50,6 +58,12 @@ class QuestionContainer extends StatelessWidget {
   final int? durationPerQuestion;
   final int? noOfCorrectAnswers;
   final String gameMode;
+  final int streakCount;
+  final bool fiftyFiftyUsed;
+  final List<int> eliminatedOptionIndices;
+  final VoidCallback? onFiftyFiftyTap;
+  final int fiftyFiftyCost;
+  final bool fiftyFiftyIsFree;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +78,6 @@ class QuestionContainer extends StatelessWidget {
       )),
       child: Column(
         children: [
-
           Container(
               child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -91,33 +104,40 @@ class QuestionContainer extends StatelessWidget {
               )
             ],
           )),
-          SizedBox(
-            height: 15.h,
-          ),
+          SizedBox(height: 4.h),
+          // Streak counter — only shown in non-WhoIsWho modes
+          if (!(isWhoIsWho ?? false))
+            Center(child: StreakCounter(streakCount: streakCount)),
+          SizedBox(height: streakCount >= 2 ? 4.h : 11.h),
           QuestionBox(
             isWhoIsWho: isWhoIsWho,
             instruction: gameQuestion.instruction,
             question: gameQuestion.question,
           ),
-          SizedBox(
-            height: 15.h,
-          ),
+          SizedBox(height: 15.h),
           ...List.generate(gameQuestion.options.length, (index) {
+            final isEliminated = eliminatedOptionIndices.contains(index);
             final isSelected = selectedOptionIndex == index;
             final isCorrect = isSelected ? isCorrectAnswer : null;
-            return OptionButton(
-              text: gameQuestion.options[index],
-              correctAnswer: gameQuestion.answer,
-              index: index,
-              onTap: () {
-                optionSelectedCallback(index);
-              },
-              isSelected: isSelected,
-              isCorrect: isCorrect,
-              hasAnswered: hasAnswered,
+            return Opacity(
+              opacity: isEliminated ? 0.3 : 1.0,
+              child: IgnorePointer(
+                ignoring: isEliminated,
+                child: OptionButton(
+                  text: gameQuestion.options[index],
+                  correctAnswer: gameQuestion.answer,
+                  index: index,
+                  onTap: () {
+                    optionSelectedCallback(index);
+                  },
+                  isSelected: isSelected,
+                  isCorrect: isCorrect,
+                  hasAnswered: hasAnswered,
+                ),
+              ),
             );
           }),
-          Spacer(),
+          const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -131,8 +151,20 @@ class QuestionContainer extends StatelessWidget {
                   width: 64.w,
                 ),
               ),
+              // Power-up buttons (only in non-WhoIsWho modes)
+              if (!(isWhoIsWho ?? false) && onFiftyFiftyTap != null)
+                PowerUpButton(
+                  label: '50/50',
+                  subLabel: fiftyFiftyIsFree ? 'Free' : '-$fiftyFiftyCost coins',
+                  isUsed: fiftyFiftyUsed,
+                  hasEnoughCoins: fiftyFiftyIsFree ? true : coinsGained >= fiftyFiftyCost,
+                  onTap: () {
+                    soundManager.playClickSound();
+                    onFiftyFiftyTap!();
+                  },
+                ),
               isWhoIsWho!
-                  ? SizedBox()
+                  ? const SizedBox()
                   : GestureDetector(
                       onTap: skipQuestion,
                       child: Image.asset(
@@ -142,9 +174,7 @@ class QuestionContainer extends StatelessWidget {
                     )
             ],
           ),
-          SizedBox(
-            height: 30.h,
-          ),
+          SizedBox(height: 30.h),
         ],
       ),
     );

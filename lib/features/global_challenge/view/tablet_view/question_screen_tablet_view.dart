@@ -113,7 +113,7 @@ class _GlobalQuestionScreenTabletViewState extends State<GlobalQuestionScreenTab
         barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
         context: context,
         builder: (BuildContext context) {
-          return QuitModal();
+          return const QuitModal();
         });
     return WillPopScope(
       onWillPop: () async {

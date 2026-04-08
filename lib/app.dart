@@ -61,6 +61,12 @@ import 'package:provider/provider.dart';
 import 'package:bible_game/shared/widgets/modal/network_modal.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:upgrader/upgrader.dart';
+import 'features/daily_devotional/bloc/daily_devotional_bloc.dart';
+import 'features/daily_devotional/view/devotional_screen.dart';
+import 'features/story_mode/bloc/story_mode_bloc.dart';
+import 'features/story_mode/view/chapter_map_screen.dart';
+import 'features/story_mode/view/story_question_screen.dart';
+import 'features/story_mode/view/story_selection_screen.dart';
 import 'features/global_challenge/view/question_screen.dart';
 import 'features/multi_player/view/question_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -173,6 +179,14 @@ class _AppState extends State<App> {
                     BlocProvider.of<AuthenticationBloc>(context),
                 fantasyLeagueRepository: widget.fantasyLeagueRepository),
           ),
+          BlocProvider<DailyDevotionalBloc>(
+            create: (_) => DailyDevotionalBloc()..add(LoadDailyDevotional()),
+          ),
+          BlocProvider<StoryModeBloc>(
+            create: (context) => StoryModeBloc(
+              settingsBloc: BlocProvider.of<SettingsBloc>(context),
+            )..add(LoadStoryArcs()),
+          ),
           ChangeNotifierProvider(create: (_) => widget.tokenNotifier),
         ],
         child: MaterialApp(
@@ -233,6 +247,14 @@ class _AppState extends State<App> {
             AppRoutes.fantasyBibleLeagueHomeScreen: (context) =>
                 BottomTabNavigation(),
             AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
+            AppRoutes.dailyDevotionalScreen: (context) =>
+                const DailyDevotionalScreen(),
+            AppRoutes.storySelectionScreen: (context) =>
+                const StorySelectionScreen(),
+            AppRoutes.chapterMapScreen: (context) =>
+                const ChapterMapScreen(),
+            AppRoutes.storyQuestionScreen: (context) =>
+                const StoryQuestionScreen(),
           },
           home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),

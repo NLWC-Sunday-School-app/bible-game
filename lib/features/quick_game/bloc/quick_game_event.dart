@@ -53,3 +53,12 @@ class ClearQuickGameData extends QuickGameEvent {}
 class ShowMaximumTopicPrompt extends QuickGameEvent {}
 
 class InitializeControllers extends QuickGameEvent {}
+
+class UseFiftyFifty extends QuickGameEvent {
+  final GameQuestion gameQuestion;
+
+  const UseFiftyFifty({required this.gameQuestion});
+
+  @override
+  List<Object> get props => [gameQuestion];
+}

@@ -71,26 +71,31 @@ class ApiClient {
 
   Response _handleError(DioException error) {
     final response = error.response;
+    Map<String, dynamic> toMap(dynamic data) {
+      if (data is Map<String, dynamic>) return data;
+      return {'error': data?.toString() ?? 'An error occurred'};
+    }
+
     if (response != null) {
       switch (response.statusCode) {
         case 400:
-          throw BadRequestException(message: response.data);
+          throw BadRequestException(message: toMap(response.data));
         case 401:
-          throw UnauthorizedException(message: response.data);
+          throw UnauthorizedException(message: toMap(response.data));
         case 403:
-          throw ForbiddenException(message: response.data);
+          throw ForbiddenException(message: toMap(response.data));
         case 404:
-          throw NotFoundException(message: response.data);
+          throw NotFoundException(message: toMap(response.data));
         case 500:
-          throw InternalServerErrorException(message: response.data);
+          throw InternalServerErrorException(message: toMap(response.data));
         default:
           throw UnknownApiException(
-              code: response.statusCode!, message: response.data);
+              code: response.statusCode!, message: toMap(response.data));
       }
     } else {
       throw ApiException(
-        code: error.response?.statusCode ?? -1,
-        message: response?.data,
+        code: -1,
+        message: {'error': error.message ?? 'Network error. Check your connection.'},
       );
     }
   }

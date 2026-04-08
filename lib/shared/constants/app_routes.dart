@@ -15,4 +15,8 @@ class AppRoutes {
   static const String arcadeScreen = 'arcade_screen';
   static const String myLeagueScreen = 'my_league_screen';
   static const String fantasyBibleLeagueHomeScreen = 'fbl_home_screen';
+  static const String dailyDevotionalScreen = 'daily_devotional_screen';
+  static const String storySelectionScreen = 'story_selection_screen';
+  static const String chapterMapScreen = 'chapter_map_screen';
+  static const String storyQuestionScreen = 'story_question_screen';
 }

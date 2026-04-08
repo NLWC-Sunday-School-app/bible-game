@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
 import 'package:bible_game/features/global_challenge/repository/global_challenge_repository.dart';
+import 'package:bible_game/shared/constants/colors.dart';
+import 'package:bible_game/shared/widgets/base_question_screen.dart';
 
 import '../../../navigation/cubit/navigation_cubit.dart';
 import '../../../shared/constants/app_routes.dart';
@@ -10,7 +12,6 @@ import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/widgets/game_summary_modal.dart';
 import '../../../shared/widgets/question_container.dart';
-import '../../../shared/widgets/quit_modal.dart';
 
 class GlobalQuestionScreen extends StatefulWidget {
   final GlobalChallengeRepository globalChallengeRepository;
@@ -22,108 +23,77 @@ class GlobalQuestionScreen extends StatefulWidget {
   State<GlobalQuestionScreen> createState() => _GlobalQuestionScreenState();
 }
 
-class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late PageController _pageController;
-  late int _currentPage;
+class _GlobalQuestionScreenState
+    extends BaseQuestionScreenState<GlobalQuestionScreen> {
   late int durationPerQuestion;
-  late int gameDuration;
-
-  void _initializeAnimationController(Duration duration) {
-    _animationController = AnimationController(
-      vsync: this,
-      duration: duration,
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _moveToNextPage();
-        }
-      });
-    _animationController.forward();
-  }
-
-  void _moveToNextPage() {
-    final globalChallengeState =
-        BlocProvider.of<GlobalChallengeBloc>(context).state;
-    if (_animationController.isAnimating) {
-      _currentPage++;
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      _animationController.stop();
-      showGameSummaryModal(
-        context: context,
-        pointEarned: globalChallengeState.coinsGained!,
-        bonusPoint: globalChallengeState.totalBonusCoinsGained!,
-        noOfCorrectQuestions: globalChallengeState.noOfCorrectAnswers,
-        totalQuestions: globalChallengeState.globalChallengeQuestions!.length,
-        averageTimeQuestion: (globalChallengeState.totalTimeSpent! ~/
-                globalChallengeState.globalChallengeQuestions!.length)
-            .round(),
-        isGlobalChallenge: true,
-        isWhoIsWho: false,
-        onTap: () {
-          context.read<GlobalChallengeBloc>().add(ClearGlobalChallengeGameData());
-          Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.home
-          );
-          context.read<NavigationCubit>().selectTab(3);
-
-        },
-      );
-      _animationController.dispose();
-      BlocProvider.of<GlobalChallengeBloc>(context)
-          .add(SubmitGlobalChallengeScore());
-      Future.delayed(Duration(seconds: 2), () {
-        BlocProvider.of<AuthenticationBloc>(context)
-            .add(FetchUserDataRequested());
-        BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
-      });
-    }
-  }
+  final int gameDuration = 2;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-    _currentPage = 0;
-      gameDuration = 2;
-    final settingsBloc = BlocProvider.of<SettingsBloc>(context);
-    durationPerQuestion =
-        int.parse(settingsBloc.state.gamePlaySettings['normal_game_speed']);
-    _initializeAnimationController(Duration(minutes: gameDuration));
-
+    durationPerQuestion = int.parse(
+      BlocProvider.of<SettingsBloc>(context)
+          .state
+          .gamePlaySettings['normal_game_speed'],
+    );
+    initQuestionControllers(
+      duration: Duration(minutes: gameDuration),
+      onTimerComplete: _moveToNextPage,
+    );
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _pageController.dispose();
-    super.dispose();
+  void _moveToNextPage() {
+    final state = BlocProvider.of<GlobalChallengeBloc>(context).state;
+    advancePageByTimer(
+      onGameComplete: () {
+        showGameSummaryModal(
+          context: context,
+          pointEarned: state.coinsGained!,
+          bonusPoint: state.totalBonusCoinsGained!,
+          noOfCorrectQuestions: state.noOfCorrectAnswers,
+          totalQuestions: state.globalChallengeQuestions!.length,
+          averageTimeQuestion: (state.totalTimeSpent! ~/
+                  state.globalChallengeQuestions!.length)
+              .round(),
+          isGlobalChallenge: true,
+          isWhoIsWho: false,
+          onTap: () {
+            context
+                .read<GlobalChallengeBloc>()
+                .add(ClearGlobalChallengeGameData());
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
+            context.read<NavigationCubit>().selectTab(3);
+          },
+        );
+        BlocProvider.of<GlobalChallengeBloc>(context)
+            .add(SubmitGlobalChallengeScore());
+        Future.delayed(const Duration(seconds: 2), () {
+          if (!mounted) return;
+          BlocProvider.of<AuthenticationBloc>(context)
+              .add(FetchUserDataRequested());
+          BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
+        });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    Future<bool?> showWarning(BuildContext context) async => showDialog(
-        barrierDismissible: true,
-        barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
-        context: context,
-        builder: (BuildContext context) {
-          return QuitModal();
-        });
-    return WillPopScope(
-      onWillPop: () async {
-        final displayDialog = await showWarning(context);
-        return displayDialog ?? false;
-      },
-      child: BlocConsumer<GlobalChallengeBloc, GlobalChallengeState>(
+    return withQuitProtection(
+      BlocConsumer<GlobalChallengeBloc, GlobalChallengeState>(
+        listenWhen: (prev, curr) =>
+            prev.selectedOptionIndex != curr.selectedOptionIndex ||
+            prev.isCorrectAnswer != curr.isCorrectAnswer,
+        buildWhen: (prev, curr) =>
+            prev.selectedOptionIndex != curr.selectedOptionIndex ||
+            prev.isCorrectAnswer != curr.isCorrectAnswer ||
+            prev.hasAnswered != curr.hasAnswered ||
+            prev.coinsGained != curr.coinsGained,
         listener: (context, state) {
           if (state.selectedOptionIndex != -1 &&
               state.isCorrectAnswer != null) {
-            Future.delayed(Duration(seconds: 1), () {
+            Future.delayed(const Duration(seconds: 1), () {
+              if (!mounted) return;
               _moveToNextPage();
             });
           }
@@ -133,36 +103,31 @@ class _GlobalQuestionScreenState extends State<GlobalQuestionScreen>
             appBar: AppBar(
               elevation: 0,
               toolbarHeight: 0,
-              backgroundColor:
-                  Color(0xFF998BBC), // Set background color to transparent
+              backgroundColor: AppColors.questionScreenBar,
             ),
             body: SafeArea(
               bottom: false,
               child: PageView.builder(
                 physics: const NeverScrollableScrollPhysics(),
-                controller: _pageController,
+                controller: pageController,
                 itemCount: state.globalChallengeQuestions!.length,
-                itemBuilder: (BuildContext context, int index) {
+                itemBuilder: (context, index) {
                   return QuestionContainer(
                     gameQuestion: state.globalChallengeQuestions![index],
-                    animationController: _animationController,
-                    currentPage: _currentPage + 1,
+                    animationController: animationController,
+                    currentPage: currentPage + 1,
                     totalQuestions: state.globalChallengeQuestions!.length,
                     optionSelectedCallback: (selectedOptionIndex) {
-                      // final remainingTime =
-                      // (durationPerQuestion * (1 - _animationController.value)).toInt();
                       context.read<GlobalChallengeBloc>().add(OptionSelected(
                             selectedOptionIndex: selectedOptionIndex,
-                            gameQuestion:
-                                state.globalChallengeQuestions![index],
-                            // remainingTime: remainingTime,
+                            gameQuestion: state.globalChallengeQuestions![index],
                           ));
                     },
                     selectedOptionIndex: state.selectedOptionIndex ?? -1,
                     isCorrectAnswer: state.isCorrectAnswer ?? false,
                     hasAnswered: state.hasAnswered,
                     coinsGained: state.coinsGained!,
-                    skipQuestion: () => _moveToNextPage(),
+                    skipQuestion: _moveToNextPage,
                     durationPerQuestion: durationPerQuestion,
                     isWhoIsWho: true,
                     gameMode: 'globalchallenge',

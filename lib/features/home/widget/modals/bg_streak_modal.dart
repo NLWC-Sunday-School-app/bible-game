@@ -38,11 +38,10 @@ class BgStreakModal extends StatefulWidget {
 class _BgStreakModalState extends State<BgStreakModal> {
   late DateTime expiryTime;
   late Duration timeLeft;
-  late Timer timer;
+  Timer? timer;
   bool showTimer = false;
   bool lostStreakAfterRestoreTime = false;
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -104,7 +103,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
 
   @override
   void dispose() {
-    timer.cancel();
+    timer?.cancel();
     super.dispose();
   }
 
@@ -112,20 +111,17 @@ class _BgStreakModalState extends State<BgStreakModal> {
     final soundManager = context.read<SettingsBloc>().soundManager;
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
-        return SizedBox(
-          height: state.userStreakDetails['restoreTimeExpiry'] != null
-              ? 600.h
-              : 500.h,
+        return Container(
           width: 500.w,
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(ProductImageRoutes.streakModalBg),
-                fit: BoxFit.fill,
-              ),
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(ProductImageRoutes.streakModalBg),
+              fit: BoxFit.fill,
             ),
-            child: Column(
-              children: [
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
                 SizedBox(
                   height: 15.h,
                 ),
@@ -503,9 +499,8 @@ class _BgStreakModalState extends State<BgStreakModal> {
                 // ),
               ],
             ),
-          ),
-        );
-      },
-    );
-  }
+          );
+        },
+      );
+    }
 }

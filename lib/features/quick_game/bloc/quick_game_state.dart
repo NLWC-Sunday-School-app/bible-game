@@ -21,6 +21,10 @@ class QuickGameState extends Equatable {
   final bool hasAnswered;
   final bool quickGameCompleted;
   final int noOfCorrectAnswers;
+  final int currentStreak;
+  final int bestStreak;
+  final bool fiftyFiftyUsed;
+  final List<int> eliminatedOptionIndices;
 
   const QuickGameState({
     this.quickGameTopics = const [],
@@ -42,7 +46,11 @@ class QuickGameState extends Equatable {
     this.isCorrectAnswer,
     this.hasAnswered = false,
     this.quickGameCompleted = false,
-    this.noOfCorrectAnswers = 0
+    this.noOfCorrectAnswers = 0,
+    this.currentStreak = 0,
+    this.bestStreak = 0,
+    this.fiftyFiftyUsed = false,
+    this.eliminatedOptionIndices = const [],
   });
 
   QuickGameState copyWith({
@@ -65,7 +73,11 @@ class QuickGameState extends Equatable {
     bool? isCorrectAnswer,
     bool? hasAnswered,
     bool? quickGameCompleted,
-    int? noOfCorrectAnswers
+    int? noOfCorrectAnswers,
+    int? currentStreak,
+    int? bestStreak,
+    bool? fiftyFiftyUsed,
+    List<int>? eliminatedOptionIndices,
   }) {
     return QuickGameState(
       quickGameTopics: quickGameTopics ?? this.quickGameTopics,
@@ -91,7 +103,11 @@ class QuickGameState extends Equatable {
       isCorrectAnswer: isCorrectAnswer ?? null,
       hasAnswered: hasAnswered ?? this.hasAnswered,
       quickGameCompleted: quickGameCompleted ?? this.quickGameCompleted,
-      noOfCorrectAnswers: noOfCorrectAnswers ?? this.noOfCorrectAnswers
+      noOfCorrectAnswers: noOfCorrectAnswers ?? this.noOfCorrectAnswers,
+      currentStreak: currentStreak ?? this.currentStreak,
+      bestStreak: bestStreak ?? this.bestStreak,
+      fiftyFiftyUsed: fiftyFiftyUsed ?? this.fiftyFiftyUsed,
+      eliminatedOptionIndices: eliminatedOptionIndices ?? this.eliminatedOptionIndices,
     );
   }
 
@@ -115,6 +131,10 @@ class QuickGameState extends Equatable {
         selectedOptionIndex,
         isCorrectAnswer,
         hasAnswered,
-        quickGameCompleted
+        quickGameCompleted,
+        currentStreak,
+        bestStreak,
+        fiftyFiftyUsed,
+        eliminatedOptionIndices,
       ];
 }

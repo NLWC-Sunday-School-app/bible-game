@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bible_game_api/model/game_question.dart';
 import 'package:bible_game_api/model/quick_game_topic.dart';
 
@@ -33,6 +35,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     on<SubmitQuickGameScore>(_onSubmitQuickGameScore);
     on<ClearQuickGameData>(_onClearQuickGameData);
     on<FindQuickGameTopics>(_onFindQuickGameTopics);
+    on<UseFiftyFifty>(_onUseFiftyFifty);
   }
 
   Future<void> _onFetchQuickGameTopics(
@@ -111,74 +114,106 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     List<QuickGameTopic> selectedTopics =
         List.from(state.selectedGameTopics as Iterable);
 
+    bool reachedMax = false;
     if (selectedTopics.contains(event.topic)) {
       selectedTopics.remove(event.topic);
-      emit(state.copyWith(hasReachedMaximumTopicSelection: false));
     } else {
       if (selectedTopics.length < 4) {
         selectedTopics.add(event.topic);
       } else {
-        emit(state.copyWith(hasReachedMaximumTopicSelection: true));
+        reachedMax = true;
       }
     }
-    emit(state.copyWith(selectedGameTopics: selectedTopics, hasReachedMaximumTopicSelection: false));
+    emit(state.copyWith(
+      selectedGameTopics: selectedTopics,
+      hasReachedMaximumTopicSelection: reachedMax,
+    ));
   }
 
   void _onOptionSelected(OptionSelected event, Emitter<QuickGameState> emit) {
     final soundManager = _settingsBloc.soundManager;
     final settingsState = _settingsBloc.state;
-    if(!state.hasAnswered){
+    if (!state.hasAnswered) {
       int coinsGained = state.coinsGained ?? 0;
       int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
       int noOfCorrectAnswers = state.noOfCorrectAnswers;
+      int currentStreak = state.currentStreak;
+      int bestStreak = state.bestStreak;
       final pointsPerQuestion = int.parse(settingsState.gamePlaySettings['base_score_pilgrim_progress']);
       final durationPerQuestion = int.parse(settingsState.gamePlaySettings['normal_game_speed']);
       final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
-      final totalTimeSpent = state.totalTimeSpent!  + (durationPerQuestion - event.remainingTime);
+      final totalTimeSpent = state.totalTimeSpent! + (durationPerQuestion - event.remainingTime);
       final isCorrect = event.gameQuestion.answer == event.gameQuestion.options[event.selectedOptionIndex];
       if (isCorrect) {
         noOfCorrectAnswers++;
+        currentStreak++;
+        if (currentStreak > bestStreak) bestStreak = currentStreak;
         soundManager.playCorrectAnswerSound();
+        // Apply streak multiplier to time bonus (capped at 2x)
+        final streakMultiplier = currentStreak >= 3
+            ? (1.0 + (currentStreak * 0.1)).clamp(1.0, 2.0)
+            : 1.0;
         dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
-            halfOfTotalPointPerQuestion;
+            halfOfTotalPointPerQuestion *
+            streakMultiplier;
         coinsGained = state.coinsGained! +
             (halfOfTotalPointPerQuestion + timeBonusPoint).round();
         totalBonusCoinsGained =
             (state.totalBonusCoinsGained! + timeBonusPoint).round();
-
       } else {
+        currentStreak = 0;
         soundManager.playWrongAnswerSound();
       }
 
       emit(state.copyWith(
-          hasAnswered: true,
-          isCorrectAnswer: isCorrect,
-          correctAnswer: event.gameQuestion.answer,
-          selectedOptionIndex: event.selectedOptionIndex,
-          coinsGained: coinsGained,
-          totalBonusCoinsGained: totalBonusCoinsGained,
-          totalTimeSpent: totalTimeSpent,
-          noOfCorrectAnswers: noOfCorrectAnswers
+        hasAnswered: true,
+        isCorrectAnswer: isCorrect,
+        correctAnswer: event.gameQuestion.answer,
+        selectedOptionIndex: event.selectedOptionIndex,
+        coinsGained: coinsGained,
+        totalBonusCoinsGained: totalBonusCoinsGained,
+        totalTimeSpent: totalTimeSpent,
+        noOfCorrectAnswers: noOfCorrectAnswers,
+        currentStreak: currentStreak,
+        bestStreak: bestStreak,
       ));
-      Future.delayed(Duration(seconds: 1), (){
-        add(MoveToNextPage());
-      });
-
     }
-
   }
 
   void _onMoveToNextPage(MoveToNextPage event, Emitter<QuickGameState> emit) {
-    emit(state.copyWith(hasAnswered: false,));
+    emit(state.copyWith(
+      hasAnswered: false,
+      eliminatedOptionIndices: [],
+      fiftyFiftyUsed: false,
+    ));
     if ((state.quickGameQuestions?.length ?? 0) >
-          (state.selectedOptionIndex ?? 0) + 1) {
-        emit(state.copyWith(
-          selectedOptionIndex: null,
-          isCorrectAnswer: null,
-          correctAnswer: null,
+        (state.selectedOptionIndex ?? 0) + 1) {
+      emit(state.copyWith(
+        selectedOptionIndex: null,
+        isCorrectAnswer: null,
+        correctAnswer: null,
+      ));
+    }
+  }
 
-        ));
-      }
+  void _onUseFiftyFifty(UseFiftyFifty event, Emitter<QuickGameState> emit) {
+    if (state.fiftyFiftyUsed || state.hasAnswered) return;
+
+    final options = event.gameQuestion.options;
+    final correctAnswer = event.gameQuestion.answer;
+    final wrongIndices = <int>[];
+    for (int i = 0; i < options.length; i++) {
+      if (options[i] != correctAnswer) wrongIndices.add(i);
+    }
+    wrongIndices.shuffle(Random());
+    final toEliminate = wrongIndices.take(2).toList();
+
+    _settingsBloc.soundManager.playClickSound();
+
+    emit(state.copyWith(
+      fiftyFiftyUsed: true,
+      eliminatedOptionIndices: toEliminate,
+    ));
   }
 
   Future<void> _onFindQuickGameTopics(

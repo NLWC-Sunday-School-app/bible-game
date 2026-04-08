@@ -13,7 +13,9 @@ import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.
 import 'package:bible_game/features/store/view/home_screen.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:bible_game/shared/data/church_history_facts.dart';
 import 'package:bible_game/shared/widgets/modal/country_update_modal.dart';
+import 'package:bible_game/shared/widgets/modal/did_you_know_modal.dart';
 import 'package:bible_game/shared/widgets/modal/welcome_modal.dart';
 import '../../features/home/view/home_screen.dart';
 import '../../shared/constants/image_routes.dart';
@@ -103,12 +105,35 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
     }
   }
 
+  displayDidYouKnowModal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final firstTime = prefs.getBool('first_time') ?? true;
+    if (firstTime) return; // skip on very first session
+
+    final today = DateTime.now();
+    final todayStr =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final lastShown = prefs.getString('did_you_know_last_shown_date') ?? '';
+
+    if (lastShown != todayStr) {
+      final dayOfYear = today.difference(DateTime(today.year, 1, 1)).inDays;
+      final fact = ChurchHistoryFacts
+          .facts[dayOfYear % ChurchHistoryFacts.facts.length];
+      await prefs.setString('did_you_know_last_shown_date', todayStr);
+      Timer(const Duration(seconds: 4), () {
+        if (!mounted) return;
+        showDidYouKnowModal(context, fact);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-   displayWelcomeModal();
-   displayCountryUpdateModal();
-   checkInternet(context);
+    displayWelcomeModal();
+    displayCountryUpdateModal();
+    displayDidYouKnowModal();
+    checkInternet(context);
   }
 
   Widget  _bottomNavigationBar(BuildContext context, int _selectedTabIndex) {

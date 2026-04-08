@@ -30,7 +30,90 @@ import '../../pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
 import '../../recap/home.dart';
 import '../widget/user_profile_info.dart';
 import 'package:intl/intl.dart';
+import 'package:bible_game/features/daily_devotional/bloc/daily_devotional_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+// ---------------------------------------------------------------------------
+// Game card data model
+// ---------------------------------------------------------------------------
+
+class _GameEntry {
+  final Color bgColor;
+  final String gameType;
+  final String gameText;
+  final String gameImage;
+  final double smallWidth;
+  final double mediumWidth;
+  final double largeWidth;
+  final String route;
+  final Object? routeArguments;
+
+  const _GameEntry({
+    required this.bgColor,
+    required this.gameType,
+    required this.gameText,
+    required this.gameImage,
+    required this.smallWidth,
+    required this.mediumWidth,
+    required this.largeWidth,
+    required this.route,
+    this.routeArguments,
+  });
+}
+
+const _gameEntries = [
+  _GameEntry(
+    bgColor: AppColors.storyModeGameCard,
+    gameType: 'Story Mode',
+    gameText: 'Journey through Bible narratives!',
+    gameImage: ProductImageRoutes.scroll,
+    smallWidth: 70,
+    mediumWidth: 80,
+    largeWidth: 90,
+    route: AppRoutes.storySelectionScreen,
+  ),
+  _GameEntry(
+    bgColor: AppColors.primaryColor,
+    gameType: 'Quick Game',
+    gameText: 'Play on your own terms!',
+    gameImage: ProductImageRoutes.crossBible,
+    smallWidth: 80,
+    mediumWidth: 95,
+    largeWidth: 100,
+    route: AppRoutes.quickGameHomeScreen,
+  ),
+  _GameEntry(
+    bgColor: AppColors.wiwGameCard,
+    gameType: 'Who is Who',
+    gameText: 'Learn Bible names & stories!',
+    gameImage: ProductImageRoutes.wiwMask,
+    smallWidth: 70,
+    mediumWidth: 84,
+    largeWidth: 90,
+    route: AppRoutes.whoIsWhoHomeScreen,
+  ),
+  _GameEntry(
+    bgColor: AppColors.pilgrimProgressGameCard,
+    gameType: 'Pilgrim Progress',
+    gameText: 'Journey through the Bible!',
+    gameImage: ProductImageRoutes.mountain,
+    smallWidth: 60,
+    mediumWidth: 70,
+    largeWidth: 90,
+    route: AppRoutes.pilgrimProgressHomeScreen,
+  ),
+  _GameEntry(
+    bgColor: AppColors.fourScripturesGameCard,
+    gameType: '4 Scriptures, 1 Word',
+    gameText: 'Journey through the Bible!',
+    gameImage: ProductImageRoutes.scroll,
+    smallWidth: 70,
+    mediumWidth: 75,
+    largeWidth: 80,
+    route: AppRoutes.questionLoadingScreen,
+    routeArguments: {'gameType': 'four_scriptures_game'},
+  ),
+];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -169,8 +252,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color(0xFF548CD7),
+      backgroundColor: AppColors.homeAppBar,
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        buildWhen: (prev, curr) => prev.user != curr.user,
         builder: (context, state) {
           return UpgradeAlert(
             showIgnore: false,
@@ -263,6 +347,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       )
                                     : SizedBox(),
                                 BlocBuilder<SettingsBloc, SettingsState>(
+                                  buildWhen: (prev, curr) =>
+                                      prev.gamePlaySettings['show_recap'] !=
+                                      curr.gamePlaySettings['show_recap'],
                                   builder: (context, state) {
                                     return SizedBox(
                                         child:
@@ -274,96 +361,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 : SizedBox());
                                   },
                                 ),
-                                SizedBox(
-                                  height: 10.h,
-                                ),
-                                GameCard(
-                                  bgColor: AppColors.primaryColor,
-                                  gameType: 'Quick Game',
-                                  gameText: 'Play on your own terms!',
-                                  gameImage: ProductImageRoutes.crossBible,
-                                  gameImageWidth: screenWidth <= 380
-                                      ? 80.w
-                                      : screenWidth > 380 && screenWidth < 430
-                                          ? 95.w
-                                          : 100.w,
-                                  onTap: () {
-                                    soundManager.playClickSound();
-                                    if (state.user.id != 0) {
-                                      Navigator.pushNamed(context,
-                                          AppRoutes.quickGameHomeScreen);
-                                    } else {
-                                      Navigator.pushNamed(
-                                          context, AppRoutes.profileScreen);
-                                    }
-                                  },
-                                ),
-                                GameCard(
-                                  bgColor: AppColors.wiwGameCard,
-                                  gameType: 'Who is Who',
-                                  gameText: 'Learn Bible names & stories!',
-                                  gameImage: ProductImageRoutes.wiwMask,
-                                  gameImageWidth: screenWidth <= 380
-                                      ? 70.w
-                                      : screenWidth > 380 && screenWidth < 430
-                                          ? 84.w
-                                          : 90.w,
-                                  onTap: () {
-                                    soundManager.playClickSound();
-                                    if (state.user.id != 0) {
-                                      Navigator.pushNamed(context,
-                                          AppRoutes.whoIsWhoHomeScreen);
-                                    } else {
-                                      Navigator.pushNamed(
-                                          context, AppRoutes.profileScreen);
-                                    }
-                                  },
-                                ),
-                                GameCard(
-                                  bgColor: AppColors.pilgrimProgressGameCard,
-                                  gameType: 'Pilgrim Progress',
-                                  gameText: 'Journey through the Bible!',
-                                  gameImage: ProductImageRoutes.mountain,
-                                  gameImageWidth: screenWidth <= 380
-                                      ? 60.w
-                                      : screenWidth > 380 && screenWidth < 430
-                                          ? 70.w
-                                          : 90.w,
-                                  onTap: () {
-                                    soundManager.playClickSound();
-                                    if (state.user.id != 0) {
-                                      Navigator.pushNamed(context,
-                                          AppRoutes.pilgrimProgressHomeScreen);
-                                    } else {
-                                      Navigator.pushNamed(
-                                          context, AppRoutes.profileScreen);
-                                    }
-                                  },
-                                ),
-                                GameCard(
-                                  bgColor: AppColors.fourScripturesGameCard,
-                                  gameType: '4 Scriptures, 1 Word',
-                                  gameText: 'Journey through the Bible!',
-                                  gameImage: ProductImageRoutes.scroll,
-                                  gameImageWidth: screenWidth <= 380
-                                      ? 70.w
-                                      : screenWidth > 380 && screenWidth < 430
-                                          ? 75.w
-                                          : 80.w,
-                                  onTap: () {
-                                    soundManager.playClickSound();
-                                    if (state.user.id != 0) {
-                                      Navigator.pushNamed(context,
-                                          AppRoutes.questionLoadingScreen,
-                                          arguments: {
-                                            'gameType': 'four_scriptures_game'
-                                          });
-                                    } else {
-                                      Navigator.pushNamed(
-                                          context, AppRoutes.profileScreen);
-                                    }
-                                  },
-                                ),
+                                SizedBox(height: 10.h),
+                                _DailyDevotionalBanner(),
+                                SizedBox(height: 10.h),
+                                ..._gameEntries.map((entry) {
+                                  final imageWidth = screenWidth <= 380
+                                      ? entry.smallWidth.w
+                                      : screenWidth < 430
+                                          ? entry.mediumWidth.w
+                                          : entry.largeWidth.w;
+                                  return GameCard(
+                                    bgColor: entry.bgColor,
+                                    gameType: entry.gameType,
+                                    gameText: entry.gameText,
+                                    gameImage: entry.gameImage,
+                                    gameImageWidth: imageWidth,
+                                    onTap: () {
+                                      soundManager.playClickSound();
+                                      if (state.user.id != 0) {
+                                        Navigator.pushNamed(
+                                          context,
+                                          entry.route,
+                                          arguments: entry.routeArguments,
+                                        );
+                                      } else {
+                                        Navigator.pushNamed(
+                                            context, AppRoutes.profileScreen);
+                                      }
+                                    },
+                                  );
+                                }),
                                 SizedBox(
                                   height: 10.h,
                                 ),
@@ -396,6 +423,104 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+class _DailyDevotionalBanner extends StatelessWidget {
+  const _DailyDevotionalBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final soundManager =
+        BlocProvider.of<SettingsBloc>(context).soundManager;
+    return BlocBuilder<DailyDevotionalBloc, DailyDevotionalState>(
+      builder: (context, state) {
+        final completed = state.hasCompletedToday;
+        return GestureDetector(
+          onTap: () {
+            soundManager.playClickSound();
+            Navigator.pushNamed(
+                context, AppRoutes.dailyDevotionalScreen);
+          },
+          child: Container(
+            width: double.infinity,
+            padding:
+                EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: completed
+                    ? [
+                        const Color(0xFF2E7D32),
+                        const Color(0xFF1B5E20),
+                      ]
+                    : [
+                        const Color(0xFF6B4C9A),
+                        const Color(0xFF4A2C7A),
+                      ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(12.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                )
+              ],
+            ),
+            child: Row(
+              children: [
+                Text(
+                  completed ? '✅' : '📖',
+                  style: TextStyle(fontSize: 24.sp),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Daily Devotional',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Neuland',
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                      Text(
+                        completed
+                            ? 'Completed! Come back tomorrow'
+                            : 'Read, reflect & answer today\'s question',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (state.devotionalStreak > 0) ...[
+                  Text('🔥', style: TextStyle(fontSize: 14.sp)),
+                  SizedBox(width: 4.w),
+                  Text(
+                    '${state.devotionalStreak}',
+                    style: TextStyle(
+                      color: Colors.orange,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                ],
+                Icon(Icons.chevron_right,
+                    color: Colors.white70, size: 20.sp),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

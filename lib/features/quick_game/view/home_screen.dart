@@ -14,8 +14,6 @@ import 'package:bible_game/shared/widgets/blue_button.dart';
 import 'package:bible_game/shared/widgets/screen_app_bar.dart';
 import '../../../shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:badges/badges.dart' as badges;
-
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 
 class QuickGameHomeScreen extends StatefulWidget {
@@ -30,6 +28,153 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
   double? searchBoxHeight;
   QuickGameBloc? quickGameBloc;
   String searchText = "";
+
+  void _showInfoDialog(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: EdgeInsets.zero,
+          backgroundColor: Colors.black.withValues(alpha: 0.96),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 50.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20.h),
+                  StrokeText(
+                    text: 'How to play',
+                    textStyle: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Mikado',
+                      fontSize: 32.sp,
+                      fontWeight: FontWeight.w900,
+                      shadows: const [
+                        Shadow(
+                          color: Color(0xFF673125),
+                          blurRadius: 5.0,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    strokeColor: const Color(0xFFF1B30C),
+                    strokeWidth: 5,
+                  ),
+                  SizedBox(height: 40.h),
+                  // Step 1 — Pick topics
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        ProductImageRoutes.treasureBox,
+                        width: 56.w,
+                      ),
+                      SizedBox(width: 24.w),
+                      Text(
+                        'Pick up to 4 topics\nyou want to be\nquizzed on.',
+                        style: TextStyle(
+                          color: Colors.white,
+                          height: 1.2,
+                          fontFamily: 'Mikado',
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5.h),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Image.asset(
+                      ProductImageRoutes.guideLeft,
+                      width: 26.w,
+                    ),
+                  ),
+                  SizedBox(height: 5.h),
+                  // Step 2 — Speed bonus
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        ProductImageRoutes.rocket,
+                        width: 56.w,
+                      ),
+                      SizedBox(width: 24.w),
+                      Text(
+                        'Answer fast for\nbonus coins. Speed\nis an advantage!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          height: 1.2,
+                          fontFamily: 'Mikado',
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Image.asset(
+                      ProductImageRoutes.guideRight,
+                      width: 30.w,
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  // Step 3 — Streaks & 50/50
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 10.w),
+                      Text(
+                        'Build streaks for\nbig multipliers.\nUse 50/50 when\nyou\'re stuck!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          height: 1.2,
+                          fontFamily: 'Mikado',
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(width: 24.w),
+                      Image.asset(
+                        ProductImageRoutes.guideFlag,
+                        width: 48.w,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 50.h),
+                  InkWell(
+                    onTap: () {
+                      soundManager.playClickSound();
+                      Navigator.pop(context);
+                    },
+                    child: StrokeText(
+                      text: 'Tap to continue',
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        letterSpacing: 1.5,
+                        fontFamily: 'Mikado',
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      strokeColor: const Color(0xFFF1B30C),
+                      strokeWidth: 5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   void handleSearchTextChanged(String text) {
     setState(() {
@@ -76,30 +221,30 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
         ),
         backgroundColor: Color(0xFF014AA0),
         body: BlocConsumer<QuickGameBloc, QuickGameState>(
+          listenWhen: (prev, curr) =>
+              curr.hasReachedMaximumTopicSelection == true &&
+              prev.hasReachedMaximumTopicSelection != true,
           listener: (context, state) {
-            if (state.hasReachedMaximumTopicSelection != null &&
-                state.hasReachedMaximumTopicSelection!) {
-              Flushbar(
-                message: 'You cannot select more than 4 topics',
-                flushbarPosition: FlushbarPosition.TOP,
-                flushbarStyle: FlushbarStyle.GROUNDED,
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 3),
-              ).show(context);
-            }
+            Flushbar(
+              message: 'You can select up to 4 topics',
+              flushbarPosition: FlushbarPosition.TOP,
+              flushbarStyle: FlushbarStyle.GROUNDED,
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 2),
+            ).show(context);
           },
           builder: (context, state) {
             final soundManager = context.read<SettingsBloc>().soundManager;
             return SafeArea(
-              child: SingleChildScrollView(
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
+              child: Container(
                   width: double.infinity,
+                  height: double.infinity,
                   decoration: BoxDecoration(
                       image: DecorationImage(
                     image: AssetImage(ProductImageRoutes.patternTwoBg),
                     fit: BoxFit.cover,
                   )),
+                child: SingleChildScrollView(
                   child: Column(
                     children: [
                       ScreenAppBar(
@@ -133,6 +278,7 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
                               InkWell(
                                 onTap: () {
                                   soundManager.playClickSound();
+                                  _showInfoDialog(context);
                                 },
                                 child: Image.asset(
                                   IconImageRoutes.infoCircle,
@@ -346,6 +492,7 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
               ),
             );
           },
-        ));
+        ),
+      );
   }
 }
