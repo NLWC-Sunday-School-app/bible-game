@@ -9,7 +9,7 @@ import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:bible_game/shared/utils/network_connection.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
-import 'package:bible_game/shared/widgets/modal/network_modal.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -270,7 +270,9 @@ class _SplashScreenState extends State<SplashScreen>
     final String? refreshToken = GetStorage().read('refresh_token');
     final networkConnection = NetworkConnection();
 
-    if (await networkConnection.hasInternetConnection()) {
+    final isOnline = await networkConnection.hasInternetConnection();
+
+    if (isOnline) {
       if (!mounted) return;
       BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
       BlocProvider.of<SettingsBloc>(context).add(FetchAds());
@@ -292,7 +294,8 @@ class _SplashScreenState extends State<SplashScreen>
                 .add(FetchPilgrimProgressLevelData());
             BlocProvider.of<UserBloc>(context).add(FetchUserYearlyRecap());
             Navigator.pushNamedAndRemoveUntil(
-                context, AppRoutes.home, (route) => false);
+                context, AppRoutes.home, (route) => false,
+                arguments: {'isOffline': false});
           });
         } else {
           BlocProvider.of<AuthenticationBloc>(context)
@@ -302,15 +305,21 @@ class _SplashScreenState extends State<SplashScreen>
           Future.delayed(const Duration(seconds: 1), () {
             if (!mounted) return;
             Navigator.pushNamedAndRemoveUntil(
-                context, AppRoutes.home, (route) => false);
+                context, AppRoutes.home, (route) => false,
+                arguments: {'isOffline': false});
           });
         }
       } else {
         Navigator.pushNamedAndRemoveUntil(
-            context, AppRoutes.home, (route) => false);
+            context, AppRoutes.home, (route) => false,
+            arguments: {'isOffline': false});
       }
     } else {
-      if (mounted) showNetworkModal(context);
+      // Offline: still navigate to home, but flag offline mode
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(
+          context, AppRoutes.home, (route) => false,
+          arguments: {'isOffline': true});
     }
   }
 }

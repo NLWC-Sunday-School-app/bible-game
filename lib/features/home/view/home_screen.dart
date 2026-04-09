@@ -9,6 +9,7 @@ import 'package:bible_game/features/home/widget/game_card.dart';
 import 'package:bible_game/features/home/widget/game_score_info.dart';
 import 'package:bible_game/features/home/widget/global_challenge_countdown.dart';
 import 'package:bible_game/features/home/widget/home_ads_slider.dart';
+import 'package:bible_game/shared/widgets/did_you_know_carousel.dart';
 import 'package:bible_game/features/home/widget/sign_in_profile.dart';
 import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/constants/colors.dart';
@@ -47,6 +48,7 @@ class _GameEntry {
   final double largeWidth;
   final String route;
   final Object? routeArguments;
+  final bool requiresNetwork;
 
   const _GameEntry({
     required this.bgColor,
@@ -58,6 +60,7 @@ class _GameEntry {
     required this.largeWidth,
     required this.route,
     this.routeArguments,
+    this.requiresNetwork = true,
   });
 }
 
@@ -71,6 +74,7 @@ const _gameEntries = [
     mediumWidth: 80,
     largeWidth: 90,
     route: AppRoutes.storySelectionScreen,
+    requiresNetwork: false,
   ),
   _GameEntry(
     bgColor: AppColors.primaryColor,
@@ -126,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   Duration _duration = Duration();
   bool _globalChallengeIsComingSoon = false;
+  bool _isOffline = false;
   late DrawableRoot svgRoot;
   MultiavatarGenerator generator = MultiavatarGenerator();
   final DeviceInfoService _deviceInfoService = DeviceInfoService();
@@ -219,16 +224,26 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     clearUpgraderSharedPreferences();
     setSoundState();
-    initializeWallet();
-    fetchGameData();
-    setGlobalChallengeTimer();
     _loadDeviceInfo();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map<String, dynamic> && args['isOffline'] == true) {
+        setState(() => _isOffline = true);
+      } else {
+        initializeWallet();
+        fetchGameData();
+        setGlobalChallengeTimer();
+      }
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
+    if (!_isOffline) {
+      BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
+    }
   }
 
   @override
@@ -362,6 +377,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                   },
                                 ),
                                 SizedBox(height: 10.h),
+                                if (_isOffline)
+                                  Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12.w, vertical: 8.h),
+                                    margin: EdgeInsets.only(bottom: 10.h),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.shade900
+                                          .withValues(alpha: 0.85),
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.wifi_off,
+                                            color: Colors.white, size: 18.sp),
+                                        SizedBox(width: 8.w),
+                                        Expanded(
+                                          child: Text(
+                                            'You\'re offline — Story Mode and Daily Devotional are available!',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 _DailyDevotionalBanner(),
                                 SizedBox(height: 10.h),
                                 ..._gameEntries.map((entry) {
@@ -370,46 +414,77 @@ class _HomeScreenState extends State<HomeScreen> {
                                       : screenWidth < 430
                                           ? entry.mediumWidth.w
                                           : entry.largeWidth.w;
-                                  return GameCard(
-                                    bgColor: entry.bgColor,
-                                    gameType: entry.gameType,
-                                    gameText: entry.gameText,
-                                    gameImage: entry.gameImage,
-                                    gameImageWidth: imageWidth,
-                                    onTap: () {
-                                      soundManager.playClickSound();
-                                      if (state.user.id != 0) {
-                                        Navigator.pushNamed(
-                                          context,
-                                          entry.route,
-                                          arguments: entry.routeArguments,
-                                        );
-                                      } else {
-                                        Navigator.pushNamed(
-                                            context, AppRoutes.profileScreen);
-                                      }
-                                    },
+                                  final isDisabled = _isOffline && entry.requiresNetwork;
+                                  return Opacity(
+                                    opacity: isDisabled ? 0.4 : 1.0,
+                                    child: GameCard(
+                                      bgColor: entry.bgColor,
+                                      gameType: entry.gameType,
+                                      gameText: isDisabled
+                                          ? 'Requires internet connection'
+                                          : entry.gameText,
+                                      gameImage: entry.gameImage,
+                                      gameImageWidth: imageWidth,
+                                      onTap: () {
+                                        if (isDisabled) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                '${entry.gameType} requires an internet connection',
+                                              ),
+                                              duration: const Duration(seconds: 2),
+                                              backgroundColor: Colors.black87,
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                        soundManager.playClickSound();
+                                        if (!entry.requiresNetwork || state.user.id != 0) {
+                                          Navigator.pushNamed(
+                                            context,
+                                            entry.route,
+                                            arguments: entry.routeArguments,
+                                          );
+                                        } else {
+                                          Navigator.pushNamed(
+                                              context, AppRoutes.profileScreen);
+                                        }
+                                      },
+                                    ),
                                   );
                                 }),
-                                SizedBox(
-                                  height: 10.h,
-                                ),
+                                SizedBox(height: 10.h),
                                 Align(
                                   alignment: Alignment.center,
                                   child: Text(
-                                    'BG Billboard',
+                                    'Did You Know? 💡',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 1,
-                                      fontSize: 22.sp,
+                                      fontSize: 20.sp,
                                       color: Colors.white,
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 15.h,
-                                ),
-                                HomeAdsSlider()
+                                SizedBox(height: 12.h),
+                                const DidYouKnowCarousel(),
+                                if (!_isOffline) ...[
+                                  SizedBox(height: 20.h),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'BG Billboard',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
+                                        fontSize: 22.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 15.h),
+                                  HomeAdsSlider(),
+                                ]
                               ],
                             ),
                           ),
