@@ -16,6 +16,7 @@ import 'package:bible_game/shared/features/user/repository/user_repository.dart'
 import 'package:bible_game_api/api/user_api.dart';
 import 'package:bible_game/shared/utils/app_bloc_observer.dart';
 import 'package:bible_game/shared/utils/awesome_notification.dart';
+import 'package:bible_game/shared/utils/devotional_notification.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'app.dart';
 import 'package:bible_game_api/api/api_client.dart';
@@ -34,7 +35,11 @@ void main() async {
       channelShowBadge: true,
       importance: NotificationImportance.Max,
     ),
+    DevotionalNotification.channel,
   ]);
+
+  // Schedule the daily devotional notification at 8 AM
+  DevotionalNotification.scheduleDailyReminder();
   await GetStorage.init();
   await AwesomeNotification.initializeRemoteNotifications(
     debug: true,);
