@@ -279,5 +279,28 @@ class _AppState extends State<App> {
       AwesomeNotifications().requestPermissionToSendNotifications(
           channelKey: 'game notifications');
     }
+
+    // Listen for notification taps — reset badge when user opens a notification
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: _onActionReceived,
+      onNotificationDisplayedMethod: _onNotificationDisplayed,
+    );
+
+    // Reset badge whenever the app is opened
+    AwesomeNotifications().resetGlobalBadge();
+  }
+
+  /// Called when user taps a notification
+  @pragma("vm:entry-point")
+  static Future<void> _onActionReceived(ReceivedAction receivedAction) async {
+    await AwesomeNotifications().resetGlobalBadge();
+  }
+
+  /// Called when a notification is displayed — keeps badge at 0
+  @pragma("vm:entry-point")
+  static Future<void> _onNotificationDisplayed(
+      ReceivedNotification receivedNotification) async {
+    // Immediately reset badge so it doesn't accumulate
+    await AwesomeNotifications().resetGlobalBadge();
   }
 }

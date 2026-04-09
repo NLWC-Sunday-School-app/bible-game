@@ -36,6 +36,7 @@ class DevotionalNotification {
         body: 'Today\'s passage: $passage — Tap to read and reflect!',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
+        badge: 0,
       ),
       schedule: NotificationCalendar(
         hour: 8,
@@ -53,4 +54,5 @@ class DevotionalNotification {
   static Future<void> cancelDailyReminder() async {
     await AwesomeNotifications().cancel(_notificationId);
   }
+
 }

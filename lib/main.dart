@@ -38,8 +38,12 @@ void main() async {
     DevotionalNotification.channel,
   ]);
 
+  // Reset the app badge count whenever the app starts
+  AwesomeNotifications().resetGlobalBadge();
+
   // Schedule the daily devotional notification at 8 AM
   DevotionalNotification.scheduleDailyReminder();
+
   await GetStorage.init();
   await AwesomeNotification.initializeRemoteNotifications(
     debug: true,);
