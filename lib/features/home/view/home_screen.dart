@@ -468,23 +468,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 SizedBox(height: 12.h),
                                 const DidYouKnowCarousel(),
-                                if (!_isOffline) ...[
-                                  SizedBox(height: 20.h),
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'BG Billboard',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1,
-                                        fontSize: 22.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 15.h),
-                                  HomeAdsSlider(),
-                                ]
+                                // if (!_isOffline) ...[
+                                //   SizedBox(height: 20.h),
+                                //   Align(
+                                //     alignment: Alignment.center,
+                                //     child: Text(
+                                //       'BG Billboard',
+                                //       style: TextStyle(
+                                //         fontWeight: FontWeight.w900,
+                                //         letterSpacing: 1,
+                                //         fontSize: 22.sp,
+                                //         color: Colors.white,
+                                //       ),
+                                //     ),
+                                //   ),
+                                //   SizedBox(height: 15.h),
+                                //   HomeAdsSlider(),
+                                // ]
                               ],
                             ),
                           ),
