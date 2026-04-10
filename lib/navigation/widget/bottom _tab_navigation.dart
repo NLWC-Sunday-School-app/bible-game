@@ -67,9 +67,30 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
     }
   }
 
+  void _precacheImages() {
+    final images = [
+      ProductImageRoutes.modalBg,
+      ProductImageRoutes.patternBg,
+      ProductImageRoutes.patternTwoBg,
+      ProductImageRoutes.successfulModalBg,
+      ProductImageRoutes.questionScreenBg,
+      ProductImageRoutes.questionLoadingBg,
+      ProductImageRoutes.gameSummaryBg,
+      ProductImageRoutes.homeScreenBg,
+      ProductImageRoutes.streakModalBg,
+      ProductImageRoutes.coinsModalBg,
+      ProductImageRoutes.gemsModalBg,
+      ProductImageRoutes.welcomeModalBg,
+    ];
+    for (final path in images) {
+      precacheImage(AssetImage(path), context);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _precacheImages();
     displayWelcomeModal();
     displayCountryUpdateModal();
   }
