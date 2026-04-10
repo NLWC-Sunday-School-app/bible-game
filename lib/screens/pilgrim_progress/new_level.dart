@@ -22,7 +22,7 @@ class _NewLevelScreenState extends State<NewLevelScreen> {
   void initState() {
     confettiController.play();
     _userController.toggleMusic();
-    _player.setAsset('assets/audios/next_level.wav');
+    _player.setAsset('assets/audios/next_level.m4a');
     _player.play();
 
     super.initState();
@@ -43,7 +43,7 @@ class _NewLevelScreenState extends State<NewLevelScreen> {
           width: double.infinity,
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/images/pilgrim_levels/new_level.png'),
+              image: AssetImage('assets/images/pilgrim_levels/new_level.webp'),
               fit: BoxFit.fill,
             ),
           ),

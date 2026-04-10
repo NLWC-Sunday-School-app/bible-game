@@ -52,7 +52,7 @@ class MemorizeScreen extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(top: 270.h),
             child: OnboardingBody(
-              imageUrl: 'assets/images/mask_one.png',
+              imageUrl: 'assets/images/mask_one.webp',
               buttonText: 'Next',
               goToNextScreen: () => goToMeditateScreen(context),
             ),

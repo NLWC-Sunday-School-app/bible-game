@@ -51,7 +51,7 @@ class MeditateScreen extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(top: 250.h),
                 child: OnboardingBody(
-                  imageUrl: 'assets/images/mask_two.png',
+                  imageUrl: 'assets/images/mask_two.webp',
                   buttonText: 'Next',
                   goToNextScreen: () => goToKnowScripturesScreen(context),
                 ),

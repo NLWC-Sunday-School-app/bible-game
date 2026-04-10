@@ -52,7 +52,7 @@ class KnowScripturesScreen extends StatelessWidget {
                Container(
                  margin: EdgeInsets.only(top: 260.h),
                  child: OnboardingBody(
-                  imageUrl: 'assets/images/mask_three.png',
+                  imageUrl: 'assets/images/mask_three.webp',
                   buttonText: 'Get Started',
                   goToNextScreen: () => goToSignupScreen(context),
               ),

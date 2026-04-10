@@ -119,7 +119,7 @@ class PilgrimProgressQuestionController extends GetxController
       totalBonusPointsGained.value = (totalBonusPointsGained.value + timeBonusPoint).round();
 
     } else {
-      player.setAsset('assets/audios/wrong_answer.wav');
+      player.setAsset('assets/audios/wrong_answer.m4a');
       player.play();
       confettiController.stop();
     }

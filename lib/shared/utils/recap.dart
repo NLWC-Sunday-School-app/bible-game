@@ -16,7 +16,7 @@ String formatUserTopGameModeImage (String word){
   }else if(word == 'QUICK_GAME'){
     return 'assets/images/product/recap/quick_game_recap.png';
   }else if (word == 'PILGRIM_PROGRESS'){
-    return 'assets/images/product/recap/pilgrim_progress_recap.png';
+    return 'assets/images/product/recap/pilgrim_progress_recap.webp';
   }else {
     return 'assets/images/product/recap/four_scriptures_recap.png';
   }
@@ -52,11 +52,11 @@ String formatBiblePersonalityPhrase (int percentile){
 
 String formatBiblePersonalityBackgroundImage (int percentile){
   if(percentile >= 1 && percentile <= 3){
-    return 'assets/images/product/recap/david_recap_bg.png';
+    return 'assets/images/product/recap/david_recap_bg.webp';
   }else if(percentile >= 4 && percentile <= 25){
     return 'assets/images/product/recap/moses_recap_bg.png';
   }else if (percentile >= 26 && percentile <= 45){
-    return 'assets/images/product/recap/daniel_recap_bg.png';
+    return 'assets/images/product/recap/daniel_recap_bg.webp';
   } else if(percentile >= 46 && percentile <= 60){
     return 'assets/images/product/recap/jacob_recap_bg.png';
   }else {
@@ -66,15 +66,15 @@ String formatBiblePersonalityBackgroundImage (int percentile){
 
 String formatBiblePersonalityImage (int percentile){
   if(percentile >= 1 && percentile <= 10){
-    return 'assets/images/product/recap/david_recap.png';
+    return 'assets/images/product/recap/david_recap.webp';
   }else if(percentile >= 11 && percentile <= 30){
-    return 'assets/images/product/recap/moses_recap.png';
+    return 'assets/images/product/recap/moses_recap.webp';
   }else if (percentile >= 31 && percentile <= 50){
-    return 'assets/images/product/recap/daniel_recap.png';
+    return 'assets/images/product/recap/daniel_recap.webp';
   } else if(percentile >= 51 && percentile <= 70){
-    return 'assets/images/product/recap/jacob_recap.png';
+    return 'assets/images/product/recap/jacob_recap.webp';
   }else {
-    return 'assets/images/product/recap/onesimus_recap.png';
+    return 'assets/images/product/recap/onesimus_recap.webp';
   }
 }
 

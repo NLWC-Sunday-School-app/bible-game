@@ -171,7 +171,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                             },
                           ),
                           PilgrimProgressLevelMenu(
-                            menuImage: 'assets/images/pilgrim_levels/child.png',
+                            menuImage: 'assets/images/pilgrim_levels/child.webp',
                             menuNumber: '',
                             textSpan: RichText(
                                 text: TextSpan(
@@ -358,7 +358,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                   //     Positioned(
                   //       top: 280.h,
                   //       child: Image.asset(
-                  //         'assets/images/pilgrim_left_cloud.png',
+                  //         'assets/images/pilgrim_left_cloud.webp',
                   //         width: 180.w,
                   //       ),
                   //     ),
@@ -366,7 +366,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                   //       top: 150.h,
                   //       right: 0,
                   //       child: Image.asset(
-                  //         'assets/images/pilgrim_right_cloud.png',
+                  //         'assets/images/pilgrim_right_cloud.webp',
                   //         width: 180.w,
                   //       ),
                   //     ),
@@ -405,7 +405,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                   //                     menuImage: _pilgrimProgressController
                   //                             .childLevelIsLocked.isTrue
                   //                         ? 'assets/images/pilgrim_levels/child_locked.png'
-                  //                         : 'assets/images/pilgrim_levels/child.png',
+                  //                         : 'assets/images/pilgrim_levels/child.webp',
                   //                     menuNumber: '02',
                   //                     menuLabel: 'Child',
                   //                     isLocked: _pilgrimProgressController

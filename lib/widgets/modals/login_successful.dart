@@ -20,7 +20,7 @@ class LoginSuccessfulModal extends StatelessWidget {
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('assets/images/modal_layout_2.png'),
+                  image: AssetImage('assets/images/modal_layout_2.webp'),
                   fit: BoxFit.fill
               ),
             ),

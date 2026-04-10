@@ -103,7 +103,7 @@ class TabAccountScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Image.asset(
-                    'assets/images/cloud_three.png',
+                    'assets/images/cloud_three.webp',
                     width: 260.w,
                   ),
                 ],

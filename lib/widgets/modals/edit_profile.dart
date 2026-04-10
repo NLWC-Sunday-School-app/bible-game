@@ -59,7 +59,7 @@ class _EditProfileState extends State<EditProfileModal> {
           child: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('assets/images/modal_layout_2.png'),
+                  image: AssetImage('assets/images/modal_layout_2.webp'),
                   fit: BoxFit.fill
               ),
             ),

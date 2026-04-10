@@ -9,7 +9,7 @@ class RetryLevelScreen extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/pilgrim_levels/retry_level.png'),
+          image: AssetImage('assets/images/pilgrim_levels/retry_level.webp'),
           fit: BoxFit.fill,
         ),
       ),
@@ -33,7 +33,7 @@ class RetryLevelScreen extends StatelessWidget {
             height: 100.h,
           ),
           Image.asset(
-            'assets/images/icons/group_star.png',
+            'assets/images/icons/group_star.webp',
             width: 200.w,
           ),
           SizedBox(

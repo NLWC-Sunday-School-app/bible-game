@@ -104,7 +104,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           Get.dialog(
               Obx(
                   ()=> BadgeInfo(
-            modalLayoutUrl: 'assets/images/babe_layout.png',
+            modalLayoutUrl: 'assets/images/babe_layout.webp',
             badgeUrl: 'assets/images/badges/babe_badge.png',
             badgeName: 'BABE BADGE!',
             badgeNameColor: 0xFF5D42C8,
@@ -121,7 +121,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         Get.dialog(
             Obx(
                 ()=> BadgeInfo(
-          modalLayoutUrl: 'assets/images/child_layout.png',
+          modalLayoutUrl: 'assets/images/child_layout.webp',
           badgeUrl: 'assets/images/badges/child_badge.png',
           badgeName: 'CHILD BADGE!',
           badgeNameColor: 0xFFC75523,
@@ -138,7 +138,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         Get.dialog(
             Obx(
                 () => BadgeInfo(
-          modalLayoutUrl: 'assets/images/yb_layout.png',
+          modalLayoutUrl: 'assets/images/yb_layout.webp',
           badgeUrl: 'assets/images/badges/yb_badge.png',
           badgeName: 'YOUNG BELIEVER\n BADGE!',
           badgeNameColor: 0xFF8999A8,
@@ -155,7 +155,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         Get.dialog(
             Obx(
                 () => BadgeInfo(
-          modalLayoutUrl: 'assets/images/charity_layout.png',
+          modalLayoutUrl: 'assets/images/charity_layout.webp',
           badgeUrl: 'assets/images/badges/charity_badge.png',
           badgeName: 'CHARITY BADGE!',
           badgeNameColor: 0xFFC88008,
@@ -172,7 +172,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         Get.dialog(
             Obx(
                 ()=> BadgeInfo(
-          modalLayoutUrl: 'assets/images/father_layout.png',
+          modalLayoutUrl: 'assets/images/father_layout.webp',
           badgeUrl: 'assets/images/badges/father_badge.png',
           badgeName: 'FATHER BADGE!',
           badgeNameColor: 0xFF4174E7,
@@ -189,7 +189,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         Get.dialog(
             Obx(
                 () => BadgeInfo(
-          modalLayoutUrl: 'assets/images/elder_layout.png',
+          modalLayoutUrl: 'assets/images/elder_layout.webp',
           badgeUrl: 'assets/images/badges/elder_badge.png',
           badgeName: 'ELDER BADGE!',
           badgeNameColor: 0xFF3F4060,

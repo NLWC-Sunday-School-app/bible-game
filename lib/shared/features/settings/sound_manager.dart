@@ -27,7 +27,7 @@ class SoundManager {
       await tabClickPlayer.setAsset('assets/sounds/tab_click.mp3');
       await achievementPlayer.setAsset('assets/sounds/achievement.mp3');
       await correctAnswerPlayer.setAsset('assets/sounds/correct_answer.mp3');
-      await wrongAnswerPlayer.setAsset('assets/sounds/wrong_answer.wav');
+      await wrongAnswerPlayer.setAsset('assets/sounds/wrong_answer.m4a');
     } catch (e) {
       debugPrint('SoundManager: could not load audio assets: $e');
     }

@@ -63,7 +63,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Image.asset(
-                'assets/images/question_screen_cloud.png',
+                'assets/images/question_screen_cloud.webp',
                 width: 350.w,
               ),
             ],
