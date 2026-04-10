@@ -77,11 +77,10 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
   Widget  _bottomNavigationBar(BuildContext context, int _selectedTabIndex) {
     final soundManager = context.read<SettingsBloc>().soundManager;
     final tr = AppLocalization.tr(context);
-    final bottomPadding = kIsWeb ? MediaQuery.of(context).viewPadding.bottom : 0.0;
-    return SizedBox(
+    return SafeArea(
+      top: false,
       child: Container(
-        padding: EdgeInsets.only(bottom: bottomPadding),
-        height: 120.h + bottomPadding,
+        height: 120.h,
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
