@@ -97,6 +97,7 @@ dependencies:
   countries_world_map: ^1.0.2
   url_launcher: ^6.3.0
   stomp_dart_client: ^2.0.0
+  multiavatar: ^0.1.5
   # flutter_js: ^0.7.0  # Disabled for web compatibility (uses dart:ffi)
 
 
