@@ -1,6 +1,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -76,9 +77,11 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
   Widget  _bottomNavigationBar(BuildContext context, int _selectedTabIndex) {
     final soundManager = context.read<SettingsBloc>().soundManager;
     final tr = AppLocalization.tr(context);
+    final bottomPadding = kIsWeb ? MediaQuery.of(context).viewPadding.bottom : 0.0;
     return SizedBox(
       child: Container(
-        height: 120.h,
+        padding: EdgeInsets.only(bottom: bottomPadding),
+        height: 120.h + bottomPadding,
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
