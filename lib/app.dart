@@ -80,6 +80,8 @@ import 'package:bible_game/shared/utils/platform_info.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'navigation/cubit/navigation_cubit.dart';
+import 'features/store/bloc/power_up_bloc.dart';
+import 'features/store/bloc/power_up_event.dart';
 import 'shared/features/localization/app_localization.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -154,6 +156,7 @@ class _AppState extends State<App> {
       builder: (BuildContext context, Widget? child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => NavigationCubit()),
+          BlocProvider(create: (_) => PowerUpBloc()..add(LoadPowerUps())),
           BlocProvider<ConnectivityBloc>(
             create: (_) => ConnectivityBloc(
               gameAPI: widget.gameAPI,

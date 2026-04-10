@@ -19,6 +19,9 @@ import '../../home/widget/modals/login_modal.dart';
 import '../../home/widget/score_info.dart';
 import 'package:intl/intl.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
+import '../bloc/power_up_bloc.dart';
+import '../bloc/power_up_event.dart';
+import '../widget/power_up_section.dart';
 
 class StoreHomeScreen extends StatefulWidget {
   const StoreHomeScreen({super.key});
@@ -101,7 +104,8 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                   fit: BoxFit.cover,
                 ),
               ),
-              child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                 children: [
                   ScreenAppBar(
                     height: 70.h,
@@ -341,35 +345,10 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                         ],
                       ),
                       SizedBox(
-                        height: 50.h,
+                        height: 30.h,
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Divider(
-                                color: Color(0xFF10498D),
-                                thickness: 2,
-                                endIndent: 20,
-                              )),
-                          StrokeText(
-                            text: tr.t('store_more_items'),
-                            textStyle: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w900,
-                            ),
-                            strokeColor: Colors.black.withOpacity(0.25),
-                            strokeWidth: 1,
-                          ),
-                          Expanded(
-                              child: Divider(
-                                color: Color(0xFF10498D),
-                                thickness: 2,
-                                indent: 20,
-                              )),
-                        ],
-                      )
+                      const PowerUpSection(),
+                      SizedBox(height: 30.h),
                     ],
                   ) :
                   Column(
@@ -433,6 +412,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
             
             
                 ],
+              ),
               ),
             ),
           );
