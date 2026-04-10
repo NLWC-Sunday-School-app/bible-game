@@ -78,6 +78,7 @@ import 'features/multi_player/view/question_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io' show Platform;
 
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'navigation/cubit/navigation_cubit.dart';
 import 'shared/features/localization/app_localization.dart';
 
@@ -241,6 +242,9 @@ class _AppState extends State<App> {
           supportedLocales: AppLocalization.supportedLocales,
           localizationsDelegates: const [
             AppLocalizationDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
           localeResolutionCallback: (deviceLocale, supportedLocales) {
             return _locale;
