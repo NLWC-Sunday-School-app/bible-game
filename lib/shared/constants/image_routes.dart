@@ -67,7 +67,7 @@ class ProductImageRoutes {
    static const String ppActiveBlueBtn = 'assets/images/product/pilgrim_progress/blue_active_btn_bg.png';
    static const String ppInactiveBlueBtn = 'assets/images/product/pilgrim_progress/blue_inactive_btn_bg.png';
    static const String babe = 'assets/images/product/pilgrim_progress/babe.png';
-   static const String child = 'assets/images/product/pilgrim_progress/child.webp';
+   static const String child = 'assets/images/product/pilgrim_progress/child.png';
    static const String youngBeliever = 'assets/images/product/pilgrim_progress/young_believer.png';
    static const String charity = 'assets/images/product/pilgrim_progress/charity.png';
    static const String elder = 'assets/images/product/pilgrim_progress/elder.png';
@@ -90,7 +90,7 @@ class ProductImageRoutes {
    static const String arrowTwo = 'assets/images/product/four_scripture/arrow_two.png';
    static const String arrowThree = 'assets/images/product/four_scripture/arrow_three.png';
    static const String broLukeThree = 'assets/images/product/four_scripture/bro_luke_three.svg';
-   static const String streakModalBg = 'assets/images/product/home/streak_modal_bg.webp';
+   static const String streakModalBg = 'assets/images/product/home/streak_modal_bg.png';
    static const String streakModalBgTabletView = 'assets/images/product/home/streak_modal_bg_tablet_view.webp';
    static const String streakBoardBg = 'assets/images/product/home/streak_board_bg.png';
    static const String streakRestoreButtonBg = 'assets/images/product/home/restore_button_bg.png';
@@ -105,14 +105,14 @@ class ProductImageRoutes {
    static const String believerBadge = 'assets/images/product/shared/believer_badge.png';
    static const String joinBtnBg = 'assets/images/product/shared/join_btn_bg.png';
    static const String leaveBtnBg = 'assets/images/product/shared/leave_btn_bg.png';
-   static const String leagueSuccessModalBg = 'assets/images/product/league/success_modal_bg.webp';
+   static const String leagueSuccessModalBg = 'assets/images/product/league/success_modal_bg.png';
    static const String leagueSuccessModalBgTabletView = 'assets/images/product/league/success_modal_bg_tablet_view.webp';
-   static const String fblModalBg = 'assets/images/product/league/fbl_modal_bg.webp';
+   static const String fblModalBg = 'assets/images/product/league/fbl_modal_bg.png';
    static const String multiplayerComingSoon = 'assets/images/product/multi_player/multiplayer_coming_soon.webp';
    static const String storeGemCard = 'assets/images/product/store/gem_card.png';
    static const String theBibleGame = 'assets/images/product/shared/the_bible_game.png';
    static const String rocket = 'assets/images/product/shared/rocket.png';
-   static const String welcomeModalBg = 'assets/images/product/shared/welcome_modal_bg.webp';
+   static const String welcomeModalBg = 'assets/images/product/shared/welcome_modal_bg.png';
    static const String broLukeIntro = 'assets/images/product/shared/bro_luke_intro.svg';
    static const String tryAgainModalBg = 'assets/images/product/who_is_who/try_again_bg.webp';
    static const String inviteBtnBg = 'assets/images/product/league/invite_btn.png';

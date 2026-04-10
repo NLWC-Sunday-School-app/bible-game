@@ -171,7 +171,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                             },
                           ),
                           PilgrimProgressLevelMenu(
-                            menuImage: 'assets/images/pilgrim_levels/child.webp',
+                            menuImage: 'assets/images/pilgrim_levels/child.png',
                             menuNumber: '',
                             textSpan: RichText(
                                 text: TextSpan(
@@ -405,7 +405,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                   //                     menuImage: _pilgrimProgressController
                   //                             .childLevelIsLocked.isTrue
                   //                         ? 'assets/images/pilgrim_levels/child_locked.png'
-                  //                         : 'assets/images/pilgrim_levels/child.webp',
+                  //                         : 'assets/images/pilgrim_levels/child.png',
                   //                     menuNumber: '02',
                   //                     menuLabel: 'Child',
                   //                     isLocked: _pilgrimProgressController
