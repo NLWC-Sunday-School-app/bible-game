@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/global_challenge_repository.dart';
 
@@ -19,13 +20,17 @@ class GlobalChallengeBloc
   final AuthenticationBloc _authenticationBloc;
   final SettingsBloc _settingsBloc;
 
+  ConnectivityBloc? _connectivityBloc;
+
   GlobalChallengeBloc(
       {required GlobalChallengeRepository globalChallengeRepository,
       required AuthenticationBloc authenticationBloc,
-      required SettingsBloc settingsBloc})
+      required SettingsBloc settingsBloc,
+      ConnectivityBloc? connectivityBloc})
       : _globalChallengeRepository = globalChallengeRepository,
         _authenticationBloc = authenticationBloc,
         _settingsBloc = settingsBloc,
+        _connectivityBloc = connectivityBloc,
         super(GlobalChallengeState()) {
     on<FetchGlobalChallengeGames>(_onFetchGlobalChallengeGames);
     on<UpdateGlobalChallengeGame>(_onUpdateGlobalChallengeGame);
@@ -139,12 +144,13 @@ class GlobalChallengeBloc
     SubmitGlobalChallengeScore event,
     Emitter<GlobalChallengeState> emit,
   ) async {
+    final authenticationState = _authenticationBloc.state;
+    final prefs = await SharedPreferences.getInstance();
+    final deviceName = prefs.getString('deviceName');
+    final deviceOs = prefs.getString('deviceOs');
+
     try {
-      final authenticationState = _authenticationBloc.state;
-      final prefs = await SharedPreferences.getInstance();
-      final deviceName = prefs.getString('deviceName');
-      final deviceOs = prefs.getString('deviceOs');
-      final response = await _globalChallengeRepository.sendGameData(
+      await _globalChallengeRepository.sendGameData(
         gameType,
         state.coinsGained!,
         state.coinsGained!,
@@ -156,9 +162,29 @@ class GlobalChallengeBloc
         null,
         5,
         deviceName,
-        deviceOs
+        deviceOs,
       );
-    } catch (_) {}
+    } catch (_) {
+      // Network failed — enqueue for offline sync
+      if (_connectivityBloc != null) {
+        final playLog = {
+          'game_mode': gameType,
+          'total_score': state.coinsGained!,
+          'base_score': state.coinsGained!,
+          'bonus_score': state.totalBonusCoinsGained!,
+          'average_time_spent':
+              (state.totalTimeSpent! ~/ state.globalChallengeQuestions!.length),
+          'player_rank': 'babe',
+          'number_of_correct_answers': state.noOfCorrectAnswers,
+          'player_id': authenticationState.user.id,
+          'user_progress': null,
+          'number_of_rounds': 5,
+          'deviceName': deviceName,
+          'deviceOs': deviceOs,
+        };
+        await _connectivityBloc!.submitOrEnqueue(playLog);
+      }
+    }
   }
 
   void _onMoveToNextPage(

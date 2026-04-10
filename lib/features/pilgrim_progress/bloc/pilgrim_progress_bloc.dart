@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/pilgrim_progress_repository.dart';
 
@@ -19,13 +20,17 @@ class PilgrimProgressBloc
   final AuthenticationBloc _authenticationBloc;
   final SettingsBloc _settingsBloc;
 
+  ConnectivityBloc? _connectivityBloc;
+
   PilgrimProgressBloc(
       {required AuthenticationBloc authenticationBloc,
       required PilgrimProgressRepository pilgrimProgressRepository,
-      required SettingsBloc settingsBloc})
+      required SettingsBloc settingsBloc,
+      ConnectivityBloc? connectivityBloc})
       : _pilgrimProgressRepository = pilgrimProgressRepository,
         _authenticationBloc = authenticationBloc,
         _settingsBloc = settingsBloc,
+        _connectivityBloc = connectivityBloc,
         super(PilgrimProgressState()) {
     on<FetchPilgrimProgressLevelData>(_onFetchUserPilgrimProgressLevelData);
     on<SetPilgrimProgressData>(_onSetPilgrimProgressData);
@@ -299,32 +304,46 @@ class PilgrimProgressBloc
                 state.coinsGained >= state.passOnFirstTrialScore
             ? childLevelIsLocked = false
             : childLevelIsLocked = true;
-        await _pilgrimProgressRepository.sendGameData(
-          'PILGRIM_PROGRESS',
-          state.coinsGained,
-          state.coinsGained,
-          state.totalBonusCoinsGained!,
-          averageTimeSpent,
-          'babe',
-          state.noOfCorrectAnswers,
-          authenticationState.user.id,
-          roundsLeft >= 1
-              ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInBabe + coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-                  ? userProgress.toStringAsFixed(5)
-                  : 0,
-          roundsLeft >= 1 &&
-                  userRank == 'babe' &&
-                  !(totalPointsGainedInBabe + state.coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-              ? roundsLeft
-              : 5,
-            deviceName,
-          deviceOs
-        );
+        try {
+          await _pilgrimProgressRepository.sendGameData(
+            'PILGRIM_PROGRESS',
+            state.coinsGained,
+            state.coinsGained,
+            state.totalBonusCoinsGained!,
+            averageTimeSpent,
+            'babe',
+            state.noOfCorrectAnswers,
+            authenticationState.user.id,
+            roundsLeft >= 1
+                ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
+                : (totalPointsGainedInBabe + coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                    ? userProgress.toStringAsFixed(5)
+                    : 0,
+            roundsLeft >= 1 &&
+                    userRank == 'babe' &&
+                    !(totalPointsGainedInBabe + state.coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                ? roundsLeft
+                : 5,
+              deviceName,
+            deviceOs
+          );
+        } catch (_) {
+          if (_connectivityBloc != null) {
+            final playLog = {
+              'game_mode': 'PILGRIM_PROGRESS',
+              'total_score': state.coinsGained,
+              'base_score': state.coinsGained,
+              'bonus_score': state.totalBonusCoinsGained!,
+              'no_of_correct_answers': state.noOfCorrectAnswers,
+              'queued_at': DateTime.now().toIso8601String(),
+            };
+            await _connectivityBloc!.submitOrEnqueue(playLog);
+          }
+        }
 
         if (roundsLeft < 1 &&
             (totalPointsGainedInBabe + coinsGained <
@@ -364,32 +383,46 @@ class PilgrimProgressBloc
             ? youngBelieversLevelIsLocked = false
             : youngBelieversLevelIsLocked = true;
 
-        await _pilgrimProgressRepository.sendGameData(
-          'PILGRIM_PROGRESS',
-          state.coinsGained,
-          state.coinsGained,
-          state.totalBonusCoinsGained!,
-          averageTimeSpent,
-          'child',
-          state.noOfCorrectAnswers,
-          authenticationState.user.id,
-          roundsLeft >= 1
-              ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInChild + coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-                  ? userProgress.toStringAsFixed(5)
-                  : 0,
-          roundsLeft >= 1 &&
-                  userRank == 'child' &&
-                  !(totalPointsGainedInChild + state.coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-              ? roundsLeft
-              : 4,
-             deviceName,
-             deviceOs
-        );
+        try {
+          await _pilgrimProgressRepository.sendGameData(
+            'PILGRIM_PROGRESS',
+            state.coinsGained,
+            state.coinsGained,
+            state.totalBonusCoinsGained!,
+            averageTimeSpent,
+            'child',
+            state.noOfCorrectAnswers,
+            authenticationState.user.id,
+            roundsLeft >= 1
+                ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
+                : (totalPointsGainedInChild + coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                    ? userProgress.toStringAsFixed(5)
+                    : 0,
+            roundsLeft >= 1 &&
+                    userRank == 'child' &&
+                    !(totalPointsGainedInChild + state.coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                ? roundsLeft
+                : 4,
+               deviceName,
+               deviceOs
+          );
+        } catch (_) {
+          if (_connectivityBloc != null) {
+            final playLog = {
+              'game_mode': 'PILGRIM_PROGRESS',
+              'total_score': state.coinsGained,
+              'base_score': state.coinsGained,
+              'bonus_score': state.totalBonusCoinsGained!,
+              'no_of_correct_answers': state.noOfCorrectAnswers,
+              'queued_at': DateTime.now().toIso8601String(),
+            };
+            await _connectivityBloc!.submitOrEnqueue(playLog);
+          }
+        }
 
         if (roundsLeft < 1 &&
             (totalPointsGainedInChild + coinsGained <
@@ -430,32 +463,46 @@ class PilgrimProgressBloc
             ? charityLevelIsLocked = false
             : charityLevelIsLocked = true;
 
-        await _pilgrimProgressRepository.sendGameData(
-          'PILGRIM_PROGRESS',
-          state.coinsGained,
-          state.coinsGained,
-          state.totalBonusCoinsGained!,
-          averageTimeSpent,
-          'young believer',
-          state.noOfCorrectAnswers,
-          authenticationState.user.id,
-          roundsLeft >= 1
-              ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInYB + coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-                  ? userProgress.toStringAsFixed(5)
-                  : 0,
-          roundsLeft >= 1 &&
-                  userRank == 'young believer' &&
-                  !(totalPointsGainedInYB + state.coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-              ? roundsLeft
-              : 3,
-             deviceName,
-             deviceOs
-        );
+        try {
+          await _pilgrimProgressRepository.sendGameData(
+            'PILGRIM_PROGRESS',
+            state.coinsGained,
+            state.coinsGained,
+            state.totalBonusCoinsGained!,
+            averageTimeSpent,
+            'young believer',
+            state.noOfCorrectAnswers,
+            authenticationState.user.id,
+            roundsLeft >= 1
+                ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
+                : (totalPointsGainedInYB + coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                    ? userProgress.toStringAsFixed(5)
+                    : 0,
+            roundsLeft >= 1 &&
+                    userRank == 'young believer' &&
+                    !(totalPointsGainedInYB + state.coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                ? roundsLeft
+                : 3,
+               deviceName,
+               deviceOs
+          );
+        } catch (_) {
+          if (_connectivityBloc != null) {
+            final playLog = {
+              'game_mode': 'PILGRIM_PROGRESS',
+              'total_score': state.coinsGained,
+              'base_score': state.coinsGained,
+              'bonus_score': state.totalBonusCoinsGained!,
+              'no_of_correct_answers': state.noOfCorrectAnswers,
+              'queued_at': DateTime.now().toIso8601String(),
+            };
+            await _connectivityBloc!.submitOrEnqueue(playLog);
+          }
+        }
 
         if (roundsLeft < 1 &&
             (totalPointsGainedInYB + coinsGained <
@@ -495,32 +542,46 @@ class PilgrimProgressBloc
                 state.coinsGained >= state.passOnFirstTrialScore
             ? fatherLevelIsLocked = false
             : fatherLevelIsLocked = true;
-        await _pilgrimProgressRepository.sendGameData(
-          'PILGRIM_PROGRESS',
-          state.coinsGained,
-          state.coinsGained,
-          state.totalBonusCoinsGained!,
-          averageTimeSpent,
-          'charity',
-          state.noOfCorrectAnswers,
-          authenticationState.user.id,
-          roundsLeft >= 1
-              ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInCharity + coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-                  ? userProgress.toStringAsFixed(5)
-                  : 0,
-          roundsLeft >= 1 &&
-                  userRank == 'charity' &&
-                  !(totalPointsGainedInCharity + state.coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-              ? roundsLeft
-              : 2,
-             deviceName,
-             deviceOs
-        );
+        try {
+          await _pilgrimProgressRepository.sendGameData(
+            'PILGRIM_PROGRESS',
+            state.coinsGained,
+            state.coinsGained,
+            state.totalBonusCoinsGained!,
+            averageTimeSpent,
+            'charity',
+            state.noOfCorrectAnswers,
+            authenticationState.user.id,
+            roundsLeft >= 1
+                ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
+                : (totalPointsGainedInCharity + coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                    ? userProgress.toStringAsFixed(5)
+                    : 0,
+            roundsLeft >= 1 &&
+                    userRank == 'charity' &&
+                    !(totalPointsGainedInCharity + state.coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                ? roundsLeft
+                : 2,
+               deviceName,
+               deviceOs
+          );
+        } catch (_) {
+          if (_connectivityBloc != null) {
+            final playLog = {
+              'game_mode': 'PILGRIM_PROGRESS',
+              'total_score': state.coinsGained,
+              'base_score': state.coinsGained,
+              'bonus_score': state.totalBonusCoinsGained!,
+              'no_of_correct_answers': state.noOfCorrectAnswers,
+              'queued_at': DateTime.now().toIso8601String(),
+            };
+            await _connectivityBloc!.submitOrEnqueue(playLog);
+          }
+        }
 
         if (roundsLeft < 1 &&
             (totalPointsGainedInCharity + coinsGained <
@@ -561,33 +622,46 @@ class PilgrimProgressBloc
             ? elderLevelIsLocked = false
             : elderLevelIsLocked = true;
 
-        await _pilgrimProgressRepository.sendGameData(
-          'PILGRIM_PROGRESS',
-          state.coinsGained,
-          state.coinsGained,
-          state.totalBonusCoinsGained!,
-          averageTimeSpent,
-          'father',
-          state.noOfCorrectAnswers,
-          authenticationState.user.id,
-          roundsLeft >= 1
-              ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInFather + coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-                  ? userProgress.toStringAsFixed(5)
-                  : 0,
-          roundsLeft >= 1 &&
-                  userRank == 'father' &&
-                  !(totalPointsGainedInFather + state.coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-              ? roundsLeft
-              : 2,
-          deviceName,
-          deviceOs
-
-        );
+        try {
+          await _pilgrimProgressRepository.sendGameData(
+            'PILGRIM_PROGRESS',
+            state.coinsGained,
+            state.coinsGained,
+            state.totalBonusCoinsGained!,
+            averageTimeSpent,
+            'father',
+            state.noOfCorrectAnswers,
+            authenticationState.user.id,
+            roundsLeft >= 1
+                ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
+                : (totalPointsGainedInFather + coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                    ? userProgress.toStringAsFixed(5)
+                    : 0,
+            roundsLeft >= 1 &&
+                    userRank == 'father' &&
+                    !(totalPointsGainedInFather + state.coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                ? roundsLeft
+                : 2,
+            deviceName,
+            deviceOs
+          );
+        } catch (_) {
+          if (_connectivityBloc != null) {
+            final playLog = {
+              'game_mode': 'PILGRIM_PROGRESS',
+              'total_score': state.coinsGained,
+              'base_score': state.coinsGained,
+              'bonus_score': state.totalBonusCoinsGained!,
+              'no_of_correct_answers': state.noOfCorrectAnswers,
+              'queued_at': DateTime.now().toIso8601String(),
+            };
+            await _connectivityBloc!.submitOrEnqueue(playLog);
+          }
+        }
 
         if (roundsLeft < 1 &&
             (totalPointsGainedInFather + coinsGained <
@@ -623,32 +697,46 @@ class PilgrimProgressBloc
         userProgress += score;
         var coinsGained = state.coinsGained;
 
-        await _pilgrimProgressRepository.sendGameData(
-          'PILGRIM_PROGRESS',
-          state.coinsGained,
-          state.coinsGained,
-          state.totalBonusCoinsGained!,
-          averageTimeSpent,
-          'elder',
-          state.noOfCorrectAnswers,
-          authenticationState.user.id,
-          roundsLeft >= 1
-              ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
-              : (totalPointsGainedInElder + coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-                  ? userProgress.toStringAsFixed(5)
-                  : 0,
-          roundsLeft >= 1 &&
-                  userRank == 'elder' &&
-                  !(totalPointsGainedInElder + state.coinsGained >=
-                          state.totalCoinsAvailableForSelectedLevel! ||
-                      coinsGained >= state.passOnFirstTrialScore)
-              ? roundsLeft
-              : 2,
-             deviceName,
-          deviceOs
-        );
+        try {
+          await _pilgrimProgressRepository.sendGameData(
+            'PILGRIM_PROGRESS',
+            state.coinsGained,
+            state.coinsGained,
+            state.totalBonusCoinsGained!,
+            averageTimeSpent,
+            'elder',
+            state.noOfCorrectAnswers,
+            authenticationState.user.id,
+            roundsLeft >= 1
+                ? (userProgress >= 1.0 ? 1.0 : userProgress.toStringAsFixed(5))
+                : (totalPointsGainedInElder + coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                    ? userProgress.toStringAsFixed(5)
+                    : 0,
+            roundsLeft >= 1 &&
+                    userRank == 'elder' &&
+                    !(totalPointsGainedInElder + state.coinsGained >=
+                            state.totalCoinsAvailableForSelectedLevel! ||
+                        coinsGained >= state.passOnFirstTrialScore)
+                ? roundsLeft
+                : 2,
+               deviceName,
+            deviceOs
+          );
+        } catch (_) {
+          if (_connectivityBloc != null) {
+            final playLog = {
+              'game_mode': 'PILGRIM_PROGRESS',
+              'total_score': state.coinsGained,
+              'base_score': state.coinsGained,
+              'bonus_score': state.totalBonusCoinsGained!,
+              'no_of_correct_answers': state.noOfCorrectAnswers,
+              'queued_at': DateTime.now().toIso8601String(),
+            };
+            await _connectivityBloc!.submitOrEnqueue(playLog);
+          }
+        }
 
         if (roundsLeft < 1 &&
             (totalPointsGainedInElder + coinsGained <
@@ -673,12 +761,13 @@ class PilgrimProgressBloc
     SubmitPilgrimProgressScore event,
     Emitter<PilgrimProgressState> emit,
   ) async {
+    final authenticationState = _authenticationBloc.state;
+    final prefs = await SharedPreferences.getInstance();
+    final deviceName = prefs.getString('deviceName');
+    final deviceOs = prefs.getString('deviceOs');
+
     try {
-      final authenticationState = _authenticationBloc.state;
-      final prefs = await SharedPreferences.getInstance();
-      final deviceName = prefs.getString('deviceName');
-      final deviceOs = prefs.getString('deviceOs');
-      final response = await _pilgrimProgressRepository.sendGameData(
+      await _pilgrimProgressRepository.sendGameData(
         'PILGRIM_PROGRESS',
         state.coinsGained,
         state.coinsGained,
@@ -690,9 +779,28 @@ class PilgrimProgressBloc
         null,
         5,
         deviceName,
-        deviceOs
+        deviceOs,
       );
-    } catch (_) {}
+    } catch (_) {
+      // Network failed — enqueue for offline sync
+      if (_connectivityBloc != null) {
+        final playLog = {
+          'game_mode': 'PILGRIM_PROGRESS',
+          'total_score': state.coinsGained,
+          'base_score': state.coinsGained,
+          'bonus_score': state.totalBonusCoinsGained!,
+          'average_time_spent': state.totalTimeSpent,
+          'player_rank': authenticationState.user!.rank,
+          'number_of_correct_answers': state.noOfCorrectAnswers,
+          'player_id': authenticationState.user!.id,
+          'user_progress': null,
+          'number_of_rounds': 5,
+          'deviceName': deviceName,
+          'deviceOs': deviceOs,
+        };
+        await _connectivityBloc!.submitOrEnqueue(playLog);
+      }
+    }
   }
 
   void _onClearPilgrimProgressData(

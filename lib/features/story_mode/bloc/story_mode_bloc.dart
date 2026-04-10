@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:bible_game/shared/data/story_arcs.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,13 +11,17 @@ part 'story_mode_state.dart';
 
 class StoryModeBloc extends Bloc<StoryModeEvent, StoryModeState> {
   final SettingsBloc _settingsBloc;
+  final ConnectivityBloc _connectivityBloc;
 
   static const int _pointsPerQuestion = 100;
   static const int _durationPerQuestion = 30;
   // 50/50 is free in story mode (1 per chapter)
 
-  StoryModeBloc({required SettingsBloc settingsBloc})
-      : _settingsBloc = settingsBloc,
+  StoryModeBloc({
+    required SettingsBloc settingsBloc,
+    required ConnectivityBloc connectivityBloc,
+  })  : _settingsBloc = settingsBloc,
+        _connectivityBloc = connectivityBloc,
         super(const StoryModeState()) {
     on<LoadStoryArcs>(_onLoadStoryArcs);
     on<SelectStory>(_onSelectStory);
@@ -299,6 +304,18 @@ class StoryModeBloc extends Bloc<StoryModeEvent, StoryModeState> {
     if (newStars == 3) {
       _settingsBloc.soundManager.playAchievementSound();
     }
+
+    // Submit score to server or enqueue for offline sync
+    final playLog = {
+      'game_mode': 'STORY_MODE',
+      'total_score': state.coinsGained,
+      'base_score': state.coinsGained,
+      'bonus_score': 0,
+      'no_of_correct_answers': state.correctAnswers,
+      'queued_at': DateTime.now().toIso8601String(),
+    };
+
+    _connectivityBloc.submitOrEnqueue(playLog);
 
     emit(state.copyWith(
       chapterCompleted: true,

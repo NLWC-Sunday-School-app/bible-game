@@ -1,4 +1,6 @@
 import 'package:bible_game/shared/data/daily_devotionals.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +10,15 @@ part 'daily_devotional_state.dart';
 
 class DailyDevotionalBloc
     extends Bloc<DailyDevotionalEvent, DailyDevotionalState> {
-  DailyDevotionalBloc() : super(const DailyDevotionalState()) {
+  final ConnectivityBloc _connectivityBloc;
+  final AuthenticationBloc _authenticationBloc;
+
+  DailyDevotionalBloc({
+    required ConnectivityBloc connectivityBloc,
+    required AuthenticationBloc authenticationBloc,
+  })  : _connectivityBloc = connectivityBloc,
+        _authenticationBloc = authenticationBloc,
+        super(const DailyDevotionalState()) {
     on<LoadDailyDevotional>(_onLoad);
     on<AnswerDevotional>(_onAnswer);
   }
@@ -78,6 +88,28 @@ class DailyDevotionalBloc
       devotionalStreak: streak,
       bestStreak: bestStreak,
     ));
+
+    // Submit play log to keep global BG Streak alive (no coins awarded)
+    final authState = _authenticationBloc.state;
+    final deviceName = prefs.getString('deviceName');
+    final deviceOs = prefs.getString('deviceOs');
+
+    final playLog = {
+      'game_mode': 'DAILY_DEVOTIONAL',
+      'total_score': 0,
+      'base_score': 0,
+      'bonus_score': 0,
+      'average_time_spent': 0,
+      'player_rank': authState.user.rank,
+      'number_of_correct_answers': isCorrect ? 1 : 0,
+      'player_id': authState.user.id,
+      'user_progress': null,
+      'number_of_rounds': 1,
+      'deviceName': deviceName,
+      'deviceOs': deviceOs,
+    };
+
+    await _connectivityBloc.submitOrEnqueue(playLog);
   }
 
   String _todayStr() {

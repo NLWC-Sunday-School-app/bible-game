@@ -7,6 +7,7 @@ import 'package:stroke_text/stroke_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/features/store/widget/modal/successfully_bought_gem_modal.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/constants/colors.dart';
@@ -245,8 +246,20 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                                       .read<SettingsBloc>()
                                       .state
                                       .gamePlaySettings['gem_price'];
+                                  final isOnline = context.read<ConnectivityBloc>().state.isOnline;
                                   return GestureDetector(
                                     onTap: (){
+                                      if (!isOnline) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: const Text('Purchases require an internet connection.'),
+                                            backgroundColor: Colors.orange.shade800,
+                                            duration: const Duration(seconds: 2),
+                                            behavior: SnackBarBehavior.floating,
+                                          ),
+                                        );
+                                        return;
+                                      }
                                       if(coinBalance >= int.parse(gemPrice)){
                                         context.read<UserBloc>().add(PurchaseGem());
                                         Future.delayed(Duration(seconds: 2), (){

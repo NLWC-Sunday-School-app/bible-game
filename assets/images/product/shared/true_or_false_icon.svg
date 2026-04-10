@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Central pillar -->
+  <rect x="46" y="35" width="8" height="45" rx="3" fill="#F5D76E"/>
+  <rect x="47.5" y="35" width="5" height="45" rx="2" fill="#F7E27A" opacity="0.6"/>
+
+  <!-- Base -->
+  <ellipse cx="50" cy="82" rx="22" ry="6" fill="#D4A520"/>
+  <ellipse cx="50" cy="80" rx="22" ry="6" fill="#F5D76E"/>
+  <ellipse cx="50" cy="80" rx="18" ry="4.5" fill="#F7E89A" opacity="0.5"/>
+
+  <!-- Top beam -->
+  <rect x="10" y="30" width="80" height="7" rx="3.5" fill="#D4A520"/>
+  <rect x="10" y="30" width="80" height="5" rx="2.5" fill="#F5D76E"/>
+  <rect x="12" y="31" width="76" height="2.5" rx="1.5" fill="#F7E89A" opacity="0.5"/>
+
+  <!-- Top ornament -->
+  <circle cx="50" cy="26" r="8" fill="#D4A520"/>
+  <circle cx="50" cy="25.5" r="7" fill="#F5D76E"/>
+  <circle cx="50" cy="25" r="4.5" fill="#F7E89A" opacity="0.6"/>
+
+  <!-- Left chain -->
+  <line x1="18" y1="37" x2="18" y2="52" stroke="#D4A520" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Left plate -->
+  <ellipse cx="18" cy="56" rx="15" ry="4" fill="#D4A520"/>
+  <ellipse cx="18" cy="55" rx="15" ry="4" fill="#F5D76E"/>
+
+  <!-- Green check on left plate -->
+  <circle cx="18" cy="50" r="9" fill="#27AE60"/>
+  <circle cx="18" cy="49.5" r="7.5" fill="#2ECC71"/>
+  <polyline points="12.5,49.5 16,53.5 24,45" fill="none" stroke="#FFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Right chain -->
+  <line x1="82" y1="37" x2="82" y2="58" stroke="#D4A520" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Right plate (lower - heavier/wrong) -->
+  <ellipse cx="82" cy="62" rx="15" ry="4" fill="#D4A520"/>
+  <ellipse cx="82" cy="61" rx="15" ry="4" fill="#F5D76E"/>
+
+  <!-- Red X on right plate -->
+  <circle cx="82" cy="56" r="9" fill="#C0392B"/>
+  <circle cx="82" cy="55.5" r="7.5" fill="#E74C3C"/>
+  <line x1="77" y1="51" x2="87" y2="60.5" stroke="#FFF" stroke-width="3" stroke-linecap="round"/>
+  <line x1="87" y1="51" x2="77" y2="60.5" stroke="#FFF" stroke-width="3" stroke-linecap="round"/>
+</svg>

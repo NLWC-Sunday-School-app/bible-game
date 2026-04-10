@@ -51,10 +51,9 @@ class _LoginModalState extends State<LoginModal> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _hasToggledPasswordVisibility = true;
-  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
   final DeviceInfoService _deviceInfoService = DeviceInfoService();
   Map<String, String> _deviceInfo = {};
+  bool _deviceInfoLoaded = false;
 
   void togglePasswordVisibility() {
     setState(() {
@@ -62,266 +61,277 @@ class _LoginModalState extends State<LoginModal> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final soundManager = context.read<SettingsBloc>().soundManager;
-    return SizedBox(
-      height: 550.h,
-      width: 500.w,
-      child: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(ProductImageRoutes.modalBg),
-            fit: BoxFit.fill,
-          ),
-        ),
-        child: Form(
-          key: _loginFormKey,
-          child: Column(
-            children: [
-              SizedBox(
-                height: 50.h,
-              ),
-              GestureDetector(
-                onTap: () {
-                  soundManager.playClickSound();
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Image.asset(
-                        IconImageRoutes.closeModal,
-                        width: 35.w,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              StrokeText(
-                text: 'Log in to play',
-                textStyle: TextStyle(
-                  color: const Color(0xFF1768B9),
-                  fontFamily: 'Mikado',
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.w900,
-                ),
-                strokeColor: Colors.white,
-                strokeWidth: 5,
-              ),
-              SizedBox(
-                height: 10.h,
-              ),
-              Text(
-                'Pick up from where you stopped!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(
-                height: 20.h,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 45.0.w),
-                child: SizedBox(
-                  child: TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    controller: emailController,
-                    style: TextStyle(
-                      height: 1.5.h,
-                      color: const Color(0xFF104387),
-                      fontSize: 14.sp,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0xFFD4DDDF),
-                      focusColor: Colors.red,
-                      errorStyle: TextStyle(fontSize: 12.sp),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      hintText: 'Input your email',
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFD4DDDF),
-                          )),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(
-                              color: Color(0xFFD4DDDF), width: 1.5)),
-                    ),
-                    validator: (text) {
-                      return Validator.validateEmail(text!);
-                    },
-                    onChanged: (text) => {},
-                  ),
-                ),
-              ),
-              SizedBox(height: 15.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 45.0.w),
-                child: SizedBox(
-                  child: TextFormField(
-                    keyboardType: TextInputType.visiblePassword,
-                    controller: passwordController,
-                    obscureText: _hasToggledPasswordVisibility,
-                    style: TextStyle(
-                      height: 1.h,
-                      color: const Color(0xFF104387),
-                    ),
-                    decoration: InputDecoration(
-                      suffixIcon: GestureDetector(
-                        onTap: () => togglePasswordVisibility(),
-                        child: Image.asset(
-                          _hasToggledPasswordVisibility
-                              ? IconImageRoutes.eyeClose
-                              : IconImageRoutes.eyeOpen,
-                          scale: 1.5,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFD4DDDF),
-                      errorStyle: TextStyle(fontSize: 12.sp),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      hintText: 'Password',
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFD4DDDF),
-                          )),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(
-                            color: Color(0xFFD4DDDF),
-                            width: 1.5.w,
-                          )),
-                    ),
-                    validator: (text) {
-                      return Validator.validatePassword(text!);
-                    },
-                    onChanged: (text) => {},
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 30.h,
-              ),
-              BlocConsumer<AuthenticationBloc, AuthenticationState>(
-                listener: (context, state) {
-                  if( state.failedToLogin){
-                    ApiException.showSnackBar(context);
-                  }
-
-                  if(state.token != null){
-                    BlocProvider.of<GlobalChallengeBloc>(context)
-                        .add(FetchGlobalChallengeGames());
-                  final tokenNotifier =
-                      Provider.of<TokenNotifier>(context, listen: false);
-                  tokenNotifier.setToken(state.token);
-                    GetStorage().write('user_token', state.token!);
-                    GetStorage().write('refresh_token', state.refreshToken!);
-                   Navigator.pop(context);
-                   showSuccessfulLoginModal(context);
-                  }
-
-
-                  // if(state.isUnauthenticated){
-                  //   ApiException.showSnackBar(context);
-                  // }
-
-
-
-                  // if (state.token != null) {
-                  //   Navigator.pop(context);
-                  //   Navigator.pushNamed(context, AppRoutes.home);
-                  //   showSuccessfulLoginModal(context);
-                  //   final tokenNotifier =
-                  //       Provider.of<TokenNotifier>(context, listen: false);
-                  //   tokenNotifier.setToken(state.token);
-                  //   final prefs = SharedPreferences.getInstance();
-                  //   prefs.then((sharedPreferences) {
-                  //     sharedPreferences.setString('user_token', state.token!);
-                  //     sharedPreferences.setString(
-                  //         'refresh_token', state.refresh_token!);
-                  //   });
-                  //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
-                  // } else if (state.isUnauthenticated) {
-                  //   print(state);
-                  //   ApiException.showSnackBar(context);
-                  // }
-
-
-                },
-                builder: (context, state) {
-                  return BlueButton(
-                    width: 250.w,
-                    buttonText: 'Login',
-                    buttonIsLoading: state.isLoadingLogin,
-                    onTap: () {
-                      soundManager.playClickSound();
-                      if (_loginFormKey.currentState!.validate()) {
-                        print('Validated');
-                        // BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
-                        BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginRequested(emailController.text,
-                          passwordController.text, _deviceInfo['deviceName']!, _deviceInfo['osVersion']!));
-
-                      }
-                    },
-                  );
-                },
-              ),
-              SizedBox(
-                height: 10.h,
-              ),
-              InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                  showResetPasswordModal(context);
-                },
-                child: Text(
-                  'Forgot Password?',
-                  style: TextStyle(
-                    color: const Color(0xFF4075BB),
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Mikado',
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<void> _loadDeviceInfo() async {
     final prefs = await SharedPreferences.getInstance();
     final info = await _deviceInfoService.getDeviceInfo();
+    if (!mounted) return;
     setState(() {
       _deviceInfo = info;
+      _deviceInfoLoaded = true;
     });
-    prefs.setString('deviceName', _deviceInfo['deviceName']!);
-    prefs.setString('deviceOs', _deviceInfo['osVersion']!);
-
+    prefs.setString('deviceName', _deviceInfo['deviceName'] ?? 'Unknown');
+    prefs.setString('deviceOs', _deviceInfo['osVersion'] ?? 'Unknown');
   }
 
   @override
   void initState() {
     super.initState();
     _loadDeviceInfo();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: SizedBox(
+        height: 550.h,
+        width: 500.w,
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(ProductImageRoutes.modalBg),
+              fit: BoxFit.fill,
+            ),
+          ),
+          child: Form(
+            key: _loginFormKey,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 50.h,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    soundManager.playClickSound();
+                    Navigator.pop(context);
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Image.asset(
+                          IconImageRoutes.closeModal,
+                          width: 35.w,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                StrokeText(
+                  text: 'Log in to play',
+                  textStyle: TextStyle(
+                    color: const Color(0xFF1768B9),
+                    fontFamily: 'Mikado',
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  strokeColor: Colors.white,
+                  strokeWidth: 5,
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                Text(
+                  'Pick up from where you stopped!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 45.0.w),
+                  child: SizedBox(
+                    child: TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      controller: emailController,
+                      textInputAction: TextInputAction.next,
+                      style: TextStyle(
+                        height: 1.5.h,
+                        color: const Color(0xFF104387),
+                        fontSize: 14.sp,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFFD4DDDF),
+                        focusColor: Colors.red,
+                        errorStyle: TextStyle(fontSize: 12.sp),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        hintText: 'Input your email',
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFD4DDDF),
+                            )),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFD4DDDF), width: 1.5)),
+                      ),
+                      validator: (text) {
+                        return Validator.validateEmail(text!);
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.h),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 45.0.w),
+                  child: SizedBox(
+                    child: TextFormField(
+                      keyboardType: TextInputType.visiblePassword,
+                      controller: passwordController,
+                      obscureText: _hasToggledPasswordVisibility,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _submitLogin(soundManager),
+                      style: TextStyle(
+                        height: 1.h,
+                        color: const Color(0xFF104387),
+                      ),
+                      decoration: InputDecoration(
+                        suffixIcon: GestureDetector(
+                          onTap: () => togglePasswordVisibility(),
+                          child: Image.asset(
+                            _hasToggledPasswordVisibility
+                                ? IconImageRoutes.eyeClose
+                                : IconImageRoutes.eyeOpen,
+                            scale: 1.5,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFD4DDDF),
+                        errorStyle: TextStyle(fontSize: 12.sp),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        hintText: 'Password',
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFD4DDDF),
+                            )),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                            borderSide: BorderSide(
+                              color: Color(0xFFD4DDDF),
+                              width: 1.5.w,
+                            )),
+                      ),
+                      validator: (text) {
+                        return Validator.validatePassword(text!);
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 30.h,
+                ),
+                BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                  listenWhen: (prev, curr) =>
+                      prev.failedToLogin != curr.failedToLogin ||
+                      prev.token != curr.token,
+                  listener: (context, state) {
+                    if (state.failedToLogin) {
+                      // Show specific error from API if available, otherwise generic message
+                      final errorMsg = ApiException.errorMessage;
+                      if (errorMsg.isNotEmpty) {
+                        ApiException.showSnackBar(context);
+                      } else {
+                        Flushbar(
+                          message: 'Invalid email or password. Please try again.',
+                          flushbarPosition: FlushbarPosition.TOP,
+                          flushbarStyle: FlushbarStyle.GROUNDED,
+                          backgroundColor: Colors.red,
+                          duration: const Duration(seconds: 3),
+                        ).show(context);
+                      }
+                    }
+
+                    if (state.token != null) {
+                      BlocProvider.of<GlobalChallengeBloc>(context)
+                          .add(FetchGlobalChallengeGames());
+                      final tokenNotifier =
+                          Provider.of<TokenNotifier>(context, listen: false);
+                      tokenNotifier.setToken(state.token);
+                      GetStorage().write('user_token', state.token!);
+                      GetStorage().write('refresh_token', state.refreshToken!);
+                      Navigator.pop(context);
+                      showSuccessfulLoginModal(context);
+                    }
+                  },
+                  builder: (context, state) {
+                    return BlueButton(
+                      width: 250.w,
+                      buttonText: 'Login',
+                      buttonIsLoading: state.isLoadingLogin,
+                      onTap: () => _submitLogin(soundManager),
+                    );
+                  },
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                    showResetPasswordModal(context);
+                  },
+                  child: Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: const Color(0xFF4075BB),
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Mikado',
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _submitLogin(dynamic soundManager) {
+    soundManager.playClickSound();
+    FocusScope.of(context).unfocus();
+    if (_loginFormKey.currentState!.validate()) {
+      final deviceName = _deviceInfoLoaded
+          ? (_deviceInfo['deviceName'] ?? 'Unknown')
+          : 'Unknown';
+      final deviceOs = _deviceInfoLoaded
+          ? (_deviceInfo['osVersion'] ?? 'Unknown')
+          : 'Unknown';
+      BlocProvider.of<AuthenticationBloc>(context).add(
+        AuthenticationLoginRequested(
+          emailController.text,
+          passwordController.text,
+          deviceName,
+          deviceOs,
+        ),
+      );
+    }
   }
 }

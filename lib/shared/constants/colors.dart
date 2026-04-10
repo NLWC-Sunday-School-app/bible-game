@@ -140,4 +140,5 @@ class AppColors {
   // ---------------------------------------------------------------------------
   static const Color devotionalGameCard = Color(0xFF6B4C9A);
   static const Color storyModeGameCard = Color(0xFF8B5E3C);
+  static const Color trueOrFalseGameCard = Color(0xFFD4A017);
 }

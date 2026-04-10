@@ -14,6 +14,8 @@ import 'package:stroke_text/stroke_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/widgets/tab_button.dart';
 import '../../../shared/constants/colors.dart';
+import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
+import '../../../shared/widgets/offline_banner.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:intl/intl.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
@@ -49,12 +51,14 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
     super.initState();
     getBasicOsInfo();
     _loadDeviceInfo();
-    final userState = BlocProvider.of<AuthenticationBloc>(context).state;
-    if (userState.user.id != 0) {
-      BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(true));
-      // BlocProvider.of<UserBloc>(context).add(FetchCountryLeaderBoard());
-    } else {
-      BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(false));
+    final isOnline = context.read<ConnectivityBloc>().state.isOnline;
+    if (isOnline) {
+      final userState = BlocProvider.of<AuthenticationBloc>(context).state;
+      if (userState.user.id != 0) {
+        BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(true));
+      } else {
+        BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(false));
+      }
     }
   }
 
@@ -119,7 +123,48 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
         backgroundColor: AppColors.primaryColorShade, // Status bar color
       ),
       backgroundColor: AppColors.primaryColor,
-      body: BlocBuilder<UserBloc, UserState>(
+      body: BlocBuilder<ConnectivityBloc, ConnectivityState>(
+        builder: (context, connectivityState) {
+          if (!connectivityState.isOnline) {
+            return SafeArea(
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(ProductImageRoutes.patternTwoBg),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    ScreenAppBar(
+                      widgets: [
+                        Center(
+                          child: StrokeText(
+                            text: 'Leaderboard',
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26.sp,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            strokeColor: AppColors.titleDropShadowColor,
+                            strokeWidth: 6,
+                          ),
+                        ),
+                        SizedBox(height: 10.h),
+                      ],
+                    ),
+                    const Spacer(),
+                    const OfflineBanner(
+                      subtitle: 'Leaderboard requires an internet connection.\nPlease reconnect to see the rankings.',
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
           if (_selectedGlobal) {
             final board = state.globalLeaderboard;
@@ -213,7 +258,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                     .state
                                     .user
                                     .id !=
-                                    0) {
+                                    0 && context.read<ConnectivityBloc>().state.isOnline) {
                                   BlocProvider.of<UserBloc>(context).add(FetchGlobalLeaderBoard(true));
 
                                 }
@@ -243,7 +288,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                         .state
                                         .user
                                         .id !=
-                                    0) {
+                                    0 && context.read<ConnectivityBloc>().state.isOnline) {
                                   BlocProvider.of<UserBloc>(context)
                                       .add(FetchCountryLeaderBoard());
                                 }
@@ -463,6 +508,8 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
               ),
             ),
           );
+        },
+      );
         },
       ),
     );

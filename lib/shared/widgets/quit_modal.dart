@@ -1,5 +1,6 @@
 import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
 import 'package:bible_game/features/story_mode/bloc/story_mode_bloc.dart';
+import 'package:bible_game/features/true_or_false/bloc/true_or_false_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -72,6 +73,10 @@ class QuitModal extends StatelessWidget {
         AppRoutes.chapterMapScreen,
         ModalRoute.withName(AppRoutes.storySelectionScreen),
       );
+    } else if (gameMode == 'trueOrFalse') {
+      BlocProvider.of<TrueOrFalseBloc>(context).add(ResetTrueOrFalseGame());
+      Navigator.pop(context); // close modal
+      Navigator.pop(context); // back to home
     } else {
       Navigator.pushNamedAndRemoveUntil(
           context, AppRoutes.home, (Route<dynamic> route) => false);

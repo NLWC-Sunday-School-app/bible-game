@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/four_scriptures_repository.dart';
 
@@ -20,13 +21,17 @@ class FourScripturesOneWordBloc
   final AuthenticationBloc _authenticationBloc;
   final SettingsBloc _settingsBloc;
 
+  ConnectivityBloc? _connectivityBloc;
+
   FourScripturesOneWordBloc(
       {required AuthenticationBloc authenticationBloc,
       required FourScripturesOneWordRepository fourScripturesOneWordRepository,
-      required SettingsBloc settingsBloc})
+      required SettingsBloc settingsBloc,
+      ConnectivityBloc? connectivityBloc})
       : _fourScripturesOneWordRepository = fourScripturesOneWordRepository,
         _authenticationBloc = authenticationBloc,
         _settingsBloc = settingsBloc,
+        _connectivityBloc = connectivityBloc,
         super(FourScripturesOneWordState()) {
     on<FetchQuestions>(_onFetchGameQuestions);
     on<FetchTotalNoOfQuestions>(_onFetchTotalNoOfQuestions);
@@ -714,17 +719,19 @@ class FourScripturesOneWordBloc
 
   Future<void> _onSendGameData(
       SendGameData event, Emitter<FourScripturesOneWordState> emit) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final authenticationState = _authenticationBloc.state;
+    final settingsState = _settingsBloc.state;
+    final deviceName = prefs.getString('deviceName');
+    final deviceOs = prefs.getString('deviceOs');
+    final totalScore = int.parse(
+      settingsState.gamePlaySettings['base_score_pilgrim_progress'],
+    );
+
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final authenticationState = _authenticationBloc.state;
-      final settingsState = _settingsBloc.state;
-      final deviceName = prefs.getString('deviceName');
-      final deviceOs = prefs.getString('deviceOs');
       await _fourScripturesOneWordRepository.sendGameData(
           'FOUR_SCRIPTURES',
-          int.parse(
-            settingsState.gamePlaySettings['base_score_pilgrim_progress'],
-          ),
+          totalScore,
           0,
           0,
           0,
@@ -734,12 +741,34 @@ class FourScripturesOneWordBloc
           0,
           0,
           deviceName,
-          deviceOs
+          deviceOs,
       );
 
       await prefs.setInt('4ScripturesHintUsed', 0);
       emit(state.copyWith(gameHintPurchasePrice: 0, noOfHintsUsed: 0));
-    } catch (_) {}
+    } catch (_) {
+      // Network failed — enqueue for offline sync
+      if (_connectivityBloc != null) {
+        final playLog = {
+          'game_mode': 'FOUR_SCRIPTURES',
+          'total_score': totalScore,
+          'base_score': 0,
+          'bonus_score': 0,
+          'average_time_spent': 0,
+          'player_rank': authenticationState.user.rank,
+          'number_of_correct_answers': 0,
+          'player_id': authenticationState.user.id,
+          'user_progress': 0,
+          'number_of_rounds': 0,
+          'deviceName': deviceName,
+          'deviceOs': deviceOs,
+        };
+        await _connectivityBloc!.submitOrEnqueue(playLog);
+      }
+
+      await prefs.setInt('4ScripturesHintUsed', 0);
+      emit(state.copyWith(gameHintPurchasePrice: 0, noOfHintsUsed: 0));
+    }
   }
 
   Future<void> _onUpdateGameLevel(

@@ -8,8 +8,10 @@ import 'package:bible_game/features/fantasy_league/widget/my_leagues.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import '../../../shared/constants/colors.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/green_button.dart';
+import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
 import '../../../shared/widgets/tab_button.dart';
 import '../../home/widget/modals/create_profile_modal.dart';
@@ -84,142 +86,150 @@ class _FantasyLeagueHomeScreenState extends State<FantasyLeagueHomeScreen> {
                 SizedBox(
                   height: 20.h,
                 ),
-                context.read<AuthenticationBloc>().state.user.id != 0
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: Container(
-                          height: 72.h,
-                          padding: EdgeInsets.symmetric(vertical: 10.h),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF898C6FE),
-                            borderRadius: BorderRadius.circular(4.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFF364865),
-                                offset: Offset(0, 5),
-                                blurRadius: 0,
-                                spreadRadius: -2,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              TabButton(
-                                width: 105,
-                                buttonText: 'Create',
-                                buttonSelected: _selectedCreate,
-                                onTap: () {
-                                  soundManager.playClickSound();
-                                  setState(() {
-                                    _selectedJoin = false;
-                                    _selectedCreate = true;
-                                    _selectedMyLeague = false;
-                                  });
-                                },
-                              ),
-                              TabButton(
-                                width: 105,
-                                buttonText: 'Join',
-                                buttonSelected: _selectedJoin,
-                                onTap: () {
-                                  soundManager.playClickSound();
-                                  setState(() {
-                                    _selectedJoin = true;
-                                    _selectedCreate = false;
-                                    _selectedMyLeague = false;
-                                  });
-                                },
-                              ),
-                              TabButton(
-                                width: 105,
-                                buttonText: 'My leagues',
-                                buttonSelected: _selectedMyLeague,
-                                onTap: () {
-                                  soundManager.playClickSound();
-                                  setState(() {
-                                    _selectedJoin = false;
-                                    _selectedCreate = false;
-                                    _selectedMyLeague = true;
-                                  });
-                                },
-                              )
-                            ],
-                          ),
+                BlocBuilder<ConnectivityBloc, ConnectivityState>(
+                  builder: (context, connectivityState) {
+                    if (!connectivityState.isOnline) {
+                      return Padding(
+                        padding: EdgeInsets.only(top: 60.h),
+                        child: const OfflineBanner(
+                          subtitle: 'Fantasy League requires an internet connection.\nPlease reconnect to access your leagues.',
                         ),
-                      )
-                    : SizedBox(),
-                SizedBox(
-                  height: 10.h,
-                ),
-                context.read<AuthenticationBloc>().state.user.id != 0
-                    ? _selectedCreate
-                        ? CreateLeague(
-                            screenHeight: usableHeight,
-                          )
-                        : _selectedJoin
-                            ? JoinLeague(
-                                screenHeight: usableHeight, showCreateLeague: showCreateLeague,
-                              )
-                            : MyLeagues(
-                                screenHeight: usableHeight,
-                              )
-                    :  Column(
-                  children: [
-                    SizedBox(
-                      height: 100.h,
-                    ),
-                    GreenButton(
-                      onTap: () {
-                        soundManager.playClickSound();
-                        showLoginModal(context);
-                      },
-                      buttonIsLoading: false,
-                      width: 350.w,
-                      customWidget: Center(
-                        child: StrokeText(
-                          text: 'Log In',
-                          textStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          strokeColor: const Color(0xFF272D39),
-                          strokeWidth: 3,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 30.h,),
-                    GestureDetector(
-                      onTap: () {
-                        soundManager.playClickSound();
-                        showCreateProfileModal(context);
-                      },
-                      child: Container(
-                        width: 350.w,
-                        padding:
-                        EdgeInsets.symmetric(vertical: 15.h),
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(
-                                  ProductImageRoutes.newBlueBtnBg),
-                              fit: BoxFit.fill,
-                            )),
-                        child: Center(
-                          child: StrokeText(
-                            text: 'Create Profile',
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w700,
+                      );
+                    }
+
+                    final isLoggedIn = context.read<AuthenticationBloc>().state.user.id != 0;
+
+                    if (!isLoggedIn) {
+                      return Column(
+                        children: [
+                          SizedBox(height: 100.h),
+                          GreenButton(
+                            onTap: () {
+                              soundManager.playClickSound();
+                              showLoginModal(context);
+                            },
+                            buttonIsLoading: false,
+                            width: 350.w,
+                            customWidget: Center(
+                              child: StrokeText(
+                                text: 'Log In',
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                strokeColor: const Color(0xFF272D39),
+                                strokeWidth: 3,
+                              ),
                             ),
-                            strokeColor: const Color(0xFF272D39),
-                            strokeWidth: 3,
+                          ),
+                          SizedBox(height: 30.h),
+                          GestureDetector(
+                            onTap: () {
+                              soundManager.playClickSound();
+                              showCreateProfileModal(context);
+                            },
+                            child: Container(
+                              width: 350.w,
+                              padding: EdgeInsets.symmetric(vertical: 15.h),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(ProductImageRoutes.newBlueBtnBg),
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                              child: Center(
+                                child: StrokeText(
+                                  text: 'Create Profile',
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  strokeColor: const Color(0xFF272D39),
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: Container(
+                            height: 72.h,
+                            padding: EdgeInsets.symmetric(vertical: 10.h),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF898C6FE),
+                              borderRadius: BorderRadius.circular(4.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFF364865),
+                                  offset: Offset(0, 5),
+                                  blurRadius: 0,
+                                  spreadRadius: -2,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                TabButton(
+                                  width: 105,
+                                  buttonText: 'Create',
+                                  buttonSelected: _selectedCreate,
+                                  onTap: () {
+                                    soundManager.playClickSound();
+                                    setState(() {
+                                      _selectedJoin = false;
+                                      _selectedCreate = true;
+                                      _selectedMyLeague = false;
+                                    });
+                                  },
+                                ),
+                                TabButton(
+                                  width: 105,
+                                  buttonText: 'Join',
+                                  buttonSelected: _selectedJoin,
+                                  onTap: () {
+                                    soundManager.playClickSound();
+                                    setState(() {
+                                      _selectedJoin = true;
+                                      _selectedCreate = false;
+                                      _selectedMyLeague = false;
+                                    });
+                                  },
+                                ),
+                                TabButton(
+                                  width: 105,
+                                  buttonText: 'My leagues',
+                                  buttonSelected: _selectedMyLeague,
+                                  onTap: () {
+                                    soundManager.playClickSound();
+                                    setState(() {
+                                      _selectedJoin = false;
+                                      _selectedCreate = false;
+                                      _selectedMyLeague = true;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  ],
+                        SizedBox(height: 10.h),
+                        _selectedCreate
+                            ? CreateLeague(screenHeight: usableHeight)
+                            : _selectedJoin
+                                ? JoinLeague(screenHeight: usableHeight, showCreateLeague: showCreateLeague)
+                                : MyLeagues(screenHeight: usableHeight),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

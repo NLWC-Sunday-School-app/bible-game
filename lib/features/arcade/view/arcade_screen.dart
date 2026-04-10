@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/view/home_screen.dart';
 import 'package:bible_game/features/multi_player/view/home_screen.dart';
 import 'package:bible_game/shared/constants/colors.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
+import 'package:bible_game/shared/widgets/offline_banner.dart';
 import 'package:bible_game/shared/widgets/screen_app_bar.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -115,18 +117,30 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                 SizedBox(
                   height: 10.h,
                 ),
-                SizedBox(
-                  child: _selectedGlobalChallenge
-                      ? SizedBox(
-                      height: usableHeight - (70.h + 20.h + 72.h + 120.h ),
-                      child: GlobalChallengeHomeScreen())
-                      :  Container(
-                    margin: EdgeInsets.only(top: 100.h),
-                    child: Image.asset(
-                      ProductImageRoutes.multiplayerComingSoon,
-                      width: 330.w,
-                    ),
-                  )
+                BlocBuilder<ConnectivityBloc, ConnectivityState>(
+                  builder: (context, connectivityState) {
+                    if (!connectivityState.isOnline) {
+                      return Padding(
+                        padding: EdgeInsets.only(top: 60.h),
+                        child: const OfflineBanner(
+                          subtitle: 'Arcade requires an internet connection.\nPlease reconnect to play.',
+                        ),
+                      );
+                    }
+                    return SizedBox(
+                      child: _selectedGlobalChallenge
+                          ? SizedBox(
+                          height: usableHeight - (70.h + 20.h + 72.h + 120.h ),
+                          child: GlobalChallengeHomeScreen())
+                          :  Container(
+                        margin: EdgeInsets.only(top: 100.h),
+                        child: Image.asset(
+                          ProductImageRoutes.multiplayerComingSoon,
+                          width: 330.w,
+                        ),
+                      )
+                    );
+                  },
                 )
               ],
             ),

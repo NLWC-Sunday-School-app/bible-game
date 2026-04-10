@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bible_game_api/model/user.dart';
@@ -54,6 +55,8 @@ class AuthenticationBloc
       try {
         final loggedOut = await _authenticationRepository.logOut();
         if (loggedOut) {
+          // Clear cached user data on logout
+          GetStorage().remove(_cachedUserKey);
           emit(state.copyWith(
               isUnauthenticated: true,
               isLoadingLogin: false,
@@ -130,16 +133,40 @@ class AuthenticationBloc
     }
   }
 
+  /// Key used to persist the last successfully-fetched User JSON in GetStorage.
+  static const _cachedUserKey = 'cached_user_data';
+
   Future<void> _onFetchUserDataRequested(
     FetchUserDataRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
     try {
       final user = await _userRepository.getUser();
-      emit(state.copyWith(user: user));
+      emit(state.copyWith(user: user, isUnauthenticated: false, isLoggedIn: true));
+
+      // Persist the user locally so we can restore it when offline
+      GetStorage().write(_cachedUserKey, jsonEncode(user.toJson()));
     } catch (_) {
-      emit(state.copyWith(isUnauthenticated: true, user: null));
+      // Network failed — try to restore from local cache
+      final cachedUser = _loadCachedUser();
+      if (cachedUser != null) {
+        emit(state.copyWith(user: cachedUser, isUnauthenticated: false, isLoggedIn: true));
+      } else {
+        emit(state.copyWith(isUnauthenticated: true, user: null));
+      }
     }
+  }
+
+  /// Attempts to load a previously-cached User from GetStorage.
+  User? _loadCachedUser() {
+    try {
+      final raw = GetStorage().read(_cachedUserKey);
+      if (raw != null && raw is String && raw.isNotEmpty) {
+        final json = jsonDecode(raw) as Map<String, dynamic>;
+        return User.fromJson(json);
+      }
+    } catch (_) {}
+    return null;
   }
 
   Future<void> _onUpdateFCMToken(

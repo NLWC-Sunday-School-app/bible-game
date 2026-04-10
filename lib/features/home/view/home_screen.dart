@@ -21,6 +21,7 @@ import 'package:bible_game/shared/utils/user_badge.dart';
 import 'package:upgrader/upgrader.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
+import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/utils/device_info.dart';
 import '../../../shared/utils/multiavatar_generator.dart';
@@ -69,7 +70,7 @@ const _gameEntries = [
     bgColor: AppColors.storyModeGameCard,
     gameType: 'Story Mode',
     gameText: 'Journey through Bible narratives!',
-    gameImage: ProductImageRoutes.scroll,
+    gameImage: IconImageRoutes.purpleBook,
     smallWidth: 70,
     mediumWidth: 80,
     largeWidth: 90,
@@ -117,6 +118,17 @@ const _gameEntries = [
     route: AppRoutes.questionLoadingScreen,
     routeArguments: {'gameType': 'four_scriptures_game'},
   ),
+  _GameEntry(
+    bgColor: const Color(0xFFC67B3C),
+    gameType: 'True or False',
+    gameText: 'Test your knowledge!',
+    gameImage: ProductImageRoutes.trueOrFalseIcon,
+    smallWidth: 65,
+    mediumWidth: 75,
+    largeWidth: 85,
+    route: AppRoutes.trueOrFalseHomeScreen,
+    requiresNetwork: false,
+  ),
 ];
 
 class HomeScreen extends StatefulWidget {
@@ -130,7 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   Duration _duration = Duration();
   bool _globalChallengeIsComingSoon = false;
-  bool _isOffline = false;
   late DrawableRoot svgRoot;
   MultiavatarGenerator generator = MultiavatarGenerator();
   final DeviceInfoService _deviceInfoService = DeviceInfoService();
@@ -227,10 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadDeviceInfo();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = ModalRoute.of(context)?.settings.arguments;
-      if (args is Map<String, dynamic> && args['isOffline'] == true) {
-        setState(() => _isOffline = true);
-      } else {
+      final isOffline = !context.read<ConnectivityBloc>().state.isOnline;
+      if (!isOffline) {
         initializeWallet();
         fetchGameData();
         setGlobalChallengeTimer();
@@ -241,7 +250,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_isOffline) {
+    final isOffline = !context.read<ConnectivityBloc>().state.isOnline;
+    if (!isOffline) {
       BlocProvider.of<SettingsBloc>(context).add(FetchGamePlaySettings());
     }
   }
@@ -377,96 +387,129 @@ class _HomeScreenState extends State<HomeScreen> {
                                   },
                                 ),
                                 SizedBox(height: 10.h),
-                                if (_isOffline)
-                                  Container(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 12.w, vertical: 8.h),
-                                    margin: EdgeInsets.only(bottom: 10.h),
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange.shade900
-                                          .withValues(alpha: 0.85),
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                    child: Row(
+                                BlocBuilder<ConnectivityBloc, ConnectivityState>(
+                                  buildWhen: (prev, curr) =>
+                                      prev.isOnline != curr.isOnline ||
+                                      prev.pendingSyncCount != curr.pendingSyncCount,
+                                  builder: (context, connState) {
+                                    return Column(
                                       children: [
-                                        Icon(Icons.wifi_off,
-                                            color: Colors.white, size: 18.sp),
-                                        SizedBox(width: 8.w),
-                                        Expanded(
-                                          child: Text(
-                                            'You\'re offline — Story Mode and Daily Devotional are available!',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w500,
+                                        if (!connState.isOnline)
+                                          Container(
+                                            width: double.infinity,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12.w, vertical: 8.h),
+                                            margin: EdgeInsets.only(bottom: 10.h),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange.shade900
+                                                  .withValues(alpha: 0.85),
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.wifi_off,
+                                                    color: Colors.white,
+                                                    size: 18.sp),
+                                                SizedBox(width: 8.w),
+                                                Expanded(
+                                                  child: Text(
+                                                    'You\'re offline — Story Mode, True or False and Daily Devotional are available!',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12.sp,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                _DailyDevotionalBanner(),
-                                SizedBox(height: 10.h),
-                                ..._gameEntries.map((entry) {
-                                  final imageWidth = screenWidth <= 380
-                                      ? entry.smallWidth.w
-                                      : screenWidth < 430
-                                          ? entry.mediumWidth.w
-                                          : entry.largeWidth.w;
-                                  final isDisabled = _isOffline && entry.requiresNetwork;
-                                  return Opacity(
-                                    opacity: isDisabled ? 0.4 : 1.0,
-                                    child: GameCard(
-                                      bgColor: entry.bgColor,
-                                      gameType: entry.gameType,
-                                      gameText: isDisabled
-                                          ? 'Requires internet connection'
-                                          : entry.gameText,
-                                      gameImage: entry.gameImage,
-                                      gameImageWidth: imageWidth,
-                                      onTap: () {
-                                        if (isDisabled) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                '${entry.gameType} requires an internet connection',
-                                              ),
-                                              duration: const Duration(seconds: 2),
-                                              backgroundColor: Colors.black87,
+                                        if (connState.pendingSyncCount > 0)
+                                          Container(
+                                            width: double.infinity,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12.w, vertical: 8.h),
+                                            margin: EdgeInsets.only(bottom: 10.h),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade800
+                                                  .withValues(alpha: 0.85),
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
                                             ),
-                                          );
-                                          return;
-                                        }
-                                        soundManager.playClickSound();
-                                        if (!entry.requiresNetwork || state.user.id != 0) {
-                                          Navigator.pushNamed(
-                                            context,
-                                            entry.route,
-                                            arguments: entry.routeArguments,
-                                          );
-                                        } else {
-                                          Navigator.pushNamed(
-                                              context, AppRoutes.profileScreen);
-                                        }
-                                      },
-                                    ),
-                                  );
-                                }),
-                                SizedBox(height: 10.h),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Did You Know? 💡',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 1,
-                                      fontSize: 20.sp,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.cloud_sync,
+                                                    color: Colors.white,
+                                                    size: 18.sp),
+                                                SizedBox(width: 8.w),
+                                                Expanded(
+                                                  child: Text(
+                                                    '${connState.pendingSyncCount} score${connState.pendingSyncCount > 1 ? 's' : ''} pending sync',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12.sp,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                      ],
+                                    );
+                                  },
                                 ),
-                                SizedBox(height: 12.h),
+                                _DailyDevotionalBanner(),
+                                SizedBox(height: 14.h),
+                                // ── All game modes in a 2-column grid ──
+                                Wrap(
+                                  spacing: 10.w,
+                                  runSpacing: 10.h,
+                                  children: List.generate(
+                                      _gameEntries.length, (index) {
+                                    final e = _gameEntries[index];
+                                    final isOffline = !context
+                                        .read<ConnectivityBloc>()
+                                        .state
+                                        .isOnline;
+                                    final disabled =
+                                        isOffline && e.requiresNetwork;
+                                    return SizedBox(
+                                      width: (screenWidth - 40.w) / 2,
+                                      child: _GameTileCard(
+                                        entry: e,
+                                        isDisabled: disabled,
+                                        onTap: () {
+                                          if (disabled) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  '${e.gameType} requires an internet connection'),
+                                              duration:
+                                                  const Duration(seconds: 2),
+                                              backgroundColor: Colors.black87,
+                                            ));
+                                            return;
+                                          }
+                                          soundManager.playClickSound();
+                                          if (!e.requiresNetwork ||
+                                              state.user.id != 0) {
+                                            Navigator.pushNamed(
+                                              context,
+                                              e.route,
+                                              arguments: e.routeArguments,
+                                            );
+                                          } else {
+                                            Navigator.pushNamed(context,
+                                                AppRoutes.profileScreen);
+                                          }
+                                        },
+                                      ),
+                                    );
+                                  }),
+                                ),
+                                SizedBox(height: 14.h),
                                 const DidYouKnowCarousel(),
                                 // if (!_isOffline) ...[
                                 //   SizedBox(height: 20.h),
@@ -596,6 +639,130 @@ class _DailyDevotionalBanner extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ─── Game tile card for horizontal scroll ───────────────────────────────────
+
+class _GameTileCard extends StatelessWidget {
+  const _GameTileCard({
+    required this.entry,
+    required this.isDisabled,
+    required this.onTap,
+  });
+  final _GameEntry entry;
+  final bool isDisabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final double imageWidth = entry.smallWidth.w;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Opacity(
+        opacity: isDisabled ? 0.40 : 1.0,
+        child: Container(
+          height: 130.h,
+          decoration: BoxDecoration(
+            color: entry.bgColor,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                color: entry.bgColor.withValues(alpha: 0.5),
+                offset: const Offset(0, 4),
+                blurRadius: 8,
+                spreadRadius: -2,
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // ── Game image (top-right area) ──
+              Positioned(
+                right: 6.w,
+                top: 8.h,
+                child: Opacity(
+                  opacity: 0.85,
+                  child: entry.gameImage.endsWith('.svg')
+                      ? SvgPicture.asset(
+                          entry.gameImage,
+                          width: imageWidth,
+                        )
+                      : Image.asset(
+                          entry.gameImage,
+                          width: imageWidth,
+                        ),
+                ),
+              ),
+              // ── Offline badge (top-left) ──
+              if (!entry.requiresNetwork)
+                Positioned(
+                  left: 8.w,
+                  top: 8.h,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 6.w, vertical: 3.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.wifi_off_rounded,
+                            color: Colors.white, size: 10.sp),
+                        SizedBox(width: 3.w),
+                        Text(
+                          'OFFLINE',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              // ── Text content (bottom-left) ──
+              Positioned(
+                left: 14.w,
+                right: 14.w,
+                bottom: 14.h,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      entry.gameType,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      entry.gameText,
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        color: Colors.white.withValues(alpha: 0.7),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

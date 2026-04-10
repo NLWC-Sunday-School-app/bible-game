@@ -49,7 +49,10 @@ import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/authentication/repository/authentication_repository.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game_api/api/game_api.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 import 'package:bible_game/shared/features/settings/sound_manager.dart';
+import 'package:bible_game/shared/utils/offline_sync_queue.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:bible_game/shared/features/user/model/user.dart';
 import 'package:bible_game/shared/features/user/repository/user_repository.dart';
@@ -67,6 +70,9 @@ import 'features/story_mode/bloc/story_mode_bloc.dart';
 import 'features/story_mode/view/chapter_map_screen.dart';
 import 'features/story_mode/view/story_question_screen.dart';
 import 'features/story_mode/view/story_selection_screen.dart';
+import 'features/true_or_false/bloc/true_or_false_bloc.dart';
+import 'features/true_or_false/view/true_or_false_home_screen.dart';
+import 'features/true_or_false/view/true_or_false_question_screen.dart';
 import 'features/global_challenge/view/question_screen.dart';
 import 'features/multi_player/view/question_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,7 +95,9 @@ class App extends StatefulWidget {
       required this.fourScripturesOneWordRepository,
       required this.whoIsWhoRepository,
       required this.globalChallengeRepository,
-      required this.fantasyLeagueRepository});
+      required this.fantasyLeagueRepository,
+      required this.gameAPI,
+      required this.offlineSyncQueue});
 
   final SoundManager soundManager;
   final AuthenticationRepository authenticationRepository;
@@ -100,6 +108,8 @@ class App extends StatefulWidget {
   final WhoIsWhoRepository whoIsWhoRepository;
   final GlobalChallengeRepository globalChallengeRepository;
   final FantasyLeagueRepository fantasyLeagueRepository;
+  final GameAPI gameAPI;
+  final OfflineSyncQueue offlineSyncQueue;
   final TokenNotifier tokenNotifier;
 
   @override
@@ -120,6 +130,12 @@ class _AppState extends State<App> {
       builder: (BuildContext context, Widget? child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => NavigationCubit()),
+          BlocProvider<ConnectivityBloc>(
+            create: (_) => ConnectivityBloc(
+              gameAPI: widget.gameAPI,
+              syncQueue: widget.offlineSyncQueue,
+            ),
+          ),
           BlocProvider<AuthenticationBloc>(
             create: (context) => AuthenticationBloc(
               authenticationRepository: widget.authenticationRepository,
@@ -141,14 +157,16 @@ class _AppState extends State<App> {
                 quickGameRepository: widget.quickGameRepository,
                 authenticationBloc:
                     BlocProvider.of<AuthenticationBloc>(context),
-                settingsBloc: BlocProvider.of<SettingsBloc>(context)),
+                settingsBloc: BlocProvider.of<SettingsBloc>(context),
+                connectivityBloc: BlocProvider.of<ConnectivityBloc>(context)),
           ),
           BlocProvider<PilgrimProgressBloc>(
             create: (context) => PilgrimProgressBloc(
                 pilgrimProgressRepository: widget.pilgrimProgressRepository,
                 authenticationBloc:
                     BlocProvider.of<AuthenticationBloc>(context),
-                settingsBloc: BlocProvider.of<SettingsBloc>(context)),
+                settingsBloc: BlocProvider.of<SettingsBloc>(context),
+                connectivityBloc: BlocProvider.of<ConnectivityBloc>(context)),
           ),
           BlocProvider<WhoIsWhoBloc>(
             create: (context) => WhoIsWhoBloc(
@@ -163,14 +181,16 @@ class _AppState extends State<App> {
                     BlocProvider.of<AuthenticationBloc>(context),
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 fourScripturesOneWordRepository:
-                    widget.fourScripturesOneWordRepository),
+                    widget.fourScripturesOneWordRepository,
+                connectivityBloc: BlocProvider.of<ConnectivityBloc>(context)),
           ),
           BlocProvider<GlobalChallengeBloc>(
             create: (context) => GlobalChallengeBloc(
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 authenticationBloc:
                     BlocProvider.of<AuthenticationBloc>(context),
-                globalChallengeRepository: widget.globalChallengeRepository),
+                globalChallengeRepository: widget.globalChallengeRepository,
+                connectivityBloc: BlocProvider.of<ConnectivityBloc>(context)),
           ),
           BlocProvider<FantasyLeagueBloc>(
             create: (context) => FantasyLeagueBloc(
@@ -180,12 +200,23 @@ class _AppState extends State<App> {
                 fantasyLeagueRepository: widget.fantasyLeagueRepository),
           ),
           BlocProvider<DailyDevotionalBloc>(
-            create: (_) => DailyDevotionalBloc()..add(LoadDailyDevotional()),
+            create: (context) => DailyDevotionalBloc(
+              connectivityBloc: BlocProvider.of<ConnectivityBloc>(context),
+              authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
+            )..add(LoadDailyDevotional()),
           ),
           BlocProvider<StoryModeBloc>(
             create: (context) => StoryModeBloc(
               settingsBloc: BlocProvider.of<SettingsBloc>(context),
+              connectivityBloc: BlocProvider.of<ConnectivityBloc>(context),
             )..add(LoadStoryArcs()),
+          ),
+          BlocProvider<TrueOrFalseBloc>(
+            create: (context) => TrueOrFalseBloc(
+              settingsBloc: BlocProvider.of<SettingsBloc>(context),
+              connectivityBloc: BlocProvider.of<ConnectivityBloc>(context),
+              authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
+            )..add(LoadTrueOrFalseData()),
           ),
           ChangeNotifierProvider(create: (_) => widget.tokenNotifier),
         ],
@@ -255,6 +286,10 @@ class _AppState extends State<App> {
                 const ChapterMapScreen(),
             AppRoutes.storyQuestionScreen: (context) =>
                 const StoryQuestionScreen(),
+            AppRoutes.trueOrFalseHomeScreen: (context) =>
+                const TrueOrFalseHomeScreen(),
+            AppRoutes.trueOrFalseQuestionScreen: (context) =>
+                const TrueOrFalseQuestionScreen(),
           },
           home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),

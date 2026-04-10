@@ -13,6 +13,7 @@ import 'package:bible_game/features/who_is_who/repository/wiw_repository.dart';
 import 'package:bible_game/shared/features/authentication/repository/authentication_repository.dart';
 import 'package:bible_game/shared/features/settings/sound_manager.dart';
 import 'package:bible_game/shared/features/user/repository/user_repository.dart';
+import 'package:bible_game/shared/utils/offline_sync_queue.dart';
 import 'package:bible_game_api/api/user_api.dart';
 import 'package:bible_game/shared/utils/app_bloc_observer.dart';
 import 'package:bible_game/shared/utils/awesome_notification.dart';
@@ -74,6 +75,7 @@ void main() async {
   final FourScripturesOneWordRepository fourScripturesOneWordRepository = FourScripturesOneWordRepository(gameAPI);
   final FantasyLeagueRepository fantasyLeagueRepository = FantasyLeagueRepository(gameAPI);
   final SoundManager soundManager = SoundManager();
+  final OfflineSyncQueue offlineSyncQueue = OfflineSyncQueue();
   runApp(App(
     authenticationRepository: authenticationRepository,
     userRepository: userRepository,
@@ -85,5 +87,7 @@ void main() async {
     whoIsWhoRepository : whoIsWhoRepository,
     tokenNotifier: tokenNotifier,
     soundManager: soundManager,
+    gameAPI: gameAPI,
+    offlineSyncQueue: offlineSyncQueue,
   ));
 }

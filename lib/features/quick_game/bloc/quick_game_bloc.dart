@@ -6,6 +6,7 @@ import 'package:bible_game_api/model/quick_game_topic.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../repository/quick_game_repository.dart';
@@ -19,13 +20,17 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
   final AuthenticationBloc _authenticationBloc;
   final SettingsBloc _settingsBloc;
 
+  ConnectivityBloc? _connectivityBloc;
+
   QuickGameBloc(
       {required AuthenticationBloc authenticationBloc,
       required QuickGameRepository quickGameRepository,
-      required SettingsBloc settingsBloc})
+      required SettingsBloc settingsBloc,
+      ConnectivityBloc? connectivityBloc})
       : _quickGameRepository = quickGameRepository,
         _authenticationBloc = authenticationBloc,
         _settingsBloc = settingsBloc,
+        _connectivityBloc = connectivityBloc,
         super(QuickGameState()) {
     on<FetchQuickGameTopics>(_onFetchQuickGameTopics);
     on<FetchQuickGameQuestions>(_onFetchQuickGameQuestions);
@@ -55,28 +60,52 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
      SubmitQuickGameScore event,
       Emitter<QuickGameState> emit,
       ) async {
+    final authenticationState = _authenticationBloc.state;
+    final prefs = await SharedPreferences.getInstance();
+    final deviceName = prefs.getString('deviceName');
+    final deviceOs = prefs.getString('deviceOs');
+
+    final questions = state.quickGameQuestions ?? [];
+    final avgTime = questions.isNotEmpty
+        ? (state.totalTimeSpent ?? 0) ~/ questions.length
+        : 0;
+    final totalScore = state.coinsGained ?? 0;
+    final bonusScore = state.totalBonusCoinsGained ?? 0;
+
     try {
-      final authenticationState = _authenticationBloc.state;
-      final prefs = await SharedPreferences.getInstance();
-      final deviceName = prefs.getString('deviceName');
-      final deviceOs = prefs.getString('deviceOs');
-      final response = await _quickGameRepository.sendGameData(
+      await _quickGameRepository.sendGameData(
         'QUICK_GAME',
-        state.coinsGained!,
-        state.coinsGained!,
-        state.totalBonusCoinsGained!,
-        (state.totalTimeSpent! ~/ state.quickGameQuestions!.length),
+        totalScore,
+        totalScore,
+        bonusScore,
+        avgTime,
         authenticationState.user.rank,
         state.noOfCorrectAnswers,
         authenticationState.user.id,
         null,
         5,
         deviceName,
-        deviceOs
+        deviceOs,
       );
-
     } catch (_) {
-
+      // Network failed — enqueue for offline sync
+      if (_connectivityBloc != null) {
+        final playLog = {
+          'game_mode': 'QUICK_GAME',
+          'total_score': totalScore,
+          'base_score': totalScore,
+          'bonus_score': bonusScore,
+          'average_time_spent': avgTime,
+          'player_rank': authenticationState.user.rank,
+          'number_of_correct_answers': state.noOfCorrectAnswers,
+          'player_id': authenticationState.user.id,
+          'user_progress': null,
+          'number_of_rounds': 5,
+          'deviceName': deviceName,
+          'deviceOs': deviceOs,
+        };
+        await _connectivityBloc!.submitOrEnqueue(playLog);
+      }
     }
   }
 

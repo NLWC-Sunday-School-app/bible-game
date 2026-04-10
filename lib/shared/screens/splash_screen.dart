@@ -295,7 +295,7 @@ class _SplashScreenState extends State<SplashScreen>
             BlocProvider.of<UserBloc>(context).add(FetchUserYearlyRecap());
             Navigator.pushNamedAndRemoveUntil(
                 context, AppRoutes.home, (route) => false,
-                arguments: {'isOffline': false});
+                arguments: null);
           });
         } else {
           BlocProvider.of<AuthenticationBloc>(context)
@@ -306,20 +306,26 @@ class _SplashScreenState extends State<SplashScreen>
             if (!mounted) return;
             Navigator.pushNamedAndRemoveUntil(
                 context, AppRoutes.home, (route) => false,
-                arguments: {'isOffline': false});
+                arguments: null);
           });
         }
       } else {
         Navigator.pushNamedAndRemoveUntil(
             context, AppRoutes.home, (route) => false,
-            arguments: {'isOffline': false});
+            arguments: null);
       }
     } else {
-      // Offline: still navigate to home, but flag offline mode
+      // Offline: restore cached user if a token exists, then navigate to home
       if (!mounted) return;
+      if (userToken != null) {
+        // Trigger FetchUserDataRequested — the bloc will fall back to cached
+        // user data since we're offline.
+        BlocProvider.of<AuthenticationBloc>(context)
+            .add(FetchUserDataRequested());
+      }
       Navigator.pushNamedAndRemoveUntil(
           context, AppRoutes.home, (route) => false,
-          arguments: {'isOffline': true});
+          arguments: null);
     }
   }
 }

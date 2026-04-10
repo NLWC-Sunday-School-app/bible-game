@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bible_game/features/arcade/view/arcade_screen.dart';
 import 'package:bible_game/features/fantasy_league/view/home_screen.dart';
@@ -12,13 +11,13 @@ import 'package:bible_game/features/leader_board/view/leaderboard_screen.dart';
 import 'package:bible_game/features/pilgrim_progress/bloc/pilgrim_progress_bloc.dart';
 import 'package:bible_game/features/store/view/home_screen.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:bible_game/shared/widgets/modal/country_update_modal.dart';
 import 'package:bible_game/shared/widgets/modal/welcome_modal.dart';
 import '../../features/home/view/home_screen.dart';
 import '../../shared/constants/image_routes.dart';
 import '../../shared/features/settings/bloc/settings_bloc.dart';
-import '../../shared/widgets/modal/network_modal.dart';
 import '../cubit/navigation_cubit.dart';
 import 'bottom_tab_item.dart';
 
@@ -33,10 +32,6 @@ class BottomTabNavigation extends StatefulWidget {
 }
 
 class _BottomTabNavigationState extends State<BottomTabNavigation> {
-  late StreamSubscription<InternetConnectionStatus> connectivitySubscription;
-  // int _selectedTabIndex = 2;
-
-
   bool _selectedHomeTab = true;
   bool _selectedLeaderboardTab = false;
   bool _selectedStoreTab = false;
@@ -76,24 +71,6 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
     }
   }
 
-  checkInternet(BuildContext context) async {
-    connectivitySubscription =
-        InternetConnectionChecker().onStatusChange.listen((status) {
-          switch (status) {
-            case InternetConnectionStatus.connected:
-              print('Data connection is available.');
-              break;
-            case InternetConnectionStatus.disconnected:
-              print('You are disconnected from the internet.');
-              if (!mounted) return;
-              showNetworkModal(context);
-              break;
-          }
-        });
-  }
-
-
-
   displayCountryUpdateModal() async {
     final userState = BlocProvider.of<AuthenticationBloc>(context).state;
     if (userState.user.id != 0 && (userState.user.country == '')) {
@@ -108,7 +85,6 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
     super.initState();
     displayWelcomeModal();
     displayCountryUpdateModal();
-    checkInternet(context);
   }
 
   Widget  _bottomNavigationBar(BuildContext context, int _selectedTabIndex) {
@@ -142,7 +118,6 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 onTap: () {
                   soundManager.playTabClickSound();
                   context.read<NavigationCubit>().selectTab(1);
-
                 },
               ),
               BottomTabItem(
@@ -152,12 +127,6 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 onTap: () {
                   soundManager.playTabClickSound();
                   context.read<NavigationCubit>().selectTab(2);
-
-                  // if(BlocProvider.of<AuthenticationBloc>(context).state.user.id != 0){
-                  //   BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
-                  //   BlocProvider.of<PilgrimProgressBloc>(context).add(FetchPilgrimProgressLevelData());
-                  //   BlocProvider.of<UserBloc>(context).add(FetchUserStreakDetails());
-                  // }
                 },
               ),
               BottomTabItem(
@@ -167,9 +136,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 onTap: () {
                   soundManager.playTabClickSound();
                   context.read<NavigationCubit>().selectTab(3);
-
-                }
-                ,
+                },
               ),
               BottomTabItem(
                 itemLabel: 'League',
@@ -178,13 +145,10 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 onTap: () {
                   soundManager.playTabClickSound();
                   context.read<NavigationCubit>().selectTab(4);
-
                 },
               ),
             ],
           ),
-
-
       ),
     );
   }
@@ -192,9 +156,46 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
   @override
   Widget build(BuildContext context) {
     final int _selectedTabIndex = context.watch<NavigationCubit>().state;
-    return Scaffold(
-      body: _pages[_selectedTabIndex]['page'],
-      bottomNavigationBar: _bottomNavigationBar(context, _selectedTabIndex),
+    return BlocListener<ConnectivityBloc, ConnectivityState>(
+      listenWhen: (previous, current) =>
+          previous.isOnline != current.isOnline ||
+          previous.isSyncing != current.isSyncing,
+      listener: (context, state) {
+        if (!state.isOnline) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('You\'re offline. Some features may be limited.'),
+              backgroundColor: Colors.orange.shade800,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else if (state.isOnline && state.isSyncing) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Syncing your scores...'),
+              backgroundColor: Colors.blue.shade700,
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else if (state.isOnline && !state.isSyncing && state.pendingSyncCount == 0) {
+          // Just came back online and sync completed
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('You\'re back online!'),
+              backgroundColor: Colors.green.shade700,
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        body: _pages[_selectedTabIndex]['page'],
+        bottomNavigationBar: _bottomNavigationBar(context, _selectedTabIndex),
+      ),
     );
   }
 }

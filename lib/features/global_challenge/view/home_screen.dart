@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
 import 'package:bible_game/features/global_challenge/widget/global_challenge_card.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 
 class GlobalChallengeHomeScreen extends StatefulWidget {
   const GlobalChallengeHomeScreen({super.key});
@@ -15,8 +16,11 @@ class _GlobalChallengeHomeScreenState extends State<GlobalChallengeHomeScreen> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<GlobalChallengeBloc>(context).add(
-        FetchGlobalChallengeGames());
+    final isOnline = context.read<ConnectivityBloc>().state.isOnline;
+    if (isOnline) {
+      BlocProvider.of<GlobalChallengeBloc>(context).add(
+          FetchGlobalChallengeGames());
+    }
   }
 
   @override
