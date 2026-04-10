@@ -8,6 +8,7 @@ import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/widgets/blue_button.dart';
 import 'package:bible_game/shared/widgets/screen_app_bar.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import '../bloc/true_or_false_bloc.dart';
 
 class TrueOrFalseHomeScreen extends StatefulWidget {
@@ -30,6 +31,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -70,7 +72,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
                           Expanded(
                             child: Center(
                               child: StrokeText(
-                                text: 'True or False',
+                                text: tr.t('tof_title'),
                                 textStyle: TextStyle(
                                   color: Colors.white,
                                   fontSize: 26.sp,
@@ -101,7 +103,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
                             children: [
                               Expanded(
                                 child: _StatCard(
-                                  label: 'High Score',
+                                  label: tr.t('tof_high_score'),
                                   value: state.highScore.toString(),
                                   icon: IconImageRoutes.coinIcon,
                                 ),
@@ -109,7 +111,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
                               SizedBox(width: 12.w),
                               Expanded(
                                 child: _StatCard(
-                                  label: 'Games Played',
+                                  label: tr.t('tof_games_played'),
                                   value: state.totalGamesPlayed.toString(),
                                   icon: IconImageRoutes.purpleBook,
                                 ),
@@ -118,7 +120,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
                           ),
                           SizedBox(height: 12.h),
                           _StatCard(
-                            label: 'Best Streak',
+                            label: tr.t('tof_best_streak'),
                             value: state.bestStreak.toString(),
                             icon: IconImageRoutes.streakIcon,
                             isWide: true,
@@ -140,7 +142,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  'How to Play',
+                                  tr.t('tof_how_to_play'),
                                   style: TextStyle(
                                     fontFamily: 'Mikado',
                                     fontWeight: FontWeight.w900,
@@ -150,7 +152,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
                                 ),
                                 SizedBox(height: 12.h),
                                 Text(
-                                  'Read each Bible statement and decide\nif it is TRUE or FALSE.\n\nAnswer quickly for bonus points!\nBuild streaks for multipliers!',
+                                  tr.t('tof_instructions'),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: 'Mikado',
@@ -168,7 +170,7 @@ class _TrueOrFalseHomeScreenState extends State<TrueOrFalseHomeScreen> {
 
                           // Play button
                           BlueButton(
-                            buttonText: 'Play Now',
+                            buttonText: tr.t('tof_play_now'),
                             buttonIsLoading: !state.isLoaded,
                             width: 280.w,
                             onTap: state.isLoaded

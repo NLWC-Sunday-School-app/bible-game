@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +10,7 @@ void showSuccessfulRegistrationModal(BuildContext context) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
+        final tr = AppLocalization.tr(context);
         return Dialog(
           insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
           backgroundColor: Colors.transparent,
@@ -62,7 +64,7 @@ void showSuccessfulRegistrationModal(BuildContext context) {
                     height: 40.h,
                   ),
                   StrokeText(
-                    text: 'Profile created \n successfully!',
+                    text: tr.t('auth_profile_created'),
                     textStyle: TextStyle(
                       color: const Color(0xFF1768B9),
                       fontSize: 24.sp,
@@ -75,7 +77,7 @@ void showSuccessfulRegistrationModal(BuildContext context) {
                     height: 10.h,
                   ),
                   Text(
-                    'Enjoy the Bible game!',
+                    tr.t('auth_enjoy_game'),
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 14.sp,

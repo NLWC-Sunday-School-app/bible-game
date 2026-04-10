@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/data/bible_facts.dart';
 import 'package:bible_game/shared/data/church_history_facts.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 
 /// A locally-powered carousel that displays Bible facts, church history,
 /// geography tidbits, and character spotlights — all stored on device.
@@ -70,9 +71,20 @@ class _FactCard extends StatelessWidget {
   const _FactCard({required this.data});
   final Map<String, String> data;
 
+  static const _categoryKeyMap = <String, String>{
+    'Bible Numbers': 'category_bible_numbers',
+    'Bible Geography': 'category_bible_geography',
+    'Fun Fact': 'category_fun_fact',
+    'Character Spotlight': 'category_character_spotlight',
+    'Bible & Language': 'category_bible_language',
+    'Church History': 'category_church_history',
+  };
+
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     final category = data['category'] ?? 'Fun Fact';
+    final localizedCategory = tr.t(_categoryKeyMap[category] ?? category);
     final icon = data['icon'] ?? '💡';
     final fact = data['fact'] ?? '';
     final style = _categoryStyles[category] ??
@@ -146,7 +158,7 @@ class _FactCard extends StatelessWidget {
                       SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
-                          category,
+                          localizedCategory,
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w800,
@@ -162,7 +174,7 @@ class _FactCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Text(
-                          'Did you know?',
+                          tr.t('did_you_know'),
                           style: TextStyle(
                             fontSize: 9.sp,
                             color: Colors.white,

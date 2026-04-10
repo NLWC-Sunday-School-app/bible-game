@@ -10,6 +10,8 @@ import 'package:bible_game/shared/features/authentication/bloc/authentication_bl
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:bible_game/shared/utils/formatter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
+import 'package:bible_game/app.dart';
 
 import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
@@ -43,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -65,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           SizedBox(width: 50.w),
                           Center(
                             child: StrokeText(
-                              text: 'Profile',
+                              text: tr.t('profile_title'),
                               textStyle: TextStyle(
                                 color: Colors.white,
                                 fontSize: 26.sp,
@@ -97,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(height: 30.h),
                   _ProfileActionButton(
                     backgroundImage: ProductImageRoutes.streakRestoreButtonBg,
-                    label: state.user.id != 0 ? 'Edit your profile' : 'Log In',
+                    label: state.user.id != 0 ? tr.t('profile_edit') : tr.t('profile_log_in'),
                     onTap: () {
                       soundManager.playClickSound();
                       state.user.id != 0
@@ -109,8 +112,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _ProfileActionButton(
                     backgroundImage: ProductImageRoutes.newBlueBtnBg,
                     label: state.user.id != 0
-                        ? 'Change your password'
-                        : 'Create Profile',
+                        ? tr.t('profile_change_password')
+                        : tr.t('auth_create_profile'),
                     onTap: () {
                       soundManager.playClickSound();
                       state.user.id != 0
@@ -119,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   SizedBox(height: 30.h),
-                  const _SectionDivider(label: 'GAME SETTINGS'),
+                  _SectionDivider(label: tr.t('profile_game_settings')),
                   SizedBox(height: 20.h),
                   _SettingsTogglesRow(
                     soundManager: soundManager,
@@ -130,10 +133,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       state.user.role.toLowerCase() != 'collaborator')
                     _CollaboratorButton(),
                   SizedBox(height: 10.h),
+                  _LanguageSetting(),
+                  SizedBox(height: 20.h),
                   GestureDetector(
                     onTap: () => showDeleteAccountModal(context),
-                    child: const Text(
-                      'Delete Account',
+                    child: Text(
+                      tr.t('profile_delete_account'),
                       style: TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.w600,
@@ -143,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   SizedBox(height: 10.h),
-                  const _SectionDivider(label: 'FOLLOW US ON'),
+                  _SectionDivider(label: tr.t('profile_follow_us')),
                   SizedBox(height: 20.h),
                   _SocialMediaRow(onLaunch: _launchURL),
                   SizedBox(height: 10.h),
@@ -374,6 +379,7 @@ class _SettingsTogglesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     return BlocBuilder<SettingsBloc, SettingsState>(
       builder: (context, state) {
         return Padding(
@@ -384,7 +390,7 @@ class _SettingsTogglesRow extends StatelessWidget {
                 : MainAxisAlignment.center,
             children: [
               _ToggleItem(
-                label: 'Music',
+                label: tr.t('profile_music'),
                 iconPath: state.isMusicOn
                     ? IconImageRoutes.musicOn
                     : IconImageRoutes.musicOff,
@@ -394,7 +400,7 @@ class _SettingsTogglesRow extends StatelessWidget {
                 },
               ),
               _ToggleItem(
-                label: 'Sound',
+                label: tr.t('profile_sound'),
                 iconPath: state.isSoundOn
                     ? IconImageRoutes.soundOn
                     : IconImageRoutes.soundOff,
@@ -405,7 +411,7 @@ class _SettingsTogglesRow extends StatelessWidget {
               ),
               if (isLoggedIn)
                 _ToggleItem(
-                  label: 'Log out',
+                  label: tr.t('auth_logout'),
                   iconPath: IconImageRoutes.logOut,
                   onTap: () {
                     soundManager.playClickSound();
@@ -463,7 +469,8 @@ class _CollaboratorButton extends StatelessWidget {
     return BlocConsumer<UserBloc, UserState>(
       listener: (context, state) {
         if (state.hasSentCollaboratorMail) {
-          showCustomToast(context, 'Thank you, a mail has \nbeen sent to you!');
+          final tr = AppLocalization.tr(context);
+          showCustomToast(context, tr.t('profile_collaborator_thanks'));
         }
       },
       builder: (context, state) {
@@ -492,7 +499,7 @@ class _CollaboratorButton extends StatelessWidget {
                         ),
                       )
                     : StrokeText(
-                        text: 'Be a Luke! Set Bible game questions.',
+                        text: AppLocalization.tr(context).t('profile_collaborator'),
                         textStyle: TextStyle(
                           color: AppColors.lightYellowSurface,
                           fontSize: 16.sp,
@@ -506,6 +513,70 @@ class _CollaboratorButton extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _LanguageSetting extends StatelessWidget {
+  const _LanguageSetting();
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
+    final currentLocale = Localizations.localeOf(context);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            tr.t('language_setting'),
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.25),
+              ),
+            ),
+            child: DropdownButton<String>(
+              value: currentLocale.languageCode,
+              dropdownColor: const Color(0xFF1A3A6B),
+              underline: const SizedBox(),
+              isDense: true,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+              icon: Icon(Icons.arrow_drop_down, color: Colors.white, size: 20.sp),
+              items: [
+                DropdownMenuItem(
+                  value: 'en',
+                  child: Text(tr.t('language_english')),
+                ),
+                DropdownMenuItem(
+                  value: 'fr',
+                  child: Text(tr.t('language_french')),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null && value != currentLocale.languageCode) {
+                  changeAppLocale(context, Locale(value));
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

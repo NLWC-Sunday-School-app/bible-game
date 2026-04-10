@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,6 +50,7 @@ class _EditProfileState extends State<EditProfileModal> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     final screenWidth =  MediaQuery.of(context).size.width;
     final screenHeight =  MediaQuery.of(context).size.height;
     return Dialog(
@@ -95,7 +97,7 @@ class _EditProfileState extends State<EditProfileModal> {
                     height: 10,
                   ),
                   StrokeText(
-                    text: 'Edit Profile',
+                    text: tr.t('auth_edit_profile'),
                     textStyle: TextStyle(
                       color: const Color(0xFF1768B9),
                       fontSize: 28.sp,
@@ -108,7 +110,7 @@ class _EditProfileState extends State<EditProfileModal> {
                     height: 10,
                   ),
                   Text(
-                    'You can make updates to \n your profile',
+                    tr.t('auth_edit_profile_subtitle'),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 14.sp,
@@ -135,7 +137,7 @@ class _EditProfileState extends State<EditProfileModal> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
-                          hintText: 'What’s your nick name?',
+                          hintText: tr.t('auth_nickname_hint'),
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                               borderSide: const BorderSide(
@@ -170,7 +172,7 @@ class _EditProfileState extends State<EditProfileModal> {
                     builder: (context, state) {
                       return BlueButton(
                         width: 250.w,
-                        buttonText: 'Update Profile',
+                        buttonText: tr.t('auth_update_profile'),
                         buttonIsLoading: state.isUpdatingProfile,
                         onTap: () {
                           if (_updateFormKey.currentState!.validate()){

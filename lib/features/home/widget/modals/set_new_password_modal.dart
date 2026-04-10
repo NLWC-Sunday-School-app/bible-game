@@ -1,5 +1,6 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,6 +49,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     final screenWidth =  MediaQuery.of(context).size.width;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -90,7 +92,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                   height: 10,
                 ),
                 StrokeText(
-                  text: 'Set Password',
+                  text: tr.t('auth_set_password'),
                   textStyle: TextStyle(
                     color: const Color(0xFF1768B9),
                     fontSize: 28.sp,
@@ -103,7 +105,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                   height: 10.h,
                 ),
                 Text(
-                  'You are in control now, \nset a new password',
+                  tr.t('auth_set_password_subtitle'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.sp,
@@ -150,7 +152,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                                     scale: 1.5,
                                   ),
                           ),
-                          hintText: 'Set a new password',
+                          hintText: tr.t('auth_new_password_hint'),
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                               borderSide: const BorderSide(
@@ -208,7 +210,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
-                          hintText: 'Input the password again',
+                          hintText: tr.t('auth_confirm_password_hint'),
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                               borderSide: const BorderSide(
@@ -235,7 +237,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                     if (state.hasResetPassword) {
                       Navigator.pop(context);
                       Flushbar(
-                        message: 'Password reset successful',
+                        message: tr.t('auth_password_reset_success'),
                         flushbarPosition: FlushbarPosition.TOP,
                         flushbarStyle: FlushbarStyle.GROUNDED,
                         backgroundColor: Colors.green,
@@ -248,7 +250,7 @@ class _SetNewPasswordModalState extends State<SetNewPasswordModal> {
                   builder: (context, state) {
                     return BlueButton(
                       width: 250.w,
-                      buttonText: 'Set new password',
+                      buttonText: tr.t('auth_set_new_password'),
                       buttonIsLoading: state.isResettingPassword,
                       onTap: () {
                         if (_newPasswordFormKey.currentState!.validate()) ;

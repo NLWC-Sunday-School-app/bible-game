@@ -79,6 +79,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io' show Platform;
 
 import 'navigation/cubit/navigation_cubit.dart';
+import 'shared/features/localization/app_localization.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -117,8 +118,20 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  Locale _locale = const Locale('en');
 
+  Future<void> _loadSavedLocale() async {
+    final locale =
+        await AppLocalization.resolveLocale(WidgetsBinding.instance.platformDispatcher.locales);
+    if (mounted) {
+      setState(() => _locale = locale);
+    }
+  }
 
+  void _changeLocale(Locale newLocale) {
+    setState(() => _locale = newLocale);
+    AppLocalization.setLocale(newLocale.languageCode);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -220,8 +233,18 @@ class _AppState extends State<App> {
           ),
           ChangeNotifierProvider(create: (_) => widget.tokenNotifier),
         ],
-        child: MaterialApp(
+        child: _LocaleProvider(
+          changeLocale: _changeLocale,
+          child: MaterialApp(
           scaffoldMessengerKey: scaffoldMessengerKey,
+          locale: _locale,
+          supportedLocales: AppLocalization.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizationDelegate(),
+          ],
+          localeResolutionCallback: (deviceLocale, supportedLocales) {
+            return _locale;
+          },
           theme: ThemeData(
             fontFamily: 'Mikado',
             useMaterial3: false,
@@ -293,6 +316,7 @@ class _AppState extends State<App> {
           },
           home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),
+        ),
       ),
     );
   }
@@ -309,6 +333,7 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+    _loadSavedLocale();
     getFcmToken();
     if (Platform.isIOS) {
       AwesomeNotifications().requestPermissionToSendNotifications(
@@ -338,4 +363,29 @@ class _AppState extends State<App> {
     // Immediately reset badge so it doesn't accumulate
     await AwesomeNotifications().resetGlobalBadge();
   }
+}
+
+// ---------------------------------------------------------------------------
+// InheritedWidget so any descendant can change the app locale
+// ---------------------------------------------------------------------------
+
+class _LocaleProvider extends InheritedWidget {
+  final void Function(Locale) changeLocale;
+
+  const _LocaleProvider({
+    required this.changeLocale,
+    required super.child,
+  });
+
+  static _LocaleProvider of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_LocaleProvider>()!;
+  }
+
+  @override
+  bool updateShouldNotify(_LocaleProvider old) => false;
+}
+
+/// Helper to change the app language from anywhere.
+void changeAppLocale(BuildContext context, Locale newLocale) {
+  _LocaleProvider.of(context).changeLocale(newLocale);
 }

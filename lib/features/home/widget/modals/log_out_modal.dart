@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -33,6 +34,7 @@ class LogoutModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     return BlocConsumer<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         if (state.hasLoggedOut) {
@@ -66,7 +68,7 @@ class LogoutModal extends StatelessWidget {
                     ),
                     Spacer(),
                     StrokeText(
-                      text: 'Log out',
+                      text: tr.t('auth_logout'),
                       textStyle: TextStyle(
                           color: Colors.white,
                           fontSize: 22.sp,
@@ -116,7 +118,7 @@ class LogoutModal extends StatelessWidget {
                   height: 20.h,
                 ),
                 Text(
-                  'Are you sure you want \nto log out ?',
+                  tr.t('auth_logout_confirm'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
@@ -156,7 +158,7 @@ class LogoutModal extends StatelessWidget {
                                 ),
                               )
                             : StrokeText(
-                                text: 'Yes, log me out',
+                                text: tr.t('auth_logout_yes'),
                                 textStyle: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18.sp,

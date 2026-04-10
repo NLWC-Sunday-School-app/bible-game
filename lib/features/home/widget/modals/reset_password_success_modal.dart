@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,6 +23,7 @@ class ResetPasswordSuccessModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     final screenWidth =  MediaQuery.of(context).size.width;
     return Dialog(
       insetPadding: EdgeInsets.zero,
@@ -70,7 +72,7 @@ class ResetPasswordSuccessModal extends StatelessWidget {
                   height: 50,
                 ),
                 AutoSizeText(
-                  'New password set \nsuccessfully!',
+                  tr.t('auth_new_password_set'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 18.sp,
@@ -84,7 +86,7 @@ class ResetPasswordSuccessModal extends StatelessWidget {
                   builder: (context, state) {
                     return state.user.id == 0
                         ? BlueButton(
-                            buttonText: 'LOG IN',
+                            buttonText: tr.t('auth_log_in_button'),
                             buttonIsLoading: false,
                             width: 250.w,
                             onTap: () {

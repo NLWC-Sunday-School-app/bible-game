@@ -18,6 +18,7 @@ import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
 import '../../../shared/widgets/offline_banner.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:intl/intl.dart';
+import '../../../shared/features/localization/app_localization.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../home/widget/modals/create_profile_modal.dart';
 import '../../home/widget/modals/login_modal.dart';
@@ -115,6 +116,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).padding.bottom;
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -140,7 +142,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                       widgets: [
                         Center(
                           child: StrokeText(
-                            text: 'Leaderboard',
+                            text: tr.t('leaderboard_title'),
                             textStyle: TextStyle(
                               color: Colors.white,
                               fontSize: 26.sp,
@@ -154,8 +156,8 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                       ],
                     ),
                     const Spacer(),
-                    const OfflineBanner(
-                      subtitle: 'Leaderboard requires an internet connection.\nPlease reconnect to see the rankings.',
+                    OfflineBanner(
+                      subtitle: tr.t('leaderboard_offline_message'),
                     ),
                     const Spacer(),
                   ],
@@ -195,7 +197,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                       widgets: [
                         Center(
                           child: StrokeText(
-                            text: 'Leaderboard',
+                            text: tr.t('leaderboard_title'),
                             textStyle: TextStyle(
                               color: Colors.white,
                               fontSize: 26.sp,
@@ -250,7 +252,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                           children: [
                             TabButton(
                               width: 164,
-                              buttonText: 'Global',
+                              buttonText: tr.t('leaderboard_global'),
                               buttonSelected: _selectedGlobal,
                               onTap: () {
                                 if (context
@@ -280,7 +282,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                       .state
                                       .user
                                       .country
-                                  : 'Your country',
+                                  : tr.t('leaderboard_your_country'),
                               buttonSelected: !_selectedGlobal,
                               onTap: () {
                                 if (context
@@ -354,7 +356,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                         ? Align(
                                             alignment: Alignment.topCenter,
                                             child: buildLeaderboardNavigator(
-                                                scrollToTop, 'Top'),
+                                                scrollToTop, tr.t('leaderboard_top')),
                                           )
                                         : SizedBox(),
                                     context
@@ -368,7 +370,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                             left: 155,
                                             right: 155,
                                             child: buildLeaderboardNavigator(
-                                                scrollToUserPosition, 'You'),
+                                                scrollToUserPosition, tr.t('leaderboard_you')),
                                           )
                                         : SizedBox(),
                                   ],
@@ -428,7 +430,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                           Align(
                                             alignment: Alignment.topCenter,
                                             child: buildLeaderboardNavigator(
-                                                scrollToCountryTop, 'Top'),
+                                                scrollToCountryTop, tr.t('leaderboard_top')),
                                           ),
                                           Positioned(
                                             bottom: 60,
@@ -436,7 +438,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                             right: 155,
                                             child: buildLeaderboardNavigator(
                                                 scrollToUserCountryPosition,
-                                                'You'),
+                                                tr.t('leaderboard_you')),
                                           ),
                                         ],
                                       )
@@ -454,7 +456,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                             width: 350.w,
                                             customWidget: Center(
                                               child: StrokeText(
-                                                text: 'Log In',
+                                                text: tr.t('profile_log_in'),
                                                 textStyle: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 18.sp,
@@ -487,7 +489,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
                                               )),
                                               child: Center(
                                                 child: StrokeText(
-                                                  text: 'Create Profile',
+                                                  text: tr.t('auth_create_profile'),
                                                   textStyle: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 18.sp,

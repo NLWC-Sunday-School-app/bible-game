@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,6 +15,7 @@ void showAuthModal(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
+      final tr = AppLocalization.tr(context);
       return Dialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
         backgroundColor: Colors.transparent,
@@ -55,7 +57,7 @@ void showAuthModal(BuildContext context) {
                   ),
                 ),
                 StrokeText(
-                  text: 'Your Profile',
+                  text: tr.t('auth_your_profile'),
                   textStyle: TextStyle(
                     color: const Color(0xFF1768B9),
                     fontSize: 24.sp,
@@ -68,7 +70,7 @@ void showAuthModal(BuildContext context) {
                   height: 10.h,
                 ),
                 Text(
-                  'Log in to your profile to save \n& continue your game play.',
+                  tr.t('auth_login_prompt'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.sp,
@@ -81,7 +83,7 @@ void showAuthModal(BuildContext context) {
                 ),
                 BlueButton(
                   width: 250.w,
-                  buttonText: 'Login',
+                  buttonText: tr.t('auth_login'),
                   buttonIsLoading: false,
                   onTap: () {
                     soundManager.playClickSound();
@@ -94,7 +96,7 @@ void showAuthModal(BuildContext context) {
                 ),
                 BlueButton(
                   width: 250.w,
-                  buttonText: 'Create Profile',
+                  buttonText: tr.t('auth_create_profile'),
                   buttonIsLoading: false,
                   onTap: () {
                     soundManager.playClickSound();

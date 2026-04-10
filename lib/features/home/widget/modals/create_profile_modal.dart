@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -89,6 +90,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: SingleChildScrollView(
@@ -131,7 +133,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                   height: 10,
                 ),
                 StrokeText(
-                  text: 'Create Profile',
+                  text: tr.t('auth_create_profile'),
                   textStyle: TextStyle(
                     color: const Color(0xFF1768B9),
                     fontSize: 24.sp,
@@ -144,7 +146,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                   height: 10,
                 ),
                 Text(
-                  'Create a profile to save your \ngame progress!',
+                  tr.t('auth_create_profile_subtitle'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.sp,
@@ -182,7 +184,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
-                              hintText: 'What\'s your nick name?',
+                              hintText: tr.t('auth_nickname_hint'),
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6.r),
                                   borderSide: const BorderSide(
@@ -224,7 +226,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
-                              hintText: 'What\'s your email?',
+                              hintText: tr.t('auth_email_hint'),
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6.r),
                                   borderSide: const BorderSide(
@@ -274,7 +276,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
-                              hintText: 'Select your country',
+                              hintText: tr.t('auth_country_hint'),
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6.r),
                                   borderSide: const BorderSide(
@@ -326,7 +328,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
-                              hintText: 'Password',
+                              hintText: tr.t('auth_login_password_hint'),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.r),
                                 borderSide: const BorderSide(
@@ -359,7 +361,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                             } else {
                               Flushbar(
                                 message:
-                                    'Registration failed. Please check your details and try again.',
+                                    tr.t('auth_registration_failed'),
                                 flushbarPosition: FlushbarPosition.TOP,
                                 flushbarStyle: FlushbarStyle.GROUNDED,
                                 backgroundColor: Colors.red,
@@ -384,7 +386,7 @@ class _CreateProfileModalState extends State<CreateProfileModal> {
                         builder: (context, state) {
                           return BlueButton(
                             width: 250.w,
-                            buttonText: 'Create Profile',
+                            buttonText: tr.t('auth_create_profile'),
                             buttonIsLoading: state.isLoadingLogin,
                             onTap: () => _submitRegistration(soundManager),
                           );

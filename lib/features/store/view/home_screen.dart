@@ -18,6 +18,7 @@ import '../../home/widget/modals/create_profile_modal.dart';
 import '../../home/widget/modals/login_modal.dart';
 import '../../home/widget/score_info.dart';
 import 'package:intl/intl.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 
 class StoreHomeScreen extends StatefulWidget {
   const StoreHomeScreen({super.key});
@@ -29,7 +30,7 @@ class StoreHomeScreen extends StatefulWidget {
 class _StoreHomeScreenState extends State<StoreHomeScreen> {
 
 
-  void showCustomToast(BuildContext context,) {
+  void showCustomToast(BuildContext context, String message) {
     FToast fToast = FToast();
     fToast.init(context);
     LinearGradient linearGradient = LinearGradient(
@@ -58,7 +59,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           StrokeText(
-            text: 'You don’t  have enough coins \nto get this! Play more games',
+            text: message,
             textStyle: TextStyle(
               color: Color(0xFFFFD400),
               fontSize: 18.sp,
@@ -82,6 +83,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
   Widget build(BuildContext context) {
     var formatter = NumberFormat('#,###,###');
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -106,7 +108,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                     widgets: [
                       Center(
                         child: StrokeText(
-                          text: 'Store',
+                          text: tr.t('store_title'),
                           textStyle: TextStyle(
                             color: Colors.white,
                             fontSize: 26.sp,
@@ -252,7 +254,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                                       if (!isOnline) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: const Text('Purchases require an internet connection.'),
+                                            content: Text(tr.t('store_requires_internet')),
                                             backgroundColor: Colors.orange.shade800,
                                             duration: const Duration(seconds: 2),
                                             behavior: SnackBarBehavior.floating,
@@ -272,7 +274,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                                           Navigator.pop(context);
                                         });
                                       }else{
-                                        showCustomToast(context);
+                                        showCustomToast(context, tr.t('store_not_enough_coins'));
                                       }
                                     },
                                     child:
@@ -302,7 +304,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                                         MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'Buy',
+                                            tr.t('store_buy'),
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 14.sp,
@@ -350,7 +352,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                                 endIndent: 20,
                               )),
                           StrokeText(
-                            text: 'MORE ITEMS COMING',
+                            text: tr.t('store_more_items'),
                             textStyle: TextStyle(
                               fontStyle: FontStyle.italic,
                               color: Colors.white,
@@ -385,7 +387,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                         width: 350.w,
                         customWidget: Center(
                           child: StrokeText(
-                            text: 'Log In',
+                            text: tr.t('profile_log_in'),
                             textStyle: TextStyle(
                               color: Colors.white,
                               fontSize: 18.sp,
@@ -414,7 +416,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                               )),
                           child: Center(
                             child: StrokeText(
-                              text: 'Create Profile',
+                              text: tr.t('auth_create_profile'),
                               textStyle: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18.sp,

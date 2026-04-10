@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_storage/get_storage.dart';
@@ -89,6 +90,7 @@ class _LoginModalState extends State<LoginModal> {
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: SizedBox(
@@ -132,7 +134,7 @@ class _LoginModalState extends State<LoginModal> {
                   height: 10,
                 ),
                 StrokeText(
-                  text: 'Log in to play',
+                  text: tr.t('auth_login_title'),
                   textStyle: TextStyle(
                     color: const Color(0xFF1768B9),
                     fontFamily: 'Mikado',
@@ -146,7 +148,7 @@ class _LoginModalState extends State<LoginModal> {
                   height: 10.h,
                 ),
                 Text(
-                  'Pick up from where you stopped!',
+                  tr.t('auth_login_subtitle'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.sp,
@@ -176,7 +178,7 @@ class _LoginModalState extends State<LoginModal> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        hintText: 'Input your email',
+                        hintText: tr.t('auth_login_email_hint'),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: const BorderSide(
@@ -223,7 +225,7 @@ class _LoginModalState extends State<LoginModal> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
-                        hintText: 'Password',
+                        hintText: tr.t('auth_login_password_hint'),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.r),
                             borderSide: const BorderSide(
@@ -257,7 +259,7 @@ class _LoginModalState extends State<LoginModal> {
                         ApiException.showSnackBar(context);
                       } else {
                         Flushbar(
-                          message: 'Invalid email or password. Please try again.',
+                          message: tr.t('auth_login_failed'),
                           flushbarPosition: FlushbarPosition.TOP,
                           flushbarStyle: FlushbarStyle.GROUNDED,
                           backgroundColor: Colors.red,
@@ -281,7 +283,7 @@ class _LoginModalState extends State<LoginModal> {
                   builder: (context, state) {
                     return BlueButton(
                       width: 250.w,
-                      buttonText: 'Login',
+                      buttonText: tr.t('auth_login'),
                       buttonIsLoading: state.isLoadingLogin,
                       onTap: () => _submitLogin(soundManager),
                     );
@@ -296,7 +298,7 @@ class _LoginModalState extends State<LoginModal> {
                     showResetPasswordModal(context);
                   },
                   child: Text(
-                    'Forgot Password?',
+                    tr.t('auth_forgot_password'),
                     style: TextStyle(
                       color: const Color(0xFF4075BB),
                       fontSize: 15.sp,

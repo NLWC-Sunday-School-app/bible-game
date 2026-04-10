@@ -1,5 +1,6 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,6 +36,7 @@ class _EnterResetPasswordCodeModalState
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     final screenWidth =  MediaQuery.of(context).size.width;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -75,7 +77,7 @@ class _EnterResetPasswordCodeModalState
                   height: 10,
                 ),
                 StrokeText(
-                  text: 'Code Sent',
+                  text: tr.t('auth_code_sent'),
                   textStyle: TextStyle(
                     color: const Color(0xFF1768B9),
                     fontSize: 25.sp,
@@ -88,7 +90,7 @@ class _EnterResetPasswordCodeModalState
                   height: 10.h,
                 ),
                 AutoSizeText(
-                  'Kindly type in the code \nsent to your mail',
+                  tr.t('auth_code_sent_subtitle'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.sp,
@@ -134,7 +136,7 @@ class _EnterResetPasswordCodeModalState
                   listener: (context, state) {
                       if(state.hasVerifiedCode){
                         Navigator.pop(context);
-                        showCustomToast(context, 'Verification successful');
+                        showCustomToast(context, tr.t('auth_verification_success'));
 
                         showSetNewPasswordModal(context);
                       }
@@ -142,7 +144,7 @@ class _EnterResetPasswordCodeModalState
                   builder: (context, state) {
                     return BlueButton(
                       width: 250.w,
-                      buttonText: 'Verify Code',
+                      buttonText: tr.t('auth_verify_code'),
                       buttonIsLoading: state.isVerifyingCode,
                       onTap: () {
                         if (textController.text.length == 4) {

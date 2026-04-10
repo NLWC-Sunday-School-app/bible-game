@@ -34,6 +34,7 @@ import '../widget/user_profile_info.dart';
 import 'package:intl/intl.dart';
 import 'package:bible_game/features/daily_devotional/bloc/daily_devotional_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 
 // ---------------------------------------------------------------------------
 // Game card data model
@@ -43,6 +44,8 @@ class _GameEntry {
   final Color bgColor;
   final String gameType;
   final String gameText;
+  final String gameTypeKey;
+  final String gameTextKey;
   final String gameImage;
   final double smallWidth;
   final double mediumWidth;
@@ -55,6 +58,8 @@ class _GameEntry {
     required this.bgColor,
     required this.gameType,
     required this.gameText,
+    required this.gameTypeKey,
+    required this.gameTextKey,
     required this.gameImage,
     required this.smallWidth,
     required this.mediumWidth,
@@ -70,6 +75,8 @@ const _gameEntries = [
     bgColor: AppColors.storyModeGameCard,
     gameType: 'Story Mode',
     gameText: 'Journey through Bible narratives!',
+    gameTypeKey: 'game_story_mode',
+    gameTextKey: 'game_story_mode_desc',
     gameImage: IconImageRoutes.purpleBook,
     smallWidth: 70,
     mediumWidth: 80,
@@ -81,6 +88,8 @@ const _gameEntries = [
     bgColor: AppColors.primaryColor,
     gameType: 'Quick Game',
     gameText: 'Play on your own terms!',
+    gameTypeKey: 'game_quick_game',
+    gameTextKey: 'game_quick_game_desc',
     gameImage: ProductImageRoutes.crossBible,
     smallWidth: 80,
     mediumWidth: 95,
@@ -91,6 +100,8 @@ const _gameEntries = [
     bgColor: AppColors.wiwGameCard,
     gameType: 'Who is Who',
     gameText: 'Learn Bible names & stories!',
+    gameTypeKey: 'game_who_is_who',
+    gameTextKey: 'game_who_is_who_desc',
     gameImage: ProductImageRoutes.wiwMask,
     smallWidth: 70,
     mediumWidth: 84,
@@ -101,6 +112,8 @@ const _gameEntries = [
     bgColor: AppColors.pilgrimProgressGameCard,
     gameType: 'Pilgrim Progress',
     gameText: 'Journey through the Bible!',
+    gameTypeKey: 'game_pilgrim_progress',
+    gameTextKey: 'game_pilgrim_progress_desc',
     gameImage: ProductImageRoutes.mountain,
     smallWidth: 60,
     mediumWidth: 70,
@@ -111,6 +124,8 @@ const _gameEntries = [
     bgColor: AppColors.fourScripturesGameCard,
     gameType: '4 Scriptures, 1 Word',
     gameText: 'Journey through the Bible!',
+    gameTypeKey: 'game_four_scriptures',
+    gameTextKey: 'game_four_scriptures_desc',
     gameImage: ProductImageRoutes.scroll,
     smallWidth: 70,
     mediumWidth: 75,
@@ -122,6 +137,8 @@ const _gameEntries = [
     bgColor: const Color(0xFFC67B3C),
     gameType: 'True or False',
     gameText: 'Test your knowledge!',
+    gameTypeKey: 'game_true_or_false',
+    gameTextKey: 'game_true_or_false_desc',
     gameImage: ProductImageRoutes.trueOrFalseIcon,
     smallWidth: 65,
     mediumWidth: 75,
@@ -392,6 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       prev.isOnline != curr.isOnline ||
                                       prev.pendingSyncCount != curr.pendingSyncCount,
                                   builder: (context, connState) {
+                                    final tr = AppLocalization.tr(context);
                                     return Column(
                                       children: [
                                         if (!connState.isOnline)
@@ -414,7 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 SizedBox(width: 8.w),
                                                 Expanded(
                                                   child: Text(
-                                                    'You\'re offline — Story Mode, True or False and Daily Devotional are available!',
+                                                    tr.t('offline_banner'),
                                                     style: TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 12.sp,
@@ -445,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 SizedBox(width: 8.w),
                                                 Expanded(
                                                   child: Text(
-                                                    '${connState.pendingSyncCount} score${connState.pendingSyncCount > 1 ? 's' : ''} pending sync',
+                                                    tr.t('scores_pending_sync', {'count': '${connState.pendingSyncCount}', 'plural': connState.pendingSyncCount > 1 ? 's' : ''}),
                                                     style: TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 12.sp,
@@ -469,6 +487,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: List.generate(
                                       _gameEntries.length, (index) {
                                     final e = _gameEntries[index];
+                                    final tr = AppLocalization.tr(context);
                                     final isOffline = !context
                                         .read<ConnectivityBloc>()
                                         .state
@@ -485,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(SnackBar(
                                               content: Text(
-                                                  '${e.gameType} requires an internet connection'),
+                                                  tr.t('requires_internet', {'game': tr.t(e.gameTypeKey)})),
                                               duration:
                                                   const Duration(seconds: 2),
                                               backgroundColor: Colors.black87,
@@ -552,6 +571,7 @@ class _DailyDevotionalBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final soundManager =
         BlocProvider.of<SettingsBloc>(context).soundManager;
+    final tr = AppLocalization.tr(context);
     return BlocBuilder<DailyDevotionalBloc, DailyDevotionalState>(
       builder: (context, state) {
         final completed = state.hasCompletedToday;
@@ -600,7 +620,7 @@ class _DailyDevotionalBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Daily Devotional',
+                        tr.t('daily_devotional'),
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'Neuland',
@@ -609,8 +629,8 @@ class _DailyDevotionalBanner extends StatelessWidget {
                       ),
                       Text(
                         completed
-                            ? 'Completed! Come back tomorrow'
-                            : 'Read, reflect & answer today\'s question',
+                            ? tr.t('daily_devotional_completed')
+                            : tr.t('daily_devotional_prompt'),
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 11.sp,
@@ -658,6 +678,7 @@ class _GameTileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double imageWidth = entry.smallWidth.w;
+    final tr = AppLocalization.tr(context);
 
     return GestureDetector(
       onTap: onTap,
@@ -715,7 +736,7 @@ class _GameTileCard extends StatelessWidget {
                             color: Colors.white, size: 10.sp),
                         SizedBox(width: 3.w),
                         Text(
-                          'OFFLINE',
+                          tr.t('offline_badge'),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 8.sp,
@@ -737,7 +758,7 @@ class _GameTileCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      entry.gameType,
+                      tr.t(entry.gameTypeKey),
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w900,
@@ -748,7 +769,7 @@ class _GameTileCard extends StatelessWidget {
                     ),
                     SizedBox(height: 2.h),
                     Text(
-                      entry.gameText,
+                      tr.t(entry.gameTextKey),
                       style: TextStyle(
                         fontSize: 10.sp,
                         color: Colors.white.withValues(alpha: 0.7),

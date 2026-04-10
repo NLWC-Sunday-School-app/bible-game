@@ -17,6 +17,7 @@ import 'package:bible_game/shared/widgets/modal/country_update_modal.dart';
 import 'package:bible_game/shared/widgets/modal/welcome_modal.dart';
 import '../../features/home/view/home_screen.dart';
 import '../../shared/constants/image_routes.dart';
+import '../../shared/features/localization/app_localization.dart';
 import '../../shared/features/settings/bloc/settings_bloc.dart';
 import '../cubit/navigation_cubit.dart';
 import 'bottom_tab_item.dart';
@@ -37,27 +38,12 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
   bool _selectedStoreTab = false;
   bool _selectedArcadeTab = false;
   bool _selectedLeagueTab = false;
-  final List<Map<String, dynamic>> _pages = [
-    {
-      'page': const StoreHomeScreen(),
-      'title': 'Store',
-    },
-    {
-      'page': const LeaderBoardScreen(),
-      'title': 'Board',
-    },
-    {
-      'page': const HomeScreen(),
-      'title': 'Home',
-    },
-    {
-      'page': const ArcadeScreen(),
-      'title': 'Arcade',
-    },
-    {
-      'page': const FantasyLeagueHomeScreen(),
-      'title': 'Team',
-    },
+  final List<Widget> _pages = [
+    const StoreHomeScreen(),
+    const LeaderBoardScreen(),
+    const HomeScreen(),
+    const ArcadeScreen(),
+    const FantasyLeagueHomeScreen(),
   ];
 
   displayWelcomeModal()async{
@@ -89,6 +75,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
 
   Widget  _bottomNavigationBar(BuildContext context, int _selectedTabIndex) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
     return SizedBox(
       child: Container(
         height: 120.h,
@@ -103,7 +90,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
         child: Row(
             children: [
               BottomTabItem(
-                itemLabel: 'Store',
+                itemLabel: tr.t('nav_store'),
                 itemIcon: IconImageRoutes.storeTabIcon,
                 itemIsSelected: _selectedTabIndex == 0,
                 onTap: () {
@@ -112,7 +99,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 },
               ),
               BottomTabItem(
-                itemLabel: 'Board',
+                itemLabel: tr.t('nav_board'),
                 itemIcon: IconImageRoutes.trophyTabICon,
                 itemIsSelected: _selectedTabIndex == 1,
                 onTap: () {
@@ -121,7 +108,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 },
               ),
               BottomTabItem(
-                itemLabel: 'Home',
+                itemLabel: tr.t('nav_home'),
                 itemIcon: IconImageRoutes.homeTabIcon,
                 itemIsSelected: _selectedTabIndex == 2,
                 onTap: () {
@@ -130,7 +117,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 },
               ),
               BottomTabItem(
-                itemLabel: 'Arcade',
+                itemLabel: tr.t('nav_arcade'),
                 itemIcon: IconImageRoutes.swordTabIcon,
                 itemIsSelected: _selectedTabIndex == 3,
                 onTap: () {
@@ -139,7 +126,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
                 },
               ),
               BottomTabItem(
-                itemLabel: 'League',
+                itemLabel: tr.t('nav_league'),
                 itemIcon: IconImageRoutes.leagueTabIcon,
                 itemIsSelected: _selectedTabIndex == 4,
                 onTap: () {
@@ -156,6 +143,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
   @override
   Widget build(BuildContext context) {
     final int _selectedTabIndex = context.watch<NavigationCubit>().state;
+    final tr = AppLocalization.tr(context);
     return BlocListener<ConnectivityBloc, ConnectivityState>(
       listenWhen: (previous, current) =>
           previous.isOnline != current.isOnline ||
@@ -164,7 +152,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
         if (!state.isOnline) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('You\'re offline. Some features may be limited.'),
+              content: Text(tr.t('offline_features_limited')),
               backgroundColor: Colors.orange.shade800,
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
@@ -173,7 +161,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
         } else if (state.isOnline && state.isSyncing) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Syncing your scores...'),
+              content: Text(tr.t('syncing_scores')),
               backgroundColor: Colors.blue.shade700,
               duration: const Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
@@ -184,7 +172,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('You\'re back online!'),
+              content: Text(tr.t('back_online')),
               backgroundColor: Colors.green.shade700,
               duration: const Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
@@ -193,7 +181,7 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
         }
       },
       child: Scaffold(
-        body: _pages[_selectedTabIndex]['page'],
+        body: _pages[_selectedTabIndex],
         bottomNavigationBar: _bottomNavigationBar(context, _selectedTabIndex),
       ),
     );

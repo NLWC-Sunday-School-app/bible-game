@@ -9,6 +9,7 @@ import 'package:bible_game/shared/widgets/screen_app_bar.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../shared/constants/image_routes.dart';
+import '../../../shared/features/localization/app_localization.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/tab_button.dart';
 
@@ -27,6 +28,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     final double usableHeight = screenHeight - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom;
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -50,7 +52,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                   widgets: [
                     Center(
                       child: StrokeText(
-                        text: 'Arcade',
+                        text: tr.t('arcade_title'),
                         textStyle: TextStyle(
                           color: Colors.white,
                           fontSize: 26.sp,
@@ -90,7 +92,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                       children: [
                         TabButton(
                           width: 164,
-                          buttonText: 'Global Challenge',
+                          buttonText: tr.t('arcade_global_challenge'),
                           buttonSelected: _selectedGlobalChallenge,
                           onTap: () {
                             soundManager.playClickSound();
@@ -101,7 +103,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                         ),
                         TabButton(
                           width: 164,
-                          buttonText: 'Multiplayer',
+                          buttonText: tr.t('arcade_multiplayer'),
                           buttonSelected: !_selectedGlobalChallenge,
                           onTap: () {
                             soundManager.playClickSound();
@@ -122,8 +124,8 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                     if (!connectivityState.isOnline) {
                       return Padding(
                         padding: EdgeInsets.only(top: 60.h),
-                        child: const OfflineBanner(
-                          subtitle: 'Arcade requires an internet connection.\nPlease reconnect to play.',
+                        child: OfflineBanner(
+                          subtitle: tr.t('arcade_offline_message'),
                         ),
                       );
                     }

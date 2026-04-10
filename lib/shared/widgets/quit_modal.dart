@@ -12,6 +12,7 @@ import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/constants/colors.dart';
 
 import '../../navigation/cubit/navigation_cubit.dart';
+import '../features/localization/app_localization.dart';
 import '../features/settings/bloc/settings_bloc.dart';
 
 void showQuitModal(BuildContext context, {String? gameMode}) {
@@ -86,6 +87,7 @@ class QuitModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final tr = AppLocalization.tr(context);
 
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 40.w),
@@ -129,7 +131,7 @@ class QuitModal extends StatelessWidget {
 
             // Title
             Text(
-              'Leaving so soon?',
+              tr.t('quit_title'),
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.w700,
@@ -142,7 +144,7 @@ class QuitModal extends StatelessWidget {
 
             // Subtitle
             Text(
-              'Your progress in this round\nwon\'t be saved.',
+              tr.t('quit_message'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.sp,
@@ -176,7 +178,7 @@ class QuitModal extends StatelessWidget {
                   ],
                 ),
                 child: Text(
-                  'Keep Playing',
+                  tr.t('quit_keep_playing'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
@@ -204,7 +206,7 @@ class QuitModal extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Quit',
+                  tr.t('quit_button'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,

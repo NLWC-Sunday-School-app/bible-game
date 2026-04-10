@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,6 +32,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
       backgroundColor: Colors.transparent,
@@ -74,7 +76,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                   height: 10,
                 ),
                 StrokeText(
-                  text: 'Reset password',
+                  text: tr.t('auth_reset_password'),
                   textStyle: TextStyle(
                     color: const Color(0xFF1768B9),
                     fontFamily: 'Mikado',
@@ -88,7 +90,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                   height: 10.h,
                 ),
                 Text(
-                  'Fear not, you can reset your \npassword.',
+                  tr.t('auth_reset_password_subtitle'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.sp,
@@ -117,7 +119,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        hintText: 'Please input your registered email',
+                        hintText: tr.t('auth_reset_email_hint'),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: const BorderSide(
@@ -144,7 +146,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                     if (state.forgotPasswordMailSent) {
                       Navigator.pop(context);
                       Flushbar(
-                        message: 'An OTP has been sent to your account email address',
+                        message: tr.t('auth_otp_sent'),
                         flushbarPosition: FlushbarPosition.TOP,
                         flushbarStyle: FlushbarStyle.GROUNDED,
                         backgroundColor: Colors.green,
@@ -156,7 +158,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                   builder: (context, state) {
                     return BlueButton(
                       width: 250.w,
-                      buttonText: 'Send Code',
+                      buttonText: tr.t('auth_send_code'),
                       buttonIsLoading: state.isSendingForgotPasswordCode,
                       onTap: () {
                         if (_resetPasswordFormKey.currentState!.validate())
