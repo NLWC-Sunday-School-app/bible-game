@@ -36,7 +36,8 @@
       background: linear-gradient(180deg, #071428 0%, #0D2050 100%);
       overflow: hidden;
       width: 100vw;
-      height: 100vh;
+      height: 100vh; /* fallback for older browsers */
+      height: 100dvh;
     }
 
     /* ── Mobile: Flutter fills the entire viewport ── */
