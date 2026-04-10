@@ -136,76 +136,13 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    // On web, wrap everything in a constrained container so ScreenUtil
-    // calculates sizes based on the phone-width viewport, not the full browser.
+    // On web, the HTML host element controls the viewport size
+    // (phone-shaped on desktop, full-screen on mobile).
+    // Always force phone layout on web since the viewport is phone-sized.
     if (PlatformInfo.isWeb) {
-      return _buildWebShell(context);
-    }
-    return _buildApp(context);
-  }
-
-  Widget _buildWebShell(BuildContext context) {
-    // Render the app at phone dimensions, then scale it to fit the browser
-    // window — exactly like a phone simulator centered on the page.
-    const double phoneWidth = 375;
-    const double phoneHeight = 812;
-    const double phoneAspect = phoneWidth / phoneHeight;
-
-    final originalData = MediaQuery.of(context);
-    final browserW = originalData.size.width;
-    final browserH = originalData.size.height;
-
-    // If the browser is already phone-sized (mobile browser), skip the shell
-    // and let ScreenUtil use the real viewport dimensions
-    if (browserW <= 500) {
       return _buildApp(context, forcePhoneLayout: true);
     }
-
-    // Desktop: scale the phone layout to fill the browser height
-    // while keeping the phone aspect ratio.
-    double scaledH = browserH;
-    double scaledW = scaledH * phoneAspect;
-
-    // If wider than browser, clamp to browser width instead
-    if (scaledW > browserW) {
-      scaledW = browserW;
-      scaledH = scaledW / phoneAspect;
-    }
-
-    return Container(
-      width: browserW,
-      height: browserH,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF071428), Color(0xFF0D2050)],
-        ),
-      ),
-      alignment: Alignment.center,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          width: scaledW,
-          height: scaledH,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: SizedBox(
-              width: phoneWidth,
-              height: phoneHeight,
-              child: MediaQuery(
-                data: originalData.copyWith(
-                  size: const Size(phoneWidth, phoneHeight),
-                  devicePixelRatio: 1.0,
-                  textScaler: TextScaler.noScaling,
-                ),
-                child: _buildApp(context, forcePhoneLayout: true),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    return _buildApp(context);
   }
 
   Widget _buildApp(BuildContext context, {bool forcePhoneLayout = false}) {
