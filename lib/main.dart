@@ -39,7 +39,9 @@ void main() async {
         channelShowBadge: true,
         importance: NotificationImportance.Max,
       ),
+
       DevotionalNotification.channel,
+      
     ]);
 
     // Reset the app badge count whenever the app starts

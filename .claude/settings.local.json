@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I {} find {} -maxdepth 1 -name \"*.dart\" -type f)",
+      "Bash(wc -l /Users/mac/Documents/Tobi/bible_games/lib/features/*/view/*.dart)",
+      "Bash(git checkout:*)",
+      "Bash(flutter pub:*)",
+      "Bash(flutter clean:*)",
+      "Bash(flutter run:*)"
+    ]
+  }
+}

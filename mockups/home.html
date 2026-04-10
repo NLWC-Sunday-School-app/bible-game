@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>Bible Game - Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .mi {
+    font-family: 'Material Symbols Rounded';
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px; display: inline-block; vertical-align: middle; line-height: 1;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    width: 390px; height: 844px;
+    overflow: hidden;
+    background: #110F0A;
+    color: #F5E6C8;
+  }
+
+  /* Noise texture overlay */
+  body::after {
+    content: '';
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0.03; z-index: 999; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .screen { height: 100%; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+  /* ===== WARM AMBIENT GLOW ===== */
+  .ambient {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+  .ambient::before {
+    content: '';
+    position: absolute;
+    top: -40%; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(200, 167, 78, 0.08) 0%, transparent 70%);
+  }
+  .ambient::after {
+    content: '';
+    position: absolute;
+    bottom: 10%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(155, 35, 53, 0.04) 0%, transparent 70%);
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    padding: 50px 20px 16px;
+    position: relative;
+  }
+
+  .header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .brand-mark {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(140deg, #C8A74E, #A68A3A);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(200, 167, 78, 0.25);
+  }
+  .brand-mark .mi { font-size: 20px; color: #1A1508; }
+  .brand-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 800;
+    color: #F5E6C8;
+    letter-spacing: -0.3px;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .h-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(245, 230, 200, 0.06);
+    border: 1px solid rgba(245, 230, 200, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative;
+  }
+  .h-icon .mi { font-size: 20px; color: rgba(245, 230, 200, 0.4); }
+  .notif-dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #C84C4C;
+    border: 1.5px solid #110F0A;
+  }
+
+  /* Wallet strip */
+  .wallet-strip {
+    display: flex; gap: 0;
+    background: rgba(245, 230, 200, 0.04);
+    border: 1px solid rgba(245, 230, 200, 0.07);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .w-item {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 9px 0;
+    position: relative;
+  }
+  .w-item + .w-item::before {
+    content: '';
+    position: absolute; left: 0; top: 20%; height: 60%;
+    width: 1px;
+    background: rgba(245, 230, 200, 0.08);
+  }
+  .w-item .mi { font-size: 16px; }
+  .w-item span { font-size: 13px; font-weight: 700; }
+  .w-coin .mi { color: #C8A74E; }
+  .w-coin span { color: #C8A74E; }
+  .w-gem .mi { color: #9B6B8E; }
+  .w-gem span { color: #9B6B8E; }
+  .w-fire .mi { color: #C87A4E; }
+  .w-fire span { color: #C87A4E; }
+
+  /* ===== SCROLL ===== */
+  .scroll {
+    flex: 1; overflow-y: auto; padding: 18px 20px 100px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  /* ===== HERO CARD ===== */
+  .hero {
+    border-radius: 20px;
+    padding: 24px 22px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, #2A1F12, #1C1610);
+    border: 1px solid rgba(200, 167, 78, 0.15);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .hero:active { transform: scale(0.98); }
+
+  /* Decorative arch pattern */
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 160px; height: 160px;
+    border-radius: 0 0 0 100%;
+    background: linear-gradient(180deg, rgba(200, 167, 78, 0.06), transparent);
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -30px; right: 20px;
+    width: 100px; height: 100px; border-radius: 50%;
+    border: 20px solid rgba(200, 167, 78, 0.04);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700;
+    color: #C8A74E;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    position: relative; z-index: 1;
+  }
+  .hero-eyebrow .mi { font-size: 14px; }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 800;
+    color: #F5E6C8;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    position: relative; z-index: 1;
+  }
+  .hero-sub {
+    font-size: 13px; color: rgba(245, 230, 200, 0.45);
+    margin-bottom: 18px;
+    position: relative; z-index: 1;
+  }
+  .hero-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(140deg, #C8A74E, #A68A3A);
+    color: #1A1508;
+    padding: 10px 22px; border-radius: 10px;
+    font-weight: 800; font-size: 13px;
+    border: none; cursor: pointer;
+    box-shadow: 0 3px 0 #8A7232, 0 4px 12px rgba(200, 167, 78, 0.2);
+    position: relative; z-index: 1;
+    transition: all 0.1s;
+  }
+  .hero-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #8A7232; }
+  .hero-btn .mi { font-size: 16px; }
+
+  /* ===== SECTION ===== */
+  .sec-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .sec-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 800;
+  }
+  .sec-more {
+    font-size: 12px; font-weight: 700;
+    color: #C8A74E; cursor: pointer;
+    display: flex; align-items: center; gap: 2px;
+  }
+  .sec-more .mi { font-size: 16px; }
+
+  /* ===== GAME CARDS ===== */
+  .games-row {
+    display: flex; gap: 10px;
+    overflow-x: auto; padding-bottom: 6px;
+    margin-bottom: 24px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .games-row::-webkit-scrollbar { display: none; }
+
+  .g-card {
+    min-width: 145px; width: 145px;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.12s;
+    flex-shrink: 0;
+    border: 1px solid rgba(245, 230, 200, 0.06);
+  }
+  .g-card:active { transform: scale(0.96); }
+
+  .g-visual {
+    height: 100px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  /* Each game has a unique visual identity */
+  .g-visual::after {
+    content: '';
+    position: absolute; bottom: -15px; right: -15px;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .g-visual .mi { font-size: 36px; color: rgba(255,255,255,0.85); position: relative; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+  .g-card.qg .g-visual { background: linear-gradient(150deg, #1B3A6B, #264E8A); }
+  .g-card.wiw .g-visual { background: linear-gradient(150deg, #3D5A3E, #4D6E4F); }
+  .g-card.pp .g-visual { background: linear-gradient(150deg, #0D5E6B, #1A7A8A); }
+  .g-card.fs .g-visual { background: linear-gradient(150deg, #6B4A2A, #8A6840); }
+
+  .g-info {
+    background: rgba(245, 230, 200, 0.04);
+    padding: 10px 12px;
+  }
+  .g-name { font-size: 13px; font-weight: 800; margin-bottom: 1px; }
+  .g-desc { font-size: 10px; color: rgba(245, 230, 200, 0.35); }
+
+  /* ===== COMPETE SECTION ===== */
+  .compete-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px;
+    background: rgba(245, 230, 200, 0.04);
+    border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .compete-card:active { transform: scale(0.98); }
+
+  .c-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .c-icon .mi { font-size: 22px; }
+  .c-icon.globe { background: linear-gradient(140deg, #1B3A6B, #264E8A); }
+  .c-icon.globe .mi { color: rgba(255,255,255,0.8); }
+  .c-icon.swords { background: linear-gradient(140deg, #6B2A2A, #8A3A3A); }
+  .c-icon.swords .mi { color: rgba(255,255,255,0.8); }
+
+  .c-meta { flex: 1; }
+  .c-name { font-size: 14px; font-weight: 800; }
+  .c-desc { font-size: 11px; color: rgba(245, 230, 200, 0.35); }
+
+  .c-badge {
+    font-size: 9px; font-weight: 800;
+    background: rgba(200, 100, 80, 0.15);
+    color: #E8977A;
+    padding: 3px 8px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .c-arrow .mi { font-size: 20px; color: rgba(245, 230, 200, 0.15); }
+
+  /* ===== DAILY STREAK (inline, minimal) ===== */
+  .streak-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: rgba(200, 122, 78, 0.08);
+    border: 1px solid rgba(200, 122, 78, 0.12);
+    border-radius: 14px;
+    margin-bottom: 24px;
+  }
+  .streak-flame {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(140deg, #C87A4E, #A86030);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 0 #8A4E28;
+  }
+  .streak-flame .mi { font-size: 20px; color: #FFF; }
+  .streak-text { flex: 1; }
+  .streak-text strong { display: block; font-size: 13px; font-weight: 800; color: #E8B47A; }
+  .streak-text span { font-size: 11px; color: rgba(245, 230, 200, 0.35); }
+  .streak-btn {
+    font-family: 'DM Sans'; font-size: 11px; font-weight: 800;
+    background: linear-gradient(140deg, #C87A4E, #A86030);
+    color: #FFF; border: none; padding: 6px 14px; border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #8A4E28;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .streak-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #8A4E28; }
+
+  /* ===== BOTTOM NAV ===== */
+  .b-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 74px;
+    background: #110F0A;
+    border-top: 1px solid rgba(245, 230, 200, 0.06);
+    display: flex; align-items: stretch;
+    z-index: 10;
+  }
+  .b-tab {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    cursor: pointer; position: relative;
+  }
+  .b-tab .mi { font-size: 22px; color: rgba(245, 230, 200, 0.2); transition: color 0.2s; }
+  .b-tab span { font-size: 9px; font-weight: 700; color: rgba(245, 230, 200, 0.2); transition: color 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .b-tab.on .mi { color: #C8A74E; }
+  .b-tab.on span { color: #C8A74E; }
+  .b-tab.on::after {
+    content: '';
+    position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px;
+    background: #C8A74E;
+  }
+
+  .page-label {
+    position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+    background: rgba(200, 167, 78, 0.1); color: #C8A74E;
+    font-size: 9px; font-weight: 800; padding: 2px 10px;
+    border-radius: 6px; letter-spacing: 1.2px; text-transform: uppercase;
+    z-index: 100; border: 1px solid rgba(200, 167, 78, 0.15);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-label">Home</div>
+<div class="ambient"></div>
+
+<div class="screen">
+  <div class="header">
+    <div class="header-row">
+      <div class="brand">
+        <div class="brand-mark"><span class="mi">auto_stories</span></div>
+        <div class="brand-text">The Bible Game</div>
+      </div>
+      <div class="header-right">
+        <div class="h-icon">
+          <span class="mi">notifications</span>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="h-icon"><span class="mi">person</span></div>
+      </div>
+    </div>
+    <div class="wallet-strip">
+      <div class="w-item w-coin"><span class="mi" style="font-size:16px">toll</span><span>2,450</span></div>
+      <div class="w-item w-gem"><span class="mi" style="font-size:16px">diamond</span><span>85</span></div>
+      <div class="w-item w-fire"><span class="mi" style="font-size:16px">local_fire_department</span><span>12 days</span></div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <!-- Streak -->
+    <div class="streak-row">
+      <div class="streak-flame"><span class="mi">local_fire_department</span></div>
+      <div class="streak-text">
+        <strong>12-day streak</strong>
+        <span>Don't break the chain</span>
+      </div>
+      <button class="streak-btn">Claim</button>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-eyebrow"><span class="mi">schedule</span> Daily Challenge</div>
+      <div class="hero-title">The Parables<br>of Jesus</div>
+      <div class="hero-sub">Today's challenge &middot; 4 questions &middot; Bonus reward</div>
+      <button class="hero-btn"><span class="mi">play_arrow</span> Begin Challenge</button>
+    </div>
+
+    <!-- Games -->
+    <div class="sec-head">
+      <div class="sec-title">Games</div>
+      <div class="sec-more">See all <span class="mi">chevron_right</span></div>
+    </div>
+
+    <div class="games-row">
+      <div class="g-card qg">
+        <div class="g-visual"><span class="mi">bolt</span></div>
+        <div class="g-info">
+          <div class="g-name">Quick Game</div>
+          <div class="g-desc">Topic trivia</div>
+        </div>
+      </div>
+      <div class="g-card wiw">
+        <div class="g-visual"><span class="mi">person_search</span></div>
+        <div class="g-info">
+          <div class="g-name">Who Is Who</div>
+          <div class="g-desc">Characters</div>
+        </div>
+      </div>
+      <div class="g-card pp">
+        <div class="g-visual"><span class="mi">hiking</span></div>
+        <div class="g-info">
+          <div class="g-name">Pilgrim</div>
+          <div class="g-desc">Rank up</div>
+        </div>
+      </div>
+      <div class="g-card fs">
+        <div class="g-visual"><span class="mi">menu_book</span></div>
+        <div class="g-info">
+          <div class="g-name">4 Scriptures</div>
+          <div class="g-desc">Missing word</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compete -->
+    <div class="sec-head">
+      <div class="sec-title">Compete</div>
+    </div>
+
+    <div class="compete-card">
+      <div class="c-icon globe"><span class="mi">public</span></div>
+      <div class="c-meta">
+        <div class="c-name">Global Challenge</div>
+        <div class="c-desc">Ends in 2h 14m &middot; 1,240 playing</div>
+      </div>
+      <div class="c-badge">Live</div>
+    </div>
+
+    <div class="compete-card">
+      <div class="c-icon swords"><span class="mi">swords</span></div>
+      <div class="c-meta">
+        <div class="c-name">Multiplayer</div>
+        <div class="c-desc">Challenge a friend</div>
+      </div>
+      <div class="c-arrow"><span class="mi">chevron_right</span></div>
+    </div>
+  </div>
+
+  <div class="b-nav">
+    <div class="b-tab on" onclick="navTo(this)"><span class="mi">home</span><span>Home</span></div>
+    <div class="b-tab" onclick="navTo(this)"><span class="mi">storefront</span><span>Store</span></div>
+    <div class="b-tab" onclick="navTo(this)"><span class="mi">emoji_events</span><span>Board</span></div>
+    <div class="b-tab" onclick="navTo(this)"><span class="mi">sports_esports</span><span>Arcade</span></div>
+    <div class="b-tab" onclick="navTo(this)"><span class="mi">shield</span><span>League</span></div>
+  </div>
+</div>
+
+<script>
+function navTo(el) {
+  document.querySelectorAll('.b-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+}
+</script>
+</body>
+</html>
