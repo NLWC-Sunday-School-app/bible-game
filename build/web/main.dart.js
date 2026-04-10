@@ -68244,7 +68244,7 @@ A.a_I.prototype={
 A(a){var s,r=A.fx($.bvE(),!0,t.GU)
 B.b.JW(r,B.eU)
 s=A.hi(r,0,A.iv(15,"count",t.S),A.as(r).c).es(0)
-return A.arJ(new A.au4(s),s.length,A.arI(1.7777777777777777,!0,B.uW,B.aK,B.a_F,!0,!0,0.15,155*$.b().gk(),0,!1,B.aN,0.88))}}
+return A.arJ(new A.au4(s),s.length,A.arI(1.7777777777777777,!0,B.uW,B.aK,B.a_F,!0,!0,0.15,185*$.b().gk(),0,!1,B.aN,0.88))}}
 A.au3.prototype={
 $1(a){var s=t.N
 return A.o(["category","Church History","icon","\u26ea","fact",a],s,s)},
@@ -68301,7 +68301,7 @@ a5=t.p
 a3=A.Y(A.a([a,a1,a0,A.A(a6,A.D(a7.aM("did_you_know"),a6,a6,a6,a6,a6,a6,a6,A.l(a6,a6,B.e,a6,a6,a6,a6,a6,a6,a6,a6,$.b().p(9),a6,a6,B.q,a6,a6,!0,a6,a6,a6,a6,a6,a6,a6,a6),a6,a6,a6,a6),B.h,a6,a6,new A.G(k,a6,a6,a4,a6,a6,B.o),a6,a6,a6,a6,new A.v(a2,a3,a2,a3),a6,a6,a6)],a5),B.k,B.p,B.i)
 a2=A.e(a6,10*$.b().gk(),a6)
 a4=$.b().p(12)
-return A.A(a6,A.rR(h,A.bk(B.M,A.a([g,e,new A.a7(new A.v(16*f,12*c,14*d,12*b),A.ab(A.a([a3,a2,A.cm(A.D(m,a6,a6,4,B.bc,a6,a6,a6,A.l(a6,a6,B.e.aW(0.85),a6,a6,a6,a6,a6,a6,a6,a6,a4,a6,a6,B.F,a6,1.4,!0,a6,a6,a6,a6,a6,a6,a6,a6),a6,a6,a6,a6),1,a6)],a5),B.a8,B.p,B.i),a6)],a5),B.z,B.H,a6),B.bJ),B.h,a6,a6,new A.G(l.a,a6,j,p,i,a6,B.o),a6,a6,a6,new A.v(s,r,s,r),a6,a6,a6,1/0)}}
+return A.A(a6,A.rR(h,A.bk(B.M,A.a([g,e,new A.a7(new A.v(16*f,12*c,14*d,12*b),A.ab(A.a([a3,a2,A.cm(A.D(m,a6,a6,6,B.bc,a6,a6,a6,A.l(a6,a6,B.e.aW(0.85),a6,a6,a6,a6,a6,a6,a6,a6,a4,a6,a6,B.F,a6,1.4,!0,a6,a6,a6,a6,a6,a6,a6,a6),a6,a6,a6,a6),1,a6)],a5),B.a8,B.p,B.i),a6)],a5),B.z,B.H,a6),B.bJ),B.h,a6,a6,new A.G(l.a,a6,j,p,i,a6,B.o),a6,a6,a6,new A.v(s,r,s,r),a6,a6,a6,1/0)}}
 A.bga.prototype={
 $1(a){var s,r=this,q=null,p=B.n.l(r.a),o=B.n.l(r.b),n=B.n.l(r.c),m=B.n.l(r.d)
 J.bJ(r.e)

@@ -29,7 +29,7 @@ class DidYouKnowCarousel extends StatelessWidget {
       itemCount: cards.length,
       itemBuilder: (context, index, _) => _FactCard(data: cards[index]),
       options: CarouselOptions(
-        height: 155.h,
+        height: 185.h,
         viewportFraction: 0.88,
         enableInfiniteScroll: true,
         autoPlay: true,
@@ -195,7 +195,7 @@ class _FactCard extends StatelessWidget {
                         height: 1.4,
                         fontWeight: FontWeight.w500,
                       ),
-                      maxLines: 4,
+                      maxLines: 6,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
