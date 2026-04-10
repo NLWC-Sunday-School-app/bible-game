@@ -13,6 +13,7 @@ class SoundManager {
 
   bool isSoundOn = true;
   bool isMusicOn = true;
+  bool _assetsLoaded = false;
 
 
   SoundManager() {
@@ -20,7 +21,6 @@ class SoundManager {
   }
 
   Future<void> _loadAssets() async {
-    // Load audio files — wrapped in try/catch for web compatibility
     try {
       await clickPlayer.setAsset('assets/sounds/click.mp3');
       await gameMusicPlayer.setAsset('assets/sounds/game_music.mp3');
@@ -28,6 +28,7 @@ class SoundManager {
       await achievementPlayer.setAsset('assets/sounds/achievement.mp3');
       await correctAnswerPlayer.setAsset('assets/sounds/correct_answer.mp3');
       await wrongAnswerPlayer.setAsset('assets/sounds/wrong_answer.m4a');
+      _assetsLoaded = true;
     } catch (e) {
       debugPrint('SoundManager: could not load audio assets: $e');
     }
@@ -45,13 +46,19 @@ class SoundManager {
     }
   }
 
-  void playClickSound() {
-    if (isSoundOn) {
-      clickPlayer.seek(Duration.zero);
-      clickPlayer.setVolume(0.5);
-      clickPlayer.play();
+  Future<void> _safePlay(AudioPlayer player, {double volume = 0.5}) async {
+    if (!isSoundOn) return;
+    try {
+      if (!_assetsLoaded) await _loadAssets();
+      await player.seek(Duration.zero);
+      await player.setVolume(volume);
+      await player.play();
+    } catch (e) {
+      debugPrint('SoundManager: playback error: $e');
     }
   }
+
+  void playClickSound() => _safePlay(clickPlayer);
 
   void playGameMusic() {
     if (isMusicOn) {
@@ -69,34 +76,13 @@ class SoundManager {
     gameMusicPlayer.stop();
   }
 
-  void playTabClickSound() {
-    if (isSoundOn) {
-      tabClickPlayer.seek(Duration.zero);
-      tabClickPlayer.setVolume(0.5);
-      tabClickPlayer.play();
-    }
-  }
+  void playTabClickSound() => _safePlay(tabClickPlayer);
 
-  void playAchievementSound() {
-    if (isSoundOn) {
-      achievementPlayer.seek(Duration.zero);
-      achievementPlayer.play();
-    }
-  }
+  void playAchievementSound() => _safePlay(achievementPlayer, volume: 1.0);
 
-  void playCorrectAnswerSound() {
-    if (isSoundOn) {
-      correctAnswerPlayer.seek(Duration.zero);
-      correctAnswerPlayer.play();
-    }
-  }
+  void playCorrectAnswerSound() => _safePlay(correctAnswerPlayer, volume: 1.0);
 
-  void playWrongAnswerSound() {
-    if (isSoundOn) {
-      wrongAnswerPlayer.seek(Duration.zero);
-      wrongAnswerPlayer.play();
-    }
-  }
+  void playWrongAnswerSound() => _safePlay(wrongAnswerPlayer, volume: 1.0);
 
   void dispose() {
     clickPlayer.dispose();
