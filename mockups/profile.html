@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>Bible Game - Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .mi {
+    font-family: 'Material Symbols Rounded';
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px; display: inline-block; vertical-align: middle; line-height: 1;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    width: 390px; height: 844px;
+    overflow-y: auto; overflow-x: hidden;
+    background: #110F0A;
+    color: #F5E6C8;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  body::-webkit-scrollbar { display: none; }
+
+  body::after {
+    content: '';
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0.03; z-index: 999; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .page-label {
+    position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+    background: rgba(200, 167, 78, 0.1); color: #C8A74E;
+    font-size: 9px; font-weight: 800; padding: 2px 10px;
+    border-radius: 6px; letter-spacing: 1.2px; text-transform: uppercase;
+    z-index: 100; border: 1px solid rgba(200, 167, 78, 0.15);
+  }
+
+  /* ===== HEADER ===== */
+  .p-header {
+    padding: 48px 20px 28px;
+    position: relative; z-index: 1;
+  }
+  .h-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 28px;
+  }
+  .h-btn {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(245, 230, 200, 0.06);
+    border: 1px solid rgba(245, 230, 200, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .h-btn .mi { font-size: 20px; color: rgba(245, 230, 200, 0.4); }
+  .h-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 800;
+  }
+
+  /* Profile hero */
+  .p-hero {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .av-ring {
+    width: 88px; height: 88px; border-radius: 22px;
+    padding: 3px;
+    background: linear-gradient(140deg, #C8A74E, #8A6E30, #C8A74E);
+    margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(200, 167, 78, 0.2);
+  }
+  .av-inner {
+    width: 100%; height: 100%; border-radius: 19px;
+    background: linear-gradient(140deg, #2A2218, #1E1A14);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 32px;
+  }
+
+  .p-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .p-loc {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; color: rgba(245, 230, 200, 0.35);
+    margin-bottom: 12px;
+  }
+  .p-loc .mi { font-size: 15px; }
+
+  .p-rank {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(140deg, rgba(200, 167, 78, 0.15), rgba(200, 167, 78, 0.05));
+    border: 1px solid rgba(200, 167, 78, 0.2);
+    padding: 6px 16px; border-radius: 10px;
+  }
+  .p-rank .mi { font-size: 16px; color: #C8A74E; }
+  .p-rank span { font-size: 13px; font-weight: 800; color: #C8A74E; }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(245, 230, 200, 0.06), transparent);
+    margin: 0 20px 20px;
+  }
+
+  /* Content */
+  .ct { padding: 0 20px 40px; position: relative; z-index: 1; }
+
+  .sec {
+    font-size: 11px; font-weight: 800; color: rgba(245, 230, 200, 0.25);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  /* ===== STATS ===== */
+  .stats-strip {
+    display: flex; gap: 0;
+    background: rgba(245, 230, 200, 0.03);
+    border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .stat {
+    flex: 1;
+    padding: 16px 10px;
+    text-align: center;
+    position: relative;
+  }
+  .stat + .stat::before {
+    content: '';
+    position: absolute; left: 0; top: 20%; height: 60%;
+    width: 1px;
+    background: rgba(245, 230, 200, 0.06);
+  }
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900;
+    color: #F5E6C8;
+    margin-bottom: 2px;
+  }
+  .stat-lbl {
+    font-size: 9px; font-weight: 700;
+    color: rgba(245, 230, 200, 0.3);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ===== BADGES ===== */
+  .badges-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .badge {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+  }
+  .badge-ic {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .badge-ic .mi { font-size: 24px; }
+
+  .badge-ic.on {
+    background: rgba(200, 167, 78, 0.08);
+    border: 1.5px solid rgba(200, 167, 78, 0.2);
+  }
+  .badge-ic.on .mi { color: #C8A74E; }
+
+  .badge-ic.off {
+    background: rgba(245, 230, 200, 0.02);
+    border: 1.5px solid rgba(245, 230, 200, 0.04);
+  }
+  .badge-ic.off .mi { color: rgba(245, 230, 200, 0.1); }
+
+  .badge-lb {
+    font-size: 9px; font-weight: 700;
+    color: rgba(245, 230, 200, 0.3);
+  }
+
+  /* ===== MENU ===== */
+  .menu-card {
+    background: rgba(245, 230, 200, 0.03);
+    border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .m-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .m-row:hover { background: rgba(245, 230, 200, 0.03); }
+  .m-row + .m-row::before {
+    content: '';
+    position: absolute; top: 0; left: 52px; right: 16px;
+    height: 1px;
+    background: rgba(245, 230, 200, 0.04);
+  }
+
+  .m-ic {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .m-ic .mi { font-size: 18px; }
+  .m-ic.c1 { background: rgba(90, 120, 180, 0.12); }
+  .m-ic.c1 .mi { color: #7A9AC8; }
+  .m-ic.c2 { background: rgba(140, 100, 180, 0.12); }
+  .m-ic.c2 .mi { color: #A87CC8; }
+  .m-ic.c3 { background: rgba(200, 167, 78, 0.1); }
+  .m-ic.c3 .mi { color: #C8A74E; }
+
+  .m-txt { flex: 1; font-size: 14px; font-weight: 700; }
+
+  .tog {
+    width: 42px; height: 24px; border-radius: 12px;
+    background: rgba(245, 230, 200, 0.08);
+    position: relative; cursor: pointer; transition: background 0.25s;
+  }
+  .tog.on { background: #4A8A5A; }
+  .tog-d {
+    width: 20px; height: 20px; border-radius: 50%; background: #F5E6C8;
+    position: absolute; top: 2px; left: 2px;
+    transition: left 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .tog.on .tog-d { left: 20px; }
+
+  /* Logout */
+  .logout-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: rgba(155, 60, 60, 0.05);
+    border: 1px solid rgba(155, 60, 60, 0.08);
+    border-radius: 14px;
+    cursor: pointer;
+    margin-bottom: 24px;
+  }
+  .logout-row .m-ic { background: rgba(155, 60, 60, 0.12); }
+  .logout-row .m-ic .mi { color: #C87A7A; }
+  .logout-row .m-txt { color: #C87A7A; }
+  .logout-row .mi.chev { font-size: 18px; color: rgba(200, 120, 120, 0.3); }
+
+  /* ===== RECENT ===== */
+  .recent-card {
+    background: rgba(245, 230, 200, 0.03);
+    border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .rc {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    position: relative;
+  }
+  .rc + .rc::before {
+    content: '';
+    position: absolute; top: 0; left: 52px; right: 16px;
+    height: 1px;
+    background: rgba(245, 230, 200, 0.04);
+  }
+  .rc-ic {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .rc-ic .mi { font-size: 18px; color: rgba(245, 230, 200, 0.6); }
+  .rc-ic.r1 { background: rgba(27, 58, 107, 0.25); }
+  .rc-ic.r2 { background: rgba(61, 90, 62, 0.25); }
+  .rc-ic.r3 { background: rgba(13, 94, 107, 0.25); }
+
+  .rc-m { flex: 1; }
+  .rc-n { font-size: 13px; font-weight: 800; }
+  .rc-t { font-size: 10px; color: rgba(245, 230, 200, 0.25); }
+  .rc-s { font-size: 14px; font-weight: 900; color: #C8A74E; }
+</style>
+</head>
+<body>
+
+<div class="page-label">Profile</div>
+
+<div class="p-header">
+  <div class="h-bar">
+    <div class="h-btn"><span class="mi">arrow_back</span></div>
+    <div class="h-title">Profile</div>
+    <div class="h-btn"><span class="mi">edit</span></div>
+  </div>
+
+  <div class="p-hero">
+    <div class="av-ring">
+      <div class="av-inner">T</div>
+    </div>
+    <div class="p-name">Tobi Samuel</div>
+    <div class="p-loc"><span class="mi">location_on</span> Nigeria</div>
+    <div class="p-rank">
+      <span class="mi">stars</span>
+      <span>Elder &middot; Level 42</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="ct">
+  <div class="sec">Stats</div>
+  <div class="stats-strip">
+    <div class="stat">
+      <div class="stat-val">12.8k</div>
+      <div class="stat-lbl">Score</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">248</div>
+      <div class="stat-lbl">Games</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">78%</div>
+      <div class="stat-lbl">Win Rate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">32</div>
+      <div class="stat-lbl">Streak</div>
+    </div>
+  </div>
+
+  <div class="sec">Badges</div>
+  <div class="badges-grid">
+    <div class="badge"><div class="badge-ic on"><span class="mi">child_care</span></div><div class="badge-lb">Babe</div></div>
+    <div class="badge"><div class="badge-ic on"><span class="mi">sentiment_satisfied</span></div><div class="badge-lb">Child</div></div>
+    <div class="badge"><div class="badge-ic on"><span class="mi">handshake</span></div><div class="badge-lb">Believer</div></div>
+    <div class="badge"><div class="badge-ic on"><span class="mi">shield_person</span></div><div class="badge-lb">Father</div></div>
+    <div class="badge"><div class="badge-ic on"><span class="mi">favorite</span></div><div class="badge-lb">Charity</div></div>
+    <div class="badge"><div class="badge-ic on"><span class="mi">stars</span></div><div class="badge-lb">Elder</div></div>
+    <div class="badge"><div class="badge-ic off"><span class="mi">lock</span></div><div class="badge-lb">Master</div></div>
+    <div class="badge"><div class="badge-ic off"><span class="mi">lock</span></div><div class="badge-lb">Apostle</div></div>
+  </div>
+
+  <div class="sec">Preferences</div>
+  <div class="menu-card">
+    <div class="m-row">
+      <div class="m-ic c1"><span class="mi">volume_up</span></div>
+      <div class="m-txt">Sound Effects</div>
+      <div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-d"></div></div>
+    </div>
+    <div class="m-row">
+      <div class="m-ic c2"><span class="mi">music_note</span></div>
+      <div class="m-txt">Background Music</div>
+      <div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-d"></div></div>
+    </div>
+    <div class="m-row">
+      <div class="m-ic c3"><span class="mi">notifications</span></div>
+      <div class="m-txt">Notifications</div>
+      <div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-d"></div></div>
+    </div>
+  </div>
+
+  <div class="logout-row">
+    <div class="m-ic"><span class="mi">logout</span></div>
+    <div class="m-txt">Log Out</div>
+    <span class="mi chev">chevron_right</span>
+  </div>
+
+  <div class="sec">Recent</div>
+  <div class="recent-card">
+    <div class="rc">
+      <div class="rc-ic r1"><span class="mi">bolt</span></div>
+      <div class="rc-m"><div class="rc-n">Quick Game</div><div class="rc-t">2 hours ago</div></div>
+      <div class="rc-s">+40</div>
+    </div>
+    <div class="rc">
+      <div class="rc-ic r2"><span class="mi">person_search</span></div>
+      <div class="rc-m"><div class="rc-n">Who Is Who</div><div class="rc-t">5 hours ago</div></div>
+      <div class="rc-s">+25</div>
+    </div>
+    <div class="rc">
+      <div class="rc-ic r3"><span class="mi">hiking</span></div>
+      <div class="rc-m"><div class="rc-n">Pilgrim Progress</div><div class="rc-t">Yesterday</div></div>
+      <div class="rc-s">+60</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

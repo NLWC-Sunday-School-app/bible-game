@@ -1,0 +1,109 @@
+import 'package:flutter/foundation.dart';
+import 'package:just_audio/just_audio.dart';
+import 'bloc/settings_bloc.dart';
+
+
+class SoundManager {
+  final AudioPlayer clickPlayer = AudioPlayer();
+  final AudioPlayer gameMusicPlayer = AudioPlayer();
+  final AudioPlayer tabClickPlayer = AudioPlayer();
+  final AudioPlayer achievementPlayer = AudioPlayer();
+  final AudioPlayer correctAnswerPlayer = AudioPlayer();
+  final AudioPlayer wrongAnswerPlayer = AudioPlayer();
+
+  bool isSoundOn = true;
+  bool isMusicOn = true;
+
+
+  SoundManager() {
+    _loadAssets();
+  }
+
+  Future<void> _loadAssets() async {
+    // Load audio files — wrapped in try/catch for web compatibility
+    try {
+      await clickPlayer.setAsset('assets/sounds/click.mp3');
+      await gameMusicPlayer.setAsset('assets/sounds/game_music.mp3');
+      await tabClickPlayer.setAsset('assets/sounds/tab_click.mp3');
+      await achievementPlayer.setAsset('assets/sounds/achievement.mp3');
+      await correctAnswerPlayer.setAsset('assets/sounds/correct_answer.mp3');
+      await wrongAnswerPlayer.setAsset('assets/sounds/wrong_answer.wav');
+    } catch (e) {
+      debugPrint('SoundManager: could not load audio assets: $e');
+    }
+  }
+
+  void updateSettings(SettingsState state) {
+    isSoundOn = state.isSoundOn;
+    isMusicOn = state.isMusicOn;
+
+    if (!isMusicOn) {
+      gameMusicPlayer.stop();
+    } else {
+      gameMusicPlayer.setLoopMode(LoopMode.one);
+      gameMusicPlayer.play();
+    }
+  }
+
+  void playClickSound() {
+    if (isSoundOn) {
+      clickPlayer.seek(Duration.zero);
+      clickPlayer.setVolume(0.5);
+      clickPlayer.play();
+    }
+  }
+
+  void playGameMusic() {
+    if (isMusicOn) {
+      gameMusicPlayer.setLoopMode(LoopMode.one);
+      gameMusicPlayer.setVolume(0.1);
+      gameMusicPlayer.play();
+    }
+  }
+
+  void pauseGameMusic(){
+    gameMusicPlayer.pause();
+  }
+
+  void stopGameMusic() {
+    gameMusicPlayer.stop();
+  }
+
+  void playTabClickSound() {
+    if (isSoundOn) {
+      tabClickPlayer.seek(Duration.zero);
+      tabClickPlayer.setVolume(0.5);
+      tabClickPlayer.play();
+    }
+  }
+
+  void playAchievementSound() {
+    if (isSoundOn) {
+      achievementPlayer.seek(Duration.zero);
+      achievementPlayer.play();
+    }
+  }
+
+  void playCorrectAnswerSound() {
+    if (isSoundOn) {
+      correctAnswerPlayer.seek(Duration.zero);
+      correctAnswerPlayer.play();
+    }
+  }
+
+  void playWrongAnswerSound() {
+    if (isSoundOn) {
+      wrongAnswerPlayer.seek(Duration.zero);
+      wrongAnswerPlayer.play();
+    }
+  }
+
+  void dispose() {
+    clickPlayer.dispose();
+    gameMusicPlayer.dispose();
+    tabClickPlayer.dispose();
+    achievementPlayer.dispose();
+    correctAnswerPlayer.dispose();
+    wrongAnswerPlayer.dispose();
+  }
+}

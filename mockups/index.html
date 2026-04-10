@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1400, initial-scale=1.0">
+<title>Bible Game — Design Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #050505;
+    color: #ddd;
+    padding: 30px 24px 60px;
+  }
+
+  .page-top {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .page-top h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900;
+    color: #eee;
+    margin-bottom: 6px;
+  }
+  .page-top p { font-size: 13px; color: rgba(255,255,255,0.3); }
+
+  /* Theme section */
+  .theme-section {
+    margin-bottom: 50px;
+  }
+
+  .theme-header {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .theme-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 800;
+  }
+  .theme-tag {
+    font-size: 10px; font-weight: 800;
+    padding: 3px 10px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .theme-desc {
+    font-size: 12px; color: rgba(255,255,255,0.3);
+  }
+
+  /* Kingdom theme colors */
+  .kingdom .theme-name { color: #C8A74E; }
+  .kingdom .theme-tag {
+    background: rgba(200, 167, 78, 0.1);
+    color: #C8A74E;
+    border: 1px solid rgba(200, 167, 78, 0.15);
+  }
+
+  /* Cathedral theme colors */
+  .cathedral .theme-name { color: #A78BFA; }
+  .cathedral .theme-tag {
+    background: rgba(167, 139, 250, 0.1);
+    color: #A78BFA;
+    border: 1px solid rgba(167, 139, 250, 0.15);
+  }
+
+  .phones {
+    display: flex; gap: 20px;
+    justify-content: center;
+  }
+
+  .phone-col {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+  }
+  .phone-label {
+    font-size: 10px; font-weight: 800;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase; letter-spacing: 1.2px;
+  }
+
+  .phone {
+    width: 390px; height: 844px;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  }
+  .kingdom .phone {
+    border: 2px solid rgba(200, 167, 78, 0.08);
+  }
+  .cathedral .phone {
+    border: 2px solid rgba(167, 139, 250, 0.08);
+  }
+
+  .phone iframe { width: 100%; height: 100%; border: none; }
+
+  /* Comparison notes */
+  .compare-notes {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .note-card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .kingdom .note-card {
+    background: rgba(200, 167, 78, 0.04);
+    border: 1px solid rgba(200, 167, 78, 0.08);
+  }
+  .cathedral .note-card {
+    background: rgba(167, 139, 250, 0.04);
+    border: 1px solid rgba(167, 139, 250, 0.08);
+  }
+
+  .note-title {
+    font-size: 14px; font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .kingdom .note-title { color: #C8A74E; }
+  .cathedral .note-title { color: #A78BFA; }
+
+  .note-list {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .note-list li {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    padding-left: 14px;
+    position: relative;
+  }
+  .note-list li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: rgba(255,255,255,0.2);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-top">
+  <h1>The Bible Game — Two Directions</h1>
+  <p>Click answers in the game screens to see feedback animations. Toggle switches work on profile.</p>
+</div>
+
+<!-- ===== KINGDOM ===== -->
+<div class="theme-section kingdom">
+  <div class="theme-header">
+    <div class="theme-name">Kingdom</div>
+    <div class="theme-tag">Warm</div>
+    <div class="theme-desc">Burnished gold, aged parchment tones, Playfair Display serif. Like opening an illuminated manuscript.</div>
+  </div>
+  <div class="phones">
+    <div class="phone-col">
+      <div class="phone-label">Home</div>
+      <div class="phone"><iframe src="home.html"></iframe></div>
+    </div>
+    <div class="phone-col">
+      <div class="phone-label">Game</div>
+      <div class="phone"><iframe src="game.html"></iframe></div>
+    </div>
+    <div class="phone-col">
+      <div class="phone-label">Profile</div>
+      <div class="phone"><iframe src="profile.html"></iframe></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CATHEDRAL ===== -->
+<div class="theme-section cathedral">
+  <div class="theme-header">
+    <div class="theme-name">Cathedral</div>
+    <div class="theme-tag">Cool</div>
+    <div class="theme-desc">Amethyst purple, jewel-tone game cards, light-bleed effects. Like light pouring through stained glass.</div>
+  </div>
+  <div class="phones">
+    <div class="phone-col">
+      <div class="phone-label">Home</div>
+      <div class="phone"><iframe src="home-v2.html"></iframe></div>
+    </div>
+    <div class="phone-col">
+      <div class="phone-label">Game</div>
+      <div class="phone"><iframe src="game-v2.html"></iframe></div>
+    </div>
+    <div class="phone-col">
+      <div class="phone-label">Profile</div>
+      <div class="phone"><iframe src="profile-v2.html"></iframe></div>
+    </div>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="compare-notes">
+  <div class="note-card" style="background: rgba(200,167,78,0.04); border: 1px solid rgba(200,167,78,0.08);">
+    <div class="note-title" style="color: #C8A74E;">Kingdom — Character</div>
+    <ul class="note-list">
+      <li>Playfair Display serif for headings — gravitas, old-world authority</li>
+      <li>Warm black (#110F0A) base — candlelit room, not cold screen</li>
+      <li>Burnished gold (#C8A74E) — aged, earned, not flashy</li>
+      <li>Noise texture overlay — breaks digital flatness</li>
+      <li>Corner flourishes on question card — manuscript reference</li>
+      <li>Hero card with editorial layout — not just another list item</li>
+      <li>Muted earth tones for game cards (sapphire, forest, leather)</li>
+    </ul>
+  </div>
+  <div class="note-card" style="background: rgba(167,139,250,0.04); border: 1px solid rgba(167,139,250,0.08);">
+    <div class="note-title" style="color: #A78BFA;">Cathedral — Character</div>
+    <ul class="note-list">
+      <li>Cormorant Garamond serif — elegant, lighter, more refined</li>
+      <li>True black (#08090E) base — deep void, makes colors pop</li>
+      <li>Amethyst purple (#A78BFA) accent — sacred, regal, modern</li>
+      <li>Stained-glass light bleeds — colored light on dark surfaces</li>
+      <li>Concentric arch pattern on question card — cathedral windows</li>
+      <li>Jewel-tone game cards with inner glow — sapphire, emerald, amethyst, amber</li>
+      <li>Hero visual with light-ray effect — divine light aesthetic</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>Bible Game - Profile (Cathedral)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .mi {
+    font-family: 'Material Symbols Rounded';
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px; display: inline-block; vertical-align: middle; line-height: 1;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    width: 390px; height: 844px;
+    overflow-y: auto; overflow-x: hidden;
+    background: #08090E;
+    color: #E8E4F0;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  body::-webkit-scrollbar { display: none; }
+
+  .page-label {
+    position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+    background: rgba(124, 58, 237, 0.1); color: #A78BFA;
+    font-size: 9px; font-weight: 800; padding: 2px 10px;
+    border-radius: 6px; letter-spacing: 1.2px; text-transform: uppercase;
+    z-index: 100; border: 1px solid rgba(124, 58, 237, 0.15);
+  }
+
+  /* Light */
+  .lb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .lb::before {
+    content: '';
+    position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(88, 28, 135, 0.08) 0%, transparent 70%);
+  }
+
+  /* ===== HEADER ===== */
+  .phdr {
+    padding: 48px 18px 0;
+    position: relative; z-index: 1;
+  }
+  .hbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 28px;
+  }
+  .hb {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: rgba(232, 228, 240, 0.04);
+    border: 1px solid rgba(232, 228, 240, 0.06);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .hb .mi { font-size: 20px; color: rgba(232, 228, 240, 0.35); }
+  .ht {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 700;
+  }
+
+  /* Profile hero */
+  .phero {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    padding-bottom: 28px;
+  }
+  .av-wrap {
+    width: 92px; height: 92px; border-radius: 24px;
+    padding: 3px;
+    background: linear-gradient(140deg, #7C3AED, #A78BFA, #7C3AED);
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
+    position: relative;
+  }
+  .av-wrap::after {
+    content: '';
+    position: absolute; inset: -6px; border-radius: 28px;
+    border: 1px solid rgba(124, 58, 237, 0.1);
+  }
+  .av-in {
+    width: 100%; height: 100%; border-radius: 21px;
+    background: linear-gradient(140deg, #1E1B4B, #312E81);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 34px;
+  }
+
+  .pn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .ploc {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; color: rgba(232, 228, 240, 0.3);
+    margin-bottom: 12px;
+  }
+  .ploc .mi { font-size: 15px; }
+
+  .prank {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(167, 139, 250, 0.1);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    padding: 6px 16px; border-radius: 10px;
+  }
+  .prank .mi { font-size: 16px; color: #A78BFA; }
+  .prank span { font-size: 13px; font-weight: 800; color: #A78BFA; }
+
+  /* Divider */
+  .div {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232, 228, 240, 0.06), transparent);
+    margin: 0 18px 20px;
+  }
+
+  .ct { padding: 0 18px 40px; position: relative; z-index: 1; }
+
+  .sec {
+    font-size: 11px; font-weight: 800; color: rgba(232, 228, 240, 0.2);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  /* Stats */
+  .stats {
+    display: flex; gap: 0;
+    background: rgba(232, 228, 240, 0.03);
+    border: 1px solid rgba(232, 228, 240, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .st {
+    flex: 1; padding: 16px 8px;
+    text-align: center; position: relative;
+  }
+  .st + .st::before {
+    content: '';
+    position: absolute; left: 0; top: 20%; height: 60%;
+    width: 1px; background: rgba(232, 228, 240, 0.05);
+  }
+  .stv {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .stl {
+    font-size: 9px; font-weight: 700;
+    color: rgba(232, 228, 240, 0.25);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Badges — jewel grid */
+  .badges {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 24px;
+  }
+  .bdg {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+  }
+  .bdg-ic {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .bdg-ic .mi { font-size: 22px; position: relative; z-index: 1; }
+  /* Inner glow */
+  .bdg-ic::before {
+    content: '';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 30px; height: 30px; border-radius: 50%;
+    filter: blur(10px);
+  }
+
+  .bdg-ic.on {
+    background: rgba(167, 139, 250, 0.08);
+    border: 1.5px solid rgba(167, 139, 250, 0.15);
+  }
+  .bdg-ic.on .mi { color: #C4B5FD; }
+  .bdg-ic.on::before { background: rgba(167, 139, 250, 0.1); }
+
+  .bdg-ic.off {
+    background: rgba(232, 228, 240, 0.02);
+    border: 1.5px solid rgba(232, 228, 240, 0.04);
+  }
+  .bdg-ic.off .mi { color: rgba(232, 228, 240, 0.08); }
+
+  .bdg-lb {
+    font-size: 9px; font-weight: 700;
+    color: rgba(232, 228, 240, 0.25);
+  }
+
+  /* Menu */
+  .mcard {
+    background: rgba(232, 228, 240, 0.03);
+    border: 1px solid rgba(232, 228, 240, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .mr {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer; position: relative;
+  }
+  .mr + .mr::before {
+    content: '';
+    position: absolute; top: 0; left: 52px; right: 16px;
+    height: 1px; background: rgba(232, 228, 240, 0.04);
+  }
+  .mic {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mic .mi { font-size: 18px; }
+  .mic.c1 { background: rgba(59, 130, 246, 0.1); }
+  .mic.c1 .mi { color: #60A5FA; }
+  .mic.c2 { background: rgba(168, 85, 247, 0.1); }
+  .mic.c2 .mi { color: #C084FC; }
+  .mic.c3 { background: rgba(251, 191, 36, 0.1); }
+  .mic.c3 .mi { color: #FBBF24; }
+
+  .mtxt { flex: 1; font-size: 14px; font-weight: 700; }
+
+  .tg {
+    width: 42px; height: 24px; border-radius: 12px;
+    background: rgba(232, 228, 240, 0.08);
+    position: relative; cursor: pointer; transition: background 0.25s;
+  }
+  .tg.on { background: #22C55E; }
+  .tgd {
+    width: 20px; height: 20px; border-radius: 50%; background: #fff;
+    position: absolute; top: 2px; left: 2px;
+    transition: left 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .tg.on .tgd { left: 20px; }
+
+  /* Logout */
+  .lo {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: rgba(239, 68, 68, 0.04);
+    border: 1px solid rgba(239, 68, 68, 0.06);
+    border-radius: 14px; cursor: pointer;
+    margin-bottom: 24px;
+  }
+  .lo .mic { background: rgba(239, 68, 68, 0.08); }
+  .lo .mic .mi { color: #FCA5A5; }
+  .lo .mtxt { color: #FCA5A5; }
+  .lo .mi.ch { font-size: 18px; color: rgba(252, 165, 165, 0.3); }
+
+  /* Recent */
+  .rcard {
+    background: rgba(232, 228, 240, 0.03);
+    border: 1px solid rgba(232, 228, 240, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .rc {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    position: relative;
+  }
+  .rc + .rc::before {
+    content: '';
+    position: absolute; top: 0; left: 52px; right: 16px;
+    height: 1px; background: rgba(232, 228, 240, 0.04);
+  }
+  .ric {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; position: relative; overflow: hidden;
+  }
+  .ric .mi { font-size: 18px; color: rgba(232, 228, 240, 0.7); position: relative; z-index: 1; }
+  .ric.r1 { background: linear-gradient(140deg, #1E3A5F, #1E40AF); }
+  .ric.r2 { background: linear-gradient(140deg, #14532D, #166534); }
+  .ric.r3 { background: linear-gradient(140deg, #3B0764, #581C87); }
+  .rm { flex: 1; }
+  .rn { font-size: 13px; font-weight: 800; }
+  .rt { font-size: 10px; color: rgba(232, 228, 240, 0.2); }
+  .rs { font-size: 14px; font-weight: 900; color: #FBBF24; }
+</style>
+</head>
+<body>
+
+<div class="page-label">Profile</div>
+<div class="lb"></div>
+
+<div class="phdr">
+  <div class="hbar">
+    <div class="hb"><span class="mi">arrow_back</span></div>
+    <div class="ht">Profile</div>
+    <div class="hb"><span class="mi">edit</span></div>
+  </div>
+  <div class="phero">
+    <div class="av-wrap"><div class="av-in">T</div></div>
+    <div class="pn">Tobi Samuel</div>
+    <div class="ploc"><span class="mi">location_on</span> Nigeria</div>
+    <div class="prank"><span class="mi">stars</span><span>Elder &middot; Level 42</span></div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<div class="ct">
+  <div class="sec">Stats</div>
+  <div class="stats">
+    <div class="st"><div class="stv">12.8k</div><div class="stl">Score</div></div>
+    <div class="st"><div class="stv">248</div><div class="stl">Games</div></div>
+    <div class="st"><div class="stv">78%</div><div class="stl">Win Rate</div></div>
+    <div class="st"><div class="stv">32</div><div class="stl">Streak</div></div>
+  </div>
+
+  <div class="sec">Badges</div>
+  <div class="badges">
+    <div class="bdg"><div class="bdg-ic on"><span class="mi">child_care</span></div><div class="bdg-lb">Babe</div></div>
+    <div class="bdg"><div class="bdg-ic on"><span class="mi">sentiment_satisfied</span></div><div class="bdg-lb">Child</div></div>
+    <div class="bdg"><div class="bdg-ic on"><span class="mi">handshake</span></div><div class="bdg-lb">Believer</div></div>
+    <div class="bdg"><div class="bdg-ic on"><span class="mi">shield_person</span></div><div class="bdg-lb">Father</div></div>
+    <div class="bdg"><div class="bdg-ic on"><span class="mi">favorite</span></div><div class="bdg-lb">Charity</div></div>
+    <div class="bdg"><div class="bdg-ic on"><span class="mi">stars</span></div><div class="bdg-lb">Elder</div></div>
+    <div class="bdg"><div class="bdg-ic off"><span class="mi">lock</span></div><div class="bdg-lb">Master</div></div>
+    <div class="bdg"><div class="bdg-ic off"><span class="mi">lock</span></div><div class="bdg-lb">Apostle</div></div>
+  </div>
+
+  <div class="sec">Preferences</div>
+  <div class="mcard">
+    <div class="mr"><div class="mic c1"><span class="mi">volume_up</span></div><div class="mtxt">Sound Effects</div><div class="tg on" onclick="this.classList.toggle('on')"><div class="tgd"></div></div></div>
+    <div class="mr"><div class="mic c2"><span class="mi">music_note</span></div><div class="mtxt">Background Music</div><div class="tg on" onclick="this.classList.toggle('on')"><div class="tgd"></div></div></div>
+    <div class="mr"><div class="mic c3"><span class="mi">notifications</span></div><div class="mtxt">Notifications</div><div class="tg on" onclick="this.classList.toggle('on')"><div class="tgd"></div></div></div>
+  </div>
+
+  <div class="lo">
+    <div class="mic"><span class="mi">logout</span></div>
+    <div class="mtxt">Log Out</div>
+    <span class="mi ch">chevron_right</span>
+  </div>
+
+  <div class="sec">Recent</div>
+  <div class="rcard">
+    <div class="rc"><div class="ric r1"><span class="mi">bolt</span></div><div class="rm"><div class="rn">Quick Game</div><div class="rt">2 hours ago</div></div><div class="rs">+40</div></div>
+    <div class="rc"><div class="ric r2"><span class="mi">person_search</span></div><div class="rm"><div class="rn">Who Is Who</div><div class="rt">5 hours ago</div></div><div class="rs">+25</div></div>
+    <div class="rc"><div class="ric r3"><span class="mi">hiking</span></div><div class="rm"><div class="rn">Pilgrim Progress</div><div class="rt">Yesterday</div></div><div class="rs">+60</div></div>
+  </div>
+</div>
+</body>
+</html>

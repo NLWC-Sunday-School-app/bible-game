@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=900, initial-scale=1.0">
+<title>Tabernacle Build — Isometric Progressive View</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .mi {
+    font-family: 'Material Symbols Rounded';
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px; display: inline-block; vertical-align: middle; line-height: 1;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0A0806;
+    color: #F5E6C8;
+    padding: 30px;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    text-align: center; font-size: 28px; color: #C8A74E; margin-bottom: 8px;
+  }
+  .subtitle { text-align: center; font-size: 13px; color: rgba(245,230,200,0.3); margin-bottom: 30px; }
+
+  .stage-nav { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; flex-wrap: wrap; }
+  .stage-btn {
+    padding: 10px 20px; border-radius: 12px;
+    border: 1.5px solid rgba(200,167,78,0.15); background: rgba(200,167,78,0.05);
+    color: rgba(245,230,200,0.4); font-family: 'DM Sans'; font-weight: 700; font-size: 13px;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .stage-btn:hover { background: rgba(200,167,78,0.1); border-color: rgba(200,167,78,0.3); color: #C8A74E; }
+  .stage-btn.active { background: rgba(200,167,78,0.15); border-color: #C8A74E; color: #C8A74E; box-shadow: 0 0 20px rgba(200,167,78,0.15); }
+
+  /* === LANDSCAPE PHONE FRAME === */
+  .demo-frame {
+    width: 844px; height: 390px; margin: 0 auto;
+    background: #110F0A; border-radius: 24px;
+    border: 2px solid rgba(200,167,78,0.1); overflow: hidden; position: relative;
+    display: flex;
+  }
+
+  /* Left panel — isometric view */
+  .iso-panel {
+    flex: 1; position: relative; display: flex; flex-direction: column;
+    border-right: 1px solid rgba(200,167,78,0.08);
+  }
+
+  .iso-top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px 0;
+  }
+  .iso-back {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(245,230,200,0.06); border: 1px solid rgba(245,230,200,0.08);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .iso-back .mi { font-size: 18px; color: rgba(245,230,200,0.4); }
+  .iso-title-area { text-align: center; }
+  .iso-title-label { font-size: 8px; font-weight: 800; color: rgba(245,230,200,0.2); text-transform: uppercase; letter-spacing: 1px; }
+  .iso-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 800; color: #F5E6C8; }
+  .iso-coins {
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(200,167,78,0.1); border: 1px solid rgba(200,167,78,0.15);
+    padding: 5px 12px; border-radius: 16px; font-size: 13px; font-weight: 800; color: #C8A74E;
+  }
+  .iso-coins .mi { font-size: 14px; }
+
+  /* The isometric viewport fills the remaining space */
+  .iso-viewport {
+    flex: 1; position: relative; overflow: hidden;
+  }
+  .iso-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .iso-layer.hidden { opacity: 0; transform: translateY(15px) scale(0.95); pointer-events: none; }
+  .iso-layer.building { animation: buildIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  @keyframes buildIn {
+    0% { opacity: 0; transform: translateY(30px) scale(0.8); filter: brightness(2.5); }
+    40% { filter: brightness(1.8); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+  }
+  .iso-layer.latest { animation: glowPulse 2.5s ease-in-out infinite; }
+  @keyframes glowPulse {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(200,167,78,0.3)); }
+    50% { filter: drop-shadow(0 0 30px rgba(200,167,78,0.7)); }
+  }
+
+  /* Stage label floating on iso view */
+  .iso-stage-badge {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(200,167,78,0.12); border: 1px solid rgba(200,167,78,0.2);
+    padding: 4px 14px; border-radius: 10px;
+    font-size: 10px; font-weight: 800; color: #C8A74E;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    z-index: 5; white-space: nowrap;
+  }
+
+  /* Right panel — info + components */
+  .info-panel {
+    width: 280px; display: flex; flex-direction: column;
+    padding: 14px 16px;
+    overflow-y: auto;
+  }
+
+  .stage-info { text-align: center; margin-bottom: 10px; }
+  .stage-label { font-size: 9px; font-weight: 800; color: rgba(245,230,200,0.2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+  .stage-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 800; color: #C8A74E; }
+  .stage-ref { font-size: 9px; color: rgba(245,230,200,0.2); margin-top: 2px; }
+
+  .progress-section { margin-bottom: 10px; }
+  .progress-bar-bg { width: 100%; height: 5px; background: rgba(245,230,200,0.06); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #8B6914, #C8A74E, #E8D48A); border-radius: 3px; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .progress-text { display: flex; justify-content: space-between; margin-top: 4px; font-size: 9px; font-weight: 700; color: rgba(245,230,200,0.25); }
+  .progress-pct { color: #C8A74E; }
+
+  .comp-list { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; }
+  .comp-row {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+    background: rgba(245,230,200,0.03); border: 1px solid rgba(245,230,200,0.06); border-radius: 10px; transition: all 0.3s;
+    min-height: 32px;
+  }
+  .comp-row.done { border-color: rgba(74,138,90,0.2); background: rgba(74,138,90,0.05); }
+  .comp-row.active { border-color: rgba(200,167,78,0.3); background: rgba(200,167,78,0.08); }
+  .comp-row.locked { opacity: 0.3; }
+  .comp-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .comp-icon.done-icon { background: rgba(74,138,90,0.2); color: #6ABA7A; }
+  .comp-icon.active-icon { background: rgba(200,167,78,0.15); color: #C8A74E; }
+  .comp-icon.locked-icon { background: rgba(245,230,200,0.06); color: rgba(245,230,200,0.2); }
+  .comp-name { flex: 1; font-size: 11px; font-weight: 700; }
+  .comp-cost { font-size: 10px; font-weight: 800; color: #C8A74E; display: flex; align-items: center; gap: 2px; }
+  .comp-cost .mi { font-size: 12px; }
+
+  .build-btn {
+    margin-top: 8px; padding: 10px;
+    border: none; border-radius: 12px; background: linear-gradient(135deg, #C8A74E, #A68A3A);
+    color: #1A1508; font-family: 'DM Sans'; font-weight: 800; font-size: 12px;
+    cursor: pointer; text-align: center; box-shadow: 0 4px 15px rgba(200,167,78,0.3); transition: all 0.2s;
+    width: 100%;
+  }
+  .build-btn:hover { box-shadow: 0 6px 25px rgba(200,167,78,0.4); transform: translateY(-1px); }
+  .build-btn:active { transform: translateY(1px); }
+
+  .particle {
+    position: absolute; width: 4px; height: 4px; background: #C8A74E; border-radius: 50%; pointer-events: none; opacity: 0;
+  }
+  .particle.go { animation: particleFly 1.2s ease-out forwards; }
+  @keyframes particleFly {
+    0% { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+  }
+
+  /* Completed celebration overlay */
+  .complete-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, rgba(200,167,78,0.08) 0%, transparent 70%);
+    pointer-events: none; opacity: 0; transition: opacity 1s;
+    z-index: 10;
+  }
+  .complete-overlay.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1>Build the Tabernacle</h1>
+<p class="subtitle">Click through stages or use "Build" to see the tabernacle grow from empty desert to full glory</p>
+
+<div class="stage-nav">
+  <button class="stage-btn active" onclick="setStage(0)">Empty</button>
+  <button class="stage-btn" onclick="setStage(1)">Stage 1</button>
+  <button class="stage-btn" onclick="setStage(2)">Stage 2</button>
+  <button class="stage-btn" onclick="setStage(3)">Stage 3</button>
+  <button class="stage-btn" onclick="setStage(4)">Stage 4</button>
+  <button class="stage-btn" onclick="setStage(5)">Stage 5</button>
+  <button class="stage-btn" onclick="setStage(6)">Stage 6</button>
+  <button class="stage-btn" onclick="setStage(7)">Stage 7</button>
+</div>
+
+<div class="demo-frame">
+  <!-- LEFT: Isometric View -->
+  <div class="iso-panel">
+    <div class="iso-top-bar">
+      <div class="iso-back"><span class="mi">arrow_back</span></div>
+      <div class="iso-title-area">
+        <div class="iso-title-label">Build Mode</div>
+        <div class="iso-title">Tabernacle of Moses</div>
+      </div>
+      <div class="iso-coins"><span class="mi">toll</span> 2,450</div>
+    </div>
+
+    <div class="iso-viewport" id="iso-vp">
+
+      <!-- SHARED SVG DEFS -->
+      <svg style="position:absolute;width:0;height:0;">
+        <defs>
+          <linearGradient id="sandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2E2618"/>
+            <stop offset="100%" stop-color="#201A10"/>
+          </linearGradient>
+          <linearGradient id="sandEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#2A2218"/>
+            <stop offset="100%" stop-color="#151008"/>
+          </linearGradient>
+          <linearGradient id="bronzeTop" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#D4884A"/>
+            <stop offset="100%" stop-color="#A0652E"/>
+          </linearGradient>
+          <linearGradient id="bronzeR" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#A0652E"/>
+            <stop offset="100%" stop-color="#6B4420"/>
+          </linearGradient>
+          <linearGradient id="bronzeL" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7A5228"/>
+            <stop offset="100%" stop-color="#4A3018"/>
+          </linearGradient>
+          <linearGradient id="goldTop" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#F0DC8A"/>
+            <stop offset="100%" stop-color="#C8A74E"/>
+          </linearGradient>
+          <linearGradient id="goldR" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#C8A74E"/>
+            <stop offset="100%" stop-color="#8B6914"/>
+          </linearGradient>
+          <linearGradient id="goldL" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#A08A3A"/>
+            <stop offset="100%" stop-color="#6B5A14"/>
+          </linearGradient>
+          <linearGradient id="tentTop" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#5A4830"/>
+            <stop offset="100%" stop-color="#3E3020"/>
+          </linearGradient>
+          <linearGradient id="tentR" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4A3A28"/>
+            <stop offset="100%" stop-color="#2E2218"/>
+          </linearGradient>
+          <linearGradient id="tentL" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3A2E20"/>
+            <stop offset="100%" stop-color="#221A12"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="bigGlow">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="fireGlow">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+      </svg>
+
+      <!-- Layer 0: Desert Ground -->
+      <div class="iso-layer" id="layer-ground">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Large isometric diamond ground -->
+          <polygon points="280,40 500,165 280,290 60,165" fill="url(#sandGrad)" stroke="rgba(200,167,78,0.12)" stroke-width="1"/>
+          <polygon points="280,290 500,165 500,180 280,305" fill="url(#sandEdge)"/>
+          <polygon points="280,290 60,165 60,180 280,305" fill="#12100A"/>
+          <!-- Pebbles scattered -->
+          <circle cx="150" cy="150" r="2" fill="rgba(200,167,78,0.08)"/>
+          <circle cx="400" cy="160" r="2" fill="rgba(200,167,78,0.06)"/>
+          <circle cx="280" cy="240" r="2.5" fill="rgba(200,167,78,0.07)"/>
+          <circle cx="120" cy="180" r="1.5" fill="rgba(200,167,78,0.05)"/>
+          <circle cx="430" cy="185" r="1.5" fill="rgba(200,167,78,0.05)"/>
+          <circle cx="200" cy="210" r="1.5" fill="rgba(200,167,78,0.04)"/>
+          <circle cx="350" cy="130" r="2" fill="rgba(200,167,78,0.05)"/>
+          <circle cx="180" cy="120" r="1" fill="rgba(200,167,78,0.04)"/>
+          <circle cx="360" cy="220" r="1.5" fill="rgba(200,167,78,0.05)"/>
+          <!-- Dotted boundary where tabernacle goes -->
+          <polygon points="280,65 460,170 280,265 100,170" fill="none" stroke="rgba(200,167,78,0.06)" stroke-width="1" stroke-dasharray="6,6"/>
+        </svg>
+      </div>
+
+      <!-- Layer 1: Outer Court Fence -->
+      <div class="iso-layer hidden" id="layer-fence">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Fence perimeter — large rectangle -->
+          <!-- Back-left -->
+          <line x1="110" y1="135" x2="280" y2="50" stroke="#9A7A20" stroke-width="2.5"/>
+          <!-- Back-right -->
+          <line x1="280" y1="50" x2="450" y2="135" stroke="#8B6914" stroke-width="2.5"/>
+          <!-- Right side -->
+          <line x1="450" y1="135" x2="450" y2="225" stroke="#7A5C14" stroke-width="2.5"/>
+          <!-- Left side -->
+          <line x1="110" y1="135" x2="110" y2="225" stroke="#9A7A20" stroke-width="2.5"/>
+          <!-- Front-right -->
+          <line x1="450" y1="225" x2="310" y2="290" stroke="#7A5C14" stroke-width="2.5"/>
+          <!-- Front-left -->
+          <line x1="110" y1="225" x2="250" y2="290" stroke="#9A7A20" stroke-width="2.5"/>
+
+          <!-- Linen curtain semi-transparent fill -->
+          <polygon points="110,135 280,50 450,135 450,225 280,300 110,225" fill="rgba(245,230,200,0.015)"/>
+
+          <!-- Fence posts — tall golden pillars -->
+          <g>
+            <!-- Back corners -->
+            <rect x="107" y="125" width="7" height="20" rx="2" fill="#A07A20" stroke="rgba(200,167,78,0.3)" stroke-width="0.5"/>
+            <rect x="277" y="40" width="7" height="20" rx="2" fill="#C8A74E" stroke="rgba(200,167,78,0.4)" stroke-width="0.5"/>
+            <rect x="447" y="125" width="7" height="20" rx="2" fill="#8B6914" stroke="rgba(200,167,78,0.2)" stroke-width="0.5"/>
+            <!-- Left side posts -->
+            <rect x="107" y="155" width="7" height="18" rx="2" fill="#A07A20"/>
+            <rect x="107" y="180" width="7" height="18" rx="2" fill="#A07A20"/>
+            <rect x="107" y="205" width="7" height="18" rx="2" fill="#A07A20"/>
+            <!-- Right side posts -->
+            <rect x="447" y="155" width="7" height="18" rx="2" fill="#8B6914"/>
+            <rect x="447" y="180" width="7" height="18" rx="2" fill="#8B6914"/>
+            <rect x="447" y="205" width="7" height="18" rx="2" fill="#8B6914"/>
+            <!-- Back posts -->
+            <rect x="180" y="82" width="6" height="16" rx="2" fill="#9A7A20"/>
+            <rect x="365" y="82" width="6" height="16" rx="2" fill="#8A6A18"/>
+            <!-- Front posts -->
+            <rect x="170" y="245" width="6" height="16" rx="2" fill="#A07A20"/>
+            <rect x="390" y="245" width="6" height="16" rx="2" fill="#8B6914"/>
+          </g>
+
+          <!-- GATE — glowing golden entrance -->
+          <rect x="245" y="280" width="10" height="22" rx="3" fill="#C8A74E" filter="url(#glow)"/>
+          <rect x="305" y="280" width="10" height="22" rx="3" fill="#C8A74E" filter="url(#glow)"/>
+          <!-- Gate curtain -->
+          <line x1="255" y1="292" x2="305" y2="292" stroke="rgba(100,60,180,0.5)" stroke-width="4"/>
+          <ellipse cx="280" cy="292" rx="30" ry="8" fill="rgba(200,167,78,0.06)" filter="url(#glow)"/>
+        </svg>
+      </div>
+
+      <!-- Layer 2: Bronze Altar -->
+      <div class="iso-layer hidden" id="layer-altar">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Large bronze altar near gate -->
+          <!-- Top -->
+          <polygon points="280,210 320,190 280,170 240,190" fill="url(#bronzeTop)" stroke="#B87333" stroke-width="0.8"/>
+          <!-- Right -->
+          <polygon points="280,210 320,190 320,215 280,235" fill="url(#bronzeR)"/>
+          <!-- Left -->
+          <polygon points="280,210 240,190 240,215 280,235" fill="url(#bronzeL)"/>
+
+          <!-- Horns on 4 corners -->
+          <rect x="237" y="182" width="7" height="14" rx="2" fill="#C09050"/>
+          <rect x="316" y="182" width="7" height="14" rx="2" fill="#A07040"/>
+          <rect x="276" y="163" width="7" height="14" rx="2" fill="#D0A060"/>
+          <rect x="276" y="203" width="7" height="14" rx="2" fill="#8B5A2B"/>
+
+          <!-- Grating -->
+          <line x1="252" y1="196" x2="280" y2="178" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/>
+          <line x1="262" y1="202" x2="298" y2="184" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/>
+          <line x1="260" y1="192" x2="300" y2="208" stroke="rgba(0,0,0,0.12)" stroke-width="0.5"/>
+
+          <!-- FIRE! -->
+          <ellipse cx="280" cy="185" rx="16" ry="8" fill="rgba(255,100,20,0.3)" filter="url(#fireGlow)"/>
+          <ellipse cx="280" cy="182" rx="11" ry="5.5" fill="rgba(255,160,40,0.35)" filter="url(#fireGlow)"/>
+          <ellipse cx="280" cy="179" rx="6" ry="3" fill="rgba(255,220,80,0.4)" filter="url(#glow)"/>
+          <!-- Flame tongues -->
+          <path d="M274,183 Q270,172 280,176 Q290,172 286,183 Z" fill="rgba(255,140,30,0.35)" filter="url(#glow)"/>
+          <path d="M277,179 Q275,168 281,173 Q287,168 284,179 Z" fill="rgba(255,200,60,0.3)" filter="url(#glow)"/>
+        </svg>
+      </div>
+
+      <!-- Layer 3: Bronze Laver -->
+      <div class="iso-layer hidden" id="layer-laver">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Pedestal -->
+          <polygon points="280,160 295,152 280,144 265,152" fill="#7A5C30"/>
+          <polygon points="280,160 295,152 295,168 280,176" fill="#5C4420"/>
+          <polygon points="280,160 265,152 265,168 280,176" fill="#4A3618"/>
+          <!-- Bowl -->
+          <ellipse cx="280" cy="142" rx="18" ry="9" fill="#9A7A40" stroke="#B89A50" stroke-width="1"/>
+          <ellipse cx="280" cy="140" rx="14" ry="7" fill="#3A3020"/>
+          <!-- Water surface -->
+          <ellipse cx="280" cy="139" rx="12" ry="6" fill="rgba(80,140,200,0.2)"/>
+          <ellipse cx="277" cy="138" rx="7" ry="3.5" fill="rgba(120,180,230,0.12)"/>
+          <!-- Shimmer highlight -->
+          <ellipse cx="274" cy="137" rx="3" ry="1.5" fill="rgba(180,220,255,0.15)"/>
+        </svg>
+      </div>
+
+      <!-- Layer 4: Tent Coverings -->
+      <div class="iso-layer hidden" id="layer-tent">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Tent — large structure back half of court -->
+          <!-- Roof top -->
+          <polygon points="280,30 390,82 280,130 170,82" fill="url(#tentTop)" stroke="rgba(200,167,78,0.22)" stroke-width="1"/>
+          <!-- Ridge -->
+          <line x1="280" y1="30" x2="280" y2="130" stroke="rgba(200,167,78,0.12)" stroke-width="0.8"/>
+
+          <!-- Right wall -->
+          <polygon points="280,130 390,82 390,132 280,180" fill="url(#tentR)" stroke="rgba(200,167,78,0.1)" stroke-width="0.5"/>
+          <!-- Left wall -->
+          <polygon points="280,130 170,82 170,132 280,180" fill="url(#tentL)" stroke="rgba(200,167,78,0.1)" stroke-width="0.5"/>
+
+          <!-- Gold trim edges -->
+          <line x1="170" y1="82" x2="170" y2="132" stroke="rgba(200,167,78,0.3)" stroke-width="2"/>
+          <line x1="390" y1="82" x2="390" y2="132" stroke="rgba(200,167,78,0.2)" stroke-width="2"/>
+          <line x1="280" y1="30" x2="170" y2="82" stroke="rgba(200,167,78,0.22)" stroke-width="1.2"/>
+          <line x1="280" y1="30" x2="390" y2="82" stroke="rgba(200,167,78,0.18)" stroke-width="1.2"/>
+          <line x1="170" y1="132" x2="280" y2="180" stroke="rgba(200,167,78,0.18)" stroke-width="1"/>
+          <line x1="390" y1="132" x2="280" y2="180" stroke="rgba(200,167,78,0.12)" stroke-width="1"/>
+
+          <!-- Texture bands on walls -->
+          <line x1="174" y1="100" x2="280" y2="148" stroke="rgba(200,167,78,0.06)" stroke-width="0.8"/>
+          <line x1="280" y1="148" x2="386" y2="100" stroke="rgba(200,167,78,0.05)" stroke-width="0.8"/>
+          <line x1="175" y1="116" x2="280" y2="164" stroke="rgba(200,167,78,0.06)" stroke-width="0.8"/>
+          <line x1="280" y1="164" x2="387" y2="116" stroke="rgba(200,167,78,0.05)" stroke-width="0.8"/>
+
+          <!-- Entrance curtain (blue/purple/scarlet) -->
+          <polygon points="262,170 298,170 298,180 280,190 262,180" fill="rgba(75,40,150,0.4)" stroke="rgba(200,167,78,0.25)" stroke-width="0.8"/>
+          <ellipse cx="280" cy="178" rx="18" ry="6" fill="rgba(200,167,78,0.05)"/>
+
+          <!-- Corner frame posts -->
+          <rect x="166" y="76" width="8" height="60" rx="2" fill="#5A4830" stroke="rgba(200,167,78,0.18)" stroke-width="0.5"/>
+          <rect x="386" y="76" width="8" height="60" rx="2" fill="#4A3A25" stroke="rgba(200,167,78,0.12)" stroke-width="0.5"/>
+        </svg>
+      </div>
+
+      <!-- Layer 5: Holy Place Furniture -->
+      <div class="iso-layer hidden" id="layer-furniture">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Warm glow from inside tent -->
+          <ellipse cx="280" cy="110" rx="60" ry="30" fill="rgba(200,167,78,0.04)" filter="url(#bigGlow)"/>
+
+          <!-- === MENORAH (left side) === -->
+          <g transform="translate(200,78)">
+            <!-- Base -->
+            <polygon points="0,34 14,26 28,34 14,42" fill="#B89A40" stroke="#A08840" stroke-width="0.3"/>
+            <!-- Stem -->
+            <rect x="12" y="2" width="4" height="32" fill="#C8A74E"/>
+            <!-- Branches -->
+            <line x1="14" y1="5" x2="0" y2="-2" stroke="#C8A74E" stroke-width="2" stroke-linecap="round"/>
+            <line x1="14" y1="5" x2="28" y2="-2" stroke="#B89A40" stroke-width="2" stroke-linecap="round"/>
+            <line x1="14" y1="12" x2="3" y2="6" stroke="#C8A74E" stroke-width="2" stroke-linecap="round"/>
+            <line x1="14" y1="12" x2="25" y2="6" stroke="#B89A40" stroke-width="2" stroke-linecap="round"/>
+            <line x1="14" y1="19" x2="6" y2="13" stroke="#C8A74E" stroke-width="2" stroke-linecap="round"/>
+            <line x1="14" y1="19" x2="22" y2="13" stroke="#B89A40" stroke-width="2" stroke-linecap="round"/>
+            <!-- 7 Flames -->
+            <circle cx="0" cy="-5" r="4.5" fill="rgba(255,200,50,0.5)" filter="url(#fireGlow)"/>
+            <circle cx="28" cy="-5" r="4" fill="rgba(255,200,50,0.45)" filter="url(#fireGlow)"/>
+            <circle cx="3" cy="3" r="3.5" fill="rgba(255,200,50,0.45)" filter="url(#fireGlow)"/>
+            <circle cx="25" cy="3" r="3.5" fill="rgba(255,200,50,0.4)" filter="url(#fireGlow)"/>
+            <circle cx="6" cy="10" r="3.5" fill="rgba(255,200,50,0.4)" filter="url(#glow)"/>
+            <circle cx="22" cy="10" r="3" fill="rgba(255,200,50,0.35)" filter="url(#glow)"/>
+            <circle cx="14" cy="-4" r="5" fill="rgba(255,220,80,0.55)" filter="url(#fireGlow)"/>
+          </g>
+
+          <!-- === TABLE OF SHOWBREAD (right side) === -->
+          <g transform="translate(330,90)">
+            <!-- Table top isometric -->
+            <polygon points="0,0 24,-14 48,0 24,14" fill="url(#goldTop)" stroke="#A08840" stroke-width="0.5"/>
+            <!-- Right leg -->
+            <polygon points="48,0 48,18 45,20 45,2" fill="url(#goldR)"/>
+            <!-- Left leg -->
+            <polygon points="0,0 0,18 3,20 3,2" fill="url(#goldL)"/>
+            <!-- Front leg -->
+            <polygon points="24,14 24,32 21,34 21,16" fill="#8B6914"/>
+            <!-- Bread loaves -->
+            <ellipse cx="14" cy="-2" rx="6" ry="3.5" fill="#B89A40" stroke="#A08840" stroke-width="0.5"/>
+            <ellipse cx="24" cy="-6" rx="6" ry="3.5" fill="#C8A74E" stroke="#B89A40" stroke-width="0.5"/>
+            <ellipse cx="34" cy="-2" rx="6" ry="3.5" fill="#B89A40" stroke="#A08840" stroke-width="0.5"/>
+            <ellipse cx="19" cy="3" rx="5" ry="3" fill="#A88A40"/>
+            <ellipse cx="29" cy="3" rx="5" ry="3" fill="#A88A40"/>
+          </g>
+
+          <!-- === ALTAR OF INCENSE (center near veil) === -->
+          <g transform="translate(262,58)">
+            <!-- Top -->
+            <polygon points="18,0 36,-10 54,0 36,10" fill="url(#goldTop)" stroke="#C8A74E" stroke-width="0.8"/>
+            <!-- Right -->
+            <polygon points="54,0 54,22 36,32 36,10" fill="url(#goldR)"/>
+            <!-- Left -->
+            <polygon points="18,0 18,22 36,32 36,10" fill="url(#goldL)"/>
+            <!-- Horns -->
+            <rect x="16" y="-6" width="5" height="9" rx="1.5" fill="#C8A74E"/>
+            <rect x="51" y="-6" width="5" height="9" rx="1.5" fill="#A08840"/>
+            <rect x="33" y="-14" width="5" height="9" rx="1.5" fill="#E8D48A"/>
+            <rect x="33" y="4" width="5" height="9" rx="1.5" fill="#8B6914"/>
+            <!-- Incense smoke -->
+            <circle cx="36" cy="-18" r="6" fill="rgba(200,167,78,0.08)" filter="url(#bigGlow)"/>
+            <circle cx="34" cy="-28" r="4" fill="rgba(200,167,78,0.05)" filter="url(#glow)"/>
+            <circle cx="38" cy="-36" r="3" fill="rgba(200,167,78,0.03)" filter="url(#glow)"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Layer 6: The Veil -->
+      <div class="iso-layer hidden" id="layer-veil">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Veil — divides Holy Place from Most Holy -->
+          <!-- Left panel -->
+          <polygon points="210,68 280,103 280,130 210,95" fill="rgba(80,40,150,0.3)" stroke="rgba(120,70,200,0.45)" stroke-width="1.2"/>
+          <!-- Right panel -->
+          <polygon points="280,103 350,68 350,95 280,130" fill="rgba(60,30,120,0.25)" stroke="rgba(100,60,180,0.35)" stroke-width="1.2"/>
+          <!-- Gold thread borders -->
+          <line x1="210" y1="68" x2="280" y2="103" stroke="rgba(200,167,78,0.35)" stroke-width="1.5"/>
+          <line x1="280" y1="103" x2="350" y2="68" stroke="rgba(200,167,78,0.25)" stroke-width="1.5"/>
+          <!-- Embroidered cherubim hints -->
+          <circle cx="240" cy="82" r="5" fill="rgba(200,167,78,0.1)" filter="url(#glow)"/>
+          <circle cx="320" cy="82" r="5" fill="rgba(200,167,78,0.08)" filter="url(#glow)"/>
+          <!-- Decorative lines -->
+          <line x1="225" y1="76" x2="260" y2="94" stroke="rgba(200,167,78,0.06)" stroke-width="0.8"/>
+          <line x1="305" y1="76" x2="340" y2="88" stroke="rgba(200,167,78,0.05)" stroke-width="0.8"/>
+        </svg>
+      </div>
+
+      <!-- Layer 7: Ark of the Covenant -->
+      <div class="iso-layer hidden" id="layer-ark">
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- THE ARK — the crown jewel -->
+          <!-- Top / Mercy Seat -->
+          <polygon points="280,45 315,28 280,10 245,28" fill="url(#goldTop)" stroke="#F0DC8A" stroke-width="1.2" filter="url(#glow)"/>
+          <!-- Right face -->
+          <polygon points="280,45 315,28 315,48 280,65" fill="url(#goldR)"/>
+          <!-- Left face -->
+          <polygon points="280,45 245,28 245,48 280,65" fill="url(#goldL)"/>
+          <!-- Crown molding -->
+          <line x1="245" y1="28" x2="280" y2="10" stroke="#F0DC8A" stroke-width="2"/>
+          <line x1="280" y1="10" x2="315" y2="28" stroke="#E8D48A" stroke-width="2"/>
+
+          <!-- Carrying poles -->
+          <line x1="240" y1="32" x2="218" y2="44" stroke="#C8A74E" stroke-width="3" stroke-linecap="round"/>
+          <line x1="320" y1="32" x2="342" y2="44" stroke="#A08840" stroke-width="3" stroke-linecap="round"/>
+          <line x1="240" y1="52" x2="218" y2="64" stroke="#8B6914" stroke-width="3" stroke-linecap="round"/>
+          <line x1="320" y1="52" x2="342" y2="64" stroke="#7A5C14" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- Cherubim — golden winged figures -->
+          <!-- Left cherub -->
+          <path d="M255,24 Q246,4 268,14 Q252,0 274,12 L274,24 Z" fill="rgba(240,220,138,0.75)" stroke="rgba(200,167,78,0.4)" stroke-width="0.8"/>
+          <ellipse cx="268" cy="22" rx="5" ry="6" fill="rgba(240,220,138,0.55)"/>
+          <!-- Right cherub -->
+          <path d="M305,24 Q314,4 292,14 Q308,0 286,12 L286,24 Z" fill="rgba(232,212,138,0.65)" stroke="rgba(200,167,78,0.3)" stroke-width="0.8"/>
+          <ellipse cx="292" cy="22" rx="5" ry="6" fill="rgba(232,212,138,0.45)"/>
+
+          <!-- ===== SHEKINAH GLORY — divine presence ===== -->
+          <!-- Massive golden glow -->
+          <ellipse cx="280" cy="0" rx="50" ry="25" fill="rgba(200,167,78,0.06)" filter="url(#bigGlow)"/>
+          <ellipse cx="280" cy="-5" rx="30" ry="15" fill="rgba(255,220,100,0.08)" filter="url(#bigGlow)"/>
+          <ellipse cx="280" cy="-8" rx="14" ry="8" fill="rgba(255,240,150,0.12)" filter="url(#glow)"/>
+          <!-- Divine light rays -->
+          <line x1="280" y1="-10" x2="280" y2="-40" stroke="rgba(255,220,100,0.15)" stroke-width="1.5" filter="url(#glow)"/>
+          <line x1="270" y1="-6" x2="255" y2="-35" stroke="rgba(255,220,100,0.08)" stroke-width="1"/>
+          <line x1="290" y1="-6" x2="305" y2="-35" stroke="rgba(255,220,100,0.08)" stroke-width="1"/>
+          <line x1="262" y1="0" x2="240" y2="-25" stroke="rgba(255,220,100,0.05)" stroke-width="0.8"/>
+          <line x1="298" y1="0" x2="320" y2="-25" stroke="rgba(255,220,100,0.05)" stroke-width="0.8"/>
+          <!-- Sparkle dots -->
+          <circle cx="280" cy="-25" r="3" fill="rgba(255,240,180,0.2)" filter="url(#glow)"/>
+          <circle cx="268" cy="-18" r="2" fill="rgba(255,220,100,0.12)" filter="url(#glow)"/>
+          <circle cx="292" cy="-18" r="2" fill="rgba(255,220,100,0.12)" filter="url(#glow)"/>
+          <circle cx="275" cy="-32" r="1.5" fill="rgba(255,240,150,0.1)" filter="url(#glow)"/>
+          <circle cx="285" cy="-32" r="1.5" fill="rgba(255,240,150,0.1)" filter="url(#glow)"/>
+        </svg>
+      </div>
+
+      <div class="complete-overlay" id="complete-overlay"></div>
+      <div class="iso-stage-badge" id="iso-badge">Empty Desert</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Info Panel -->
+  <div class="info-panel">
+    <div class="stage-info">
+      <div class="stage-label" id="stage-label">Stage 0 of 7</div>
+      <div class="stage-name" id="stage-name">Empty Desert</div>
+      <div class="stage-ref" id="stage-ref">Begin your journey — Exodus 25:8</div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="prog-fill" style="width: 0%"></div>
+      </div>
+      <div class="progress-text">
+        <span id="prog-parts">0/7 components</span>
+        <span class="progress-pct" id="prog-pct">0%</span>
+      </div>
+    </div>
+
+    <div class="comp-list" id="comp-list"></div>
+
+    <button class="build-btn" id="build-btn" onclick="buildNext()" style="display:none;">
+      <span class="mi" style="font-size:16px;vertical-align:middle;">construction</span> Build Next
+    </button>
+  </div>
+</div>
+
+<script>
+const stages = [
+  { name: "Empty Desert", ref: "Begin your journey \u2014 Exodus 25:8", layers: [] },
+  { name: "Outer Court Fence", ref: "White linen curtains \u2014 Ex 27:9-19", layers: ["fence"], cost: 300 },
+  { name: "Bronze Altar", ref: "Altar of burnt offering \u2014 Ex 27:1-8", layers: ["fence","altar"], cost: 400 },
+  { name: "Bronze Laver", ref: "Basin for washing \u2014 Ex 30:17-21", layers: ["fence","altar","laver"], cost: 600 },
+  { name: "Tent Coverings", ref: "Goat hair & ram skins \u2014 Ex 26:1-14", layers: ["fence","altar","laver","tent"], cost: 800 },
+  { name: "Holy Place Furniture", ref: "Lampstand, table & incense \u2014 Ex 25-30", layers: ["fence","altar","laver","tent","furniture"], cost: 1000 },
+  { name: "The Veil", ref: "Blue, purple & scarlet \u2014 Ex 26:31-35", layers: ["fence","altar","laver","tent","furniture","veil"], cost: 1200 },
+  { name: "Ark of the Covenant", ref: "Gold-covered acacia wood \u2014 Ex 25:10-22", layers: ["fence","altar","laver","tent","furniture","veil","ark"], cost: 2500 },
+];
+const components = [
+  { id: "fence", name: "Outer Court Fence", icon: "fence" },
+  { id: "altar", name: "Bronze Altar", icon: "local_fire_department" },
+  { id: "laver", name: "Bronze Laver", icon: "water_drop" },
+  { id: "tent", name: "Tent Coverings", icon: "house" },
+  { id: "furniture", name: "Holy Place Furniture", icon: "emoji_objects" },
+  { id: "veil", name: "The Veil", icon: "curtains" },
+  { id: "ark", name: "Ark of the Covenant", icon: "deployed_code" },
+];
+let currentStage = 0;
+
+function setStage(n) {
+  currentStage = n;
+  const stage = stages[n];
+  document.querySelectorAll('.stage-btn').forEach((b, i) => b.classList.toggle('active', i === n));
+  document.getElementById('stage-label').textContent = 'Stage ' + n + ' of 7';
+  document.getElementById('stage-name').textContent = stage.name;
+  document.getElementById('stage-ref').textContent = stage.ref;
+  document.getElementById('iso-badge').textContent = n === 0 ? 'Empty Desert' : 'Stage ' + n + ': ' + stage.name;
+
+  const allLayers = ['fence','altar','laver','tent','furniture','veil','ark'];
+  allLayers.forEach(id => {
+    const el = document.getElementById('layer-' + id);
+    if (stage.layers.includes(id)) {
+      el.classList.remove('hidden');
+      el.classList.toggle('latest', id === stage.layers[stage.layers.length - 1]);
+    } else {
+      el.classList.add('hidden');
+      el.classList.remove('latest');
+    }
+  });
+
+  // Completion glow
+  document.getElementById('complete-overlay').classList.toggle('show', n === 7);
+
+  const pct = Math.round((n / 7) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-parts').textContent = n + '/7 components';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  updateCompList(n);
+
+  const btn = document.getElementById('build-btn');
+  if (n < 7) {
+    btn.style.display = 'block';
+    const nextComp = components[n];
+    const nextCost = stages[n + 1].cost;
+    btn.innerHTML = '<span class="mi" style="font-size:16px;vertical-align:middle;">construction</span> Build ' + nextComp.name + ' <span style="opacity:0.7;margin-left:4px;"><span class="mi" style="font-size:12px;">toll</span> ' + nextCost.toLocaleString() + '</span>';
+  } else {
+    btn.innerHTML = '<span class="mi" style="font-size:16px;vertical-align:middle;">auto_awesome</span> Tabernacle Complete!';
+    btn.style.background = 'linear-gradient(135deg, #6ABA7A, #4A8A5A)';
+  }
+}
+
+function updateCompList(stageNum) {
+  const list = document.getElementById('comp-list');
+  list.innerHTML = '';
+  components.forEach((comp, i) => {
+    const isDone = i < stageNum;
+    const isActive = i === stageNum && stageNum < 7;
+    const cost = stages[i + 1].cost;
+    const row = document.createElement('div');
+    row.className = 'comp-row ' + (isDone ? 'done' : isActive ? 'active' : stageNum >= 7 ? 'done' : 'locked');
+    row.innerHTML = '<div class="comp-icon ' + (isDone || stageNum >= 7 ? 'done-icon' : isActive ? 'active-icon' : 'locked-icon') + '"><span class="mi" style="font-size:12px;">' + (isDone || stageNum >= 7 ? 'check_circle' : isActive ? comp.icon : 'lock') + '</span></div><div class="comp-name">' + comp.name + '</div>' + (isDone || stageNum >= 7 ? '<span style="font-size:9px;color:#6ABA7A;font-weight:800;">BUILT</span>' : '<div class="comp-cost"><span class="mi">toll</span><span>' + cost.toLocaleString() + '</span></div>');
+    list.appendChild(row);
+  });
+}
+
+function buildNext() {
+  if (currentStage >= 7) return;
+  const nextStage = currentStage + 1;
+  const newLayerId = stages[nextStage].layers[stages[nextStage].layers.length - 1];
+  const newLayer = document.getElementById('layer-' + newLayerId);
+  newLayer.classList.remove('hidden');
+  newLayer.classList.add('building');
+  spawnParticles();
+  setTimeout(() => { newLayer.classList.remove('building'); setStage(nextStage); }, 1000);
+}
+
+function spawnParticles() {
+  const vp = document.getElementById('iso-vp');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (200 + Math.random() * 160) + 'px';
+    p.style.top = (80 + Math.random() * 100) + 'px';
+    p.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+    p.style.setProperty('--dy', (Math.random() * -100 - 30) + 'px');
+    p.style.background = Math.random() > 0.5 ? '#C8A74E' : '#E8D48A';
+    const s = 3 + Math.random() * 5;
+    p.style.width = s + 'px'; p.style.height = s + 'px';
+    vp.appendChild(p);
+    setTimeout(() => p.classList.add('go'), 30 + i * 15);
+    setTimeout(() => p.remove(), 1400);
+  }
+}
+
+setStage(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1800, initial-scale=1.0">
+<title>Bible Game — Kingdom Theme</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .mi {
+    font-family: 'Material Symbols Rounded';
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px; display: inline-block; vertical-align: middle; line-height: 1;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #050505;
+    color: #ddd;
+    padding: 30px 24px 60px;
+  }
+
+  .page-top {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .page-top h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900;
+    color: #eee;
+    margin-bottom: 6px;
+  }
+  .page-top p { font-size: 13px; color: rgba(255,255,255,0.3); }
+
+  /* Theme section */
+  .theme-section { margin-bottom: 50px; }
+
+  .theme-header {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .theme-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 800;
+  }
+  .theme-tag {
+    font-size: 10px; font-weight: 800;
+    padding: 3px 10px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .theme-desc { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+  .kingdom .theme-name { color: #C8A74E; }
+  .kingdom .theme-tag {
+    background: rgba(200, 167, 78, 0.1);
+    color: #C8A74E;
+    border: 1px solid rgba(200, 167, 78, 0.15);
+  }
+
+  .phones {
+    display: flex; gap: 20px;
+    justify-content: center;
+  }
+
+  .phone-col {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+  }
+  .phone-label {
+    font-size: 10px; font-weight: 800;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase; letter-spacing: 1.2px;
+  }
+
+  .phone {
+    width: 390px; height: 844px;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    position: relative;
+  }
+  .kingdom .phone { border: 2px solid rgba(200, 167, 78, 0.08); }
+
+  /* ===== Inline phone screen ===== */
+  .phone-screen {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Comparison notes */
+  .compare-notes {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 40px;
+  }
+  .note-card { padding: 20px; border-radius: 14px; }
+  .note-title { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+  .note-list {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .note-list li {
+    font-size: 12px; color: rgba(255,255,255,0.4);
+    padding-left: 14px; position: relative;
+  }
+  .note-list li::before {
+    content: '\2192'; position: absolute; left: 0;
+    color: rgba(255,255,255,0.2);
+  }
+
+  /* ================================================================
+     KINGDOM THEME STYLES (scoped via .k-screen)
+     ================================================================ */
+  .k-screen {
+    font-family: 'DM Sans', sans-serif;
+    width: 390px; height: 844px;
+    overflow: hidden;
+    background: #110F0A;
+    color: #F5E6C8;
+    position: relative;
+  }
+
+  /* Noise */
+  .k-screen::after {
+    content: '';
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0.03; z-index: 999; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .k-screen .inner { height: 100%; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+  /* Ambient */
+  .k-screen .ambient {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+  .k-screen .ambient::before {
+    content: '';
+    position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(200, 167, 78, 0.08) 0%, transparent 70%);
+  }
+  .k-screen .ambient::after {
+    content: '';
+    position: absolute; bottom: 10%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(155, 35, 53, 0.04) 0%, transparent 70%);
+  }
+
+  /* ---- Kingdom Home ---- */
+  .k-screen .header { padding: 50px 20px 16px; position: relative; }
+  .k-screen .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .k-screen .brand { display: flex; align-items: center; gap: 10px; }
+  .k-screen .brand-mark {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(140deg, #C8A74E, #A68A3A);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(200, 167, 78, 0.25);
+  }
+  .k-screen .brand-mark .mi { font-size: 20px; color: #1A1508; }
+  .k-screen .brand-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 800; color: #F5E6C8; letter-spacing: -0.3px;
+  }
+  .k-screen .header-right { display: flex; align-items: center; gap: 8px; }
+  .k-screen .h-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(245, 230, 200, 0.06);
+    border: 1px solid rgba(245, 230, 200, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative;
+  }
+  .k-screen .h-icon .mi { font-size: 20px; color: rgba(245, 230, 200, 0.4); }
+  .k-screen .notif-dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #C84C4C; border: 1.5px solid #110F0A;
+  }
+  .k-screen .wallet-strip {
+    display: flex; gap: 0;
+    background: rgba(245, 230, 200, 0.04);
+    border: 1px solid rgba(245, 230, 200, 0.07);
+    border-radius: 12px; overflow: hidden;
+  }
+  .k-screen .w-item {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 9px 0; position: relative;
+  }
+  .k-screen .w-item + .w-item::before {
+    content: ''; position: absolute; left: 0; top: 20%; height: 60%;
+    width: 1px; background: rgba(245, 230, 200, 0.08);
+  }
+  .k-screen .w-item .mi { font-size: 16px; }
+  .k-screen .w-item span { font-size: 13px; font-weight: 700; }
+  .k-screen .w-coin .mi, .k-screen .w-coin span { color: #C8A74E; }
+  .k-screen .w-gem .mi, .k-screen .w-gem span { color: #9B6B8E; }
+  .k-screen .w-fire .mi, .k-screen .w-fire span { color: #C87A4E; }
+
+  .k-screen .scroll {
+    flex: 1; overflow-y: auto; padding: 18px 20px 100px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .k-screen .scroll::-webkit-scrollbar { display: none; }
+
+  /* Streak */
+  .k-screen .streak-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: rgba(200, 122, 78, 0.08);
+    border: 1px solid rgba(200, 122, 78, 0.12);
+    border-radius: 14px; margin-bottom: 24px;
+  }
+  .k-screen .streak-flame {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(140deg, #C87A4E, #A86030);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 0 #8A4E28;
+  }
+  .k-screen .streak-flame .mi { font-size: 20px; color: #FFF; }
+  .k-screen .streak-text { flex: 1; }
+  .k-screen .streak-text strong { display: block; font-size: 13px; font-weight: 800; color: #E8B47A; }
+  .k-screen .streak-text span { font-size: 11px; color: rgba(245, 230, 200, 0.35); }
+  .k-screen .streak-btn {
+    font-family: 'DM Sans'; font-size: 11px; font-weight: 800;
+    background: linear-gradient(140deg, #C87A4E, #A86030);
+    color: #FFF; border: none; padding: 6px 14px; border-radius: 8px;
+    cursor: pointer; box-shadow: 0 2px 0 #8A4E28;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Hero */
+  .k-screen .hero {
+    border-radius: 20px; padding: 24px 22px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(145deg, #2A1F12, #1C1610);
+    border: 1px solid rgba(200, 167, 78, 0.15);
+    cursor: pointer;
+  }
+  .k-screen .hero::before {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 160px; height: 160px; border-radius: 0 0 0 100%;
+    background: linear-gradient(180deg, rgba(200, 167, 78, 0.06), transparent);
+  }
+  .k-screen .hero::after {
+    content: ''; position: absolute; bottom: -30px; right: 20px;
+    width: 100px; height: 100px; border-radius: 50%;
+    border: 20px solid rgba(200, 167, 78, 0.04);
+  }
+  .k-screen .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700; color: #C8A74E;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 10px; position: relative; z-index: 1;
+  }
+  .k-screen .hero-eyebrow .mi { font-size: 14px; }
+  .k-screen .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 800; color: #F5E6C8;
+    line-height: 1.15; margin-bottom: 6px; position: relative; z-index: 1;
+  }
+  .k-screen .hero-sub {
+    font-size: 13px; color: rgba(245, 230, 200, 0.45);
+    margin-bottom: 18px; position: relative; z-index: 1;
+  }
+  .k-screen .hero-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(140deg, #C8A74E, #A68A3A);
+    color: #1A1508; padding: 10px 22px; border-radius: 10px;
+    font-weight: 800; font-size: 13px; border: none; cursor: pointer;
+    box-shadow: 0 3px 0 #8A7232, 0 4px 12px rgba(200, 167, 78, 0.2);
+    position: relative; z-index: 1;
+  }
+  .k-screen .hero-btn .mi { font-size: 16px; }
+
+  .k-screen .sec-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .k-screen .sec-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; }
+  .k-screen .sec-more {
+    font-size: 12px; font-weight: 700; color: #C8A74E;
+    display: flex; align-items: center; gap: 2px;
+  }
+  .k-screen .sec-more .mi { font-size: 16px; }
+
+  .k-screen .games-row {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 24px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .k-screen .games-row::-webkit-scrollbar { display: none; }
+  .k-screen .g-card {
+    min-width: 145px; width: 145px; border-radius: 16px; overflow: hidden;
+    cursor: pointer; flex-shrink: 0;
+    border: 1px solid rgba(245, 230, 200, 0.06);
+  }
+  .k-screen .g-visual {
+    height: 100px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .k-screen .g-visual::after {
+    content: ''; position: absolute; bottom: -15px; right: -15px;
+    width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.06);
+  }
+  .k-screen .g-visual .mi { font-size: 36px; color: rgba(255,255,255,0.85); position: relative; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  .k-screen .g-card.qg .g-visual { background: linear-gradient(150deg, #1B3A6B, #264E8A); }
+  .k-screen .g-card.wiw .g-visual { background: linear-gradient(150deg, #3D5A3E, #4D6E4F); }
+  .k-screen .g-card.pp .g-visual { background: linear-gradient(150deg, #0D5E6B, #1A7A8A); }
+  .k-screen .g-card.fs .g-visual { background: linear-gradient(150deg, #6B4A2A, #8A6840); }
+  .k-screen .g-info { background: rgba(245, 230, 200, 0.04); padding: 10px 12px; }
+  .k-screen .g-name { font-size: 13px; font-weight: 800; margin-bottom: 1px; }
+  .k-screen .g-desc { font-size: 10px; color: rgba(245, 230, 200, 0.35); }
+
+  .k-screen .compete-card {
+    display: flex; align-items: center; gap: 14px; padding: 14px;
+    background: rgba(245, 230, 200, 0.04);
+    border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 14px; margin-bottom: 10px; cursor: pointer;
+  }
+  .k-screen .c-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .k-screen .c-icon .mi { font-size: 22px; }
+  .k-screen .c-icon.globe { background: linear-gradient(140deg, #1B3A6B, #264E8A); }
+  .k-screen .c-icon.globe .mi { color: rgba(255,255,255,0.8); }
+  .k-screen .c-icon.swords { background: linear-gradient(140deg, #6B2A2A, #8A3A3A); }
+  .k-screen .c-icon.swords .mi { color: rgba(255,255,255,0.8); }
+  .k-screen .c-meta { flex: 1; }
+  .k-screen .c-name { font-size: 14px; font-weight: 800; }
+  .k-screen .c-desc { font-size: 11px; color: rgba(245, 230, 200, 0.35); }
+  .k-screen .c-badge {
+    font-size: 9px; font-weight: 800;
+    background: rgba(200, 100, 80, 0.15); color: #E8977A;
+    padding: 3px 8px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .k-screen .c-arrow .mi { font-size: 20px; color: rgba(245, 230, 200, 0.15); }
+
+  .k-screen .b-nav {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 74px;
+    background: #110F0A; border-top: 1px solid rgba(245, 230, 200, 0.06);
+    display: flex; align-items: stretch; z-index: 10;
+  }
+  .k-screen .b-tab {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    cursor: pointer; position: relative;
+  }
+  .k-screen .b-tab .mi { font-size: 22px; color: rgba(245, 230, 200, 0.2); }
+  .k-screen .b-tab span { font-size: 9px; font-weight: 700; color: rgba(245, 230, 200, 0.2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .k-screen .b-tab.on .mi { color: #C8A74E; }
+  .k-screen .b-tab.on span { color: #C8A74E; }
+  .k-screen .b-tab.on::after {
+    content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 2px; background: #C8A74E;
+  }
+
+  /* ---- Kingdom Game ---- */
+  .k-screen .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .k-screen .top-back {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(245, 230, 200, 0.06);
+    border: 1px solid rgba(245, 230, 200, 0.08);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .k-screen .top-back .mi { font-size: 20px; color: rgba(245, 230, 200, 0.4); }
+  .k-screen .top-info { text-align: center; }
+  .k-screen .top-game-name {
+    font-size: 10px; font-weight: 800; color: rgba(245, 230, 200, 0.3);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;
+  }
+  .k-screen .top-coins {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 13px; font-weight: 700; color: #C8A74E;
+  }
+  .k-screen .top-coins .mi { font-size: 14px; }
+  .k-screen .timer-box {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: rgba(245, 230, 200, 0.06);
+    border: 1px solid rgba(245, 230, 200, 0.08);
+    display: flex; align-items: center; justify-content: center; position: relative;
+  }
+  .k-screen .timer-num { font-size: 16px; font-weight: 900; color: #C8A74E; }
+  .k-screen .timer-ring-bg {
+    position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
+    border-radius: 15px; border: 2.5px solid rgba(200, 167, 78, 0.15);
+  }
+  .k-screen .timer-ring-fill {
+    position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
+    border-radius: 15px; border: 2.5px solid #C8A74E;
+    border-right-color: transparent; border-bottom-color: transparent;
+    animation: kTimerSpin 8s linear infinite;
+  }
+  @keyframes kTimerSpin { to { transform: rotate(360deg); } }
+
+  .k-screen .q-num-row {
+    display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px;
+  }
+  .k-screen .q-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(245, 230, 200, 0.1); }
+  .k-screen .q-dot.done { background: #4A8A5A; }
+  .k-screen .q-dot.now { width: 28px; border-radius: 4px; background: #C8A74E; }
+
+  .k-screen .q-card {
+    background: linear-gradient(150deg, #1E1812, #1A1610);
+    border: 1px solid rgba(245, 230, 200, 0.08);
+    border-radius: 20px; padding: 28px 22px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+  }
+  .k-screen .q-card::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 50px; height: 50px;
+    border-top: 2px solid rgba(200, 167, 78, 0.12);
+    border-left: 2px solid rgba(200, 167, 78, 0.12);
+    border-radius: 20px 0 0 0;
+  }
+  .k-screen .q-card::after {
+    content: ''; position: absolute; bottom: 0; right: 0;
+    width: 50px; height: 50px;
+    border-bottom: 2px solid rgba(200, 167, 78, 0.12);
+    border-right: 2px solid rgba(200, 167, 78, 0.12);
+    border-radius: 0 0 20px 0;
+  }
+  .k-screen .q-category {
+    font-size: 10px; font-weight: 800; color: #C8A74E;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 4px;
+  }
+  .k-screen .q-category .mi { font-size: 13px; }
+  .k-screen .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; color: #F5E6C8; line-height: 1.45;
+  }
+
+  .k-screen .opts { display: flex; flex-direction: column; gap: 8px; }
+  .k-screen .opt {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(245, 230, 200, 0.05);
+    border: 1.5px solid rgba(245, 230, 200, 0.08);
+    border-radius: 14px; padding: 14px 16px; cursor: pointer;
+    transition: all 0.15s ease-out;
+  }
+  .k-screen .opt:hover { background: rgba(245, 230, 200, 0.08); border-color: rgba(245, 230, 200, 0.15); }
+  .k-screen .opt-letter {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: rgba(245, 230, 200, 0.06);
+    border: 1.5px solid rgba(245, 230, 200, 0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px; color: rgba(245, 230, 200, 0.5); flex-shrink: 0;
+  }
+  .k-screen .opt-text { flex: 1; font-size: 15px; font-weight: 700; color: #F5E6C8; }
+  .k-screen .opt-result { opacity: 0; transform: scale(0); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .k-screen .opt-result .mi { font-size: 20px; }
+  .k-screen .opt.ok {
+    background: rgba(74, 138, 90, 0.2); border-color: #4A8A5A;
+    box-shadow: 0 0 20px rgba(74, 138, 90, 0.1);
+  }
+  .k-screen .opt.ok .opt-letter { background: #4A8A5A; border-color: #4A8A5A; color: #fff; }
+  .k-screen .opt.ok .opt-result { opacity: 1; transform: scale(1); }
+  .k-screen .opt.ok .opt-result .mi { color: #6ABA7A; }
+  .k-screen .opt.no {
+    background: rgba(155, 60, 60, 0.2); border-color: #9B3C3C;
+    animation: kShake 0.35s ease-in-out;
+  }
+  .k-screen .opt.no .opt-letter { background: #9B3C3C; border-color: #9B3C3C; color: #fff; }
+  .k-screen .opt.no .opt-result { opacity: 1; transform: scale(1); }
+  .k-screen .opt.no .opt-result .mi { color: #DB6A6A; }
+  @keyframes kShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 50%{transform:translateX(5px)} 75%{transform:translateX(-3px)} }
+  .k-screen .opt.dim { opacity: 0.25; pointer-events: none; }
+
+  .k-screen .g-foot {
+    margin-top: auto; padding-top: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .k-screen .f-btn {
+    display: flex; align-items: center; gap: 4px;
+    padding: 10px 18px; border-radius: 10px;
+    font-family: 'DM Sans'; font-weight: 700; font-size: 13px;
+    cursor: pointer; border: none;
+  }
+  .k-screen .f-btn .mi { font-size: 16px; }
+  .k-screen .f-quit { background: rgba(245, 230, 200, 0.05); color: rgba(245, 230, 200, 0.3); border: 1px solid rgba(245, 230, 200, 0.06); }
+  .k-screen .f-skip { background: rgba(200, 167, 78, 0.1); color: #C8A74E; border: 1px solid rgba(200, 167, 78, 0.15); }
+
+  .k-screen .pts {
+    position: absolute; font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900; color: #C8A74E;
+    pointer-events: none; opacity: 0; z-index: 50;
+    text-shadow: 0 0 20px rgba(200, 167, 78, 0.4);
+  }
+  .k-screen .pts.go { animation: kFly 0.9s ease-out forwards; }
+  @keyframes kFly { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-70px) scale(1.3)} }
+
+  /* ---- Kingdom Profile ---- */
+  .k-screen.profile-screen { overflow-y: auto; -ms-overflow-style: none; scrollbar-width: none; }
+  .k-screen.profile-screen::-webkit-scrollbar { display: none; }
+  .k-screen .p-header { padding: 48px 20px 28px; position: relative; z-index: 1; }
+  .k-screen .h-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+  .k-screen .h-btn {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(245, 230, 200, 0.06); border: 1px solid rgba(245, 230, 200, 0.08);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .k-screen .h-btn .mi { font-size: 20px; color: rgba(245, 230, 200, 0.4); }
+  .k-screen .h-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; }
+  .k-screen .p-hero { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 28px; }
+  .k-screen .av-ring {
+    width: 88px; height: 88px; border-radius: 22px; padding: 3px;
+    background: linear-gradient(140deg, #C8A74E, #8A6E30, #C8A74E);
+    margin-bottom: 14px; box-shadow: 0 4px 16px rgba(200, 167, 78, 0.2);
+  }
+  .k-screen .av-inner {
+    width: 100%; height: 100%; border-radius: 19px;
+    background: linear-gradient(140deg, #2A2218, #1E1A14);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 32px;
+  }
+  .k-screen .p-name { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .k-screen .p-loc { display: flex; align-items: center; gap: 4px; font-size: 13px; color: rgba(245, 230, 200, 0.35); margin-bottom: 12px; }
+  .k-screen .p-loc .mi { font-size: 15px; }
+  .k-screen .p-rank {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(140deg, rgba(200, 167, 78, 0.15), rgba(200, 167, 78, 0.05));
+    border: 1px solid rgba(200, 167, 78, 0.2); padding: 6px 16px; border-radius: 10px;
+  }
+  .k-screen .p-rank .mi { font-size: 16px; color: #C8A74E; }
+  .k-screen .p-rank span { font-size: 13px; font-weight: 800; color: #C8A74E; }
+  .k-screen .divider {
+    height: 1px; background: linear-gradient(90deg, transparent, rgba(245, 230, 200, 0.06), transparent);
+    margin: 0 20px 20px;
+  }
+  .k-screen .ct { padding: 0 20px 40px; position: relative; z-index: 1; }
+  .k-screen .sec { font-size: 11px; font-weight: 800; color: rgba(245, 230, 200, 0.25); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+  .k-screen .stats-strip {
+    display: flex; background: rgba(245, 230, 200, 0.03); border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 16px; overflow: hidden; margin-bottom: 24px;
+  }
+  .k-screen .stat { flex: 1; padding: 16px 10px; text-align: center; position: relative; }
+  .k-screen .stat + .stat::before {
+    content: ''; position: absolute; left: 0; top: 20%; height: 60%;
+    width: 1px; background: rgba(245, 230, 200, 0.06);
+  }
+  .k-screen .stat-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #F5E6C8; margin-bottom: 2px; }
+  .k-screen .stat-lbl { font-size: 9px; font-weight: 700; color: rgba(245, 230, 200, 0.3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .k-screen .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  .k-screen .badge { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .k-screen .badge-ic {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .k-screen .badge-ic .mi { font-size: 24px; }
+  .k-screen .badge-ic.on { background: rgba(200, 167, 78, 0.08); border: 1.5px solid rgba(200, 167, 78, 0.2); }
+  .k-screen .badge-ic.on .mi { color: #C8A74E; }
+  .k-screen .badge-ic.off { background: rgba(245, 230, 200, 0.02); border: 1.5px solid rgba(245, 230, 200, 0.04); }
+  .k-screen .badge-ic.off .mi { color: rgba(245, 230, 200, 0.1); }
+  .k-screen .badge-lb { font-size: 9px; font-weight: 700; color: rgba(245, 230, 200, 0.3); }
+  .k-screen .menu-card {
+    background: rgba(245, 230, 200, 0.03); border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 16px; overflow: hidden; margin-bottom: 24px;
+  }
+  .k-screen .m-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; position: relative; }
+  .k-screen .m-row + .m-row::before {
+    content: ''; position: absolute; top: 0; left: 52px; right: 16px;
+    height: 1px; background: rgba(245, 230, 200, 0.04);
+  }
+  .k-screen .m-ic {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .k-screen .m-ic .mi { font-size: 18px; }
+  .k-screen .m-ic.c1 { background: rgba(90, 120, 180, 0.12); }
+  .k-screen .m-ic.c1 .mi { color: #7A9AC8; }
+  .k-screen .m-ic.c2 { background: rgba(140, 100, 180, 0.12); }
+  .k-screen .m-ic.c2 .mi { color: #A87CC8; }
+  .k-screen .m-ic.c3 { background: rgba(200, 167, 78, 0.1); }
+  .k-screen .m-ic.c3 .mi { color: #C8A74E; }
+  .k-screen .m-txt { flex: 1; font-size: 14px; font-weight: 700; }
+  .k-screen .tog {
+    width: 42px; height: 24px; border-radius: 12px;
+    background: rgba(245, 230, 200, 0.08); position: relative; cursor: pointer; transition: background 0.25s;
+  }
+  .k-screen .tog.on { background: #4A8A5A; }
+  .k-screen .tog-d {
+    width: 20px; height: 20px; border-radius: 50%; background: #F5E6C8;
+    position: absolute; top: 2px; left: 2px;
+    transition: left 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .k-screen .tog.on .tog-d { left: 20px; }
+
+  /* ================================================================
+  /* ================================================================
+     TABERNACLE BUILD MODE
+     ================================================================ */
+  .k-screen .tab-header {
+    text-align: center; margin-bottom: 16px;
+  }
+  .k-screen .tab-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900; color: #F5E6C8; margin-bottom: 2px;
+  }
+  .k-screen .tab-header p { font-size: 11px; color: rgba(245, 230, 200, 0.35); }
+
+  /* Progress arc */
+  .k-screen .tab-progress {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; margin-bottom: 20px;
+    padding: 14px;
+    background: rgba(245, 230, 200, 0.03);
+    border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 16px;
+  }
+  .k-screen .tab-prog-ring {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: conic-gradient(#C8A74E 0deg, #C8A74E 103deg, rgba(245,230,200,0.08) 103deg);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .k-screen .tab-prog-inner {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #151210;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+  .k-screen .tab-prog-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px; font-weight: 900; color: #C8A74E; line-height: 1;
+  }
+  .k-screen .tab-prog-label { font-size: 7px; font-weight: 700; color: rgba(245,230,200,0.3); text-transform: uppercase; }
+  .k-screen .tab-prog-info { flex: 1; }
+  .k-screen .tab-prog-title { font-size: 13px; font-weight: 800; color: #F5E6C8; margin-bottom: 2px; }
+  .k-screen .tab-prog-sub { font-size: 10px; color: rgba(245,230,200,0.35); }
+  .k-screen .tab-prog-bar {
+    height: 4px; border-radius: 2px; background: rgba(245,230,200,0.06);
+    margin-top: 6px; overflow: hidden;
+  }
+  .k-screen .tab-prog-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, #C8A74E, #E8C860);
+  }
+
+  /* Isometric view */
+  .k-screen .tab-iso {
+    position: relative;
+    height: 200px;
+    margin-bottom: 18px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #1A1610 0%, #0D0B08 100%);
+    border: 1px solid rgba(245,230,200,0.06);
+  }
+  .k-screen .tab-iso-ground {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
+    background: linear-gradient(180deg, transparent 0%, rgba(200,167,78,0.03) 100%);
+  }
+  /* Desert dots */
+  .k-screen .tab-iso-ground::before {
+    content: '';
+    position: absolute; bottom: 10px; left: 20px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(200,167,78,0.06);
+    box-shadow:
+      30px -5px 0 rgba(200,167,78,0.04),
+      70px 3px 0 rgba(200,167,78,0.05),
+      110px -2px 0 rgba(200,167,78,0.03),
+      160px 4px 0 rgba(200,167,78,0.06),
+      200px -1px 0 rgba(200,167,78,0.04),
+      250px 2px 0 rgba(200,167,78,0.05),
+      300px -3px 0 rgba(200,167,78,0.04);
+  }
+
+  /* Tabernacle structure */
+  .k-screen .tab-struct {
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+  }
+  /* Outer court - rectangle */
+  .k-screen .tab-outer {
+    width: 260px; height: 120px;
+    border: 2px solid rgba(200,167,78,0.25);
+    border-radius: 4px;
+    position: relative;
+    transform: perspective(400px) rotateX(25deg);
+  }
+  .k-screen .tab-outer::before {
+    content: 'OUTER COURT';
+    position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+    font-size: 7px; font-weight: 800; color: rgba(200,167,78,0.2);
+    letter-spacing: 1px;
+  }
+  /* Holy place */
+  .k-screen .tab-holy {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 70px;
+    background: rgba(200,167,78,0.06);
+    border: 1.5px solid rgba(200,167,78,0.2);
+    border-radius: 3px;
+  }
+  .k-screen .tab-holy::before {
+    content: 'HOLY PLACE';
+    position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+    font-size: 6px; font-weight: 800; color: rgba(200,167,78,0.2);
+    letter-spacing: 1px;
+  }
+  /* Most Holy */
+  .k-screen .tab-mostholy {
+    position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+    width: 45px; height: 35px;
+    background: linear-gradient(180deg, rgba(200,167,78,0.15), rgba(200,167,78,0.05));
+    border: 1.5px solid rgba(200,167,78,0.35);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .k-screen .tab-mostholy .mi { font-size: 14px; color: rgba(200,167,78,0.5); }
+  /* Items in outer court */
+  .k-screen .tab-item {
+    position: absolute;
+    width: 20px; height: 20px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .k-screen .tab-item .mi { font-size: 12px; }
+  .k-screen .tab-item.built {
+    background: rgba(200,167,78,0.12); border: 1px solid rgba(200,167,78,0.2);
+  }
+  .k-screen .tab-item.built .mi { color: #C8A74E; }
+  .k-screen .tab-item.locked {
+    background: rgba(245,230,200,0.03); border: 1px dashed rgba(245,230,200,0.08);
+  }
+  .k-screen .tab-item.locked .mi { color: rgba(245,230,200,0.1); }
+
+  /* Components list */
+  .k-screen .tab-comp {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px;
+    background: rgba(245, 230, 200, 0.03);
+    border: 1px solid rgba(245, 230, 200, 0.06);
+    border-radius: 14px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .k-screen .tab-comp.done {
+    border-color: rgba(74,138,90,0.2);
+  }
+  .k-screen .tab-comp.active {
+    border-color: rgba(200,167,78,0.25);
+    background: linear-gradient(135deg, rgba(200,167,78,0.06), rgba(200,167,78,0.02));
+  }
+  .k-screen .tab-comp-ic {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .k-screen .tab-comp-ic .mi { font-size: 20px; }
+  .k-screen .tab-comp-ic.gold {
+    background: linear-gradient(140deg, rgba(200,167,78,0.15), rgba(200,167,78,0.08));
+    border: 1px solid rgba(200,167,78,0.2);
+  }
+  .k-screen .tab-comp-ic.gold .mi { color: #C8A74E; }
+  .k-screen .tab-comp-ic.green {
+    background: rgba(74,138,90,0.1);
+    border: 1px solid rgba(74,138,90,0.15);
+  }
+  .k-screen .tab-comp-ic.green .mi { color: #6ABA7A; }
+  .k-screen .tab-comp-ic.dim {
+    background: rgba(245,230,200,0.03);
+    border: 1px solid rgba(245,230,200,0.04);
+  }
+  .k-screen .tab-comp-ic.dim .mi { color: rgba(245,230,200,0.12); }
+  .k-screen .tab-comp-info { flex: 1; }
+  .k-screen .tab-comp-name { font-size: 13px; font-weight: 800; margin-bottom: 1px; }
+  .k-screen .tab-comp-ref { font-size: 10px; color: rgba(245,230,200,0.3); font-style: italic; }
+  .k-screen .tab-comp-cost {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 12px; font-weight: 800;
+  }
+  .k-screen .tab-comp-cost .mi { font-size: 14px; color: #C8A74E; }
+  .k-screen .tab-comp-cost span { color: #C8A74E; }
+  .k-screen .tab-comp-check .mi { font-size: 18px; color: #6ABA7A; }
+
+  .k-screen .tab-comp-btn {
+    font-family: 'DM Sans'; font-size: 10px; font-weight: 800;
+    background: linear-gradient(140deg, #C8A74E, #A68A3A);
+    color: #1A1508; border: none; padding: 5px 12px; border-radius: 7px;
+    cursor: pointer; box-shadow: 0 2px 0 #8A7232;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ================================================================
+     ARMOR OF GOD
+     ================================================================ */
+  .k-screen .armor-figure {
+    position: relative;
+    height: 320px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Body silhouette */
+  .k-screen .armor-body {
+    width: 80px; height: 220px;
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  /* Head */
+  .k-screen .armor-head {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(245,230,200,0.06);
+    border: 2px solid rgba(245,230,200,0.1);
+    margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 2;
+  }
+  .k-screen .armor-head .mi { font-size: 20px; color: rgba(245,230,200,0.15); }
+  /* Torso */
+  .k-screen .armor-torso {
+    width: 60px; height: 70px;
+    background: rgba(245,230,200,0.04);
+    border: 2px solid rgba(245,230,200,0.08);
+    border-radius: 8px 8px 4px 4px;
+    margin-bottom: 2px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .k-screen .armor-torso .mi { font-size: 24px; color: rgba(245,230,200,0.1); }
+  /* Waist */
+  .k-screen .armor-waist {
+    width: 54px; height: 14px;
+    background: rgba(245,230,200,0.04);
+    border: 2px solid rgba(245,230,200,0.08);
+    border-radius: 3px;
+    margin-bottom: 2px;
+  }
+  /* Legs */
+  .k-screen .armor-legs {
+    display: flex; gap: 6px;
+  }
+  .k-screen .armor-leg {
+    width: 22px; height: 60px;
+    background: rgba(245,230,200,0.04);
+    border: 2px solid rgba(245,230,200,0.08);
+    border-radius: 4px 4px 6px 6px;
+  }
+  /* Feet */
+  .k-screen .armor-feet {
+    display: flex; gap: 10px; margin-top: 2px;
+  }
+  .k-screen .armor-foot {
+    width: 26px; height: 12px;
+    background: rgba(245,230,200,0.04);
+    border: 2px solid rgba(245,230,200,0.08);
+    border-radius: 3px 3px 6px 6px;
+  }
+
+  /* Armor slots - positioned around the figure */
+  .k-screen .a-slot {
+    position: absolute;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .k-screen .a-slot-ic {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .k-screen .a-slot-ic .mi { font-size: 16px; }
+  .k-screen .a-slot-name { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
+  .k-screen .a-slot-verse { font-size: 7px; font-weight: 600; }
+
+  /* Line connector */
+  .k-screen .a-slot::before {
+    content: '';
+    position: absolute;
+    background: rgba(245,230,200,0.06);
+  }
+
+  /* Equipped state */
+  .k-screen .a-slot.equipped {
+    background: rgba(200,167,78,0.08);
+    border: 1px solid rgba(200,167,78,0.2);
+  }
+  .k-screen .a-slot.equipped .a-slot-ic {
+    background: linear-gradient(140deg, rgba(200,167,78,0.2), rgba(200,167,78,0.1));
+  }
+  .k-screen .a-slot.equipped .a-slot-ic .mi { color: #C8A74E; }
+  .k-screen .a-slot.equipped .a-slot-name { color: #C8A74E; }
+  .k-screen .a-slot.equipped .a-slot-verse { color: rgba(200,167,78,0.4); }
+
+  /* Locked state */
+  .k-screen .a-slot.locked {
+    background: rgba(245,230,200,0.02);
+    border: 1px dashed rgba(245,230,200,0.06);
+  }
+  .k-screen .a-slot.locked .a-slot-ic {
+    background: rgba(245,230,200,0.03);
+  }
+  .k-screen .a-slot.locked .a-slot-ic .mi { color: rgba(245,230,200,0.1); }
+  .k-screen .a-slot.locked .a-slot-name { color: rgba(245,230,200,0.2); }
+  .k-screen .a-slot.locked .a-slot-verse { color: rgba(245,230,200,0.1); }
+
+  /* Equipped body parts glow */
+  .k-screen .armor-head.equipped {
+    background: rgba(200,167,78,0.1);
+    border-color: rgba(200,167,78,0.3);
+    box-shadow: 0 0 15px rgba(200,167,78,0.1);
+  }
+  .k-screen .armor-head.equipped .mi { color: #C8A74E; }
+  .k-screen .armor-torso.equipped {
+    background: rgba(200,167,78,0.08);
+    border-color: rgba(200,167,78,0.25);
+    box-shadow: 0 0 12px rgba(200,167,78,0.08);
+  }
+  .k-screen .armor-torso.equipped .mi { color: #C8A74E; }
+  .k-screen .armor-waist.equipped {
+    background: rgba(200,167,78,0.1);
+    border-color: rgba(200,167,78,0.3);
+  }
+  .k-screen .armor-foot.equipped {
+    background: rgba(200,167,78,0.08);
+    border-color: rgba(200,167,78,0.25);
+    box-shadow: 0 0 8px rgba(200,167,78,0.06);
+  }
+
+  /* Full armor glow effect */
+  .k-screen .armor-glow {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 160px; height: 260px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(200,167,78,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Armor stats bar */
+  .k-screen .armor-stats {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .k-screen .armor-stat {
+    flex: 1; padding: 10px 8px; text-align: center;
+    background: rgba(245,230,200,0.03);
+    border: 1px solid rgba(245,230,200,0.06);
+    border-radius: 10px;
+  }
+  .k-screen .armor-stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 900; color: #C8A74E; margin-bottom: 1px;
+  }
+  .k-screen .armor-stat-lbl {
+    font-size: 8px; font-weight: 700; color: rgba(245,230,200,0.25);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Buy material button */
+  .k-screen .armor-buy-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: rgba(245,230,200,0.03);
+    border: 1px solid rgba(245,230,200,0.06);
+    border-radius: 14px;
+    margin-bottom: 6px;
+  }
+  .k-screen .armor-buy-ic {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .k-screen .armor-buy-ic .mi { font-size: 18px; }
+  .k-screen .armor-buy-info { flex: 1; }
+  .k-screen .armor-buy-name { font-size: 12px; font-weight: 800; }
+  .k-screen .armor-buy-verse { font-size: 9px; color: rgba(245,230,200,0.3); font-style: italic; }
+  .k-screen .armor-buy-cost {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 800;
+    background: linear-gradient(140deg, #C8A74E, #A68A3A);
+    color: #1A1508; padding: 5px 12px; border-radius: 8px;
+    box-shadow: 0 2px 0 #8A7232;
+  }
+  .k-screen .armor-buy-cost .mi { font-size: 12px; color: #1A1508; }
+</style>
+</head>
+<body>
+
+<div class="page-top">
+  <h1>The Bible Game — Kingdom Theme</h1>
+  <p>Interactive mockups for the Bible game app redesign. Click game answers to see feedback animations.</p>
+</div>
+
+<!-- ===== KINGDOM ===== -->
+<div class="theme-section kingdom">
+  <div class="theme-header">
+    <div class="theme-name">Kingdom</div>
+    <div class="theme-tag">Warm</div>
+    <div class="theme-desc">Burnished gold, aged parchment tones, Playfair Display serif. Like opening an illuminated manuscript.</div>
+  </div>
+  <div class="phones">
+
+    <!-- Kingdom Home -->
+    <div class="phone-col">
+      <div class="phone-label">Home</div>
+      <div class="phone">
+        <div class="k-screen">
+          <div class="ambient"></div>
+          <div class="inner">
+            <div class="header">
+              <div class="header-row">
+                <div class="brand">
+                  <div class="brand-mark"><span class="mi">auto_stories</span></div>
+                  <div class="brand-text">The Bible Game</div>
+                </div>
+                <div class="header-right">
+                  <div class="h-icon"><span class="mi">notifications</span><div class="notif-dot"></div></div>
+                  <div class="h-icon"><span class="mi">person</span></div>
+                </div>
+              </div>
+              <div class="wallet-strip">
+                <div class="w-item w-coin"><span class="mi" style="font-size:16px">toll</span><span>2,450</span></div>
+                <div class="w-item w-gem"><span class="mi" style="font-size:16px">diamond</span><span>85</span></div>
+                <div class="w-item w-fire"><span class="mi" style="font-size:16px">local_fire_department</span><span>12 days</span></div>
+              </div>
+            </div>
+            <div class="scroll">
+              <div class="streak-row">
+                <div class="streak-flame"><span class="mi">local_fire_department</span></div>
+                <div class="streak-text"><strong>12-day streak</strong><span>Don't break the chain</span></div>
+                <button class="streak-btn">Claim</button>
+              </div>
+              <div class="hero">
+                <div class="hero-eyebrow"><span class="mi">schedule</span> Daily Challenge</div>
+                <div class="hero-title">The Parables<br>of Jesus</div>
+                <div class="hero-sub">Today's challenge &middot; 4 questions &middot; Bonus reward</div>
+                <button class="hero-btn"><span class="mi">play_arrow</span> Begin Challenge</button>
+              </div>
+              <div class="sec-head">
+                <div class="sec-title">Games</div>
+                <div class="sec-more">See all <span class="mi">chevron_right</span></div>
+              </div>
+              <div class="games-row">
+                <div class="g-card qg"><div class="g-visual"><span class="mi">bolt</span></div><div class="g-info"><div class="g-name">Quick Game</div><div class="g-desc">Topic trivia</div></div></div>
+                <div class="g-card wiw"><div class="g-visual"><span class="mi">person_search</span></div><div class="g-info"><div class="g-name">Who Is Who</div><div class="g-desc">Characters</div></div></div>
+                <div class="g-card pp"><div class="g-visual"><span class="mi">hiking</span></div><div class="g-info"><div class="g-name">Pilgrim</div><div class="g-desc">Rank up</div></div></div>
+                <div class="g-card fs"><div class="g-visual"><span class="mi">menu_book</span></div><div class="g-info"><div class="g-name">4 Scriptures</div><div class="g-desc">Missing word</div></div></div>
+              </div>
+              <div class="sec-head"><div class="sec-title">Compete</div></div>
+              <div class="compete-card">
+                <div class="c-icon globe"><span class="mi">public</span></div>
+                <div class="c-meta"><div class="c-name">Global Challenge</div><div class="c-desc">Ends in 2h 14m &middot; 1,240 playing</div></div>
+                <div class="c-badge">Live</div>
+              </div>
+              <div class="compete-card">
+                <div class="c-icon swords"><span class="mi">swords</span></div>
+                <div class="c-meta"><div class="c-name">Multiplayer</div><div class="c-desc">Challenge a friend</div></div>
+                <div class="c-arrow"><span class="mi">chevron_right</span></div>
+              </div>
+            </div>
+            <div class="b-nav">
+              <div class="b-tab on"><span class="mi">home</span><span>Home</span></div>
+              <div class="b-tab"><span class="mi">storefront</span><span>Store</span></div>
+              <div class="b-tab"><span class="mi">emoji_events</span><span>Board</span></div>
+              <div class="b-tab"><span class="mi">sports_esports</span><span>Arcade</span></div>
+              <div class="b-tab"><span class="mi">shield</span><span>League</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kingdom Game -->
+    <div class="phone-col">
+      <div class="phone-label">Game</div>
+      <div class="phone">
+        <div class="k-screen" id="kg">
+          <div class="ambient"></div>
+          <div class="inner" style="padding: 46px 20px 24px;">
+            <div class="top-bar">
+              <div class="top-back"><span class="mi">close</span></div>
+              <div class="top-info">
+                <div class="top-game-name">Quick Game</div>
+                <div class="top-coins"><span class="mi" style="font-size:14px">toll</span> 2,450</div>
+              </div>
+              <div class="timer-box">
+                <div class="timer-ring-bg"></div>
+                <div class="timer-ring-fill"></div>
+                <div class="timer-num" id="k-tn">22</div>
+              </div>
+            </div>
+            <div class="q-num-row">
+              <div class="q-dot done"></div>
+              <div class="q-dot now"></div>
+              <div class="q-dot"></div>
+              <div class="q-dot"></div>
+            </div>
+            <div class="q-card">
+              <div class="q-category"><span class="mi">bookmark</span> Old Testament</div>
+              <div class="q-text">Who built the ark as instructed by God to survive the great flood?</div>
+            </div>
+            <div class="opts" id="k-opts">
+              <div class="opt" data-c="0" onclick="kPick(this)"><div class="opt-letter">A</div><div class="opt-text">Abraham</div><div class="opt-result"><span class="mi">close</span></div></div>
+              <div class="opt" data-c="1" onclick="kPick(this)"><div class="opt-letter">B</div><div class="opt-text">Noah</div><div class="opt-result"><span class="mi">check</span></div></div>
+              <div class="opt" data-c="0" onclick="kPick(this)"><div class="opt-letter">C</div><div class="opt-text">Moses</div><div class="opt-result"><span class="mi">close</span></div></div>
+              <div class="opt" data-c="0" onclick="kPick(this)"><div class="opt-letter">D</div><div class="opt-text">David</div><div class="opt-result"><span class="mi">close</span></div></div>
+            </div>
+            <div class="g-foot">
+              <button class="f-btn f-quit"><span class="mi">logout</span> Quit</button>
+              <button class="f-btn f-skip">Skip <span class="mi">skip_next</span></button>
+            </div>
+          </div>
+          <div class="pts" id="k-pts">+10</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kingdom Profile -->
+    <div class="phone-col">
+      <div class="phone-label">Profile</div>
+      <div class="phone">
+        <div class="k-screen profile-screen">
+          <div class="p-header">
+            <div class="h-bar">
+              <div class="h-btn"><span class="mi">arrow_back</span></div>
+              <div class="h-title">Profile</div>
+              <div class="h-btn"><span class="mi">edit</span></div>
+            </div>
+            <div class="p-hero">
+              <div class="av-ring"><div class="av-inner">T</div></div>
+              <div class="p-name">Tobi Samuel</div>
+              <div class="p-loc"><span class="mi">location_on</span> Nigeria</div>
+              <div class="p-rank"><span class="mi">stars</span><span>Elder &middot; Level 42</span></div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="ct">
+            <div class="sec">Stats</div>
+            <div class="stats-strip">
+              <div class="stat"><div class="stat-val">12.8k</div><div class="stat-lbl">Score</div></div>
+              <div class="stat"><div class="stat-val">248</div><div class="stat-lbl">Games</div></div>
+              <div class="stat"><div class="stat-val">78%</div><div class="stat-lbl">Win Rate</div></div>
+              <div class="stat"><div class="stat-val">32</div><div class="stat-lbl">Streak</div></div>
+            </div>
+            <div class="sec">Badges</div>
+            <div class="badges-grid">
+              <div class="badge"><div class="badge-ic on"><span class="mi">child_care</span></div><div class="badge-lb">Babe</div></div>
+              <div class="badge"><div class="badge-ic on"><span class="mi">sentiment_satisfied</span></div><div class="badge-lb">Child</div></div>
+              <div class="badge"><div class="badge-ic on"><span class="mi">handshake</span></div><div class="badge-lb">Believer</div></div>
+              <div class="badge"><div class="badge-ic on"><span class="mi">shield_person</span></div><div class="badge-lb">Father</div></div>
+              <div class="badge"><div class="badge-ic on"><span class="mi">favorite</span></div><div class="badge-lb">Charity</div></div>
+              <div class="badge"><div class="badge-ic on"><span class="mi">stars</span></div><div class="badge-lb">Elder</div></div>
+              <div class="badge"><div class="badge-ic off"><span class="mi">lock</span></div><div class="badge-lb">Master</div></div>
+              <div class="badge"><div class="badge-ic off"><span class="mi">lock</span></div><div class="badge-lb">Apostle</div></div>
+            </div>
+            <div class="sec">Preferences</div>
+            <div class="menu-card">
+              <div class="m-row"><div class="m-ic c1"><span class="mi">volume_up</span></div><div class="m-txt">Sound Effects</div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-d"></div></div></div>
+              <div class="m-row"><div class="m-ic c2"><span class="mi">music_note</span></div><div class="m-txt">Background Music</div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-d"></div></div></div>
+              <div class="m-row"><div class="m-ic c3"><span class="mi">notifications</span></div><div class="m-txt">Notifications</div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-d"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kingdom Leaderboard -->
+    <div class="phone-col">
+      <div class="phone-label">Leaderboard</div>
+      <div class="phone">
+        <div class="k-screen" style="overflow-y: auto; scrollbar-width: none;">
+          <div class="ambient"></div>
+          <div style="padding: 48px 20px 30px; position: relative; z-index: 1;">
+            <div class="h-bar" style="margin-bottom: 6px;">
+              <div class="h-btn"><span class="mi">arrow_back</span></div>
+              <div class="h-title">Leaderboard</div>
+              <div class="h-btn"><span class="mi">filter_list</span></div>
+            </div>
+            <div style="text-align:center; margin-bottom:18px;">
+              <span style="font-size:12px; color: rgba(245,230,200,0.35); font-weight:600;">(April)</span>
+            </div>
+            <div class="lb-tabs">
+              <div class="lb-tab on">Global</div>
+              <div class="lb-tab">Nigeria</div>
+            </div>
+
+            <!-- Rank 1 - Top -->
+            <div class="lb-row" style="border-color: rgba(200,167,78,0.25); background: linear-gradient(135deg, rgba(200,167,78,0.12), rgba(200,167,78,0.04)); margin-bottom:6px;">
+              <div style="position:relative;">
+                <span class="mi" style="font-size:28px; color:#C8A74E;">military_tech</span>
+                <span style="position:absolute;bottom:-2px;right:-4px;font-size:10px;font-weight:900;background:#C8A74E;color:#1A1508;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;">1</span>
+              </div>
+              <div class="rank-av" style="width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,#C8A74E,#A68A3A);border:2px solid rgba(200,167,78,0.3);font-size:16px;color:#1A1508;">R</div>
+              <div class="rank-info">
+                <div class="rank-name" style="font-size:14px;">Rhino2011</div>
+                <div class="rank-pts" style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:11px;">&#127487;&#127462;</span> ZAF
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;background:rgba(245,230,200,0.08);border:1px solid rgba(245,230,200,0.1);padding:5px 12px;border-radius:20px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:13px;font-weight:800;color:#C8A74E;">105,900</span>
+              </div>
+            </div>
+
+            <!-- Rank 2 -->
+            <div class="lb-row" style="margin-bottom:6px;">
+              <div style="position:relative;">
+                <span class="mi" style="font-size:28px; color:#B0BEC5;">military_tech</span>
+                <span style="position:absolute;bottom:-2px;right:-4px;font-size:10px;font-weight:900;background:#B0BEC5;color:#1A1508;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;">2</span>
+              </div>
+              <div class="rank-av" style="width:42px;height:42px;border-radius:50%;background:rgba(200,122,78,0.2);border:2px solid rgba(200,122,78,0.15);font-size:16px;color:#E8B47A;">Y</div>
+              <div class="rank-info">
+                <div class="rank-name">yoyoooooo</div>
+                <div class="rank-pts" style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:11px;">&#127487;&#127484;</span> ZWE
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;background:rgba(245,230,200,0.06);border:1px solid rgba(245,230,200,0.08);padding:5px 12px;border-radius:20px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:13px;font-weight:800;color:rgba(245,230,200,0.6);">62,495</span>
+              </div>
+            </div>
+
+            <!-- Rank 3 -->
+            <div class="lb-row" style="margin-bottom:6px;">
+              <div style="position:relative;">
+                <span class="mi" style="font-size:28px; color:#CD7F32;">military_tech</span>
+                <span style="position:absolute;bottom:-2px;right:-4px;font-size:10px;font-weight:900;background:#CD7F32;color:#1A1508;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;">3</span>
+              </div>
+              <div class="rank-av" style="width:42px;height:42px;border-radius:50%;background:rgba(155,60,90,0.2);border:2px solid rgba(155,60,90,0.15);font-size:16px;color:#C87A9A;">N</div>
+              <div class="rank-info">
+                <div class="rank-name">Nyam#6412</div>
+                <div class="rank-pts" style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:11px;">&#127474;&#127486;</span> MYS
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;background:rgba(245,230,200,0.06);border:1px solid rgba(245,230,200,0.08);padding:5px 12px;border-radius:20px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:13px;font-weight:800;color:rgba(245,230,200,0.6);">42,940</span>
+              </div>
+            </div>
+
+            <!-- Rank 4 -->
+            <div class="lb-row" style="margin-bottom:6px;">
+              <div style="position:relative;">
+                <span class="mi" style="font-size:28px; color:rgba(245,230,200,0.15);">military_tech</span>
+                <span style="position:absolute;bottom:-2px;right:-4px;font-size:10px;font-weight:900;background:rgba(245,230,200,0.15);color:#F5E6C8;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;">4</span>
+              </div>
+              <div class="rank-av" style="width:42px;height:42px;border-radius:50%;background:rgba(27,58,107,0.25);border:2px solid rgba(27,58,107,0.15);font-size:16px;color:#7A9AC8;">H</div>
+              <div class="rank-info">
+                <div class="rank-name">HIS4EVER</div>
+                <div class="rank-pts" style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:11px;">&#127482;&#127480;</span> USA
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;background:rgba(245,230,200,0.06);border:1px solid rgba(245,230,200,0.08);padding:5px 12px;border-radius:20px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:13px;font-weight:800;color:rgba(245,230,200,0.6);">36,150</span>
+              </div>
+            </div>
+
+            <!-- Rank 5 - You -->
+            <div class="lb-row" style="border-color: rgba(200,167,78,0.25); background: linear-gradient(135deg, rgba(200,167,78,0.08), rgba(200,167,78,0.02)); margin-bottom:6px; position:relative;">
+              <div style="position:absolute;top:6px;right:12px;font-size:8px;font-weight:800;background:rgba(200,167,78,0.2);color:#C8A74E;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.5px;">You</div>
+              <div style="position:relative;">
+                <span class="mi" style="font-size:28px; color:rgba(245,230,200,0.15);">military_tech</span>
+                <span style="position:absolute;bottom:-2px;right:-4px;font-size:10px;font-weight:900;background:rgba(245,230,200,0.15);color:#F5E6C8;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;">5</span>
+              </div>
+              <div class="rank-av" style="width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,#C8A74E,#A68A3A);border:2px solid rgba(200,167,78,0.3);font-size:16px;color:#1A1508;">M</div>
+              <div class="rank-info">
+                <div class="rank-name" style="color:#C8A74E;">MammaCila</div>
+                <div class="rank-pts" style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:11px;">&#127487;&#127462;</span> ZAF
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;background:rgba(200,167,78,0.1);border:1px solid rgba(200,167,78,0.15);padding:5px 12px;border-radius:20px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:13px;font-weight:800;color:#C8A74E;">30,180</span>
+              </div>
+            </div>
+
+            <!-- Rank 6 -->
+            <div class="lb-row" style="margin-bottom:6px;">
+              <div style="position:relative;">
+                <span class="mi" style="font-size:28px; color:rgba(245,230,200,0.15);">military_tech</span>
+                <span style="position:absolute;bottom:-2px;right:-4px;font-size:10px;font-weight:900;background:rgba(245,230,200,0.15);color:#F5E6C8;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;">6</span>
+              </div>
+              <div class="rank-av" style="width:42px;height:42px;border-radius:50%;background:rgba(61,90,62,0.25);border:2px solid rgba(61,90,62,0.15);font-size:16px;color:#7AAA7C;">I</div>
+              <div class="rank-info">
+                <div class="rank-name">Ifikile_J</div>
+                <div class="rank-pts" style="display:flex;align-items:center;gap:3px;">
+                  <span style="font-size:11px;">&#127475;&#127468;</span> NGA
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;background:rgba(245,230,200,0.06);border:1px solid rgba(245,230,200,0.08);padding:5px 12px;border-radius:20px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:13px;font-weight:800;color:rgba(245,230,200,0.6);">28,410</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabernacle Build -->
+    <div class="phone-col">
+      <div class="phone-label">Tabernacle</div>
+      <div class="phone">
+        <div class="k-screen" style="overflow-y: auto; scrollbar-width: none;">
+          <div class="ambient"></div>
+          <div style="padding: 48px 20px 30px; position: relative; z-index: 1;">
+            <div class="h-bar" style="margin-bottom: 14px;">
+              <div class="h-btn"><span class="mi">arrow_back</span></div>
+              <div class="h-title" style="display:flex;align-items:center;gap:6px;"><span class="mi" style="font-size:20px;color:#C8A74E;">construction</span> Build</div>
+              <div style="display:flex;align-items:center;gap:3px;background:rgba(200,167,78,0.1);border:1px solid rgba(200,167,78,0.15);padding:4px 10px;border-radius:8px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:12px;font-weight:800;color:#C8A74E;">2,450</span>
+              </div>
+            </div>
+
+            <div class="tab-header">
+              <h2>Tabernacle of Moses</h2>
+              <p>Build the dwelling place of God &middot; Exodus 25-27</p>
+            </div>
+
+            <!-- Progress ring -->
+            <div class="tab-progress">
+              <div class="tab-prog-ring">
+                <div class="tab-prog-inner">
+                  <div class="tab-prog-pct">29%</div>
+                  <div class="tab-prog-label">Done</div>
+                </div>
+              </div>
+              <div class="tab-prog-info">
+                <div class="tab-prog-title">Stage 3 of 7</div>
+                <div class="tab-prog-sub">Bronze Laver &middot; 2 materials remaining</div>
+                <div class="tab-prog-bar"><div class="tab-prog-fill" style="width:29%"></div></div>
+              </div>
+            </div>
+
+            <!-- Isometric tabernacle view -->
+            <div class="tab-iso">
+              <div class="tab-iso-ground"></div>
+              <div class="tab-struct">
+                <div class="tab-outer">
+                  <!-- Built items -->
+                  <div class="tab-item built" style="bottom:8px;left:110px;" title="Gate"><span class="mi">door_front</span></div>
+                  <div class="tab-item built" style="bottom:30px;left:110px;" title="Bronze Altar"><span class="mi">local_fire_department</span></div>
+                  <div class="tab-item locked" style="bottom:55px;left:113px;" title="Laver"><span class="mi">water_drop</span></div>
+                  <div class="tab-holy">
+                    <div class="tab-item locked" style="top:28px;left:8px;" title="Lampstand"><span class="mi">lightbulb</span></div>
+                    <div class="tab-item locked" style="top:28px;right:8px;" title="Showbread"><span class="mi">bakery_dining</span></div>
+                    <div class="tab-item locked" style="top:6px;left:35px;" title="Incense"><span class="mi">sensors</span></div>
+                    <div class="tab-mostholy">
+                      <span class="mi">inventory_2</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Legend -->
+              <div style="position:absolute;top:10px;left:12px;display:flex;gap:10px;">
+                <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:2px;background:#C8A74E;"></div><span style="font-size:7px;font-weight:700;color:rgba(245,230,200,0.3);">BUILT</span></div>
+                <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:2px;border:1px dashed rgba(245,230,200,0.15);"></div><span style="font-size:7px;font-weight:700;color:rgba(245,230,200,0.2);">LOCKED</span></div>
+              </div>
+            </div>
+
+            <!-- Components list -->
+            <div style="font-size:10px;font-weight:800;color:rgba(245,230,200,0.2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Components</div>
+
+            <div class="tab-comp done">
+              <div class="tab-comp-ic green"><span class="mi">fence</span></div>
+              <div class="tab-comp-info">
+                <div class="tab-comp-name">Outer Court Fence</div>
+                <div class="tab-comp-ref">60 pillars &middot; Exodus 27:9-19</div>
+              </div>
+              <div class="tab-comp-check"><span class="mi">check_circle</span></div>
+            </div>
+
+            <div class="tab-comp done">
+              <div class="tab-comp-ic green"><span class="mi">local_fire_department</span></div>
+              <div class="tab-comp-info">
+                <div class="tab-comp-name">Bronze Altar</div>
+                <div class="tab-comp-ref">Acacia wood + bronze &middot; Ex 27:1-8</div>
+              </div>
+              <div class="tab-comp-check"><span class="mi">check_circle</span></div>
+            </div>
+
+            <div class="tab-comp active">
+              <div class="tab-comp-ic gold"><span class="mi">water_drop</span></div>
+              <div class="tab-comp-info">
+                <div class="tab-comp-name">Bronze Laver</div>
+                <div class="tab-comp-ref">Washing basin &middot; Exodus 30:17-21</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+                <div class="tab-comp-cost"><span class="mi">toll</span><span>600</span></div>
+                <button class="tab-comp-btn">Buy</button>
+              </div>
+            </div>
+
+            <div class="tab-comp">
+              <div class="tab-comp-ic dim"><span class="mi">layers</span></div>
+              <div class="tab-comp-info">
+                <div class="tab-comp-name" style="color:rgba(245,230,200,0.3);">Tent Coverings</div>
+                <div class="tab-comp-ref">4 layers &middot; Exodus 26:1-14</div>
+              </div>
+              <div class="tab-comp-cost" style="opacity:0.3;"><span class="mi">toll</span><span>1,200</span></div>
+            </div>
+
+            <div class="tab-comp">
+              <div class="tab-comp-ic dim"><span class="mi">emoji_objects</span></div>
+              <div class="tab-comp-info">
+                <div class="tab-comp-name" style="color:rgba(245,230,200,0.3);">Holy Place Furniture</div>
+                <div class="tab-comp-ref">Lampstand, Showbread, Incense</div>
+              </div>
+              <div class="tab-comp-cost" style="opacity:0.3;"><span class="mi">toll</span><span>2,400</span></div>
+            </div>
+
+            <div class="tab-comp">
+              <div class="tab-comp-ic dim"><span class="mi">curtains</span></div>
+              <div class="tab-comp-info">
+                <div class="tab-comp-name" style="color:rgba(245,230,200,0.3);">The Veil</div>
+                <div class="tab-comp-ref">Blue, purple, scarlet &middot; Ex 26:31</div>
+              </div>
+              <div class="tab-comp-cost" style="opacity:0.3;"><span class="mi">toll</span><span>1,000</span></div>
+            </div>
+
+            <div class="tab-comp">
+              <div class="tab-comp-ic dim"><span class="mi">inventory_2</span></div>
+              <div class="tab-comp-info">
+                <div class="tab-comp-name" style="color:rgba(245,230,200,0.3);">Ark of the Covenant</div>
+                <div class="tab-comp-ref">Gold + mercy seat &middot; Ex 25:10-22</div>
+              </div>
+              <div class="tab-comp-cost" style="opacity:0.3;"><span class="mi">toll</span><span>2,500</span></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Armor of God -->
+    <div class="phone-col">
+      <div class="phone-label">Armor of God</div>
+      <div class="phone">
+        <div class="k-screen" style="overflow-y: auto; scrollbar-width: none;">
+          <div class="ambient"></div>
+          <div style="padding: 48px 20px 30px; position: relative; z-index: 1;">
+            <div class="h-bar" style="margin-bottom: 14px;">
+              <div class="h-btn"><span class="mi">arrow_back</span></div>
+              <div class="h-title" style="display:flex;align-items:center;gap:6px;"><span class="mi" style="font-size:20px;color:#C8A74E;">shield</span> Equip</div>
+              <div style="display:flex;align-items:center;gap:3px;background:rgba(200,167,78,0.1);border:1px solid rgba(200,167,78,0.15);padding:4px 10px;border-radius:8px;">
+                <span class="mi" style="font-size:14px;color:#C8A74E;">toll</span>
+                <span style="font-size:12px;font-weight:800;color:#C8A74E;">2,450</span>
+              </div>
+            </div>
+
+            <div class="tab-header">
+              <h2>Armor of God</h2>
+              <p>Put on the full armor &middot; Ephesians 6:10-18</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="armor-stats">
+              <div class="armor-stat">
+                <div class="armor-stat-val">3/6</div>
+                <div class="armor-stat-lbl">Equipped</div>
+              </div>
+              <div class="armor-stat">
+                <div class="armor-stat-val">1.5x</div>
+                <div class="armor-stat-lbl">Multiplier</div>
+              </div>
+              <div class="armor-stat">
+                <div class="armor-stat-val" style="color:#B0BEC5;">Silver</div>
+                <div class="armor-stat-lbl">Tier</div>
+              </div>
+            </div>
+
+            <!-- Character figure with armor slots -->
+            <div class="armor-figure">
+              <div class="armor-glow"></div>
+
+              <!-- Body -->
+              <div class="armor-body">
+                <div class="armor-head equipped"><span class="mi">face</span></div>
+                <div class="armor-torso equipped"><span class="mi">shield_person</span></div>
+                <div class="armor-waist equipped"></div>
+                <div class="armor-legs">
+                  <div class="armor-leg"></div>
+                  <div class="armor-leg"></div>
+                </div>
+                <div class="armor-feet">
+                  <div class="armor-foot equipped"></div>
+                  <div class="armor-foot equipped"></div>
+                </div>
+              </div>
+
+              <!-- Slot labels positioned around -->
+              <!-- Helmet - top right -->
+              <div class="a-slot equipped" style="top:10px;right:10px;">
+                <div class="a-slot-ic"><span class="mi">hard_hat</span></div>
+                <div>
+                  <div class="a-slot-name">Helmet</div>
+                  <div class="a-slot-verse">Salvation</div>
+                </div>
+              </div>
+
+              <!-- Breastplate - right middle -->
+              <div class="a-slot equipped" style="top:80px;right:10px;">
+                <div class="a-slot-ic"><span class="mi">security</span></div>
+                <div>
+                  <div class="a-slot-name">Breastplate</div>
+                  <div class="a-slot-verse">Righteousness</div>
+                </div>
+              </div>
+
+              <!-- Belt - left middle -->
+              <div class="a-slot equipped" style="top:140px;left:10px;">
+                <div class="a-slot-ic"><span class="mi">donut_large</span></div>
+                <div>
+                  <div class="a-slot-name">Belt</div>
+                  <div class="a-slot-verse">Truth</div>
+                </div>
+              </div>
+
+              <!-- Shield - left top -->
+              <div class="a-slot locked" style="top:30px;left:10px;">
+                <div class="a-slot-ic"><span class="mi">shield</span></div>
+                <div>
+                  <div class="a-slot-name">Shield</div>
+                  <div class="a-slot-verse">Faith</div>
+                </div>
+              </div>
+
+              <!-- Shoes - bottom left -->
+              <div class="a-slot equipped" style="bottom:20px;left:10px;">
+                <div class="a-slot-ic"><span class="mi">steps</span></div>
+                <div>
+                  <div class="a-slot-name">Shoes</div>
+                  <div class="a-slot-verse">Peace</div>
+                </div>
+              </div>
+
+              <!-- Sword - bottom right -->
+              <div class="a-slot locked" style="bottom:20px;right:10px;">
+                <div class="a-slot-ic"><span class="mi">swords</span></div>
+                <div>
+                  <div class="a-slot-name">Sword</div>
+                  <div class="a-slot-verse">The Spirit</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Buy next pieces -->
+            <div style="font-size:10px;font-weight:800;color:rgba(245,230,200,0.2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Next to Unlock</div>
+
+            <div class="armor-buy-row" style="border-color: rgba(200,167,78,0.15); background: linear-gradient(135deg, rgba(200,167,78,0.06), rgba(200,167,78,0.02));">
+              <div class="armor-buy-ic" style="background:linear-gradient(140deg, rgba(200,167,78,0.15), rgba(200,167,78,0.08)); border: 1px solid rgba(200,167,78,0.2);">
+                <span class="mi" style="color:#C8A74E;">shield</span>
+              </div>
+              <div class="armor-buy-info">
+                <div class="armor-buy-name" style="color:#F5E6C8;">Shield of Faith</div>
+                <div class="armor-buy-verse">Eph 6:16 &middot; Extinguish fiery darts</div>
+              </div>
+              <div class="armor-buy-cost"><span class="mi">toll</span> 1,000</div>
+            </div>
+
+            <div class="armor-buy-row">
+              <div class="armor-buy-ic" style="background:rgba(245,230,200,0.03); border: 1px solid rgba(245,230,200,0.04);">
+                <span class="mi" style="color:rgba(245,230,200,0.15);">swords</span>
+              </div>
+              <div class="armor-buy-info">
+                <div class="armor-buy-name" style="color:rgba(245,230,200,0.35);">Sword of the Spirit</div>
+                <div class="armor-buy-verse">Eph 6:17 &middot; The Word of God</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:3px;font-size:11px;font-weight:800;color:rgba(245,230,200,0.2);">
+                <span class="mi" style="font-size:12px;color:rgba(245,230,200,0.15);">toll</span> 1,200
+              </div>
+            </div>
+
+            <!-- Full armor bonus teaser -->
+            <div style="margin-top:14px;padding:14px;border-radius:14px;background:linear-gradient(135deg, rgba(200,167,78,0.06), rgba(200,167,78,0.02));border:1px solid rgba(200,167,78,0.1);text-align:center;">
+              <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:4px;">
+                <span class="mi" style="font-size:16px;color:#C8A74E;">auto_awesome</span>
+                <span style="font-family:'Playfair Display',serif;font-size:13px;font-weight:800;color:#C8A74E;">Full Armor Bonus</span>
+              </div>
+              <div style="font-size:10px;color:rgba(245,230,200,0.35);">Equip all 6 pieces for 2x score multiplier + radiant glow + exclusive "Spiritual Warfare" quiz category</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>

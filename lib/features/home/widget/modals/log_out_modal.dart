@@ -1,0 +1,181 @@
+import 'package:bible_game/shared/features/localization/app_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stroke_text/stroke_text.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+
+import '../../../../shared/constants/app_routes.dart';
+import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/utils/avatar_credentials.dart';
+import '../../../../shared/widgets/multi_avatar.dart';
+
+void showLogoutModal(BuildContext context) {
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: const Color.fromRGBO(40, 40, 40, 0.95),
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+          backgroundColor: Colors.transparent,
+          insetAnimationCurve: Curves.easeIn,
+          insetAnimationDuration: const Duration(milliseconds: 500),
+          child: LogoutModal(),
+        );
+      });
+}
+
+class LogoutModal extends StatelessWidget {
+  const LogoutModal({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = AppLocalization.tr(context);
+    return BlocConsumer<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        if (state.hasLoggedOut) {
+          Navigator.pop(context);
+          Navigator.pushNamedAndRemoveUntil(
+              context, AppRoutes.home, (Route<dynamic> route) => false);
+          GetStorage().remove('user_token');
+          GetStorage().remove('refresh_token');
+        }
+      },
+      builder: (context, state) {
+        return SizedBox(
+          height: 400.h,
+          width: 350.h,
+          child: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(ProductImageRoutes.streakModalBg),
+                fit: BoxFit.fill,
+              ),
+            ),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 20.h,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 40.w,
+                    ),
+                    Spacer(),
+                    StrokeText(
+                      text: tr.t('auth_logout'),
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w700),
+                      strokeColor: const Color(0xFF272D39),
+                      strokeWidth: 3,
+                    ),
+                    Spacer(),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Image.asset(
+                        IconImageRoutes.blueCircleCancel,
+                        width: 35.w,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10.w,
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+                Container(
+                    padding: EdgeInsets.all(5.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        width: 4.w,
+                        color: const Color(0xFF4A91FF),
+                      ),
+                    ),
+                    child:
+                        // SvgPicture.network(
+                        //   '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
+                        //   width: 70.w,
+                        //   semanticsLabel: 'avatar',
+                        //   placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
+                        // ),
+                        AvatarWidget(
+                      seed: state.user.id.toString(),
+                      width: 70.w,
+                      height: 70.h,
+                    )),
+                SizedBox(
+                  height: 20.h,
+                ),
+                Text(
+                  tr.t('auth_logout_confirm'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20.sp,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(
+                  height: 30.h,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    context
+                        .read<AuthenticationBloc>()
+                        .add(AuthenticationLogoutRequested());
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15.w),
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 15.h),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(
+                              ProductImageRoutes.streakRestoreButtonBg),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      child: Center(
+                        child: state.isLoggingOut
+                            ? SizedBox(
+                                height: 20.h,
+                                width: 20.w,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : StrokeText(
+                                text: tr.t('auth_logout_yes'),
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                strokeColor: const Color(0xFF272D39),
+                                strokeWidth: 3,
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
