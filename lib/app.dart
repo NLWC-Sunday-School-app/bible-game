@@ -262,6 +262,15 @@ class _AppState extends State<App> {
           theme: ThemeData(
             fontFamily: 'Mikado',
             useMaterial3: false,
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: {
+                TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+              },
+            ),
           ),
           initialRoute: '/',
           routes: {
