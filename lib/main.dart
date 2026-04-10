@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bible_game_api/api/game_api.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_storage/get_storage.dart';
@@ -28,26 +29,40 @@ void main() async {
 
   Bloc.observer = AppBlocObserver();
 
-  AwesomeNotifications().initialize('resource://drawable/notification_icon', [
-    NotificationChannel(
-      channelKey: 'game notifications',
-      channelName: 'Game Notifications',
-      channelDescription: 'Notification channel for notification',
-      channelShowBadge: true,
-      importance: NotificationImportance.Max,
-    ),
-    DevotionalNotification.channel,
-  ]);
+  // Notifications and Firebase are mobile-only (not supported on web)
+  if (!kIsWeb) {
+    AwesomeNotifications().initialize('resource://drawable/notification_icon', [
+      NotificationChannel(
+        channelKey: 'game notifications',
+        channelName: 'Game Notifications',
+        channelDescription: 'Notification channel for notification',
+        channelShowBadge: true,
+        importance: NotificationImportance.Max,
+      ),
+      DevotionalNotification.channel,
+    ]);
 
-  // Reset the app badge count whenever the app starts
-  AwesomeNotifications().resetGlobalBadge();
+    // Reset the app badge count whenever the app starts
+    AwesomeNotifications().resetGlobalBadge();
 
-  // Schedule the daily devotional notification at 8 AM
-  DevotionalNotification.scheduleDailyReminder();
+    // Schedule the daily devotional notification at 8 AM
+    DevotionalNotification.scheduleDailyReminder();
+  }
 
-  await GetStorage.init();
-  await AwesomeNotification.initializeRemoteNotifications(
-    debug: true,);
+  // GetStorage uses path_provider internally. On iOS hot restart the Pigeon
+  // channel can be momentarily unavailable — retry once if it fails.
+  try {
+    await GetStorage.init();
+  } catch (_) {
+    await Future.delayed(const Duration(milliseconds: 400));
+    await GetStorage.init();
+  }
+
+  // Firebase/FCM is mobile-only
+  if (!kIsWeb) {
+    await AwesomeNotification.initializeRemoteNotifications(
+      debug: true,);
+  }
 
   final String? userToken = await GetStorage().read('user_token');
   final ApiClient apiClient = ApiClient(

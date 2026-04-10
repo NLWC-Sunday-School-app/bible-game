@@ -50,6 +50,8 @@ class ProductImageRoutes {
    static const String gameSummaryBgTabletView = 'assets/images/product/shared/game_summary_bg_tablet_view.png';
    static const String threeStars = 'assets/images/product/shared/three_stars.png';
    static const String trueOrFalseIcon = 'assets/images/product/shared/true_or_false_icon.svg';
+   static const String trueOrFalseHomeIllustration = 'assets/images/product/true_or_false/true_or_false_home_illustration.png';
+   static const String trueOrFalseCardHeader = 'assets/images/product/true_or_false/true_or_false_card_header.svg';
    static const String vs = 'assets/images/product/multi_player/vs.png';
    static const String storeComingSoon = 'assets/images/product/store/store_coming_soon.png';
    static const String fblComingSoon = 'assets/images/product/league/fbl_coming_soon.png';

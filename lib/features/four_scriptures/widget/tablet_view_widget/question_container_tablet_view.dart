@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:typed_data';
-import 'dart:io';
 import 'package:bible_game/features/four_scriptures/widget/tablet_view_widget/scripture_box_tablet_view.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/utils/formatter.dart';
@@ -8,7 +7,6 @@ import 'package:bible_game/shared/widgets/tablet_view_widget/blue_button_tablet_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bible_game/features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
@@ -22,7 +20,7 @@ import 'package:bible_game/features/who_is_who/widget/modal/not_enough_coins_mod
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/widgets/quit_modal.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:bible_game/shared/utils/share_helper.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -439,19 +437,10 @@ class _QuestionContainerTabletViewState extends State<QuestionContainerTabletVie
                           .capture(delay: const Duration(milliseconds: 10))
                           .then((Uint8List? image) async {
                         if (image != null) {
-                          final directory =
-                              await getApplicationDocumentsDirectory();
-                          String fileName =
-                              DateTime.fromMicrosecondsSinceEpoch.toString();
-                          final imagePath = File('${directory.path}/image.png');
-                          await imagePath.writeAsBytes(image);
-
-                          final box = context.findRenderObject() as RenderBox?;
-                          await Share.shareFiles(
-                            [imagePath.path],
+                          await shareScreenshot(
+                            imageBytes: image,
+                            context: context,
                             subject: 'Can you please help me with this puzzle?',
-                            sharePositionOrigin:
-                                box!.localToGlobal(Offset.zero) & box.size,
                           );
                         }
                       });

@@ -1,9 +1,14 @@
 import 'dart:async';
 import 'package:bible_game_api/api/game_api.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:bible_game/shared/utils/offline_sync_queue.dart';
+
+// Conditional import: InternetConnectionChecker is mobile-only
+import 'package:internet_connection_checker/internet_connection_checker.dart'
+    if (dart.library.js_interop) 'package:bible_game/shared/features/connectivity/bloc/connectivity_web_stub.dart';
 
 part 'connectivity_event.dart';
 part 'connectivity_state.dart';
@@ -11,7 +16,7 @@ part 'connectivity_state.dart';
 class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
   final GameAPI _gameAPI;
   final OfflineSyncQueue _syncQueue;
-  late final StreamSubscription<InternetConnectionStatus> _subscription;
+  StreamSubscription? _subscription;
 
   ConnectivityBloc({
     required GameAPI gameAPI,
@@ -24,20 +29,34 @@ class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
     on<SyncCompleted>(_onSyncCompleted);
     on<SyncFailed>(_onSyncFailed);
 
-    // Subscribe to connectivity changes
-    _subscription = InternetConnectionChecker().onStatusChange.listen((status) {
-      add(ConnectivityChanged(
-        isOnline: status == InternetConnectionStatus.connected,
-      ));
-    });
-
-    // Check initial connectivity and pending queue
-    _initAsync();
+    _initConnectivity();
   }
 
-  Future<void> _initAsync() async {
-    final isOnline = await InternetConnectionChecker().hasConnection;
-    add(ConnectivityChanged(isOnline: isOnline));
+  void _initConnectivity() {
+    if (kIsWeb) {
+      // On web, use connectivity_plus (checks navigator.onLine)
+      _subscription =
+          Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+        final isOnline = !results.contains(ConnectivityResult.none);
+        add(ConnectivityChanged(isOnline: isOnline));
+      });
+      // Initial check
+      Connectivity().checkConnectivity().then((results) {
+        add(ConnectivityChanged(
+            isOnline: !results.contains(ConnectivityResult.none)));
+      });
+    } else {
+      // On mobile, use InternetConnectionChecker for reliable ping-based checks
+      _subscription =
+          InternetConnectionChecker().onStatusChange.listen((status) {
+        add(ConnectivityChanged(
+          isOnline: status == InternetConnectionStatus.connected,
+        ));
+      });
+      InternetConnectionChecker().hasConnection.then((isOnline) {
+        add(ConnectivityChanged(isOnline: isOnline));
+      });
+    }
   }
 
   Future<void> _onConnectivityChanged(
@@ -140,7 +159,7 @@ class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
 
   @override
   Future<void> close() {
-    _subscription.cancel();
+    _subscription?.cancel();
     return super.close();
   }
 }

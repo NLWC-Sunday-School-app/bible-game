@@ -1,33 +1,22 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_js/flutter_js.dart';
 
+/// Multiavatar SVG generator.
+///
+/// Note: flutter_js was removed for web compatibility (it uses dart:ffi).
+/// Avatar generation now returns empty string, and the AvatarWidget
+/// falls back to the default avatar image. To restore dynamic avatars,
+/// re-add flutter_js to pubspec.yaml (mobile-only builds) or use a
+/// pure Dart SVG avatar library.
 class MultiavatarGenerator {
-  late JavascriptRuntime jsRuntime;
-
-  MultiavatarGenerator() {
-    // Initialize JavaScript runtime
-    jsRuntime = getJavascriptRuntime();
-  }
+  MultiavatarGenerator();
 
   Future<void> loadJs() async {
-    try {
-      String jsCode = await rootBundle.loadString('assets/js/multiavatar.js');
-      await jsRuntime.evaluateAsync(jsCode);
-    } catch (e) {
-      debugPrint("Error loading JavaScript: $e");
-    }
+    // No-op — flutter_js removed for web compatibility
   }
 
-
   Future<String> generateAvatar(String seed) async {
-    // Ensure JavaScript is loaded before calling the function
-    await loadJs();
-
-    // Execute the Multiavatar function
-    String script = "multiavatar('$seed');";
-    JsEvalResult result = await jsRuntime.evaluateAsync(script);
-
-    return result.stringResult;
+    // Returns empty so AvatarWidget shows the default avatar image
+    return '';
   }
 }

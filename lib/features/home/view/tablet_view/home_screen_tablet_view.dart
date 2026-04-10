@@ -20,6 +20,7 @@ import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:bible_game/shared/utils/user_badge.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:upgrader/upgrader.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -125,6 +126,15 @@ class _HomeScreenTabletViewState extends State<HomeScreenTabletView> {
     }
   }
 
+  Widget _wrapWithUpgradeAlert({required Widget child}) {
+    if (kIsWeb) return child;
+    return UpgradeAlert(
+      showIgnore: false,
+      showLater: false,
+      child: child,
+    );
+  }
+
   Future<void> clearUpgraderSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userIgnoredVersion');
@@ -172,9 +182,7 @@ class _HomeScreenTabletViewState extends State<HomeScreenTabletView> {
       backgroundColor: const Color(0xFF548CD7),
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
-          return UpgradeAlert(
-            showIgnore: false,
-            showLater: false,
+          return _wrapWithUpgradeAlert(
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(

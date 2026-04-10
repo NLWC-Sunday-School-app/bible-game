@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'bloc/settings_bloc.dart';
 
@@ -15,13 +16,21 @@ class SoundManager {
 
 
   SoundManager() {
-    // Load audio files
-    clickPlayer.setAsset('assets/sounds/click.mp3');
-    gameMusicPlayer.setAsset('assets/sounds/game_music.mp3');
-    tabClickPlayer.setAsset('assets/sounds/tab_click.mp3');
-    achievementPlayer.setAsset('assets/sounds/achievement.mp3');
-    correctAnswerPlayer.setAsset('assets/sounds/correct_answer.mp3');
-    wrongAnswerPlayer.setAsset('assets/sounds/wrong_answer.wav');
+    _loadAssets();
+  }
+
+  Future<void> _loadAssets() async {
+    // Load audio files — wrapped in try/catch for web compatibility
+    try {
+      await clickPlayer.setAsset('assets/sounds/click.mp3');
+      await gameMusicPlayer.setAsset('assets/sounds/game_music.mp3');
+      await tabClickPlayer.setAsset('assets/sounds/tab_click.mp3');
+      await achievementPlayer.setAsset('assets/sounds/achievement.mp3');
+      await correctAnswerPlayer.setAsset('assets/sounds/correct_answer.mp3');
+      await wrongAnswerPlayer.setAsset('assets/sounds/wrong_answer.wav');
+    } catch (e) {
+      debugPrint('SoundManager: could not load audio assets: $e');
+    }
   }
 
   void updateSettings(SettingsState state) {

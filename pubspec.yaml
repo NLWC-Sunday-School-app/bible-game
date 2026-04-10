@@ -97,7 +97,7 @@ dependencies:
   countries_world_map: ^1.0.2
   url_launcher: ^6.3.0
   stomp_dart_client: ^2.0.0
-  flutter_js: ^0.7.0
+  # flutter_js: ^0.7.0  # Disabled for web compatibility (uses dart:ffi)
 
 
 dev_dependencies:
@@ -160,6 +160,7 @@ flutter:
    - assets/images/product/pilgrim_progress/
    - assets/images/product/four_scripture/
    - assets/images/product/recap/
+   - assets/images/product/true_or_false/
    - assets/images/flags/
    - assets/sounds/
    - assets/js/
@@ -214,4 +215,5 @@ dependency_overrides:
   win32: 5.15.0
   carousel_slider: ^5.0.0
   screenshot: ^3.0.0
+  just_audio_web: ^0.4.13
 

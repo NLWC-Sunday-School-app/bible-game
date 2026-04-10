@@ -1,13 +1,11 @@
 import 'dart:typed_data';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:bible_game/shared/utils/share_helper.dart';
 import 'package:get/get.dart';
 
 import '../../shared/features/user/bloc/user_bloc.dart';
@@ -83,20 +81,10 @@ class _RecapEightScreenState extends State<RecapEightScreen> {
                         .capture(delay: const Duration(milliseconds: 10))
                         .then((Uint8List? image) async {
                       if (image != null) {
-                        final directory = await getApplicationDocumentsDirectory();
-                        print(directory);
-                        String fileName = DateTime.fromMicrosecondsSinceEpoch.toString();
-                        print(fileName);
-                        final imagePath = File('${directory.path}/image.png');
-                        print(imagePath);
-                        await imagePath.writeAsBytes(image);
-
-                        final box = context.findRenderObject() as RenderBox?;
-                        await Share.shareFiles(
-                          [imagePath.path],
+                        await shareScreenshot(
+                          imageBytes: image,
+                          context: context,
                           subject: 'Check out my #2024BibleGameRecap! Go see yours on your #BibleGameApp via https://onelink.to/rr9q7d',
-                          sharePositionOrigin:
-                          box!.localToGlobal(Offset.zero) & box.size,
                         );
                       }
                     });

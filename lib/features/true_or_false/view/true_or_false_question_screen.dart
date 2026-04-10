@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/widgets/quit_modal.dart';
@@ -270,8 +271,6 @@ class _TrueOrFalseQuestionScreenState extends State<TrueOrFalseQuestionScreen>
                     child: Container(
                       width: double.infinity,
                       constraints: BoxConstraints(minHeight: 120.h),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 24.w, vertical: 28.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20.r),
@@ -283,17 +282,37 @@ class _TrueOrFalseQuestionScreenState extends State<TrueOrFalseQuestionScreen>
                           ),
                         ],
                       ),
-                      child: Center(
-                        child: Text(
-                          statement,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 17.sp,
-                            color: const Color(0xFF1A1A2E),
-                            height: 1.5,
+                      child: Column(
+                        children: [
+                          // Scroll banner header
+                          ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20.r),
+                              topRight: Radius.circular(20.r),
+                            ),
+                            child: SvgPicture.asset(
+                              ProductImageRoutes.trueOrFalseCardHeader,
+                              width: double.infinity,
+                              height: 52.h,
+                              fit: BoxFit.fill,
+                            ),
                           ),
-                        ),
+                          // Question text
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 24.w, vertical: 22.h),
+                            child: Text(
+                              statement,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 17.sp,
+                                color: const Color(0xFF1A1A2E),
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

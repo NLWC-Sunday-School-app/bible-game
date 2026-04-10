@@ -34,10 +34,11 @@ class DailyDevotionalBloc
     final streak = prefs.getInt('devotional_streak') ?? 0;
     final bestStreak = prefs.getInt('devotional_best_streak') ?? 0;
 
-    // Pick today's devotional deterministically by day-of-year
+    // Pick today's devotional using a deterministic scatter so consecutive
+    // days pull from different books instead of sequential entries.
     final now = DateTime.now();
     final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
-    final index = dayOfYear % DailyDevotionals.devotionals.length;
+    final index = _scatteredIndex(dayOfYear, DailyDevotionals.devotionals.length);
     final data = DailyDevotionals.devotionals[index];
 
     emit(state.copyWith(
@@ -110,6 +111,16 @@ class DailyDevotionalBloc
     };
 
     await _connectivityBloc.submitOrEnqueue(playLog);
+  }
+
+  /// Maps a sequential day number to a scattered index so that adjacent days
+  /// land on devotionals far apart in the list (different books).
+  /// Uses a simple multiplicative hash: (day * prime) mod length.
+  /// The prime 137 is coprime with 291 (291 = 3×97), guaranteeing every
+  /// index is hit exactly once over a full 291-day cycle.
+  int _scatteredIndex(int dayOfYear, int length) {
+    const prime = 137;
+    return (dayOfYear * prime) % length;
   }
 
   String _todayStr() {

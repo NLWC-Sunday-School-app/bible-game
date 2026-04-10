@@ -18,6 +18,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:bible_game/shared/utils/avatar_credentials.dart';
 import 'package:bible_game/shared/utils/user_badge.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:upgrader/upgrader.dart';
 
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
@@ -139,10 +140,10 @@ const _gameEntries = [
     gameText: 'Test your knowledge!',
     gameTypeKey: 'game_true_or_false',
     gameTextKey: 'game_true_or_false_desc',
-    gameImage: ProductImageRoutes.trueOrFalseIcon,
-    smallWidth: 65,
-    mediumWidth: 75,
-    largeWidth: 85,
+    gameImage: ProductImageRoutes.trueOrFalseHomeIllustration,
+    smallWidth: 45,
+    mediumWidth: 52,
+    largeWidth: 58,
     route: AppRoutes.trueOrFalseHomeScreen,
     requiresNetwork: false,
   ),
@@ -240,6 +241,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Wraps child with UpgradeAlert on mobile, returns child directly on web.
+  Widget _wrapWithUpgradeAlert({required Widget child}) {
+    if (kIsWeb) return child;
+    return UpgradeAlert(
+      showIgnore: false,
+      showLater: false,
+      child: child,
+    );
+  }
+
   Future<void> clearUpgraderSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userIgnoredVersion');
@@ -298,9 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         buildWhen: (prev, curr) => prev.user != curr.user,
         builder: (context, state) {
-          return UpgradeAlert(
-            showIgnore: false,
-            showLater: false,
+          return _wrapWithUpgradeAlert(
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(

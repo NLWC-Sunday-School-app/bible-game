@@ -1,11 +1,11 @@
 {
-    "name": "bible_games",
-    "short_name": "bible_games",
+    "name": "The Bible Game",
+    "short_name": "Bible Game",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#071428",
+    "theme_color": "#014AA0",
+    "description": "Test Your Knowledge of God's Word - Bible trivia games, daily devotionals, and more!",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,52 +1,100 @@
-<!DOCTYPE html><html><head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
+<!DOCTYPE html>
+<html>
+<head>
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="The Bible Game - Test Your Knowledge of God's Word">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="bible_games">
+  <meta name="apple-mobile-web-app-title" content="The Bible Game">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png">
 
-  <title>bible_games</title>
+  <title>The Bible Game</title>
   <link rel="manifest" href="manifest.json">
 
-  <script>
-    // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = null;
-  </script>
-  <!-- This script adds the flutter initialization JS code -->
-  <script src="flutter.js" defer=""></script>
-  <link rel="stylesheet" type="text/css" href="splash/style.css">
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-  <script src="splash/splash.js"></script>
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="The Bible Game">
+  <meta property="og:description" content="Test Your Knowledge of God's Word - Play Bible trivia games, daily devotionals, and more!">
+  <meta property="og:type" content="website">
+
+  <!-- Theme color for mobile browsers -->
+  <meta name="theme-color" content="#014AA0">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #071428;
+      overflow: hidden;
+    }
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(180deg, #071428 0%, #0D1E3E 30%, #0A1A3A 65%, #0D2050 100%);
+    }
+    .loading-title {
+      font-family: 'Georgia', serif;
+      font-size: 32px;
+      color: #FFD700;
+      text-align: center;
+      margin-bottom: 24px;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+    .loading-subtitle {
+      font-family: 'Arial', sans-serif;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 30px;
+    }
+    .loading-bar-track {
+      width: 200px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .loading-bar-fill {
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, #FFE57A, #FFD700, #FFA500);
+      border-radius: 4px;
+      animation: loading 1.5s ease-in-out infinite;
+    }
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+  </style>
+
+  <script src="flutter.js" defer></script>
 </head>
 <body>
+  <div class="loading-container" id="loading">
+    <div class="loading-title">THE BIBLE<br>GAME</div>
+    <div class="loading-subtitle">Loading...</div>
+    <div class="loading-bar-track">
+      <div class="loading-bar-fill"></div>
+    </div>
+  </div>
+
   <script>
     window.addEventListener('load', function(ev) {
-      // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
+          serviceWorkerVersion: null,
         },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
@@ -56,6 +104,5 @@
       });
     });
   </script>
-
-
-</body></html>
+</body>
+</html>
