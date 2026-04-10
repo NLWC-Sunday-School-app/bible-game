@@ -203,9 +203,12 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
           );
         }
       },
-      child: Scaffold(
-        body: _pages[_selectedTabIndex],
-        bottomNavigationBar: _bottomNavigationBar(context, _selectedTabIndex),
+      child: PopScope(
+        canPop: false,
+        child: Scaffold(
+          body: _pages[_selectedTabIndex],
+          bottomNavigationBar: _bottomNavigationBar(context, _selectedTabIndex),
+        ),
       ),
     );
   }
