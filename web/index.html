@@ -187,6 +187,18 @@
   </style>
 
   <script src="flutter.js" defer></script>
+  <script>
+    // Prevent browser back-swipe / back button from leaving the app.
+    // Push an extra history entry immediately so there is always something
+    // to "go back to" within the app, then re-push it on every popstate
+    // so the browser can never actually navigate away.
+    (function() {
+      history.pushState(null, '', window.location.href);
+      window.addEventListener('popstate', function() {
+        history.pushState(null, '', window.location.href);
+      });
+    })();
+  </script>
 </head>
 <body>
   <div id="flutter-host">
