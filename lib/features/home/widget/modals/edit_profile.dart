@@ -3,190 +3,281 @@ import 'package:bible_game_api/utils/api_exception.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:get/get.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
-import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
 
 void showEditProfileModal(BuildContext context) {
   showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return EditProfileModal();
-      });
+    context: context,
+    barrierColor: Colors.black.withOpacity(0.75),
+    builder: (BuildContext context) {
+      return Dialog(
+        insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+        backgroundColor: Colors.transparent,
+        child: const EditProfileModal(),
+      );
+    },
+  );
 }
 
 class EditProfileModal extends StatefulWidget {
-  const EditProfileModal({Key? key}) : super(key: key);
+  const EditProfileModal({super.key});
 
   @override
   State<EditProfileModal> createState() => _EditProfileState();
 }
 
-class _EditProfileState extends State<EditProfileModal> {
+class _EditProfileState extends State<EditProfileModal>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _updateFormKey = GlobalKey<FormState>();
-
   final nameController = TextEditingController();
-  bool isToggle = true;
-  GetStorage box = GetStorage();
+  final FocusNode _nameFocus = FocusNode();
+  late AnimationController _animController;
+  late Animation<double> _scaleAnim;
 
   @override
   void initState() {
     super.initState();
     nameController.text =
         BlocProvider.of<AuthenticationBloc>(context).state.user.name;
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _scaleAnim = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.elasticOut,
+    );
+    _animController.forward();
   }
 
-  void toggle() {
-    setState(() {
-      isToggle = !isToggle;
-    });
+  @override
+  void dispose() {
+    nameController.dispose();
+    _nameFocus.dispose();
+    _animController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     final tr = AppLocalization.tr(context);
-    final screenWidth =  MediaQuery.of(context).size.width;
-    final screenHeight =  MediaQuery.of(context).size.height;
-    return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
-      backgroundColor: Colors.transparent,
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: screenWidth >= 500
-              ? 500.h
-              : screenHeight >= 800
-                  ? 450.h
-                  : 500.h,
-          width: screenWidth >= 500 ? 600.w : 500.w,
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    return ScaleTransition(
+      scale: _scaleAnim,
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: bottomInset),
           child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(ProductImageRoutes.modalBg),
-                  fit: BoxFit.fill),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: const Color(0xFF5AA0F0).withOpacity(0.6),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4A9EFF).withOpacity(0.35),
+                  blurRadius: 28,
+                  spreadRadius: 2,
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.4),
+                  blurRadius: 20,
+                  spreadRadius: 4,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            child: Form(
-              key: _updateFormKey,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22.r),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    height: 50.h,
+                  // ── Header ──
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.only(top: 20.h, bottom: 28.h),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF2E7FE8),
+                          Color(0xFF1565C0),
+                          Color(0xFF0D50A0),
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        // Close
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 16.w),
+                            child: GestureDetector(
+                              onTap: () {
+                                soundManager.playClickSound();
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                width: 32.w,
+                                height: 32.w,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.15),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.close_rounded,
+                                  color: Colors.white.withOpacity(0.8),
+                                  size: 18.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        // Emblem
+                        Container(
+                          width: 64.w,
+                          height: 64.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFFFFE066),
+                                Color(0xFFFFAA00),
+                                Color(0xFFFF8800),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFFAA00).withOpacity(0.4),
+                                blurRadius: 16,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.5),
+                              width: 3,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.edit_rounded,
+                            color: const Color(0xFF7A3800),
+                            size: 30.sp,
+                          ),
+                        ),
+                        SizedBox(height: 14.h),
+                        StrokeText(
+                          text: tr.t('auth_edit_profile'),
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Mikado',
+                            fontSize: 26.sp,
+                            fontWeight: FontWeight.w900,
+                          ),
+                          strokeColor: const Color(0xFF042A6B),
+                          strokeWidth: 5,
+                        ),
+                        SizedBox(height: 6.h),
+                        Text(
+                          tr.t('auth_edit_profile_subtitle'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.white.withOpacity(0.65),
+                            fontFamily: 'Mikado',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  GestureDetector(
-                    onTap: () => {Navigator.pop(context)},
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 15.0.w),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Image.asset(
-                            IconImageRoutes.closeModal,
-                            width: 35.w,
-                          )
+
+                  // ── Gold divider ──
+                  Container(
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFFAA00),
+                          Color(0xFFFFD700),
+                          Color(0xFFFFE066),
+                          Color(0xFFFFD700),
+                          Color(0xFFFFAA00),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  StrokeText(
-                    text: tr.t('auth_edit_profile'),
-                    textStyle: TextStyle(
-                      color: const Color(0xFF1768B9),
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.w900,
-                    ),
-                    strokeColor: Colors.white,
-                    strokeWidth: 5,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    tr.t('auth_edit_profile_subtitle'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Mikado'),
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 45.0.w),
-                    child: SizedBox(
-                      child: TextFormField(
-                        controller: nameController,
-                        keyboardType: TextInputType.text,
-                        style: TextStyle(
-                            height: 1.5.sp,
-                            color: const Color(0xFF104387),
-                            fontSize: 14.sp,
-                            fontFamily: 'Mikado'),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color(0xFFD4DDDF),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          hintText: tr.t('auth_nickname_hint'),
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFD4DDDF),
-                              )),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: const BorderSide(
-                                  color: Color(0xFFD4DDDF), width: 1.5)),
-                        ),
-                        validator: (text) {
-                          var validation = Validator.validateName(text!);
-                          return validation;
-                        },
-                        onChanged: (text) => {},
+
+                  // ── Form ──
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.fromLTRB(24.w, 28.h, 24.w, 24.h),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF0C2244),
+                          Color(0xFF071832),
+                        ],
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: screenHeight <= 670.h ? 15.h : 20.h,
-                  ),
-                  BlocConsumer<UserBloc, UserState>(
-                    listener: (context, state) {
-                       if(state.updatedProfile){
-                         Navigator.pop(context);
-                         BlocProvider.of<AuthenticationBloc>(context).add(FetchUserDataRequested());
-                       }
-                       if(state.failedToUpdate == true){
-                         ApiException.showSnackBar(context);
-                       }
-                    },
-                    builder: (context, state) {
-                      return BlueButton(
-                        width: 250.w,
-                        buttonText: tr.t('auth_update_profile'),
-                        buttonIsLoading: state.isUpdatingProfile,
-                        onTap: () {
-                          if (_updateFormKey.currentState!.validate()){
-                            context.read<UserBloc>().add(
-                                UpdateUserProfile(nameController.text)
-                            );
-                          }
-
-                        },
-                      );
-                    },
-                  ),
-                  SizedBox(
-                    height: screenHeight <= 670.h ? 15.h : 20.h,
+                    child: Form(
+                      key: _updateFormKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildField(
+                            controller: nameController,
+                            focusNode: _nameFocus,
+                            hint: tr.t('auth_nickname_hint'),
+                            icon: Icons.person_outline_rounded,
+                            keyboardType: TextInputType.text,
+                            action: TextInputAction.done,
+                            onSubmit: (_) => _submitUpdate(soundManager),
+                            validator: (t) => Validator.validateName(t!),
+                          ),
+                          SizedBox(height: 28.h),
+                          BlocConsumer<UserBloc, UserState>(
+                            listener: (context, state) {
+                              if (state.updatedProfile) {
+                                Navigator.pop(context);
+                                BlocProvider.of<AuthenticationBloc>(context)
+                                    .add(FetchUserDataRequested());
+                              }
+                              if (state.failedToUpdate == true) {
+                                ApiException.showSnackBar(context);
+                              }
+                            },
+                            builder: (context, state) {
+                              return BlueButton(
+                                width: double.infinity,
+                                buttonText: tr.t('auth_update_profile'),
+                                buttonIsLoading: state.isUpdatingProfile,
+                                onTap: () => _submitUpdate(soundManager),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 12.h),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -195,5 +286,71 @@ class _EditProfileState extends State<EditProfileModal> {
         ),
       ),
     );
+  }
+
+  Widget _buildField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required String hint,
+    required IconData icon,
+    TextInputType? keyboardType,
+    TextInputAction? action,
+    String? Function(String?)? validator,
+    void Function(String)? onSubmit,
+  }) {
+    return TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: keyboardType,
+      textInputAction: action,
+      onFieldSubmitted: onSubmit,
+      style: TextStyle(color: Colors.white, fontSize: 14.sp),
+      validator: validator,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: const Color(0xFF0F2A4A),
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(left: 14.w, right: 10.w),
+          child: Icon(icon, color: const Color(0xFFFFBB33), size: 20.sp),
+        ),
+        prefixIconConstraints: BoxConstraints(minWidth: 44.w),
+        hintText: hint,
+        hintStyle: TextStyle(color: const Color(0xFF456080), fontSize: 14.sp),
+        errorStyle: TextStyle(
+          fontSize: 11.sp,
+          color: const Color(0xFFFF6B6B),
+          fontWeight: FontWeight.w500,
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: const BorderSide(color: Color(0xFF1A3A5E), width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: const BorderSide(color: Color(0xFFFFBB33), width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: const BorderSide(color: Color(0xFFFF6B6B), width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: const BorderSide(color: Color(0xFFFF6B6B), width: 2),
+        ),
+      ),
+    );
+  }
+
+  void _submitUpdate(dynamic soundManager) {
+    soundManager.playClickSound();
+    FocusScope.of(context).unfocus();
+    if (_updateFormKey.currentState!.validate()) {
+      context.read<UserBloc>().add(UpdateUserProfile(nameController.text));
+    }
   }
 }

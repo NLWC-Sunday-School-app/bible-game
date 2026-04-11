@@ -1,104 +1,163 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:stroke_text/stroke_text.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-import 'package:bible_game/shared/widgets/blue_button.dart';
-import '../../../../shared/constants/image_routes.dart';
+import '../../../../shared/widgets/blue_button.dart';
 import 'login_modal.dart';
 
 void showResetPasswordSuccessModal(BuildContext context) {
   showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ResetPasswordSuccessModal();
-      });
+    context: context,
+    barrierColor: Colors.black.withOpacity(0.75),
+    builder: (BuildContext context) {
+      return Dialog(
+        insetPadding: EdgeInsets.symmetric(horizontal: 40.w),
+        backgroundColor: Colors.transparent,
+        child: const ResetPasswordSuccessModal(),
+      );
+    },
+  );
 }
 
 class ResetPasswordSuccessModal extends StatelessWidget {
-  const ResetPasswordSuccessModal({Key? key}) : super(key: key);
+  const ResetPasswordSuccessModal({super.key});
 
   @override
   Widget build(BuildContext context) {
     final tr = AppLocalization.tr(context);
-    final screenWidth =  MediaQuery.of(context).size.width;
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      backgroundColor: Colors.transparent,
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: screenWidth >= 500 ? 450.h : 500.h,
-          width: screenWidth >= 500 ? 600.h : 350.w,
-          child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(ProductImageRoutes.modalBg),
-                  fit: BoxFit.fill),
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24.r),
+        border: Border.all(
+          color: const Color(0xFF5AA0F0).withOpacity(0.6),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4A9EFF).withOpacity(0.35),
+            blurRadius: 28,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 20,
+            spreadRadius: 4,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22.r),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 24.w),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF1565C0),
+                Color(0xFF0C2244),
+                Color(0xFF071832),
+              ],
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 50.h,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 15.0.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Image.asset(
-                          IconImageRoutes.closeModal,
-                          width: 40.w,
-                        )
-                      ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Close
+              Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 32.w,
+                    height: 32.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.15),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.close_rounded,
+                      color: Colors.white.withOpacity(0.8),
+                      size: 18.sp,
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
+              ),
+              SizedBox(height: 8.h),
+
+              // Success icon
+              Container(
+                width: 80.w,
+                height: 80.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF7BED9F),
+                      Color(0xFF2ECC71),
+                      Color(0xFF1A9A54),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2ECC71).withOpacity(0.4),
+                      blurRadius: 20,
+                      spreadRadius: 4,
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.5),
+                    width: 3,
+                  ),
                 ),
-                Image.asset(
-                  ProductImageRoutes.successfulMark,
-                  width: 80.w,
+                child: Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 40.sp,
                 ),
-                const SizedBox(
-                  height: 50,
+              ),
+              SizedBox(height: 24.h),
+
+              StrokeText(
+                text: tr.t('auth_new_password_set'),
+                textStyle: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Mikado',
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w900,
                 ),
-                AutoSizeText(
-                  tr.t('auth_new_password_set'),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF4075BB)),
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-                BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, state) {
-                    return state.user.id == 0
-                        ? BlueButton(
-                            buttonText: tr.t('auth_log_in_button'),
-                            buttonIsLoading: false,
-                            width: 250.w,
-                            onTap: () {
-                              Navigator.pop(context);
-                              showLoginModal(context);
-                            },
-                          )
-                        : SizedBox();
-                  },
-                ),
-              ],
-            ),
+                strokeColor: const Color(0xFF042A6B),
+                strokeWidth: 5,
+              ),
+              SizedBox(height: 24.h),
+
+              BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, state) {
+                  return state.user.id == 0
+                      ? BlueButton(
+                          buttonText: tr.t('auth_log_in_button'),
+                          buttonIsLoading: false,
+                          width: double.infinity,
+                          onTap: () {
+                            Navigator.pop(context);
+                            showLoginModal(context);
+                          },
+                        )
+                      : const SizedBox();
+                },
+              ),
+              SizedBox(height: 12.h),
+            ],
           ),
         ),
       ),

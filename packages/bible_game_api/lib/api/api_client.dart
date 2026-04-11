@@ -22,7 +22,8 @@ class ApiClient {
         options.headers = {
           'Content-Type': 'application/json; charset=UTF-8',
           'accept': '*/*',
-          'Authorization': 'Bearer $token'
+          if (token != null && token!.isNotEmpty)
+            'Authorization': 'Bearer $token',
         };
         return handler.next(options); // Continue
       },

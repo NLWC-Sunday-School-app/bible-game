@@ -13,11 +13,14 @@ class AuthenticationAPI {
         'email': email,
         'password': password,
         'fcmToken': fcmToken,
-        'country': country
+        'country': country,
+        'deviceName': deviceName,
+        'deviceOs': deviceOs,
       });
-      return response.statusCode == 200;
+      return response.statusCode == 200 || response.statusCode == 201;
     } on ApiException catch (e) {
-      return false;
+      ApiException.errorMessage = e.message['error'] ?? e.message['message'] ?? 'Registration failed';
+      rethrow;
     }
   }
 

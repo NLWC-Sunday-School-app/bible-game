@@ -2,31 +2,26 @@ import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
-
 import '../../../../shared/constants/app_routes.dart';
-import '../../../../shared/constants/image_routes.dart';
-import '../../../../shared/utils/avatar_credentials.dart';
+import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../../shared/widgets/multi_avatar.dart';
 
 void showLogoutModal(BuildContext context) {
   showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: const Color.fromRGBO(40, 40, 40, 0.95),
-      builder: (BuildContext context) {
-        return Dialog(
-          insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
-          backgroundColor: Colors.transparent,
-          insetAnimationCurve: Curves.easeIn,
-          insetAnimationDuration: const Duration(milliseconds: 500),
-          child: LogoutModal(),
-        );
-      });
+    context: context,
+    barrierDismissible: false,
+    barrierColor: Colors.black.withOpacity(0.8),
+    builder: (BuildContext context) {
+      return Dialog(
+        insetPadding: EdgeInsets.symmetric(horizontal: 30.w),
+        backgroundColor: Colors.transparent,
+        child: const LogoutModal(),
+      );
+    },
+  );
 }
 
 class LogoutModal extends StatelessWidget {
@@ -34,7 +29,9 @@ class LogoutModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final soundManager = context.read<SettingsBloc>().soundManager;
     final tr = AppLocalization.tr(context);
+
     return BlocConsumer<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
         if (state.hasLoggedOut) {
@@ -46,132 +43,206 @@ class LogoutModal extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        return SizedBox(
-          height: 400.h,
-          width: 350.h,
-          child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(ProductImageRoutes.streakModalBg),
-                fit: BoxFit.fill,
-              ),
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24.r),
+            border: Border.all(
+              color: const Color(0xFF5AA0F0).withOpacity(0.6),
+              width: 2,
             ),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 20.h,
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 40.w,
-                    ),
-                    Spacer(),
-                    StrokeText(
-                      text: tr.t('auth_logout'),
-                      textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.w700),
-                      strokeColor: const Color(0xFF272D39),
-                      strokeWidth: 3,
-                    ),
-                    Spacer(),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Image.asset(
-                        IconImageRoutes.blueCircleCancel,
-                        width: 35.w,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.w,
-                    ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4A9EFF).withOpacity(0.35),
+                blurRadius: 28,
+                spreadRadius: 2,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.4),
+                blurRadius: 20,
+                spreadRadius: 4,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22.r),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 28.h, horizontal: 24.w),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF1565C0),
+                    Color(0xFF0C2244),
+                    Color(0xFF071832),
                   ],
                 ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                Container(
-                    padding: EdgeInsets.all(5.w),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Close + title row
+                  Row(
+                    children: [
+                      SizedBox(width: 32.w),
+                      const Spacer(),
+                      StrokeText(
+                        text: tr.t('auth_logout'),
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Mikado',
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w900,
+                        ),
+                        strokeColor: const Color(0xFF042A6B),
+                        strokeWidth: 4,
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          soundManager.playClickSound();
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 32.w,
+                          height: 32.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.15),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.close_rounded,
+                            color: Colors.white.withOpacity(0.8),
+                            size: 18.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+
+                  // Avatar
+                  Container(
+                    padding: EdgeInsets.all(3.w),
                     decoration: BoxDecoration(
-                      color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        width: 4.w,
-                        color: const Color(0xFF4A91FF),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFFFF6B6B),
+                          Color(0xFFEE5A24),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFEE5A24).withOpacity(0.3),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(3.w),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF0C2244),
+                      ),
+                      child: AvatarWidget(
+                        seed: state.user.id.toString(),
+                        width: 64.w,
+                        height: 64.w,
                       ),
                     ),
-                    child:
-                        // SvgPicture.network(
-                        //   '${AvatarCredentials.BaseURL}/${state.user.id}.svg?apikey=${AvatarCredentials.APIKey}/',
-                        //   width: 70.w,
-                        //   semanticsLabel: 'avatar',
-                        //   placeholderBuilder: (BuildContext context) => Image.asset(ProductImageRoutes.defaultAvatar, width: 50.w,),
-                        // ),
-                        AvatarWidget(
-                      seed: state.user.id.toString(),
-                      width: 70.w,
-                      height: 70.h,
-                    )),
-                SizedBox(
-                  height: 20.h,
-                ),
-                Text(
-                  tr.t('auth_logout_confirm'),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20.sp,
-                    color: Colors.white,
                   ),
-                ),
-                SizedBox(
-                  height: 30.h,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    context
-                        .read<AuthenticationBloc>()
-                        .add(AuthenticationLogoutRequested());
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15.w),
+                  SizedBox(height: 20.h),
+
+                  Text(
+                    tr.t('auth_logout_confirm'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.sp,
+                      color: Colors.white.withOpacity(0.8),
+                      fontFamily: 'Mikado',
+                    ),
+                  ),
+                  SizedBox(height: 28.h),
+
+                  // Log out button
+                  GestureDetector(
+                    onTap: () {
+                      soundManager.playClickSound();
+                      context
+                          .read<AuthenticationBloc>()
+                          .add(AuthenticationLogoutRequested());
+                    },
                     child: Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 15.h),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
                       decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(
-                              ProductImageRoutes.streakRestoreButtonBg),
-                          fit: BoxFit.fill,
+                        borderRadius: BorderRadius.circular(14.r),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFF6B6B), Color(0xFFEE5A24)],
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFEE5A24).withOpacity(0.3),
+                            offset: const Offset(0, 4),
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
                       child: Center(
                         child: state.isLoggingOut
                             ? SizedBox(
                                 height: 20.h,
                                 width: 20.w,
-                                child: CircularProgressIndicator(
+                                child: const CircularProgressIndicator(
                                   color: Colors.white,
-                                  strokeWidth: 3,
+                                  strokeWidth: 2.5,
                                 ),
                               )
                             : StrokeText(
                                 text: tr.t('auth_logout_yes'),
                                 textStyle: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 18.sp,
+                                  fontSize: 16.sp,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                strokeColor: const Color(0xFF272D39),
+                                strokeColor: const Color(0xFF7A1A00),
                                 strokeWidth: 3,
                               ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(height: 12.h),
+
+                  // Cancel
+                  GestureDetector(
+                    onTap: () {
+                      soundManager.playClickSound();
+                      Navigator.pop(context);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

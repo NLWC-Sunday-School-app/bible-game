@@ -124,7 +124,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
         toolbarHeight: 0,
         backgroundColor: AppColors.primaryColorShade, // Status bar color
       ),
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: const Color(0xFF014AA0),
       body: BlocBuilder<ConnectivityBloc, ConnectivityState>(
         builder: (context, connectivityState) {
           if (!connectivityState.isOnline) {

@@ -108,26 +108,31 @@ class AuthenticationBloc
   ) async {
     emit(state.copyWith(isLoadingLogin: true, failedToRegister: false));
 
-    final success = await _authenticationRepository.register(
-        event.name, event.email, event.password, event.fcmToken, event.country, event.deviceName, event.deviceOs);
-    if (success) {
-      final response =
-      await _authenticationRepository.logIn(event.email, event.password, event.deviceName, event.deviceOs);
-      if (response.containsKey('token')) {
-        emit(state.copyWith(
-          isLoggedIn: true,
-          isLoadingLogin: false,
-          token: response['token'],
-          refreshToken: response['refreshToken'],
-          failedToRegister: false,
-        ));
-        Future.delayed(Duration(seconds: 1), () {
-          add(FetchUserDataRequested());
-          add(UpdateFCMToken());
-        });
+    try {
+      final success = await _authenticationRepository.register(
+          event.name, event.email, event.password, event.fcmToken, event.country, event.deviceName, event.deviceOs);
+      if (success) {
+        final response =
+        await _authenticationRepository.logIn(event.email, event.password, event.deviceName, event.deviceOs);
+        if (response.containsKey('token')) {
+          emit(state.copyWith(
+            isLoggedIn: true,
+            isLoadingLogin: false,
+            token: response['token'],
+            refreshToken: response['refreshToken'],
+            failedToRegister: false,
+          ));
+          Future.delayed(Duration(seconds: 1), () {
+            add(FetchUserDataRequested());
+            add(UpdateFCMToken());
+          });
+          emit(state.copyWith(isLoadingLogin: false, failedToRegister: false));
+        }
+      } else {
+        emit(state.copyWith(isLoadingLogin: false, failedToRegister: true));
         emit(state.copyWith(isLoadingLogin: false, failedToRegister: false));
       }
-    } else {
+    } catch (e) {
       emit(state.copyWith(isLoadingLogin: false, failedToRegister: true));
       emit(state.copyWith(isLoadingLogin: false, failedToRegister: false));
     }

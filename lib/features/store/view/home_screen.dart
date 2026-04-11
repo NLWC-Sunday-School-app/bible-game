@@ -10,15 +10,14 @@ import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/constants/colors.dart';
 import '../../../shared/constants/image_routes.dart';
-import '../../../shared/widgets/green_button.dart';
-import '../../home/widget/modals/create_profile_modal.dart';
-import '../../home/widget/modals/login_modal.dart';
 import 'package:intl/intl.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import '../bloc/power_up_bloc.dart';
 import '../bloc/power_up_event.dart';
 import '../bloc/power_up_state.dart';
 import '../model/power_up.dart';
+import '../../../shared/widgets/login_gate_widget.dart';
+import '../../../shared/widgets/screen_app_bar.dart';
 
 class StoreHomeScreen extends StatefulWidget {
   const StoreHomeScreen({super.key});
@@ -104,128 +103,91 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
         toolbarHeight: 0,
         backgroundColor: AppColors.primaryColorShade,
       ),
-      backgroundColor: const Color(0xFF3887E1),
-      body: BlocListener<PowerUpBloc, PowerUpState>(
-        listenWhen: (prev, curr) =>
-            prev.isPurchasing && !curr.isPurchasing,
-        listener: (context, powerUpState) {
-          final soundManager = context.read<SettingsBloc>().soundManager;
-          if (powerUpState.error != null) {
-            // Purchase failed
-            _showToast(context, powerUpState.error!);
-          } else if (powerUpState.lastPurchased != null) {
-            // Purchase succeeded — refresh user balance
-            soundManager.playAchievementSound();
-            context.read<AuthenticationBloc>().add(FetchUserDataRequested());
-            final item = PowerUpItem.allPowerUps
-                .firstWhere((p) => p.type == powerUpState.lastPurchased);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
+      backgroundColor: const Color(0xFF014AA0),
+      body: SafeArea(
+        child: BlocListener<PowerUpBloc, PowerUpState>(
+          listenWhen: (prev, curr) =>
+              prev.isPurchasing && !curr.isPurchasing,
+          listener: (context, powerUpState) {
+            final soundManager = context.read<SettingsBloc>().soundManager;
+            if (powerUpState.error != null) {
+              _showToast(context, powerUpState.error!);
+            } else if (powerUpState.lastPurchased != null) {
+              soundManager.playAchievementSound();
+              context.read<AuthenticationBloc>().add(FetchUserDataRequested());
+              final item = PowerUpItem.allPowerUps
+                  .firstWhere((p) => p.type == powerUpState.lastPurchased);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Image.asset(item.iconPath, width: 20.w, height: 20.w),
+                      SizedBox(width: 8.w),
+                      Text(
+                        '${item.name} purchased!',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: const Color(0xFF7FB800),
+                  duration: const Duration(seconds: 2),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+            builder: (context, state) {
+              final user = state.user;
+              return Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(ProductImageRoutes.patternTwoBg),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Column(
                   children: [
-                    Image.asset(item.iconPath, width: 20.w, height: 20.w),
-                    SizedBox(width: 8.w),
-                    Text(
-                      '${item.name} purchased!',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ScreenAppBar(
+                      height: 55.h,
+                      widgets: [
+                        Center(
+                          child: StrokeText(
+                            text: tr.t('store_title'),
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26.sp,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            strokeColor: AppColors.titleDropShadowColor,
+                            strokeWidth: 6,
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+                    Expanded(
+                      child: user.id != 0
+                          ? _buildStoreContent(context, state, formatter, soundManager, tr)
+                          : _buildLoginContent(context, soundManager, tr),
                     ),
                   ],
                 ),
-                backgroundColor: const Color(0xFF7FB800),
-                duration: const Duration(seconds: 2),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
-        },
-        child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-        builder: (context, state) {
-          final user = state.user;
-          return Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(ProductImageRoutes.patternTwoBg),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: user.id != 0
-                ? _buildStoreContent(context, state, formatter, soundManager, tr)
-                : _buildLoginContent(context, soundManager, tr),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildLoginContent(
       BuildContext context, dynamic soundManager, dynamic tr) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          StrokeText(
-            text: tr.t('store_title'),
-            textStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 28.sp,
-              fontWeight: FontWeight.w900,
-            ),
-            strokeColor: AppColors.titleDropShadowColor,
-            strokeWidth: 6,
-          ),
-          SizedBox(height: 40.h),
-          GreenButton(
-            onTap: () {
-              soundManager.playClickSound();
-              showLoginModal(context);
-            },
-            buttonIsLoading: false,
-            width: 350.w,
-            customWidget: Center(
-              child: StrokeText(
-                text: tr.t('profile_log_in'),
-                textStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-                strokeColor: const Color(0xFF272D39),
-                strokeWidth: 3,
-              ),
-            ),
-          ),
-          SizedBox(height: 20.h),
-          GestureDetector(
-            onTap: () {
-              soundManager.playClickSound();
-              showCreateProfileModal(context);
-            },
-            child: Container(
-              width: 350.w,
-              padding: EdgeInsets.symmetric(vertical: 15.h),
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(ProductImageRoutes.newBlueBtnBg),
-                  fit: BoxFit.fill,
-                ),
-              ),
-              child: Center(
-                child: StrokeText(
-                  text: tr.t('auth_create_profile'),
-                  textStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  strokeColor: const Color(0xFF272D39),
-                  strokeWidth: 3,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return const LoginGateWidget(
+      featureTitle: 'Store',
+      subtitle: 'Log in or create a profile\nto access the Store!',
+      icon: Icons.storefront_rounded,
     );
   }
 
@@ -241,19 +203,6 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
       child: Column(
         children: [
           SizedBox(height: 10.h),
-
-          // ── Title ──
-          StrokeText(
-            text: tr.t('store_title'),
-            textStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 24.sp,
-              fontWeight: FontWeight.w900,
-            ),
-            strokeColor: AppColors.titleDropShadowColor,
-            strokeWidth: 6,
-          ),
-          SizedBox(height: 12.h),
 
           // ── Wallet Bar ──
           _buildWalletBar(authState, formatter),

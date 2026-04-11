@@ -10,12 +10,10 @@ import '../../../shared/constants/colors.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/connectivity/bloc/connectivity_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
-import '../../../shared/widgets/green_button.dart';
 import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
 import '../../../shared/widgets/tab_button.dart';
-import '../../home/widget/modals/create_profile_modal.dart';
-import '../../home/widget/modals/login_modal.dart';
+import '../../../shared/widgets/login_gate_widget.dart';
 
 class FantasyLeagueHomeScreen extends StatefulWidget {
   const FantasyLeagueHomeScreen({super.key});
@@ -100,59 +98,10 @@ class _FantasyLeagueHomeScreenState extends State<FantasyLeagueHomeScreen> {
                     final isLoggedIn = context.read<AuthenticationBloc>().state.user.id != 0;
 
                     if (!isLoggedIn) {
-                      return Column(
-                        children: [
-                          SizedBox(height: 100.h),
-                          GreenButton(
-                            onTap: () {
-                              soundManager.playClickSound();
-                              showLoginModal(context);
-                            },
-                            buttonIsLoading: false,
-                            width: 350.w,
-                            customWidget: Center(
-                              child: StrokeText(
-                                text: 'Log In',
-                                textStyle: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                strokeColor: const Color(0xFF272D39),
-                                strokeWidth: 3,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 30.h),
-                          GestureDetector(
-                            onTap: () {
-                              soundManager.playClickSound();
-                              showCreateProfileModal(context);
-                            },
-                            child: Container(
-                              width: 350.w,
-                              padding: EdgeInsets.symmetric(vertical: 15.h),
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(ProductImageRoutes.newBlueBtnBg),
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                              child: Center(
-                                child: StrokeText(
-                                  text: 'Create Profile',
-                                  textStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  strokeColor: const Color(0xFF272D39),
-                                  strokeWidth: 3,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      return const LoginGateWidget(
+                        featureTitle: 'Fantasy League',
+                        subtitle: 'Log in or create a profile\nto join the Fantasy Bible League!',
+                        icon: Icons.emoji_events_rounded,
                       );
                     }
 
