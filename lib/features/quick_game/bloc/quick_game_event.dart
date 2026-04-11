@@ -62,3 +62,9 @@ class UseFiftyFifty extends QuickGameEvent {
   @override
   List<Object> get props => [gameQuestion];
 }
+
+class UseTimeFreeze extends QuickGameEvent {}
+
+class UseSecondChance extends QuickGameEvent {}
+
+class ActivateDoubleCoins extends QuickGameEvent {}

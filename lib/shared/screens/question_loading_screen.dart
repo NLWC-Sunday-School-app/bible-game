@@ -40,13 +40,15 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
       final gameType = arguments['gameType'];
       final hasTimer = arguments['hasTimer'];
       final selectedLevel = arguments['selectedLevel'];
+      final doubleCoins = arguments['doubleCoins'] ?? false;
+      final secondChance = arguments['secondChance'] ?? false;
       if (gameType == 'quick_game') {
         context.read<QuickGameBloc>().add(FetchQuickGameQuestions());
         context.read<QuickGameBloc>().stream.listen((state) {
           if (state.quickGameQuestionLoaded!) {
             Timer(Duration(seconds: 5), () {
               if (mounted && !_isModalShown) {
-                showQuickGameTipsModal(context, hasTimer);
+                showQuickGameTipsModal(context, hasTimer, doubleCoins: doubleCoins, secondChance: secondChance);
                 _isModalShown = true;
               }
             });

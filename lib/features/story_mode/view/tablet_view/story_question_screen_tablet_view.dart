@@ -11,27 +11,27 @@ import 'package:bible_game/shared/widgets/blue_button.dart';
 import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:bible_game/shared/widgets/power_up_bar.dart';
 import 'package:bible_game/shared/widgets/question_container.dart';
-import '../../store/bloc/power_up_bloc.dart';
-import '../../store/bloc/power_up_event.dart';
-import '../../store/bloc/power_up_state.dart';
-import '../../store/model/power_up.dart';
-import '../bloc/story_mode_bloc.dart';
-import '../widget/typing_text_widget.dart';
+import '../../../store/bloc/power_up_bloc.dart';
+import '../../../store/bloc/power_up_event.dart';
+import '../../../store/model/power_up.dart';
+import '../../bloc/story_mode_bloc.dart';
+import '../../widget/typing_text_widget.dart';
 import 'package:bible_game/features/story_mode/widget/modal/chapter_summary_modal.dart';
 
-class StoryQuestionScreen extends StatefulWidget {
-  const StoryQuestionScreen({super.key});
+class StoryQuestionScreenTabletView extends StatefulWidget {
+  const StoryQuestionScreenTabletView({super.key});
 
   @override
-  State<StoryQuestionScreen> createState() => _StoryQuestionScreenState();
+  State<StoryQuestionScreenTabletView> createState() =>
+      _StoryQuestionScreenTabletViewState();
 }
 
-class _StoryQuestionScreenState extends State<StoryQuestionScreen>
+class _StoryQuestionScreenTabletViewState
+    extends State<StoryQuestionScreenTabletView>
     with TickerProviderStateMixin {
   late AnimationController _timerController;
   late ConfettiController _confettiController;
 
-  // Tracks whether the current narrative segment has finished typing
   bool _typingComplete = false;
 
   // Power-up local state
@@ -53,7 +53,6 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
 
     _timerController.addStatusListener((status) {
       if (status == AnimationStatus.dismissed) {
-        // Timer counted all the way down — treat as expired
         if (mounted) {
           context.read<StoryModeBloc>().add(TimerExpired());
         }
@@ -68,10 +67,6 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
     super.dispose();
   }
 
-  // -------------------------------------------------------------------------
-  // Timer helpers
-  // -------------------------------------------------------------------------
-
   void _startTimer(Map<String, dynamic> chapter) {
     final timerEnabled = chapter['timerEnabled'] as bool? ?? false;
     if (!timerEnabled) return;
@@ -82,13 +77,8 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
 
   int _getRemainingTime(Map<String, dynamic> chapter) {
     final duration = chapter['timerDurationSeconds'] as int? ?? 30;
-    // _timerController.value goes 1.0 → 0.0 as time counts down
     return (_timerController.value * duration).round();
   }
-
-  // -------------------------------------------------------------------------
-  // Power-up helpers
-  // -------------------------------------------------------------------------
 
   void _resetPowerUpsForQuestion() {
     setState(() {
@@ -125,10 +115,6 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
     showCustomToast(context, '\u{2744} Time Freeze! +30s');
   }
 
-  // -------------------------------------------------------------------------
-  // Chapter lookup
-  // -------------------------------------------------------------------------
-
   Map<String, dynamic>? _currentChapter(StoryModeState state) {
     if (state.selectedArcId.isEmpty || state.selectedChapterId.isEmpty) {
       return null;
@@ -148,10 +134,6 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
     }
   }
 
-  // -------------------------------------------------------------------------
-  // Question conversion
-  // -------------------------------------------------------------------------
-
   GameQuestion _toGameQuestion(Map<String, dynamic> q) {
     return GameQuestion(
       instruction: q['instruction'] as String? ?? 'Story Mode',
@@ -160,10 +142,6 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
       options: List<String>.from(q['options'] as List),
     );
   }
-
-  // -------------------------------------------------------------------------
-  // Build
-  // -------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +176,6 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
         }
 
         if (!state.hasAnswered && !state.chapterCompleted) {
-          // New question loaded — restart timer and reset power-ups
           _resetPowerUpsForQuestion();
           if (chapter != null) _startTimer(chapter);
         }
@@ -207,8 +184,7 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
         final chapter = _currentChapter(state);
         if (chapter == null) return const SizedBox.shrink();
 
-        final narratives =
-            chapter['narratives'] as List? ?? <dynamic>[];
+        final narratives = chapter['narratives'] as List? ?? <dynamic>[];
         final questions =
             chapter['questions'] as List<Map<String, dynamic>>;
 
@@ -221,9 +197,8 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
           ),
           body: Stack(
             children: [
-              // Phase router
               if (!state.narrativeComplete)
-                _NarrativeView(
+                _NarrativeViewTablet(
                   chapter: chapter,
                   narratives: narratives,
                   currentIndex: state.currentNarrativeIndex,
@@ -242,7 +217,7 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
                   },
                 )
               else
-                _QuestionPhase(
+                _QuestionPhaseTablet(
                   state: state,
                   chapter: chapter,
                   questions: questions,
@@ -256,7 +231,6 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
                   onUseTimeFreeze: (duration) => _useTimeFreeze(duration),
                 ),
 
-              // Confetti overlay
               Align(
                 alignment: Alignment.topCenter,
                 child: ConfettiWidget(
@@ -281,11 +255,11 @@ class _StoryQuestionScreenState extends State<StoryQuestionScreen>
 }
 
 // =============================================================================
-// Narrative Phase
+// Narrative Phase (Tablet)
 // =============================================================================
 
-class _NarrativeView extends StatelessWidget {
-  const _NarrativeView({
+class _NarrativeViewTablet extends StatelessWidget {
+  const _NarrativeViewTablet({
     required this.chapter,
     required this.narratives,
     required this.currentIndex,
@@ -334,145 +308,150 @@ class _NarrativeView extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Chapter title
-              Text(
-                chapter['title'] as String? ?? '',
-                style: TextStyle(
-                  color: AppColors.accentColor,
-                  fontFamily: 'Neuland',
-                  fontSize: 18.sp,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              SizedBox(height: 4.h),
-              // Segment indicator
-              Text(
-                _segmentLabel,
-                style: TextStyle(
-                  color: Colors.white54,
-                  fontSize: 12.sp,
-                ),
-              ),
-              SizedBox(height: 16.h),
-
-              // Narrative card
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: onTapCard,
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0A0A1A).withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(
-                        color: AppColors.accentColor.withValues(alpha: 0.3),
-                      ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 620.w),
+            child: Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    chapter['title'] as String? ?? '',
+                    style: TextStyle(
+                      color: AppColors.accentColor,
+                      fontFamily: 'Neuland',
+                      fontSize: 18.sp,
+                      letterSpacing: 0.5,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '\u{1F4DC}',
-                              style: TextStyle(fontSize: 18.sp),
-                            ),
-                            SizedBox(width: 8.w),
-                            Text(
-                              'The Story',
-                              style: TextStyle(
-                                color: AppColors.accentColor,
-                                fontFamily: 'Neuland',
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.h),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: TypingTextWidget(
-                              key: ValueKey('narrative_$currentIndex'),
-                              text: _currentText,
-                              charsPerSecond: 38,
-                              onComplete: onTypingComplete,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.sp,
-                                height: 1.75,
-                              ),
-                            ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    _segmentLabel,
+                    style: TextStyle(
+                      color: Colors.white54,
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: onTapCard,
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(24.w),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0A0A1A)
+                              .withValues(alpha: 0.7),
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: AppColors.accentColor
+                                .withValues(alpha: 0.3),
                           ),
                         ),
-                        // "Tap to continue" prompt — only when typing is done
-                        AnimatedOpacity(
-                          opacity: typingComplete ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 400),
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 12.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
                                 Text(
-                                  _isLastSegment
-                                      ? 'Ready to answer \u2192'
-                                      : 'Tap to continue \u2192',
+                                  '\u{1F4DC}',
+                                  style: TextStyle(fontSize: 20.sp),
+                                ),
+                                SizedBox(width: 10.w),
+                                Text(
+                                  'The Story',
                                   style: TextStyle(
-                                    color: AppColors.accentColor
-                                        .withValues(alpha: 0.85),
-                                    fontSize: 12.sp,
-                                    fontStyle: FontStyle.italic,
+                                    color: AppColors.accentColor,
+                                    fontFamily: 'Neuland',
+                                    fontSize: 15.sp,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 16.h),
-
-              // "Begin Questions" button — shown when last segment is fully typed
-              if (typingComplete && _isLastSegment)
-                BlueButton(
-                  onTap: onBeginQuestions,
-                  buttonText: 'Begin Questions',
-                  buttonIsLoading: false,
-                  width: double.infinity,
-                )
-              else
-                // "Skip Story" link — always available until last segment
-                GestureDetector(
-                  onTap: onBeginQuestions,
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                    child: Center(
-                      child: Text(
-                        'Skip Story  \u00BB',
-                        style: TextStyle(
-                          color: Colors.white38,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.3,
+                            SizedBox(height: 18.h),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: TypingTextWidget(
+                                  key: ValueKey(
+                                      'narrative_$currentIndex'),
+                                  text: _currentText,
+                                  charsPerSecond: 38,
+                                  onComplete: onTypingComplete,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15.sp,
+                                    height: 1.8,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            AnimatedOpacity(
+                              opacity: typingComplete ? 1.0 : 0.0,
+                              duration:
+                                  const Duration(milliseconds: 400),
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 14.h),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      _isLastSegment
+                                          ? 'Ready to answer \u2192'
+                                          : 'Tap to continue \u2192',
+                                      style: TextStyle(
+                                        color: AppColors.accentColor
+                                            .withValues(alpha: 0.85),
+                                        fontSize: 13.sp,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                ),
-              SizedBox(height: 12.h),
-            ],
+
+                  SizedBox(height: 18.h),
+
+                  if (typingComplete && _isLastSegment)
+                    BlueButton(
+                      onTap: onBeginQuestions,
+                      buttonText: 'Begin Questions',
+                      buttonIsLoading: false,
+                      width: double.infinity,
+                    )
+                  else
+                    GestureDetector(
+                      onTap: onBeginQuestions,
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        child: Center(
+                          child: Text(
+                            'Skip Story  \u00BB',
+                            style: TextStyle(
+                              color: Colors.white38,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 14.h),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -481,11 +460,11 @@ class _NarrativeView extends StatelessWidget {
 }
 
 // =============================================================================
-// Question Phase
+// Question Phase (Tablet)
 // =============================================================================
 
-class _QuestionPhase extends StatelessWidget {
-  const _QuestionPhase({
+class _QuestionPhaseTablet extends StatelessWidget {
+  const _QuestionPhaseTablet({
     required this.state,
     required this.chapter,
     required this.questions,
@@ -518,7 +497,6 @@ class _QuestionPhase extends StatelessWidget {
     final timerEnabled = chapter['timerEnabled'] as bool? ?? false;
     final timerDuration = chapter['timerDurationSeconds'] as int? ?? 30;
 
-    // Build power-up items from store inventory
     final powerUpState = context.watch<PowerUpBloc>().state;
     final powerUpItems = <PowerUpBarItem>[
       PowerUpBarItem(

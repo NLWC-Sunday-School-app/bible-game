@@ -87,22 +87,33 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
     }
   }
 
+  bool _didInit = false;
+
   @override
   void initState() {
     super.initState();
-    _precacheImages();
-    displayWelcomeModal();
-    displayCountryUpdateModal();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didInit) {
+      _didInit = true;
+      _precacheImages();
+      displayWelcomeModal();
+      displayCountryUpdateModal();
+    }
   }
 
   Widget  _bottomNavigationBar(BuildContext context, int _selectedTabIndex) {
     final soundManager = context.read<SettingsBloc>().soundManager;
     final tr = AppLocalization.tr(context);
-    return SafeArea(
-      top: false,
-      child: Container(
-        height: 120.h,
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+    return Container(
+        height: 91.h + bottomPadding,
+        padding: EdgeInsets.only(bottom: bottomPadding),
         decoration: BoxDecoration(
+          color: const Color(0xFF17397E),
           border: Border(
             top: BorderSide(
               width: 5.w,
@@ -159,7 +170,6 @@ class _BottomTabNavigationState extends State<BottomTabNavigation> {
               ),
             ],
           ),
-      ),
     );
   }
 

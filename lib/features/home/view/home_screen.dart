@@ -350,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 10.h,
                         ),
                         SizedBox(
-                          height: screenHeight - (200.h),
+                          height: screenHeight - (224.h),
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
@@ -649,12 +649,12 @@ class _DailyDevotionalBanner extends StatelessWidget {
                   ),
                 ),
                 if (state.devotionalStreak > 0) ...[
-                  Text('🔥', style: TextStyle(fontSize: 14.sp)),
+                  Text('📖', style: TextStyle(fontSize: 14.sp)),
                   SizedBox(width: 4.w),
                   Text(
-                    '${state.devotionalStreak}',
+                    '${state.devotionalStreak}d',
                     style: TextStyle(
-                      color: Colors.orange,
+                      color: const Color(0xFF7EC8E3),
                       fontWeight: FontWeight.bold,
                       fontSize: 14.sp,
                     ),

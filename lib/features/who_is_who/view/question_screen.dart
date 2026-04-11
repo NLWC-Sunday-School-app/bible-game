@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
@@ -5,12 +7,19 @@ import 'package:bible_game/features/who_is_who/widget/modal/not_enough_coins_mod
 import 'package:bible_game/features/who_is_who/widget/modal/wiw_time_up_modal.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/constants/colors.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/widgets/base_question_screen.dart';
+import 'package:bible_game/shared/widgets/power_up_bar.dart';
 import 'package:bible_game/shared/widgets/question_container.dart';
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/user/bloc/user_bloc.dart';
+import '../../../shared/widgets/custom_toast.dart';
 import '../../../shared/widgets/game_summary_modal.dart';
+import '../../store/bloc/power_up_bloc.dart';
+import '../../store/bloc/power_up_event.dart';
+import '../../store/bloc/power_up_state.dart';
+import '../../store/model/power_up.dart';
 
 class WhoIsWhoQuestionScreen extends StatefulWidget {
   const WhoIsWhoQuestionScreen({super.key});
@@ -24,6 +33,11 @@ class _WhoIsWhoQuestionScreenState
   late int gameDuration;
   late int questionsRequiredToPass;
   late int gameTimePurchasePrice;
+
+  // Power-up local state (per question)
+  bool _fiftyFiftyUsed = false;
+  bool _timeFreezeUsed = false;
+  List<int> _eliminatedOptionIndices = [];
 
   @override
   void initState() {
@@ -43,7 +57,46 @@ class _WhoIsWhoQuestionScreenState
     );
   }
 
+  void _resetPowerUpsForQuestion() {
+    setState(() {
+      _fiftyFiftyUsed = false;
+      _eliminatedOptionIndices = [];
+      // Time Freeze is NOT reset per question — it's one-time for the whole game
+    });
+  }
+
+  void _useTimeFreeze() {
+    if (_timeFreezeUsed) return;
+    setState(() => _timeFreezeUsed = true);
+    context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.timeFreeze));
+    // Add 30 seconds to the game-wide timer
+    // value goes 0→1, so subtract to add time back
+    final totalSeconds = gameDuration * 60;
+    final freezeBonus = 30.0 / totalSeconds;
+    final newValue = (animationController.value - freezeBonus).clamp(0.0, 1.0);
+    animationController.value = newValue;
+    showCustomToast(context, '\u{2744} Time Freeze! +30s');
+  }
+
+  void _useFiftyFifty(gameQuestion) {
+    if (_fiftyFiftyUsed) return;
+    final options = gameQuestion.options;
+    final correctAnswer = gameQuestion.answer;
+    final wrongIndices = <int>[];
+    for (int i = 0; i < options.length; i++) {
+      if (options[i] != correctAnswer) wrongIndices.add(i);
+    }
+    wrongIndices.shuffle(Random());
+    final toEliminate = wrongIndices.take(2).toList();
+    setState(() {
+      _fiftyFiftyUsed = true;
+      _eliminatedOptionIndices = toEliminate;
+    });
+    context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.fiftyFifty));
+  }
+
   void _moveToNextPage() {
+    _resetPowerUpsForQuestion();
     final wiwGameBloc = BlocProvider.of<WhoIsWhoBloc>(context);
     final authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
 
@@ -141,6 +194,33 @@ class _WhoIsWhoQuestionScreenState
           }
         },
         builder: (context, state) {
+          // Build power-up items from store inventory (50/50 only for game-wide timer modes)
+          final powerUpState = context.watch<PowerUpBloc>().state;
+          final powerUpItems = <PowerUpBarItem>[
+            PowerUpBarItem(
+              label: '50/50',
+              iconPath: IconImageRoutes.star,
+              quantity: powerUpState.getQuantity(PowerUpType.fiftyFifty),
+              isUsed: _fiftyFiftyUsed,
+              accentColor: const Color(0xFFFF6B6B),
+              onTap: () {
+                if (state.hasAnswered) return;
+                _useFiftyFifty(state.wiwGameQuestions![currentPage]);
+              },
+            ),
+            PowerUpBarItem(
+              label: 'Freeze',
+              iconPath: IconImageRoutes.greenTimer,
+              quantity: powerUpState.getQuantity(PowerUpType.timeFreeze),
+              isUsed: _timeFreezeUsed,
+              accentColor: const Color(0xFF54D6FF),
+              onTap: () {
+                if (state.hasAnswered) return;
+                _useTimeFreeze();
+              },
+            ),
+          ];
+
           return Scaffold(
             appBar: AppBar(
               elevation: 0,
@@ -174,6 +254,9 @@ class _WhoIsWhoQuestionScreenState
                     noOfCorrectAnswers: state.noOfCorrectAnswers,
                     whoIsWhoGameDuration: gameDuration,
                     gameMode: 'whoIsWho',
+                    fiftyFiftyUsed: _fiftyFiftyUsed,
+                    eliminatedOptionIndices: _eliminatedOptionIndices,
+                    powerUpItems: powerUpItems,
                   );
                 },
               ),

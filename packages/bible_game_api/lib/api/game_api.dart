@@ -258,12 +258,12 @@ class GameAPI {
     }
   }
 
-  Future<bool> buyFromStore(userId, amount) async {
+  Future<bool> buyFromStore(userId, amount, {String description = "Game Extra time"}) async {
     try {
       final response = await apiClient.post('/store/payment', data: {
         "userId": userId,
         "amount": amount,
-        "description": "Game Extra time"
+        "description": description,
       });
       return response.statusCode == 200;
     } on ApiException catch (e) {

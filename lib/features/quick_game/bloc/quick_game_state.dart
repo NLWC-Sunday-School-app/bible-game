@@ -23,8 +23,15 @@ class QuickGameState extends Equatable {
   final int noOfCorrectAnswers;
   final int currentStreak;
   final int bestStreak;
+  // Power-ups
   final bool fiftyFiftyUsed;
   final List<int> eliminatedOptionIndices;
+  final bool timeFreezeUsed;
+  final bool timeFreezeTriggered; // true for one frame when freeze fires
+  final bool doubleCoinsActive;
+  final bool secondChanceAvailable; // user owns & activated for this game
+  final bool secondChanceUsed; // consumed on first wrong answer
+  final bool secondChanceTriggered; // true for one frame when second chance fires
 
   const QuickGameState({
     this.quickGameTopics = const [],
@@ -51,6 +58,12 @@ class QuickGameState extends Equatable {
     this.bestStreak = 0,
     this.fiftyFiftyUsed = false,
     this.eliminatedOptionIndices = const [],
+    this.timeFreezeUsed = false,
+    this.timeFreezeTriggered = false,
+    this.doubleCoinsActive = false,
+    this.secondChanceAvailable = false,
+    this.secondChanceUsed = false,
+    this.secondChanceTriggered = false,
   });
 
   QuickGameState copyWith({
@@ -78,6 +91,12 @@ class QuickGameState extends Equatable {
     int? bestStreak,
     bool? fiftyFiftyUsed,
     List<int>? eliminatedOptionIndices,
+    bool? timeFreezeUsed,
+    bool? timeFreezeTriggered,
+    bool? doubleCoinsActive,
+    bool? secondChanceAvailable,
+    bool? secondChanceUsed,
+    bool? secondChanceTriggered,
   }) {
     return QuickGameState(
       quickGameTopics: quickGameTopics ?? this.quickGameTopics,
@@ -108,6 +127,12 @@ class QuickGameState extends Equatable {
       bestStreak: bestStreak ?? this.bestStreak,
       fiftyFiftyUsed: fiftyFiftyUsed ?? this.fiftyFiftyUsed,
       eliminatedOptionIndices: eliminatedOptionIndices ?? this.eliminatedOptionIndices,
+      timeFreezeUsed: timeFreezeUsed ?? this.timeFreezeUsed,
+      timeFreezeTriggered: timeFreezeTriggered ?? false,
+      doubleCoinsActive: doubleCoinsActive ?? this.doubleCoinsActive,
+      secondChanceAvailable: secondChanceAvailable ?? this.secondChanceAvailable,
+      secondChanceUsed: secondChanceUsed ?? this.secondChanceUsed,
+      secondChanceTriggered: secondChanceTriggered ?? false,
     );
   }
 
@@ -136,5 +161,11 @@ class QuickGameState extends Equatable {
         bestStreak,
         fiftyFiftyUsed,
         eliminatedOptionIndices,
+        timeFreezeUsed,
+        timeFreezeTriggered,
+        doubleCoinsActive,
+        secondChanceAvailable,
+        secondChanceUsed,
+        secondChanceTriggered,
       ];
 }

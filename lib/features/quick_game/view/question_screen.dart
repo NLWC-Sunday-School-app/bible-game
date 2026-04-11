@@ -6,14 +6,20 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/constants/app_routes.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:bible_game/shared/constants/colors.dart';
 import 'package:bible_game/shared/widgets/base_question_screen.dart';
 import 'package:bible_game/shared/widgets/game_summary_modal.dart';
+import 'package:bible_game/shared/widgets/power_up_bar.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/widgets/custom_toast.dart';
 import '../../../shared/widgets/question_container.dart';
+import '../../store/bloc/power_up_bloc.dart';
+import '../../store/bloc/power_up_event.dart';
+import '../../store/bloc/power_up_state.dart';
+import '../../store/model/power_up.dart';
 import '../bloc/quick_game_bloc.dart';
 import '../repository/quick_game_repository.dart';
 
@@ -91,6 +97,16 @@ class _QuickGameQuestionScreenState
       duration: Duration(seconds: durationPerQuestion),
       onTimerComplete: hasTimer ? _moveToNextPage : null,
     );
+
+    // Activate power-ups passed from game home screen
+    final doubleCoins = arguments['doubleCoins'] ?? false;
+    final secondChance = arguments['secondChance'] ?? false;
+    if (doubleCoins) {
+      context.read<QuickGameBloc>().add(ActivateDoubleCoins());
+    }
+    if (secondChance) {
+      context.read<QuickGameBloc>().add(UseSecondChance());
+    }
   }
 
   void _moveToNextPage() {
@@ -142,7 +158,9 @@ class _QuickGameQuestionScreenState
             listenWhen: (prev, curr) =>
                 prev.selectedOptionIndex != curr.selectedOptionIndex ||
                 prev.isCorrectAnswer != curr.isCorrectAnswer ||
-                prev.currentStreak != curr.currentStreak,
+                prev.currentStreak != curr.currentStreak ||
+                prev.secondChanceTriggered != curr.secondChanceTriggered ||
+                prev.timeFreezeTriggered != curr.timeFreezeTriggered,
             buildWhen: (prev, curr) =>
                 prev.selectedOptionIndex != curr.selectedOptionIndex ||
                 prev.isCorrectAnswer != curr.isCorrectAnswer ||
@@ -150,8 +168,26 @@ class _QuickGameQuestionScreenState
                 prev.coinsGained != curr.coinsGained ||
                 prev.currentStreak != curr.currentStreak ||
                 prev.fiftyFiftyUsed != curr.fiftyFiftyUsed ||
-                prev.eliminatedOptionIndices != curr.eliminatedOptionIndices,
+                prev.eliminatedOptionIndices != curr.eliminatedOptionIndices ||
+                prev.timeFreezeUsed != curr.timeFreezeUsed ||
+                prev.secondChanceUsed != curr.secondChanceUsed ||
+                prev.secondChanceTriggered != curr.secondChanceTriggered,
             listener: (context, state) {
+              // Second Chance triggered — show toast and let user retry
+              if (state.secondChanceTriggered) {
+                showCustomToast(context, '\u{1F6E1} Second Chance! Try again');
+                return; // Don't auto-advance
+              }
+
+              // Time Freeze triggered — add 30 seconds to timer
+              if (state.timeFreezeTriggered && hasTimer) {
+                final currentValue = animationController.value;
+                final freezeBonus = 30.0 / durationPerQuestion;
+                final newValue = (currentValue - freezeBonus).clamp(0.0, 1.0);
+                animationController.value = newValue;
+                showCustomToast(context, '\u{2744} Time Freeze! +30s');
+              }
+
               if (state.selectedOptionIndex != -1 &&
                   state.isCorrectAnswer != null) {
                 // Floating coin pop on correct answer
@@ -166,14 +202,62 @@ class _QuickGameQuestionScreenState
                   _moveToNextPage();
                 });
               }
-              // Fire confetti + toast on streak milestones
+              // Fire confetti + toast on combo milestones
               if (_streakMilestones.contains(state.currentStreak)) {
                 _confettiController.play();
+                final multiplier = (1.0 + state.currentStreak * 0.1).clamp(1.0, 2.0);
+                final multiplierStr = multiplier == 2.0
+                    ? '2x MAX'
+                    : '${multiplier.toStringAsFixed(1)}x';
                 showCustomToast(
-                    context, '🔥 x${state.currentStreak} Streak!');
+                    context,
+                    '\u26A1 ${state.currentStreak}x Combo \u2022 $multiplierStr coins!');
               }
             },
             builder: (context, state) {
+              // Build power-up bar items from PowerUpBloc
+              final powerUpState = context.watch<PowerUpBloc>().state;
+              final powerUpItems = <PowerUpBarItem>[
+                // 50/50
+                PowerUpBarItem(
+                  label: '50/50',
+                  iconPath: IconImageRoutes.star,
+                  quantity: powerUpState.getQuantity(PowerUpType.fiftyFifty),
+                  isUsed: state.fiftyFiftyUsed,
+                  accentColor: const Color(0xFFFF6B6B),
+                  onTap: () {
+                    if (state.hasAnswered) return;
+                    context.read<QuickGameBloc>().add(UseFiftyFifty(
+                        gameQuestion: state.quickGameQuestions![currentPage]));
+                    context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.fiftyFifty));
+                  },
+                ),
+                // Time Freeze
+                if (hasTimer)
+                  PowerUpBarItem(
+                    label: 'Freeze',
+                    iconPath: IconImageRoutes.greenTimer,
+                    quantity: powerUpState.getQuantity(PowerUpType.timeFreeze),
+                    isUsed: state.timeFreezeUsed,
+                    accentColor: const Color(0xFF54D6FF),
+                    onTap: () {
+                      if (state.hasAnswered) return;
+                      context.read<QuickGameBloc>().add(UseTimeFreeze());
+                      context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.timeFreeze));
+                    },
+                  ),
+                // Second Chance (passive — auto triggers)
+                if (state.secondChanceAvailable)
+                  PowerUpBarItem(
+                    label: 'Retry',
+                    iconPath: IconImageRoutes.arrowCircleBack,
+                    quantity: 1,
+                    isUsed: state.secondChanceUsed,
+                    isAuto: true,
+                    accentColor: const Color(0xFF7BED9F),
+                  ),
+              ];
+
               return Scaffold(
                 appBar: AppBar(
                   elevation: 0,
@@ -217,12 +301,8 @@ class _QuickGameQuestionScreenState
                         streakCount: state.currentStreak,
                         fiftyFiftyUsed: state.fiftyFiftyUsed,
                         eliminatedOptionIndices: state.eliminatedOptionIndices,
-                        fiftyFiftyIsFree: true,
-                        onFiftyFiftyTap: () {
-                          context.read<QuickGameBloc>().add(UseFiftyFifty(
-                              gameQuestion:
-                                  state.quickGameQuestions![index]));
-                        },
+                        powerUpItems: powerUpItems,
+                        doubleCoinsActive: state.doubleCoinsActive,
                       );
                     },
                   ),
@@ -259,7 +339,7 @@ class _QuickGameQuestionScreenState
                 child: Container(
                   key: _coinPopKey,
                   child: Text(
-                    '🪙 +$_lastCoinGain',
+                    '\u{1FA99} +$_lastCoinGain',
                     style: TextStyle(
                       color: const Color(0xFFFFD700),
                       fontSize: 22.sp,

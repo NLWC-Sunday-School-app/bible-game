@@ -11,11 +11,14 @@ import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
 import 'package:intl/intl.dart';
 
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
+import 'package:bible_game/shared/features/localization/app_localization.dart';
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/widgets/green_button.dart';
 import '../../../../shared/widgets/screen_app_bar.dart';
 import '../../../home/widget/modals/create_profile_modal.dart';
 import '../../../home/widget/modals/login_modal.dart';
+import '../../widget/power_up_section.dart';
 
 class StoreHomeScreenTabletView extends StatefulWidget {
   const StoreHomeScreenTabletView({super.key});
@@ -97,7 +100,8 @@ class _StoreHomeScreenTabletViewState extends State<StoreHomeScreenTabletView> {
                   fit: BoxFit.cover,
                 ),
               ),
-              child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                 children: [
                   ScreenAppBar(
                     height: 70.h,
@@ -130,10 +134,8 @@ class _StoreHomeScreenTabletViewState extends State<StoreHomeScreenTabletView> {
                       0
                       ?
             
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
+                  Column(
+                    children: [
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 60.w),
                           child: Row(
@@ -332,50 +334,17 @@ class _StoreHomeScreenTabletViewState extends State<StoreHomeScreenTabletView> {
                               ],
                             ),
                             SizedBox(
-                              height: 50.h,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 100.w,
-                                  child: Divider(
-                                    color: Color(0xFF10498D),
-                                    thickness: 2,
-                                    endIndent: 20,
-                                  ),
-                                ),
-                                StrokeText(
-                                  text: 'MORE ITEMS COMING',
-                                  textStyle: TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    color: Colors.white,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                  strokeColor: Colors.black.withOpacity(0.25),
-                                  strokeWidth: 1,
-                                ),
-                                SizedBox(
-                                  width: 100.w,
-                                  child: Divider(
-                                    color: Color(0xFF10498D),
-                                    thickness: 2,
-                                    indent: 20,
-                                  ),
-                                ),
-                              ],
+                              height: 30.h,
                             ),
                           ],
                         ),
-                        Container()
+                        const PowerUpSection(),
+                        SizedBox(height: 30.h),
                       ],
-                    ),
                   ) :
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  Column(
                       children: [
+                        SizedBox(height: 100.h),
                         GreenButton(
                           onTap: () {
                             soundManager.playClickSound();
@@ -427,9 +396,9 @@ class _StoreHomeScreenTabletViewState extends State<StoreHomeScreenTabletView> {
                           ),
                         )
                       ],
-                    ),
                   ),
                 ],
+              ),
               ),
             ),
           );

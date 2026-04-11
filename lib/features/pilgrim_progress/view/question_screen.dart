@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,13 +8,20 @@ import 'package:bible_game/features/pilgrim_progress/repository/pilgrim_progress
 import 'package:bible_game/features/pilgrim_progress/widget/modal/retry_modal.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/constants/colors.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/widgets/base_question_screen.dart';
+import 'package:bible_game/shared/widgets/custom_toast.dart';
+import 'package:bible_game/shared/widgets/power_up_bar.dart';
 import 'package:bible_game/shared/widgets/question_container.dart';
 
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/features/user/bloc/user_bloc.dart';
 import '../../../shared/widgets/game_summary_modal.dart';
+import '../../store/bloc/power_up_bloc.dart';
+import '../../store/bloc/power_up_event.dart';
+import '../../store/bloc/power_up_state.dart';
+import '../../store/model/power_up.dart';
 import '../widget/modal/new_rank_modal.dart';
 
 class PilgrimQuestionScreen extends StatefulWidget {
@@ -34,6 +42,11 @@ class _PilgrimQuestionScreenState
     extends BaseQuestionScreenState<PilgrimQuestionScreen> {
   late int durationPerQuestion;
 
+  // Power-up local state (per question)
+  bool _fiftyFiftyUsed = false;
+  bool _timeFreezeUsed = false;
+  List<int> _eliminatedOptionIndices = [];
+
   @override
   void initState() {
     super.initState();
@@ -48,7 +61,43 @@ class _PilgrimQuestionScreenState
     );
   }
 
+  void _resetPowerUpsForQuestion() {
+    setState(() {
+      _fiftyFiftyUsed = false;
+      _timeFreezeUsed = false;
+      _eliminatedOptionIndices = [];
+    });
+  }
+
+  void _useFiftyFifty(gameQuestion) {
+    if (_fiftyFiftyUsed) return;
+    final options = gameQuestion.options;
+    final correctAnswer = gameQuestion.answer;
+    final wrongIndices = <int>[];
+    for (int i = 0; i < options.length; i++) {
+      if (options[i] != correctAnswer) wrongIndices.add(i);
+    }
+    wrongIndices.shuffle(Random());
+    final toEliminate = wrongIndices.take(2).toList();
+    setState(() {
+      _fiftyFiftyUsed = true;
+      _eliminatedOptionIndices = toEliminate;
+    });
+    context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.fiftyFifty));
+  }
+
+  void _useTimeFreeze() {
+    if (_timeFreezeUsed) return;
+    setState(() => _timeFreezeUsed = true);
+    context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.timeFreeze));
+    final freezeBonus = 30.0 / durationPerQuestion;
+    final newValue = (animationController.value - freezeBonus).clamp(0.0, 1.0);
+    animationController.value = newValue;
+    showCustomToast(context, '\u{2744} Time Freeze! +30s');
+  }
+
   void _moveToNextPage() {
+    _resetPowerUpsForQuestion();
     final state = BlocProvider.of<PilgrimProgressBloc>(context).state;
     advancePageWithReset(
       totalPages: state.pilgrimProgressQuestions?.length ?? 0,
@@ -116,6 +165,33 @@ class _PilgrimQuestionScreenState
         }
       },
       builder: (context, state) {
+        // Build power-up items from store inventory
+        final powerUpState = context.watch<PowerUpBloc>().state;
+        final powerUpItems = <PowerUpBarItem>[
+          PowerUpBarItem(
+            label: '50/50',
+            iconPath: IconImageRoutes.star,
+            quantity: powerUpState.getQuantity(PowerUpType.fiftyFifty),
+            isUsed: _fiftyFiftyUsed,
+            accentColor: const Color(0xFFFF6B6B),
+            onTap: () {
+              if (state.hasAnswered) return;
+              _useFiftyFifty(state.pilgrimProgressQuestions![currentPage]);
+            },
+          ),
+          PowerUpBarItem(
+            label: 'Freeze',
+            iconPath: IconImageRoutes.greenTimer,
+            quantity: powerUpState.getQuantity(PowerUpType.timeFreeze),
+            isUsed: _timeFreezeUsed,
+            accentColor: const Color(0xFF54D6FF),
+            onTap: () {
+              if (state.hasAnswered) return;
+              _useTimeFreeze();
+            },
+          ),
+        ];
+
         return Scaffold(
           appBar: AppBar(
             elevation: 0,
@@ -136,10 +212,12 @@ class _PilgrimQuestionScreenState
                   totalQuestions: state.pilgrimProgressQuestions!.length,
                   optionSelectedCallback: (selectedOptionIndex) {
                     final remainingTime =
-                        (30 * (1 - animationController.value)).toInt();
+                        (durationPerQuestion * (1 - animationController.value))
+                            .toInt();
                     context.read<PilgrimProgressBloc>().add(OptionSelected(
                           selectedOptionIndex: selectedOptionIndex,
-                          gameQuestion: state.pilgrimProgressQuestions![index],
+                          gameQuestion:
+                              state.pilgrimProgressQuestions![index],
                           remainingTime: remainingTime,
                         ));
                   },
@@ -150,6 +228,9 @@ class _PilgrimQuestionScreenState
                   skipQuestion: _moveToNextPage,
                   durationPerQuestion: durationPerQuestion,
                   gameMode: 'pilgrimProgress',
+                  fiftyFiftyUsed: _fiftyFiftyUsed,
+                  eliminatedOptionIndices: _eliminatedOptionIndices,
+                  powerUpItems: powerUpItems,
                 );
               },
             ),

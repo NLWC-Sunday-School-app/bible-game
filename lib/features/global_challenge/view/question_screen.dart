@@ -1,17 +1,26 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
 import 'package:bible_game/features/global_challenge/repository/global_challenge_repository.dart';
 import 'package:bible_game/shared/constants/colors.dart';
+import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/widgets/base_question_screen.dart';
+import 'package:bible_game/shared/widgets/power_up_bar.dart';
 
 import '../../../navigation/cubit/navigation_cubit.dart';
 import '../../../shared/constants/app_routes.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/features/user/bloc/user_bloc.dart';
+import '../../../shared/widgets/custom_toast.dart';
 import '../../../shared/widgets/game_summary_modal.dart';
 import '../../../shared/widgets/question_container.dart';
+import '../../store/bloc/power_up_bloc.dart';
+import '../../store/bloc/power_up_event.dart';
+import '../../store/bloc/power_up_state.dart';
+import '../../store/model/power_up.dart';
 
 class GlobalQuestionScreen extends StatefulWidget {
   final GlobalChallengeRepository globalChallengeRepository;
@@ -28,6 +37,11 @@ class _GlobalQuestionScreenState
   late int durationPerQuestion;
   final int gameDuration = 2;
 
+  // Power-up local state (per question)
+  bool _fiftyFiftyUsed = false;
+  bool _timeFreezeUsed = false;
+  List<int> _eliminatedOptionIndices = [];
+
   @override
   void initState() {
     super.initState();
@@ -42,7 +56,45 @@ class _GlobalQuestionScreenState
     );
   }
 
+  void _resetPowerUpsForQuestion() {
+    setState(() {
+      _fiftyFiftyUsed = false;
+      _eliminatedOptionIndices = [];
+    });
+  }
+
+  void _useTimeFreeze() {
+    if (_timeFreezeUsed) return;
+    setState(() => _timeFreezeUsed = true);
+    context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.timeFreeze));
+    // Add 30 seconds to the game-wide 2-minute timer
+    // value goes 0→1, so subtract to add time back
+    final totalSeconds = gameDuration * 60;
+    final freezeBonus = 30.0 / totalSeconds;
+    final newValue = (animationController.value - freezeBonus).clamp(0.0, 1.0);
+    animationController.value = newValue;
+    showCustomToast(context, '\u{2744} Time Freeze! +30s');
+  }
+
+  void _useFiftyFifty(gameQuestion) {
+    if (_fiftyFiftyUsed) return;
+    final options = gameQuestion.options;
+    final correctAnswer = gameQuestion.answer;
+    final wrongIndices = <int>[];
+    for (int i = 0; i < options.length; i++) {
+      if (options[i] != correctAnswer) wrongIndices.add(i);
+    }
+    wrongIndices.shuffle(Random());
+    final toEliminate = wrongIndices.take(2).toList();
+    setState(() {
+      _fiftyFiftyUsed = true;
+      _eliminatedOptionIndices = toEliminate;
+    });
+    context.read<PowerUpBloc>().add(UsePowerUp(PowerUpType.fiftyFifty));
+  }
+
   void _moveToNextPage() {
+    _resetPowerUpsForQuestion();
     final state = BlocProvider.of<GlobalChallengeBloc>(context).state;
     advancePageByTimer(
       onGameComplete: () {
@@ -99,6 +151,33 @@ class _GlobalQuestionScreenState
           }
         },
         builder: (context, state) {
+          // Build power-up items from store inventory
+          final powerUpState = context.watch<PowerUpBloc>().state;
+          final powerUpItems = <PowerUpBarItem>[
+            PowerUpBarItem(
+              label: '50/50',
+              iconPath: IconImageRoutes.star,
+              quantity: powerUpState.getQuantity(PowerUpType.fiftyFifty),
+              isUsed: _fiftyFiftyUsed,
+              accentColor: const Color(0xFFFF6B6B),
+              onTap: () {
+                if (state.hasAnswered) return;
+                _useFiftyFifty(state.globalChallengeQuestions![currentPage]);
+              },
+            ),
+            PowerUpBarItem(
+              label: 'Freeze',
+              iconPath: IconImageRoutes.greenTimer,
+              quantity: powerUpState.getQuantity(PowerUpType.timeFreeze),
+              isUsed: _timeFreezeUsed,
+              accentColor: const Color(0xFF54D6FF),
+              onTap: () {
+                if (state.hasAnswered) return;
+                _useTimeFreeze();
+              },
+            ),
+          ];
+
           return Scaffold(
             appBar: AppBar(
               elevation: 0,
@@ -120,7 +199,8 @@ class _GlobalQuestionScreenState
                     optionSelectedCallback: (selectedOptionIndex) {
                       context.read<GlobalChallengeBloc>().add(OptionSelected(
                             selectedOptionIndex: selectedOptionIndex,
-                            gameQuestion: state.globalChallengeQuestions![index],
+                            gameQuestion:
+                                state.globalChallengeQuestions![index],
                           ));
                     },
                     selectedOptionIndex: state.selectedOptionIndex ?? -1,
@@ -133,6 +213,9 @@ class _GlobalQuestionScreenState
                     gameMode: 'globalchallenge',
                     noOfCorrectAnswers: state.noOfCorrectAnswers,
                     whoIsWhoGameDuration: gameDuration,
+                    fiftyFiftyUsed: _fiftyFiftyUsed,
+                    eliminatedOptionIndices: _eliminatedOptionIndices,
+                    powerUpItems: powerUpItems,
                   );
                 },
               ),

@@ -21,7 +21,7 @@ class PowerUpCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -52,16 +52,17 @@ class PowerUpCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 44.w,
-                height: 44.w,
+                width: 38.w,
+                height: 38.w,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Center(
-                  child: Text(
-                    item.emoji,
-                    style: TextStyle(fontSize: 22.sp),
+                  child: Image.asset(
+                    item.iconPath,
+                    width: 22.w,
+                    height: 22.w,
                   ),
                 ),
               ),
@@ -90,7 +91,7 @@ class PowerUpCard extends StatelessWidget {
                 ),
             ],
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 6.h),
 
           // Name
           Text(

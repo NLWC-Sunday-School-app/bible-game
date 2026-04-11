@@ -140,26 +140,32 @@ class _TrueOrFalseQuestionScreenState extends State<TrueOrFalseQuestionScreen>
                           ),
                         ),
                         const Spacer(),
-                        // Streak
+                        // Combo
                         if (state.currentStreak > 0)
                           Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 10.w, vertical: 4.h),
                             decoration: BoxDecoration(
-                              color: Colors.orange.withValues(alpha: 0.2),
+                              color: state.currentStreak >= 3
+                                  ? const Color(0xFF4A9FFF).withOpacity(0.2)
+                                  : Colors.white.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(20.r),
                               border: Border.all(
-                                  color: Colors.orange.withValues(alpha: 0.5)),
+                                  color: state.currentStreak >= 3
+                                      ? const Color(0xFF4A9FFF).withOpacity(0.5)
+                                      : Colors.white.withOpacity(0.3)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('🔥', style: TextStyle(fontSize: 12.sp)),
+                                Text('\u26A1', style: TextStyle(fontSize: 12.sp)),
                                 SizedBox(width: 4.w),
                                 Text(
-                                  '${state.currentStreak}',
+                                  '${state.currentStreak}x',
                                   style: TextStyle(
-                                    color: Colors.orange,
+                                    color: state.currentStreak >= 3
+                                        ? const Color(0xFF5BB5FF)
+                                        : Colors.white,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 13.sp,
                                   ),

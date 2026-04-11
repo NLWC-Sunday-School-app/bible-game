@@ -1,4 +1,6 @@
-enum PowerUpType { fiftyFifty, timeFreeze, doubleCoins, skipQuestion }
+import '../../../shared/constants/image_routes.dart';
+
+enum PowerUpType { fiftyFifty, timeFreeze, doubleCoins, secondChance }
 
 class PowerUpItem {
   final PowerUpType type;
@@ -9,7 +11,7 @@ class PowerUpItem {
   final int price;
   final bool usesGems;
   final String storageKey;
-  final String emoji;
+  final String iconPath;
 
   const PowerUpItem({
     required this.type,
@@ -20,7 +22,7 @@ class PowerUpItem {
     required this.price,
     required this.usesGems,
     required this.storageKey,
-    required this.emoji,
+    required this.iconPath,
   });
 
   static const List<PowerUpItem> allPowerUps = [
@@ -30,10 +32,10 @@ class PowerUpItem {
       nameKey: 'store_fifty_fifty',
       description: 'Remove 2 wrong answers',
       descriptionKey: 'store_fifty_fifty_desc',
-      price: 500,
+      price: 15000,
       usesGems: false,
       storageKey: 'powerup_fifty_fifty',
-      emoji: '\u{1F3AF}',
+      iconPath: IconImageRoutes.star,
     ),
     PowerUpItem(
       type: PowerUpType.timeFreeze,
@@ -41,10 +43,10 @@ class PowerUpItem {
       nameKey: 'store_time_freeze',
       description: 'Extra 30 seconds',
       descriptionKey: 'store_time_freeze_desc',
-      price: 300,
+      price: 20000,
       usesGems: false,
       storageKey: 'powerup_time_freeze',
-      emoji: '\u{23F1}',
+      iconPath: IconImageRoutes.greenTimer,
     ),
     PowerUpItem(
       type: PowerUpType.doubleCoins,
@@ -52,21 +54,21 @@ class PowerUpItem {
       nameKey: 'store_double_coins',
       description: '2x coins next game',
       descriptionKey: 'store_double_coins_desc',
-      price: 2,
+      price: 10,
       usesGems: true,
       storageKey: 'powerup_double_coins',
-      emoji: '\u{2728}',
+      iconPath: IconImageRoutes.coinIcon,
     ),
     PowerUpItem(
-      type: PowerUpType.skipQuestion,
-      name: 'Skip Question',
-      nameKey: 'store_skip_question',
-      description: 'Skip without penalty',
-      descriptionKey: 'store_skip_question_desc',
-      price: 400,
+      type: PowerUpType.secondChance,
+      name: 'Second Chance',
+      nameKey: 'store_second_chance',
+      description: 'Retry 1 wrong answer',
+      descriptionKey: 'store_second_chance_desc',
+      price: 10000,
       usesGems: false,
-      storageKey: 'powerup_skip_question',
-      emoji: '\u{23E9}',
+      storageKey: 'powerup_second_chance',
+      iconPath: IconImageRoutes.arrowCircleBack,
     ),
   ];
 }

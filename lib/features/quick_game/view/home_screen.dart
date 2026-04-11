@@ -132,7 +132,7 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
                     children: [
                       SizedBox(width: 10.w),
                       Text(
-                        'Build streaks for\nbig multipliers.\nUse 50/50 when\nyou\'re stuck!',
+                        'Build combos for\ncoin multipliers!\nUp to 2x at 10+\ncorrect in a row',
                         style: TextStyle(
                           color: Colors.white,
                           height: 1.2,

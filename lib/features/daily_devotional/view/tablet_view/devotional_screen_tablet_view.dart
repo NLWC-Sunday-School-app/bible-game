@@ -5,16 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/constants/colors.dart';
 import 'package:bible_game/shared/widgets/custom_toast.dart';
-import '../bloc/daily_devotional_bloc.dart';
+import '../../bloc/daily_devotional_bloc.dart';
 
-class DailyDevotionalScreen extends StatefulWidget {
-  const DailyDevotionalScreen({super.key});
+class DailyDevotionalScreenTabletView extends StatefulWidget {
+  const DailyDevotionalScreenTabletView({super.key});
 
   @override
-  State<DailyDevotionalScreen> createState() => _DailyDevotionalScreenState();
+  State<DailyDevotionalScreenTabletView> createState() =>
+      _DailyDevotionalScreenTabletViewState();
 }
 
-class _DailyDevotionalScreenState extends State<DailyDevotionalScreen> {
+class _DailyDevotionalScreenTabletViewState
+    extends State<DailyDevotionalScreenTabletView> {
   late ConfettiController _confettiController;
 
   @override
@@ -39,9 +41,9 @@ class _DailyDevotionalScreenState extends State<DailyDevotionalScreen> {
         if (state.hasAnswered) {
           if (state.isCorrect == true) {
             _confettiController.play();
-            showCustomToast(context, '✅ Correct! Great job!');
+            showCustomToast(context, 'Correct! Great job!');
           } else {
-            showCustomToast(context, '📖 Keep studying the Word!');
+            showCustomToast(context, 'Keep studying the Word!');
           }
         }
       },
@@ -68,7 +70,8 @@ class _DailyDevotionalScreenState extends State<DailyDevotionalScreen> {
                 Padding(
                   padding: EdgeInsets.only(right: 16.w),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: const Color(0xFF7EC8E3).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(16.r),
@@ -123,54 +126,59 @@ class _DailyDevotionalScreenState extends State<DailyDevotionalScreen> {
   }
 
   Widget _buildContent(BuildContext context, DailyDevotionalState state) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Completed today banner
-          if (state.hasCompletedToday && !state.hasAnswered)
-            _CompletedBanner(streak: state.devotionalStreak)
-                .animate()
-                .fadeIn(duration: 400.ms),
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 600.w),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Completed today banner
+              if (state.hasCompletedToday && !state.hasAnswered)
+                _CompletedBannerTablet(streak: state.devotionalStreak)
+                    .animate()
+                    .fadeIn(duration: 400.ms),
 
-          // Passage card
-          _PassageCard(
-            passage: state.passage,
-            passageText: state.passageText,
-          ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
+              // Passage card
+              _PassageCardTablet(
+                passage: state.passage,
+                passageText: state.passageText,
+              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
 
-          SizedBox(height: 16.h),
+              SizedBox(height: 20.h),
 
-          // Reflection card
-          _ReflectionCard(reflection: state.reflection)
-              .animate()
-              .fadeIn(duration: 500.ms, delay: 100.ms)
-              .slideY(begin: 0.2, end: 0),
+              // Reflection card
+              _ReflectionCardTablet(reflection: state.reflection)
+                  .animate()
+                  .fadeIn(duration: 500.ms, delay: 100.ms)
+                  .slideY(begin: 0.2, end: 0),
 
-          SizedBox(height: 20.h),
+              SizedBox(height: 24.h),
 
-          // Question section
-          if (!state.hasCompletedToday || state.hasAnswered)
-            _QuestionSection(state: state).animate().fadeIn(
-                  duration: 500.ms,
-                  delay: 200.ms,
-                ),
-        ],
+              // Question section
+              if (!state.hasCompletedToday || state.hasAnswered)
+                _QuestionSectionTablet(state: state).animate().fadeIn(
+                      duration: 500.ms,
+                      delay: 200.ms,
+                    ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class _CompletedBanner extends StatelessWidget {
+class _CompletedBannerTablet extends StatelessWidget {
   final int streak;
-  const _CompletedBanner({required this.streak});
+  const _CompletedBannerTablet({required this.streak});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: AppColors.correctAnswer.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12.r),
@@ -178,8 +186,8 @@ class _CompletedBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text('✅', style: TextStyle(fontSize: 20.sp)),
-          SizedBox(width: 10.w),
+          Text('✅', style: TextStyle(fontSize: 22.sp)),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,23 +197,23 @@ class _CompletedBanner extends StatelessWidget {
                   style: TextStyle(
                     color: AppColors.correctAnswer,
                     fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
+                    fontSize: 15.sp,
                   ),
                 ),
                 Text(
                   'Come back tomorrow for a new devotional.',
-                  style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+                  style: TextStyle(color: Colors.white70, fontSize: 13.sp),
                 ),
               ],
             ),
           ),
           if (streak > 0) ...[
-            Text('📖', style: TextStyle(fontSize: 16.sp)),
+            Text('📖', style: TextStyle(fontSize: 18.sp)),
             Text(
               ' $streak day${streak > 1 ? 's' : ''}',
               style: TextStyle(
                   color: const Color(0xFF7EC8E3),
-                  fontSize: 12.sp,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.bold),
             ),
           ],
@@ -215,16 +223,17 @@ class _CompletedBanner extends StatelessWidget {
   }
 }
 
-class _PassageCard extends StatelessWidget {
+class _PassageCardTablet extends StatelessWidget {
   final String passage;
   final String passageText;
-  const _PassageCard({required this.passage, required this.passageText});
+  const _PassageCardTablet(
+      {required this.passage, required this.passageText});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: AppColors.navyBlue,
         borderRadius: BorderRadius.circular(16.r),
@@ -235,25 +244,25 @@ class _PassageCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text('📖', style: TextStyle(fontSize: 18.sp)),
-              SizedBox(width: 8.w),
+              Text('📖', style: TextStyle(fontSize: 20.sp)),
+              SizedBox(width: 10.w),
               Text(
                 passage,
                 style: TextStyle(
                   color: AppColors.accentColor,
                   fontFamily: 'Neuland',
-                  fontSize: 16.sp,
+                  fontSize: 17.sp,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 14.h),
           Text(
             passageText,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 14.sp,
-              height: 1.6,
+              fontSize: 15.sp,
+              height: 1.7,
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -263,15 +272,15 @@ class _PassageCard extends StatelessWidget {
   }
 }
 
-class _ReflectionCard extends StatelessWidget {
+class _ReflectionCardTablet extends StatelessWidget {
   final String reflection;
-  const _ReflectionCard({required this.reflection});
+  const _ReflectionCardTablet({required this.reflection});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: AppColors.slateBlue,
         borderRadius: BorderRadius.circular(16.r),
@@ -280,20 +289,20 @@ class _ReflectionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '💡 Reflection',
+            'Reflection',
             style: TextStyle(
               color: Colors.white,
               fontFamily: 'Neuland',
-              fontSize: 14.sp,
+              fontSize: 15.sp,
             ),
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 12.h),
           Text(
             reflection,
             style: TextStyle(
               color: Colors.white70,
-              fontSize: 13.sp,
-              height: 1.6,
+              fontSize: 14.sp,
+              height: 1.7,
             ),
           ),
         ],
@@ -302,9 +311,9 @@ class _ReflectionCard extends StatelessWidget {
   }
 }
 
-class _QuestionSection extends StatelessWidget {
+class _QuestionSectionTablet extends StatelessWidget {
   final DailyDevotionalState state;
-  const _QuestionSection({required this.state});
+  const _QuestionSectionTablet({required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -312,16 +321,16 @@ class _QuestionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '❓ Quick Question',
+          'Quick Question',
           style: TextStyle(
             color: Colors.white,
             fontFamily: 'Neuland',
-            fontSize: 15.sp,
+            fontSize: 16.sp,
           ),
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: 12.h),
         Container(
-          padding: EdgeInsets.all(14.w),
+          padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
             color: AppColors.navyBlue,
             borderRadius: BorderRadius.circular(12.r),
@@ -330,35 +339,35 @@ class _QuestionSection extends StatelessWidget {
             state.question,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 14.sp,
+              fontSize: 15.sp,
               height: 1.5,
             ),
           ),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 14.h),
         ...List.generate(state.options.length, (index) {
-          return _OptionTile(
+          return _OptionTileTablet(
             text: state.options[index],
             index: index,
             state: state,
           );
         }),
         if (state.hasAnswered) ...[
-          SizedBox(height: 8.h),
-          _PostAnswerMessage(isCorrect: state.isCorrect == true),
+          SizedBox(height: 10.h),
+          _PostAnswerMessageTablet(isCorrect: state.isCorrect == true),
         ],
-        SizedBox(height: 20.h),
+        SizedBox(height: 24.h),
       ],
     );
   }
 }
 
-class _OptionTile extends StatelessWidget {
+class _OptionTileTablet extends StatelessWidget {
   final String text;
   final int index;
   final DailyDevotionalState state;
 
-  const _OptionTile(
+  const _OptionTileTablet(
       {required this.text, required this.index, required this.state});
 
   @override
@@ -372,16 +381,13 @@ class _OptionTile extends StatelessWidget {
 
     if (state.hasAnswered) {
       if (text == state.answer) {
-        // Correct answer: green highlight
         bgColor = AppColors.correctAnswer.withValues(alpha: 0.2);
         borderColor = AppColors.correctAnswer;
       } else if (index == state.selectedOptionIndex) {
-        // User's wrong pick: red highlight
         bgColor = AppColors.wrongAnswer.withValues(alpha: 0.2);
         borderColor = AppColors.wrongAnswer;
         textColor = Colors.white70;
       } else {
-        // Unselected wrong options: dimmed
         tileOpacity = 0.4;
         textColor = Colors.white54;
         labelColor = Colors.white54;
@@ -399,8 +405,8 @@ class _OptionTile extends StatelessWidget {
                 .add(AnswerDevotional(selectedOptionIndex: index)),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 400),
-          margin: EdgeInsets.only(bottom: 8.h),
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          margin: EdgeInsets.only(bottom: 10.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(10.r),
@@ -409,8 +415,8 @@ class _OptionTile extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 28.w,
-                height: 28.w,
+                width: 30.w,
+                height: 30.w,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
@@ -421,27 +427,27 @@ class _OptionTile extends StatelessWidget {
                     style: TextStyle(
                       color: labelColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12.sp,
+                      fontSize: 13.sp,
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 10.w),
+              SizedBox(width: 12.w),
               Expanded(
                 child: Text(
                   text,
                   style: TextStyle(
                     color: textColor,
-                    fontSize: 13.sp,
+                    fontSize: 14.sp,
                   ),
                 ),
               ),
               if (state.hasAnswered && text == state.answer)
-                Text('✅', style: TextStyle(fontSize: 14.sp)),
+                Text('✅', style: TextStyle(fontSize: 16.sp)),
               if (state.hasAnswered &&
                   index == state.selectedOptionIndex &&
                   text != state.answer)
-                Text('❌', style: TextStyle(fontSize: 14.sp)),
+                Text('❌', style: TextStyle(fontSize: 16.sp)),
             ],
           ),
         ),
@@ -450,15 +456,15 @@ class _OptionTile extends StatelessWidget {
   }
 }
 
-class _PostAnswerMessage extends StatelessWidget {
+class _PostAnswerMessageTablet extends StatelessWidget {
   final bool isCorrect;
-  const _PostAnswerMessage({required this.isCorrect});
+  const _PostAnswerMessageTablet({required this.isCorrect});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: isCorrect
             ? AppColors.correctAnswer.withValues(alpha: 0.12)
@@ -474,19 +480,21 @@ class _PostAnswerMessage extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            isCorrect ? '🎉 Well done!' : '📖 The correct answer is highlighted above',
+            isCorrect
+                ? 'Well done!'
+                : 'The correct answer is highlighted above',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,
-              fontSize: 13.sp,
+              fontSize: 14.sp,
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
           Text(
             'Come back tomorrow for a new devotional!',
             style: TextStyle(
               color: Colors.white60,
-              fontSize: 12.sp,
+              fontSize: 13.sp,
             ),
           ),
         ],

@@ -8,7 +8,7 @@ import 'package:bible_game/shared/widgets/blue_button.dart';
 
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 
-void showQuickGameTipsModal(BuildContext context, bool hasTimer) {
+void showQuickGameTipsModal(BuildContext context, bool hasTimer, {bool doubleCoins = false, bool secondChance = false}) {
   double screenHeight = MediaQuery.of(context).size.height;
   double screenWidth = MediaQuery.of(context).size.width;
   final soundManager = context
@@ -109,7 +109,11 @@ void showQuickGameTipsModal(BuildContext context, bool hasTimer) {
                     onTap: () {
                       soundManager.playClickSound();
                       Navigator.pushReplacementNamed(
-                          context, AppRoutes.quickGameQuestionScreen, arguments:{ 'hasTimer': hasTimer});
+                          context, AppRoutes.quickGameQuestionScreen, arguments: {
+                        'hasTimer': hasTimer,
+                        'doubleCoins': doubleCoins,
+                        'secondChance': secondChance,
+                      });
                     },
                     width: 280.w,
                   )

@@ -41,6 +41,9 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     on<ClearQuickGameData>(_onClearQuickGameData);
     on<FindQuickGameTopics>(_onFindQuickGameTopics);
     on<UseFiftyFifty>(_onUseFiftyFifty);
+    on<UseTimeFreeze>(_onUseTimeFreeze);
+    on<UseSecondChance>(_onUseSecondChance);
+    on<ActivateDoubleCoins>(_onActivateDoubleCoins);
   }
 
   Future<void> _onFetchQuickGameTopics(
@@ -185,11 +188,26 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
         dynamic timeBonusPoint = (event.remainingTime / durationPerQuestion) *
             halfOfTotalPointPerQuestion *
             streakMultiplier;
-        coinsGained = state.coinsGained! +
-            (halfOfTotalPointPerQuestion + timeBonusPoint).round();
+        var earnedCoins = (halfOfTotalPointPerQuestion + timeBonusPoint).round();
+        // Apply Double Coins multiplier
+        if (state.doubleCoinsActive) {
+          earnedCoins = (earnedCoins * 2);
+        }
+        coinsGained = state.coinsGained! + earnedCoins;
         totalBonusCoinsGained =
             (state.totalBonusCoinsGained! + timeBonusPoint).round();
       } else {
+        // Check if Second Chance is available
+        if (state.secondChanceAvailable && !state.secondChanceUsed) {
+          soundManager.playWrongAnswerSound();
+          // Don't reset streak, don't mark as answered — let them retry
+          emit(state.copyWith(
+            secondChanceUsed: true,
+            secondChanceTriggered: true,
+            totalTimeSpent: totalTimeSpent,
+          ));
+          return; // Exit early — user gets to pick again
+        }
         currentStreak = 0;
         soundManager.playWrongAnswerSound();
       }
@@ -205,6 +223,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
         noOfCorrectAnswers: noOfCorrectAnswers,
         currentStreak: currentStreak,
         bestStreak: bestStreak,
+        secondChanceTriggered: false,
       ));
     }
   }
@@ -214,6 +233,8 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
       hasAnswered: false,
       eliminatedOptionIndices: [],
       fiftyFiftyUsed: false,
+      timeFreezeUsed: false,
+      secondChanceTriggered: false,
     ));
     if ((state.quickGameQuestions?.length ?? 0) >
         (state.selectedOptionIndex ?? 0) + 1) {
@@ -243,6 +264,25 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
       fiftyFiftyUsed: true,
       eliminatedOptionIndices: toEliminate,
     ));
+  }
+
+  void _onUseTimeFreeze(UseTimeFreeze event, Emitter<QuickGameState> emit) {
+    if (state.timeFreezeUsed || state.hasAnswered) return;
+    _settingsBloc.soundManager.playClickSound();
+    emit(state.copyWith(
+      timeFreezeUsed: true,
+      timeFreezeTriggered: true,
+    ));
+  }
+
+  void _onUseSecondChance(UseSecondChance event, Emitter<QuickGameState> emit) {
+    // Second chance is passive — just mark it as available for this game
+    // This is called at game start to activate it
+    emit(state.copyWith(secondChanceAvailable: true));
+  }
+
+  void _onActivateDoubleCoins(ActivateDoubleCoins event, Emitter<QuickGameState> emit) {
+    emit(state.copyWith(doubleCoinsActive: true));
   }
 
   Future<void> _onFindQuickGameTopics(

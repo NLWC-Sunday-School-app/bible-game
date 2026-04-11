@@ -9,7 +9,7 @@ import 'package:bible_game/shared/widgets/question_number_box.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/widgets/quit_modal.dart';
 import '../../../shared/widgets/coins_number_box.dart';
-import '../../../shared/widgets/power_up_button.dart';
+import '../../../shared/widgets/power_up_bar.dart';
 import '../../../shared/widgets/streak_counter.dart';
 import '../features/settings/bloc/settings_bloc.dart';
 
@@ -40,6 +40,8 @@ class QuestionContainer extends StatelessWidget {
     this.onFiftyFiftyTap,
     this.fiftyFiftyCost = 20,
     this.fiftyFiftyIsFree = false,
+    this.powerUpItems = const [],
+    this.doubleCoinsActive = false,
   });
 
   final GameQuestion gameQuestion;
@@ -64,6 +66,8 @@ class QuestionContainer extends StatelessWidget {
   final VoidCallback? onFiftyFiftyTap;
   final int fiftyFiftyCost;
   final bool fiftyFiftyIsFree;
+  final List<PowerUpBarItem> powerUpItems;
+  final bool doubleCoinsActive;
 
   @override
   Widget build(BuildContext context) {
@@ -105,9 +109,42 @@ class QuestionContainer extends StatelessWidget {
             ],
           )),
           SizedBox(height: 4.h),
-          // Streak counter — only shown in non-WhoIsWho modes
+          // Combo counter — only shown in non-WhoIsWho modes
           if (!(isWhoIsWho ?? false))
-            Center(child: StreakCounter(streakCount: streakCount)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                StreakCounter(streakCount: streakCount),
+                if (doubleCoinsActive && streakCount >= 2)
+                  SizedBox(width: 6.w),
+                if (doubleCoinsActive)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFD400).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: Border.all(
+                        color: const Color(0xFFFFD400).withOpacity(0.4),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(IconImageRoutes.coinIcon, width: 12.w),
+                        SizedBox(width: 3.w),
+                        Text(
+                          '2x',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFFFFD400),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           SizedBox(height: streakCount >= 2 ? 4.h : 11.h),
           QuestionBox(
             isWhoIsWho: isWhoIsWho,
@@ -140,6 +177,7 @@ class QuestionContainer extends StatelessWidget {
           const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
                 onTap: () {
@@ -151,13 +189,21 @@ class QuestionContainer extends StatelessWidget {
                   width: 64.w,
                 ),
               ),
-              // Power-up buttons (only in non-WhoIsWho modes)
-              if (!(isWhoIsWho ?? false) && onFiftyFiftyTap != null)
-                PowerUpButton(
+              // Power-ups in the center of the action row
+              if (powerUpItems.isNotEmpty)
+                Expanded(
+                  child: PowerUpBar(items: powerUpItems),
+                )
+              // Keep legacy 50/50 button for game modes that don't use new power-up bar
+              else if (!(isWhoIsWho ?? false) &&
+                  onFiftyFiftyTap != null)
+                _LegacyPowerUpButton(
                   label: '50/50',
-                  subLabel: fiftyFiftyIsFree ? 'Free' : '-$fiftyFiftyCost coins',
+                  subLabel:
+                      fiftyFiftyIsFree ? 'Free' : '-$fiftyFiftyCost coins',
                   isUsed: fiftyFiftyUsed,
-                  hasEnoughCoins: fiftyFiftyIsFree ? true : coinsGained >= fiftyFiftyCost,
+                  hasEnoughCoins:
+                      fiftyFiftyIsFree ? true : coinsGained >= fiftyFiftyCost,
                   onTap: () {
                     soundManager.playClickSound();
                     onFiftyFiftyTap!();
@@ -176,6 +222,68 @@ class QuestionContainer extends StatelessWidget {
           ),
           SizedBox(height: 30.h),
         ],
+      ),
+    );
+  }
+}
+
+/// Legacy power-up button kept for backward compatibility with other game modes
+class _LegacyPowerUpButton extends StatelessWidget {
+  final String label;
+  final String subLabel;
+  final bool isUsed;
+  final bool hasEnoughCoins;
+  final VoidCallback onTap;
+
+  const _LegacyPowerUpButton({
+    required this.label,
+    required this.subLabel,
+    required this.isUsed,
+    required this.hasEnoughCoins,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool canUse = !isUsed && hasEnoughCoins;
+    return GestureDetector(
+      onTap: canUse ? onTap : null,
+      child: Opacity(
+        opacity: isUsed ? 0.35 : (hasEnoughCoins ? 1.0 : 0.5),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: isUsed ? Colors.grey.shade700 : const Color(0xFF366ABC),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: isUsed
+                  ? Colors.grey
+                  : Colors.white.withOpacity(0.5),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontFamily: 'Neuland',
+                ),
+              ),
+              Text(
+                isUsed ? 'used' : subLabel,
+                style: TextStyle(
+                  fontSize: 9.sp,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

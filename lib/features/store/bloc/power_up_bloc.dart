@@ -1,11 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:bible_game_api/api/game_api.dart';
 import '../model/power_up.dart';
 import 'power_up_event.dart';
 import 'power_up_state.dart';
 
 class PowerUpBloc extends Bloc<PowerUpEvent, PowerUpState> {
-  PowerUpBloc() : super(const PowerUpState()) {
+  final GameAPI gameAPI;
+
+  PowerUpBloc({required this.gameAPI}) : super(const PowerUpState()) {
     on<LoadPowerUps>(_onLoad);
     on<PurchasePowerUp>(_onPurchase);
     on<UsePowerUp>(_onUse);
@@ -21,25 +24,55 @@ class PowerUpBloc extends Bloc<PowerUpEvent, PowerUpState> {
     emit(state.copyWith(quantities: quantities));
   }
 
-  void _onPurchase(PurchasePowerUp event, Emitter<PowerUpState> emit) {
-    final item = PowerUpItem.allPowerUps.firstWhere((p) => p.type == event.type);
-    final current = state.getQuantity(event.type);
-    final newQty = current + 1;
+  Future<void> _onPurchase(
+      PurchasePowerUp event, Emitter<PowerUpState> emit) async {
+    final item =
+        PowerUpItem.allPowerUps.firstWhere((p) => p.type == event.type);
 
-    _storage.write(item.storageKey, newQty);
+    emit(state.copyWith(isPurchasing: true, error: null));
 
-    final updated = Map<PowerUpType, int>.from(state.quantities);
-    updated[event.type] = newQty;
+    try {
+      if (!item.usesGems) {
+        // Deduct coins via backend API
+        final success = await gameAPI.buyFromStore(
+          event.userId,
+          item.price,
+          description: 'Power-up: ${item.name}',
+        );
+        if (!success) {
+          emit(state.copyWith(
+            isPurchasing: false,
+            error: 'Purchase failed',
+          ));
+          return;
+        }
+      }
 
-    emit(state.copyWith(
-      quantities: updated,
-      lastPurchased: event.type,
-      error: null,
-    ));
+      // Increment local quantity
+      final current = state.getQuantity(event.type);
+      final newQty = current + 1;
+      _storage.write(item.storageKey, newQty);
+
+      final updated = Map<PowerUpType, int>.from(state.quantities);
+      updated[event.type] = newQty;
+
+      emit(state.copyWith(
+        quantities: updated,
+        lastPurchased: event.type,
+        isPurchasing: false,
+        error: null,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isPurchasing: false,
+        error: 'Purchase failed. Try again.',
+      ));
+    }
   }
 
   void _onUse(UsePowerUp event, Emitter<PowerUpState> emit) {
-    final item = PowerUpItem.allPowerUps.firstWhere((p) => p.type == event.type);
+    final item =
+        PowerUpItem.allPowerUps.firstWhere((p) => p.type == event.type);
     final current = state.getQuantity(event.type);
     if (current <= 0) return;
 

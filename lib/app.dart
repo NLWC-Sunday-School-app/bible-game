@@ -66,13 +66,19 @@ import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:upgrader/upgrader.dart';
 import 'features/daily_devotional/bloc/daily_devotional_bloc.dart';
 import 'features/daily_devotional/view/devotional_screen.dart';
+import 'features/daily_devotional/view/tablet_view/devotional_screen_tablet_view.dart';
 import 'features/story_mode/bloc/story_mode_bloc.dart';
 import 'features/story_mode/view/chapter_map_screen.dart';
 import 'features/story_mode/view/story_question_screen.dart';
 import 'features/story_mode/view/story_selection_screen.dart';
+import 'features/story_mode/view/tablet_view/story_selection_screen_tablet_view.dart';
+import 'features/story_mode/view/tablet_view/chapter_map_screen_tablet_view.dart';
+import 'features/story_mode/view/tablet_view/story_question_screen_tablet_view.dart';
 import 'features/true_or_false/bloc/true_or_false_bloc.dart';
 import 'features/true_or_false/view/true_or_false_home_screen.dart';
 import 'features/true_or_false/view/true_or_false_question_screen.dart';
+import 'features/true_or_false/view/tablet_view/true_or_false_home_screen_tablet_view.dart';
+import 'features/true_or_false/view/tablet_view/true_or_false_question_screen_tablet_view.dart';
 import 'features/global_challenge/view/question_screen.dart';
 import 'features/multi_player/view/question_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -156,7 +162,9 @@ class _AppState extends State<App> {
       builder: (BuildContext context, Widget? child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => NavigationCubit()),
-          BlocProvider(create: (_) => PowerUpBloc()..add(LoadPowerUps())),
+          BlocProvider(create: (_) => PowerUpBloc(
+            gameAPI: widget.gameAPI,
+          )..add(LoadPowerUps())),
           BlocProvider<ConnectivityBloc>(
             create: (_) => ConnectivityBloc(
               gameAPI: widget.gameAPI,
@@ -328,17 +336,17 @@ class _AppState extends State<App> {
                 BottomTabNavigation(),
             AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),
             AppRoutes.dailyDevotionalScreen: (context) =>
-                const DailyDevotionalScreen(),
+                isTablet ? const DailyDevotionalScreenTabletView() : const DailyDevotionalScreen(),
             AppRoutes.storySelectionScreen: (context) =>
-                const StorySelectionScreen(),
+                isTablet ? const StorySelectionScreenTabletView() : const StorySelectionScreen(),
             AppRoutes.chapterMapScreen: (context) =>
-                const ChapterMapScreen(),
+                isTablet ? const ChapterMapScreenTabletView() : const ChapterMapScreen(),
             AppRoutes.storyQuestionScreen: (context) =>
-                const StoryQuestionScreen(),
+                isTablet ? const StoryQuestionScreenTabletView() : const StoryQuestionScreen(),
             AppRoutes.trueOrFalseHomeScreen: (context) =>
-                const TrueOrFalseHomeScreen(),
+                isTablet ? const TrueOrFalseHomeScreenTabletView() : const TrueOrFalseHomeScreen(),
             AppRoutes.trueOrFalseQuestionScreen: (context) =>
-                const TrueOrFalseQuestionScreen(),
+                isTablet ? const TrueOrFalseQuestionScreenTabletView() : const TrueOrFalseQuestionScreen(),
           },
           home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),

@@ -39,17 +39,14 @@ class PowerUpSection extends StatelessWidget {
     }
 
     soundManager.playClickSound();
-    context.read<PowerUpBloc>().add(PurchasePowerUp(item.type));
-    soundManager.playAchievementSound();
+    final userId = context.read<AuthenticationBloc>().state.user.id;
+    context.read<PowerUpBloc>().add(PurchasePowerUp(item.type, userId: userId));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Text(
-              item.emoji,
-              style: TextStyle(fontSize: 18.sp),
-            ),
+            Image.asset(item.iconPath, width: 20.w, height: 20.w),
             SizedBox(width: 8.w),
             Text(
               '${item.name} purchased!',
@@ -103,7 +100,7 @@ class PowerUpSection extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 10.h),
 
             // Power-up grid
             Padding(
@@ -112,9 +109,9 @@ class PowerUpSection extends StatelessWidget {
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12.h,
-                crossAxisSpacing: 12.w,
-                childAspectRatio: 0.85,
+                mainAxisSpacing: 10.h,
+                crossAxisSpacing: 10.w,
+                childAspectRatio: 0.95,
                 children: PowerUpItem.allPowerUps.map((item) {
                   return PowerUpCard(
                     item: item,

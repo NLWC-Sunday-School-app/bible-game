@@ -28,7 +28,7 @@
   "syncing_scores": "Syncing your scores...",
   "offline_features_limited": "You're offline. Some features may be limited.",
 
-  "daily_devotional": "Daily Devotional",
+  "daily_devotional": "Daily Reading",
   "daily_devotional_completed": "Completed! Come back tomorrow",
   "daily_devotional_prompt": "Read, reflect & answer today's question",
 
@@ -116,8 +116,8 @@
   "store_time_freeze_desc": "Extra 30 seconds",
   "store_double_coins": "Double Coins",
   "store_double_coins_desc": "2x coins next game",
-  "store_skip_question": "Skip Question",
-  "store_skip_question_desc": "Skip without penalty",
+  "store_second_chance": "Second Chance",
+  "store_second_chance_desc": "Retry 1 wrong answer",
   "store_purchased": "purchased!",
   "store_not_enough_gems": "Not enough gems!",
 
