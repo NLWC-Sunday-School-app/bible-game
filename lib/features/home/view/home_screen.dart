@@ -342,15 +342,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  Container(
+                  Expanded(
+                    child: Container(
                     padding: EdgeInsets.only(left: 15.w, right: 15.w),
                     child: Column(
                       children: [
                         SizedBox(
                           height: 10.h,
                         ),
-                        SizedBox(
-                          height: screenHeight - (224.h),
+                        Expanded(
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
@@ -562,6 +562,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       ],
                     ),
+                  ),
                   )
                 ],
               ),
@@ -648,19 +649,11 @@ class _DailyDevotionalBanner extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (state.devotionalStreak > 0) ...[
-                  Text('📖', style: TextStyle(fontSize: 14.sp)),
-                  SizedBox(width: 4.w),
-                  Text(
-                    '${state.devotionalStreak}d',
-                    style: TextStyle(
-                      color: const Color(0xFF7EC8E3),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
-                    ),
+                if (completed)
+                  Padding(
+                    padding: EdgeInsets.only(right: 8.w),
+                    child: Text('✅', style: TextStyle(fontSize: 14.sp)),
                   ),
-                  SizedBox(width: 8.w),
-                ],
                 Icon(Icons.chevron_right,
                     color: Colors.white70, size: 20.sp),
               ],

@@ -65,37 +65,7 @@ class _DailyDevotionalScreenTabletViewState
                 fontSize: 18.sp,
               ),
             ),
-            actions: [
-              if (state.devotionalStreak > 0)
-                Padding(
-                  padding: EdgeInsets.only(right: 16.w),
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF7EC8E3).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(
-                        color: const Color(0xFF7EC8E3).withOpacity(0.4),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text('📖', style: TextStyle(fontSize: 14.sp)),
-                        SizedBox(width: 4.w),
-                        Text(
-                          '${state.devotionalStreak} day${state.devotionalStreak > 1 ? 's' : ''}',
-                          style: TextStyle(
-                            color: const Color(0xFF7EC8E3),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.sp,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
+            actions: const [],
           ),
           body: Stack(
             children: [
@@ -136,7 +106,7 @@ class _DailyDevotionalScreenTabletViewState
             children: [
               // Completed today banner
               if (state.hasCompletedToday && !state.hasAnswered)
-                _CompletedBannerTablet(streak: state.devotionalStreak)
+                const _CompletedBannerTablet()
                     .animate()
                     .fadeIn(duration: 400.ms),
 
@@ -171,8 +141,7 @@ class _DailyDevotionalScreenTabletViewState
 }
 
 class _CompletedBannerTablet extends StatelessWidget {
-  final int streak;
-  const _CompletedBannerTablet({required this.streak});
+  const _CompletedBannerTablet();
 
   @override
   Widget build(BuildContext context) {
@@ -207,16 +176,6 @@ class _CompletedBannerTablet extends StatelessWidget {
               ],
             ),
           ),
-          if (streak > 0) ...[
-            Text('📖', style: TextStyle(fontSize: 18.sp)),
-            Text(
-              ' $streak day${streak > 1 ? 's' : ''}',
-              style: TextStyle(
-                  color: const Color(0xFF7EC8E3),
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
         ],
       ),
     );

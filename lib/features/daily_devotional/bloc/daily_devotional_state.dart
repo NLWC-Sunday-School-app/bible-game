@@ -12,8 +12,6 @@ class DailyDevotionalState extends Equatable {
   final bool? isCorrect;
   final int selectedOptionIndex;
   final bool hasCompletedToday;
-  final int devotionalStreak;
-  final int bestStreak;
 
   const DailyDevotionalState({
     this.passage = '',
@@ -27,8 +25,6 @@ class DailyDevotionalState extends Equatable {
     this.isCorrect,
     this.selectedOptionIndex = -1,
     this.hasCompletedToday = false,
-    this.devotionalStreak = 0,
-    this.bestStreak = 0,
   });
 
   DailyDevotionalState copyWith({
@@ -43,8 +39,6 @@ class DailyDevotionalState extends Equatable {
     bool? isCorrect,
     int? selectedOptionIndex,
     bool? hasCompletedToday,
-    int? devotionalStreak,
-    int? bestStreak,
   }) {
     return DailyDevotionalState(
       passage: passage ?? this.passage,
@@ -58,8 +52,6 @@ class DailyDevotionalState extends Equatable {
       isCorrect: isCorrect ?? this.isCorrect,
       selectedOptionIndex: selectedOptionIndex ?? this.selectedOptionIndex,
       hasCompletedToday: hasCompletedToday ?? this.hasCompletedToday,
-      devotionalStreak: devotionalStreak ?? this.devotionalStreak,
-      bestStreak: bestStreak ?? this.bestStreak,
     );
   }
 
@@ -76,7 +68,5 @@ class DailyDevotionalState extends Equatable {
         isCorrect,
         selectedOptionIndex,
         hasCompletedToday,
-        devotionalStreak,
-        bestStreak,
       ];
 }
