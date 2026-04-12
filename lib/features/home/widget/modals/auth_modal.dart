@@ -14,155 +14,251 @@ void showAuthModal(BuildContext context) {
   final soundManager = context.read<SettingsBloc>().soundManager;
   showDialog(
     context: context,
+    barrierColor: Colors.black.withOpacity(0.75),
     builder: (BuildContext context) {
       final tr = AppLocalization.tr(context);
       return Dialog(
-        insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+        insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
         backgroundColor: Colors.transparent,
-        insetAnimationCurve: Curves.easeIn,
-        insetAnimationDuration: const Duration(milliseconds: 500),
-        child: SizedBox(
-          height: 500.h,
-          width: 500.w,
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(ProductImageRoutes.modalBg),
-                fit: BoxFit.fill,
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(
+              width: 3,
+              color: const Color(0xFF2A5A9A),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1565C0).withOpacity(0.3),
+                blurRadius: 24,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.r),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  height: 50.h,
-                ),
-                GestureDetector(
-                  onTap: (){
-                    soundManager.playClickSound();
-                    Navigator.pop(context);
-                    },
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
+                // ── Header ──
+                Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF1565C0),
+                        Color(0xFF0D47A1),
+                      ],
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Image.asset(
-                          IconImageRoutes.closeModal,
-                          width: 35.w,
-                        )
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      // Stars
+                      Positioned(
+                        top: 14.h,
+                        left: 22.w,
+                        child: Image.asset(
+                          IconImageRoutes.star,
+                          width: 16.w,
+                          opacity: const AlwaysStoppedAnimation(0.35),
+                        ),
+                      ),
+                      Positioned(
+                        top: 35.h,
+                        right: 28.w,
+                        child: Image.asset(
+                          IconImageRoutes.star,
+                          width: 12.w,
+                          opacity: const AlwaysStoppedAnimation(0.3),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 25.h,
+                        left: 50.w,
+                        child: Image.asset(
+                          IconImageRoutes.star,
+                          width: 10.w,
+                          opacity: const AlwaysStoppedAnimation(0.2),
+                        ),
+                      ),
+                      // Close button
+                      Positioned(
+                        top: 12.h,
+                        right: 12.w,
+                        child: GestureDetector(
+                          onTap: () {
+                            soundManager.playClickSound();
+                            Navigator.pop(context);
+                          },
+                          child: Image.asset(
+                            IconImageRoutes.closeModal,
+                            width: 32.w,
+                          ),
+                        ),
+                      ),
+                      // Content
+                      Padding(
+                        padding: EdgeInsets.only(top: 28.h, bottom: 40.h),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(14.w),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.12),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 2,
+                                ),
+                              ),
+                              child: Image.asset(
+                                ProductImageRoutes.theBibleGame,
+                                width: 50.w,
+                                height: 50.w,
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            Image.asset(
+                              ProductImageRoutes.threeStars,
+                              width: 80.w,
+                              opacity: const AlwaysStoppedAnimation(0.7),
+                            ),
+                            SizedBox(height: 8.h),
+                            StrokeText(
+                              text: tr.t('auth_your_profile'),
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'Mikado',
+                                fontSize: 26.sp,
+                                fontWeight: FontWeight.w900,
+                              ),
+                              strokeColor: const Color(0xFF0A3060),
+                              strokeWidth: 5,
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              tr.t('auth_login_prompt'),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.7),
+                                fontFamily: 'Mikado',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ── Gold divider ──
+                Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFFFD700).withOpacity(0.0),
+                        const Color(0xFFFFD700).withOpacity(0.6),
+                        const Color(0xFFFFD700).withOpacity(0.0),
                       ],
                     ),
                   ),
                 ),
-                StrokeText(
-                  text: tr.t('auth_your_profile'),
-                  textStyle: TextStyle(
-                    color: const Color(0xFF1768B9),
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.w900,
+
+                // ── Buttons section ──
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(24.w, 28.h, 24.w, 24.h),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF0D2B52),
+                        Color(0xFF091E3A),
+                      ],
+                    ),
                   ),
-                  strokeColor: Colors.white,
-                  strokeWidth: 5,
-                ),
-                SizedBox(
-                  height: 10.h,
-                ),
-                Text(
-                  tr.t('auth_login_prompt'),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Mikado',
-                  ),
-                ),
-                SizedBox(
-                  height: 30.h,
-                ),
-                BlueButton(
-                  width: 250.w,
-                  buttonText: tr.t('auth_login'),
-                  buttonIsLoading: false,
-                  onTap: () {
-                    soundManager.playClickSound();
-                    Navigator.pop(context);
-                    showLoginModal(context);
-                  },
-                ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                BlueButton(
-                  width: 250.w,
-                  buttonText: tr.t('auth_create_profile'),
-                  buttonIsLoading: false,
-                  onTap: () {
-                    soundManager.playClickSound();
-                    Navigator.pop(context);
-                    showCreateProfileModal(context);
-                  },
-                ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                BlocBuilder<SettingsBloc, SettingsState>(
-                  builder: (context, state) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
-                              onTap: () {
-                                soundManager.playClickSound();
-                                context.read<SettingsBloc>().add(ToggleSound());
-                              },
-                              child: Image.asset(
-                                state.isSoundOn
-                                    ? IconImageRoutes.soundOn
-                                    : IconImageRoutes.soundOff,
-                                width: 50.w,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      BlueButton(
+                        width: double.infinity,
+                        buttonText: tr.t('auth_login'),
+                        buttonIsLoading: false,
+                        onTap: () {
+                          soundManager.playClickSound();
+                          Navigator.pop(context);
+                          showLoginModal(context);
+                        },
+                      ),
+                      SizedBox(height: 14.h),
+                      BlueButton(
+                        width: double.infinity,
+                        buttonText: tr.t('auth_create_profile'),
+                        buttonIsLoading: false,
+                        onTap: () {
+                          soundManager.playClickSound();
+                          Navigator.pop(context);
+                          showCreateProfileModal(context);
+                        },
+                      ),
+                      SizedBox(height: 24.h),
+
+                      // Settings toggles
+                      BlocBuilder<SettingsBloc, SettingsState>(
+                        builder: (context, state) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _settingsIcon(
                                 onTap: () {
                                   soundManager.playClickSound();
-                                  context.read<SettingsBloc>().add(ToggleMusic());
+                                  context
+                                      .read<SettingsBloc>()
+                                      .add(ToggleSound());
                                 },
-                                child: Image.asset(
-                                  state.isMusicOn
-                                      ? IconImageRoutes.musicOn
-                                      : IconImageRoutes.musicOff,
-                                  width: 50.w,
-                                )),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
+                                asset: state.isSoundOn
+                                    ? IconImageRoutes.soundOn
+                                    : IconImageRoutes.soundOff,
+                              ),
+                              SizedBox(width: 16.w),
+                              _settingsIcon(
+                                onTap: () {
+                                  soundManager.playClickSound();
+                                  context
+                                      .read<SettingsBloc>()
+                                      .add(ToggleMusic());
+                                },
+                                asset: state.isMusicOn
+                                    ? IconImageRoutes.musicOn
+                                    : IconImageRoutes.musicOff,
+                              ),
+                              SizedBox(width: 16.w),
+                              _settingsIcon(
                                 onTap: () {
                                   soundManager.playClickSound();
                                   context
                                       .read<SettingsBloc>()
                                       .add(ToggleNotification());
                                 },
-                                child: Image.asset(
-                                  state.isNotificationOn
-                                      ? IconImageRoutes.notificationOn
-                                      : IconImageRoutes.notificationOff,
-                                  width: 50.w,
-                                )),
-                          ),
-                        ],
+                                asset: state.isNotificationOn
+                                    ? IconImageRoutes.notificationOn
+                                    : IconImageRoutes.notificationOff,
+                              ),
+                            ],
+                          );
+                        },
                       ),
-                    );
-                  },
+                      SizedBox(height: 8.h),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -170,5 +266,29 @@ void showAuthModal(BuildContext context) {
         ),
       );
     },
+  );
+}
+
+Widget _settingsIcon({
+  required VoidCallback onTap,
+  required String asset,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: EdgeInsets.all(10.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A1A3A),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: const Color(0xFF1E3A5F),
+          width: 2,
+        ),
+      ),
+      child: Image.asset(
+        asset,
+        width: 32.w,
+      ),
+    ),
   );
 }
