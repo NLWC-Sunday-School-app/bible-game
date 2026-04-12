@@ -26,7 +26,8 @@ import 'package:bible_game_api/api/api_client.dart';
 import 'package:bible_game_api/api/authentication_api.dart';
 
 void main() async {
-  if (kIsWeb) usePathUrlStrategy();
+  // Hash URL strategy is the default — don't set path strategy
+  // to avoid browser history pollution that causes mobile swipe-back issues.
   WidgetsFlutterBinding.ensureInitialized();
 
   Bloc.observer = AppBlocObserver();

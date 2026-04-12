@@ -189,13 +189,19 @@
   <script src="flutter.js" defer></script>
   <script>
     // Prevent browser back-swipe / back button from leaving the app.
-    // Push an extra history entry immediately so there is always something
-    // to "go back to" within the app, then re-push it on every popstate
-    // so the browser can never actually navigate away.
+    // Push multiple history entries to create a buffer on mobile browsers
+    // where swipe-back gestures can fire faster than JS can intercept.
     (function() {
-      history.pushState(null, '', window.location.href);
-      window.addEventListener('popstate', function() {
-        history.pushState(null, '', window.location.href);
+      for (var i = 0; i < 3; i++) {
+        history.pushState({ biblegame: true }, '', window.location.href);
+      }
+      window.addEventListener('popstate', function(e) {
+        history.pushState({ biblegame: true }, '', window.location.href);
+      });
+      // Warn before unloading (catches edge cases on some mobile browsers)
+      window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
       });
     })();
   </script>
