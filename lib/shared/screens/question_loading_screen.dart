@@ -13,8 +13,10 @@ import 'package:bible_game/features/pilgrim_progress/widget/modal/quick_tips_mod
 import 'package:bible_game/features/who_is_who/bloc/who_is_who_bloc.dart';
 import 'package:bible_game/features/who_is_who/widget/modal/quick_tips_modal.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
+import 'package:bible_game/shared/features/connectivity/bloc/connectivity_bloc.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/features/user/bloc/user_bloc.dart';
+import 'package:stroke_text/stroke_text.dart';
 
 import '../../features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
 import '../../features/quick_game/bloc/quick_game_bloc.dart';
@@ -30,11 +32,89 @@ class QuestionLoadingScreen extends StatefulWidget {
 
 class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
   bool _isModalShown = false;
+  bool _isOfflineDialogShown = false;
+
+  void _showOfflineDialog() {
+    if (_isOfflineDialogShown || !mounted) return;
+    _isOfflineDialogShown = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.all(24.w),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A2E),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: const Color(0xFFFFD400), width: 2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.wifi_off_rounded, color: const Color(0xFFFFD400), size: 56.w),
+              SizedBox(height: 16.h),
+              StrokeText(
+                text: 'You are offline',
+                textStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w900,
+                ),
+                strokeColor: const Color(0xFF673125),
+                strokeWidth: 4,
+              ),
+              SizedBox(height: 12.h),
+              Text(
+                'Please check your internet connection and try again.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14.sp,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(ctx);
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 14.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFD400),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Go Back',
+                      style: TextStyle(
+                        color: const Color(0xFF1A1A2E),
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((_) => _isOfflineDialogShown = false);
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isOnline = context.read<ConnectivityBloc>().state.isOnline;
+      if (!isOnline) {
+        _showOfflineDialog();
+        return;
+      }
+
       final arguments = (ModalRoute.of(context)?.settings.arguments ??
           <String, dynamic>{}) as Map;
       final gameType = arguments['gameType'];
@@ -115,7 +195,12 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Container(
+      body: BlocListener<ConnectivityBloc, ConnectivityState>(
+        listenWhen: (prev, curr) => prev.isOnline && !curr.isOnline,
+        listener: (context, state) {
+          _showOfflineDialog();
+        },
+        child: Container(
         height: screenHeight,
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -164,6 +249,7 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
             );
           },
         ),
+      ),
       ),
     );
   }

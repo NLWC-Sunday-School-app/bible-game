@@ -1918,9 +1918,9 @@ class TrueOrFalseQuestionsData {
     },
     {
       'statement': 'Paul wrote the book of Hebrews.',
-      'isTrue': false,
+      'isTrue': true,
       'explanation':
-          'The authorship of Hebrews is unknown and debated. While Paul was once suggested, the style differs significantly from his other letters.',
+          'Paul is traditionally credited as the author of the book of Hebrews.',
       'bibleReference': 'Hebrews 1:1',
       'category': 'Acts & Letters',
     },

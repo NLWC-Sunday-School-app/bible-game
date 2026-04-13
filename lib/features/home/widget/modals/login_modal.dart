@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
@@ -94,6 +93,66 @@ class _LoginModalState extends State<LoginModal>
     super.dispose();
   }
 
+  InputDecoration _inputDecoration({
+    required String hint,
+    required IconData prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      filled: true,
+      fillColor: const Color(0xFF0A1A3A),
+      prefixIcon: Container(
+        margin: EdgeInsets.only(left: 12.w, right: 8.w),
+        child: Icon(prefixIcon, color: const Color(0xFF4A9EFF), size: 22.sp),
+      ),
+      prefixIconConstraints: BoxConstraints(minWidth: 44.w),
+      suffixIcon: suffixIcon,
+      hintText: hint,
+      hintStyle: TextStyle(
+        color: const Color(0xFF4A6A8A),
+        fontSize: 14.sp,
+      ),
+      errorStyle: TextStyle(
+        fontSize: 11.sp,
+        color: const Color(0xFFFF6B6B),
+        fontWeight: FontWeight.w500,
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14.r),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14.r),
+        borderSide: const BorderSide(
+          color: Color(0xFF1E3A5F),
+          width: 2,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14.r),
+        borderSide: const BorderSide(
+          color: Color(0xFF4A9EFF),
+          width: 2,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14.r),
+        borderSide: const BorderSide(
+          color: Color(0xFFFF6B6B),
+          width: 2,
+        ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14.r),
+        borderSide: const BorderSide(
+          color: Color(0xFFFF6B6B),
+          width: 2,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
@@ -108,373 +167,295 @@ class _LoginModalState extends State<LoginModal>
           padding: EdgeInsets.only(bottom: bottomInset),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24.r),
+              borderRadius: BorderRadius.circular(20.r),
               border: Border.all(
-                color: const Color(0xFF5AA0F0).withOpacity(0.6),
-                width: 2,
+                width: 3,
+                color: const Color(0xFF2A5A9A),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF4A9EFF).withOpacity(0.35),
-                  blurRadius: 28,
-                  spreadRadius: 2,
-                ),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.4),
-                  blurRadius: 20,
-                  spreadRadius: 4,
-                  offset: const Offset(0, 8),
+                  color: const Color(0xFF1565C0).withOpacity(0.3),
+                  blurRadius: 24,
+                  spreadRadius: 0,
                 ),
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(22.r),
+              borderRadius: BorderRadius.circular(20.r),
               child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // ── Header ──
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.only(top: 20.h, bottom: 32.h),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF2E7FE8),
-                        Color(0xFF1565C0),
-                        Color(0xFF0D50A0),
-                      ],
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // ── Header with treasure box & stars ──
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF1565C0),
+                          Color(0xFF0D47A1),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: CustomPaint(
-                    painter: _SparklesPainter(),
-                    child: Column(
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
                       children: [
-                        // Close
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 16.w),
-                            child: GestureDetector(
-                              onTap: () {
-                                soundManager.playClickSound();
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                width: 32.w,
-                                height: 32.w,
+                        // Scattered stars
+                        Positioned(
+                          top: 12.h,
+                          left: 20.w,
+                          child: Image.asset(
+                            IconImageRoutes.star,
+                            width: 18.w,
+                            opacity: const AlwaysStoppedAnimation(0.4),
+                          ),
+                        ),
+                        Positioned(
+                          top: 30.h,
+                          right: 30.w,
+                          child: Image.asset(
+                            IconImageRoutes.star,
+                            width: 12.w,
+                            opacity: const AlwaysStoppedAnimation(0.3),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 20.h,
+                          left: 45.w,
+                          child: Image.asset(
+                            IconImageRoutes.star,
+                            width: 10.w,
+                            opacity: const AlwaysStoppedAnimation(0.25),
+                          ),
+                        ),
+                        // Close button
+                        Positioned(
+                          top: 12.h,
+                          right: 12.w,
+                          child: GestureDetector(
+                            onTap: () {
+                              soundManager.playClickSound();
+                              Navigator.pop(context);
+                            },
+                            child: Image.asset(
+                              IconImageRoutes.closeModal,
+                              width: 32.w,
+                            ),
+                          ),
+                        ),
+                        // Header content
+                        Padding(
+                          padding: EdgeInsets.only(top: 28.h, bottom: 40.h),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(14.w),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.15),
+                                  color: Colors.white.withOpacity(0.12),
                                   border: Border.all(
                                     color: Colors.white.withOpacity(0.2),
+                                    width: 2,
                                   ),
                                 ),
-                                child: Icon(
-                                  Icons.close_rounded,
-                                  color: Colors.white.withOpacity(0.8),
-                                  size: 18.sp,
+                                child: Image.asset(
+                                  ProductImageRoutes.treasureBox,
+                                  width: 50.w,
+                                  height: 50.w,
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-
-                        // Emblem
-                        Container(
-                          width: 72.w,
-                          height: 72.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xFFFFE066),
-                                Color(0xFFFFAA00),
-                                Color(0xFFFF8800),
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFFFAA00).withOpacity(0.4),
-                                blurRadius: 20,
-                                spreadRadius: 4,
-                              ),
-                            ],
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
-                              width: 3,
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Icon(
-                                Icons.person_rounded,
-                                color: const Color(0xFF7A3800),
-                                size: 36.sp,
-                              ),
-                              // Small crown on top
-                              Positioned(
-                                top: 6.h,
-                                child: Icon(
-                                  Icons.auto_awesome,
-                                  color: Colors.white.withOpacity(0.9),
-                                  size: 14.sp,
+                              SizedBox(height: 14.h),
+                              StrokeText(
+                                text: tr.t('auth_login_title'),
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Mikado',
+                                  fontSize: 28.sp,
+                                  fontWeight: FontWeight.w900,
                                 ),
+                                strokeColor: const Color(0xFF0A3060),
+                                strokeWidth: 5,
                               ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-                        StrokeText(
-                          text: tr.t('auth_login_title'),
-                          textStyle: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Mikado',
-                            fontSize: 28.sp,
-                            fontWeight: FontWeight.w900,
-                          ),
-                          strokeColor: const Color(0xFF042A6B),
-                          strokeWidth: 5,
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          tr.t('auth_login_subtitle'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: Colors.white.withOpacity(0.65),
-                            fontFamily: 'Mikado',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // ── Decorative divider ──
-                Container(
-                  height: 4,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFFFAA00),
-                        Color(0xFFFFD700),
-                        Color(0xFFFFE066),
-                        Color(0xFFFFD700),
-                        Color(0xFFFFAA00),
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0x55FFD700),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-
-                // ── Form ──
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.fromLTRB(24.w, 28.h, 24.w, 24.h),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFF0C2244),
-                        Color(0xFF071832),
-                      ],
-                    ),
-                  ),
-                  child: Form(
-                    key: _loginFormKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildField(
-                          controller: emailController,
-                          focusNode: _emailFocus,
-                          hint: tr.t('auth_login_email_hint'),
-                          icon: Icons.mail_outline_rounded,
-                          keyboardType: TextInputType.emailAddress,
-                          action: TextInputAction.next,
-                          onSubmit: (_) => FocusScope.of(context)
-                              .requestFocus(_passwordFocus),
-                          validator: (t) => Validator.validateEmail(t!),
-                        ),
-                        SizedBox(height: 16.h),
-                        _buildField(
-                          controller: passwordController,
-                          focusNode: _passwordFocus,
-                          hint: tr.t('auth_login_password_hint'),
-                          icon: Icons.lock_outline_rounded,
-                          obscure: _obscurePassword,
-                          keyboardType: TextInputType.visiblePassword,
-                          action: TextInputAction.done,
-                          onSubmit: (_) => _submitLogin(soundManager),
-                          validator: (t) => Validator.validatePassword(t!),
-                          suffix: GestureDetector(
-                            onTap: () => setState(
-                                () => _obscurePassword = !_obscurePassword),
-                            child: Padding(
-                              padding: EdgeInsets.only(right: 14.w),
-                              child: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                color: const Color(0xFF5A7A9A),
-                                size: 20.sp,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 10.h),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                showResetPasswordModal(context);
-                              },
-                              child: Text(
-                                tr.t('auth_forgot_password'),
+                              SizedBox(height: 6.h),
+                              Text(
+                                tr.t('auth_login_subtitle'),
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: const Color(0xFF5EB0FF),
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.7),
                                   fontFamily: 'Mikado',
                                 ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 28.h),
-                        BlocConsumer<AuthenticationBloc, AuthenticationState>(
-                          listenWhen: (prev, curr) =>
-                              prev.failedToLogin != curr.failedToLogin ||
-                              prev.token != curr.token,
-                          listener: (context, state) {
-                            if (state.failedToLogin) {
-                              final errorMsg = ApiException.errorMessage;
-                              if (errorMsg.isNotEmpty) {
-                                ApiException.showSnackBar(context);
-                              } else {
-                                Flushbar(
-                                  message: tr.t('auth_login_failed'),
-                                  flushbarPosition: FlushbarPosition.TOP,
-                                  flushbarStyle: FlushbarStyle.GROUNDED,
-                                  backgroundColor: Colors.red,
-                                  duration: const Duration(seconds: 3),
-                                ).show(context);
-                              }
-                            }
-                            if (state.token != null) {
-                              BlocProvider.of<GlobalChallengeBloc>(context)
-                                  .add(FetchGlobalChallengeGames());
-                              final tokenNotifier = Provider.of<TokenNotifier>(
-                                  context,
-                                  listen: false);
-                              tokenNotifier.setToken(state.token);
-                              GetStorage().write('user_token', state.token!);
-                              GetStorage()
-                                  .write('refresh_token', state.refreshToken!);
-                              Navigator.pop(context);
-                              showSuccessfulLoginModal(context);
-                            }
-                          },
-                          builder: (context, state) {
-                            return BlueButton(
-                              width: double.infinity,
-                              buttonText: tr.t('auth_login'),
-                              buttonIsLoading: state.isLoadingLogin,
-                              onTap: () => _submitLogin(soundManager),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 12.h),
                       ],
                     ),
                   ),
-                ),
-              ],
-            ),
+
+                  // ── Divider line ──
+                  Container(
+                    height: 3,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFFFD700).withOpacity(0.0),
+                          const Color(0xFFFFD700).withOpacity(0.6),
+                          const Color(0xFFFFD700).withOpacity(0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ── Form section ──
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.fromLTRB(24.w, 28.h, 24.w, 24.h),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF0D2B52),
+                          Color(0xFF091E3A),
+                        ],
+                      ),
+                    ),
+                    child: Form(
+                      key: _loginFormKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            controller: emailController,
+                            focusNode: _emailFocus,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) => FocusScope.of(context)
+                                .requestFocus(_passwordFocus),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.sp,
+                            ),
+                            decoration: _inputDecoration(
+                              hint: tr.t('auth_login_email_hint'),
+                              prefixIcon: Icons.mail_outline_rounded,
+                            ),
+                            validator: (text) =>
+                                Validator.validateEmail(text!),
+                          ),
+                          SizedBox(height: 16.h),
+                          TextFormField(
+                            keyboardType: TextInputType.visiblePassword,
+                            controller: passwordController,
+                            focusNode: _passwordFocus,
+                            obscureText: _obscurePassword,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) =>
+                                _submitLogin(soundManager),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.sp,
+                            ),
+                            decoration: _inputDecoration(
+                              hint: tr.t('auth_login_password_hint'),
+                              prefixIcon: Icons.lock_outline_rounded,
+                              suffixIcon: GestureDetector(
+                                onTap: () => setState(() =>
+                                    _obscurePassword = !_obscurePassword),
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 12.w),
+                                  child: Image.asset(
+                                    _obscurePassword
+                                        ? IconImageRoutes.eyeClose
+                                        : IconImageRoutes.eyeOpen,
+                                    width: 24.w,
+                                    color: const Color(0xFF4A6A8A),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            validator: (text) =>
+                                Validator.validatePassword(text!),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10.h),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  showResetPasswordModal(context);
+                                },
+                                child: Text(
+                                  tr.t('auth_forgot_password'),
+                                  style: TextStyle(
+                                    color: const Color(0xFF4A9EFF),
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Mikado',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 24.h),
+                          BlocConsumer<AuthenticationBloc,
+                              AuthenticationState>(
+                            listenWhen: (prev, curr) =>
+                                prev.failedToLogin != curr.failedToLogin ||
+                                prev.token != curr.token,
+                            listener: (context, state) {
+                              if (state.failedToLogin) {
+                                final errorMsg = ApiException.errorMessage;
+                                if (errorMsg.isNotEmpty) {
+                                  ApiException.showSnackBar(context);
+                                } else {
+                                  Flushbar(
+                                    message: tr.t('auth_login_failed'),
+                                    flushbarPosition: FlushbarPosition.TOP,
+                                    flushbarStyle: FlushbarStyle.GROUNDED,
+                                    backgroundColor: Colors.red,
+                                    duration: const Duration(seconds: 3),
+                                  ).show(context);
+                                }
+                              }
+                              if (state.token != null) {
+                                BlocProvider.of<GlobalChallengeBloc>(context)
+                                    .add(FetchGlobalChallengeGames());
+                                final tokenNotifier =
+                                    Provider.of<TokenNotifier>(context,
+                                        listen: false);
+                                tokenNotifier.setToken(state.token);
+                                GetStorage()
+                                    .write('user_token', state.token!);
+                                GetStorage().write(
+                                    'refresh_token', state.refreshToken!);
+                                Navigator.pop(context);
+                                showSuccessfulLoginModal(context);
+                              }
+                            },
+                            builder: (context, state) {
+                              return BlueButton(
+                                width: double.infinity,
+                                buttonText: tr.t('auth_login'),
+                                buttonIsLoading: state.isLoadingLogin,
+                                onTap: () => _submitLogin(soundManager),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 12.h),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildField({
-    required TextEditingController controller,
-    required FocusNode focusNode,
-    required String hint,
-    required IconData icon,
-    TextInputType? keyboardType,
-    TextInputAction? action,
-    bool obscure = false,
-    Widget? suffix,
-    String? Function(String?)? validator,
-    void Function(String)? onSubmit,
-  }) {
-    return TextFormField(
-      controller: controller,
-      focusNode: focusNode,
-      keyboardType: keyboardType,
-      textInputAction: action,
-      obscureText: obscure,
-      onFieldSubmitted: onSubmit,
-      style: TextStyle(color: Colors.white, fontSize: 14.sp),
-      validator: validator,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFF0F2A4A),
-        prefixIcon: Padding(
-          padding: EdgeInsets.only(left: 14.w, right: 10.w),
-          child: Icon(icon, color: const Color(0xFFFFBB33), size: 20.sp),
-        ),
-        prefixIconConstraints: BoxConstraints(minWidth: 44.w),
-        suffixIcon: suffix,
-        suffixIconConstraints: BoxConstraints(minWidth: 40.w),
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: const Color(0xFF456080),
-          fontSize: 14.sp,
-        ),
-        errorStyle: TextStyle(
-          fontSize: 11.sp,
-          color: const Color(0xFFFF6B6B),
-          fontWeight: FontWeight.w500,
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: const BorderSide(color: Color(0xFF1A3A5E), width: 1.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: const BorderSide(color: Color(0xFFFFBB33), width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: const BorderSide(color: Color(0xFFFF6B6B), width: 1.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: const BorderSide(color: Color(0xFFFF6B6B), width: 2),
         ),
       ),
     );
@@ -500,23 +481,4 @@ class _LoginModalState extends State<LoginModal>
       );
     }
   }
-}
-
-/// Paints subtle sparkle dots in the header
-class _SparklesPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rng = Random(42);
-    final paint = Paint()..color = Colors.white;
-    for (int i = 0; i < 18; i++) {
-      final x = rng.nextDouble() * size.width;
-      final y = rng.nextDouble() * size.height;
-      final r = rng.nextDouble() * 1.8 + 0.5;
-      paint.color = Colors.white.withOpacity(rng.nextDouble() * 0.25 + 0.05);
-      canvas.drawCircle(Offset(x, y), r, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
