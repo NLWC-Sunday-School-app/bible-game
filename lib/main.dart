@@ -3,7 +3,6 @@ import 'package:bible_game_api/api/game_api.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_web_plugins/url_strategy.dart' if (dart.library.html) 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bible_game/features/fantasy_league/repository/fantasy_league_repository.dart';
@@ -26,8 +25,6 @@ import 'package:bible_game_api/api/api_client.dart';
 import 'package:bible_game_api/api/authentication_api.dart';
 
 void main() async {
-  // Hash URL strategy is the default — don't set path strategy
-  // to avoid browser history pollution that causes mobile swipe-back issues.
   WidgetsFlutterBinding.ensureInitialized();
 
   Bloc.observer = AppBlocObserver();
