@@ -59,6 +59,8 @@ class AuthenticationRegisterRequested extends AuthenticationEvent {
 
 class FetchUserDataRequested extends AuthenticationEvent {}
 
+class RestoreSession extends AuthenticationEvent {}
+
 class UpdateFCMToken extends AuthenticationEvent {}
 
 class SendForgotPasswordMail extends AuthenticationEvent {
