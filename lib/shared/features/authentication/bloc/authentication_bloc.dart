@@ -37,6 +37,7 @@ class AuthenticationBloc
     on<VerifyOTP>(_onVerifyOTP);
     on<ResetPassword>(_onResetPassword);
     on<DeleteAccount>(_onDeleteAccount);
+    on<RestoreSession>(_onRestoreSession);
   }
 
   Future<void> _onAuthenticationStatusChanged(
@@ -247,6 +248,29 @@ class AuthenticationBloc
       emit(state.copyWith(isResettingPassword: false, hasResetPassword: true));
     } catch (_) {
       emit(state.copyWith(isResettingPassword: false));
+    }
+  }
+
+  Future<void> _onRestoreSession(
+    RestoreSession event,
+    Emitter<AuthenticationState> emit,
+  ) async {
+    final storedToken = GetStorage().read('user_token');
+    final storedRefreshToken = GetStorage().read('refresh_token');
+    if (storedToken != null) {
+      emit(state.copyWith(
+        token: storedToken,
+        refreshToken: storedRefreshToken,
+        isUnauthenticated: false,
+      ));
+      // Restore cached user data immediately so UI shows logged-in state
+      final cachedUser = _loadCachedUser();
+      if (cachedUser != null) {
+        emit(state.copyWith(
+          user: cachedUser,
+          isLoggedIn: true,
+        ));
+      }
     }
   }
 

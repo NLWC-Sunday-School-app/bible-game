@@ -175,7 +175,7 @@ class _AppState extends State<App> {
             create: (context) => AuthenticationBloc(
               authenticationRepository: widget.authenticationRepository,
               userRepository: widget.userRepository,
-            ),
+            )..add(RestoreSession()),
           ),
           BlocProvider<UserBloc>(
             create: (context) => UserBloc(

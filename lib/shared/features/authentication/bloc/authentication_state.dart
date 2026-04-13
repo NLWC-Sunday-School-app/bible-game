@@ -74,8 +74,8 @@ class AuthenticationState extends Equatable {
         isLoggingOut: isLoggingOut ?? this.isLoggingOut,
         hasDeletedAccount: hasDeletedAccount ?? this.hasDeletedAccount,
         user: user ?? this.user,
-        token: token ?? null,
-        refreshToken: refreshToken ?? null,
+        token: token ?? this.token,
+        refreshToken: refreshToken ?? this.refreshToken,
         failedToLogin: failedToLogin ?? this.failedToLogin,
         failedToRegister: failedToRegister ?? this.failedToRegister,
         hasLoggedOut: hasLoggedOut ?? this.hasLoggedOut);
