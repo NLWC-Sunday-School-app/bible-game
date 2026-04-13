@@ -103,7 +103,7 @@ class GlobalChallengeBloc
       int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
       int noOfCorrectAnswers = state.noOfCorrectAnswers;
       final pointsPerQuestion =
-          int.parse(settingsState.gamePlaySettings['num_whoiswho_plays']);
+          int.tryParse(settingsState.gamePlaySettings['num_whoiswho_plays']?.toString() ?? '') ?? 80;
       final isCorrect = event.gameQuestion.answer ==
           event.gameQuestion.options[event.selectedOptionIndex];
       if (isCorrect) {

@@ -8,7 +8,8 @@ class PowerUpItem {
   final String nameKey;
   final String description;
   final String descriptionKey;
-  final int price;
+  final int defaultPrice;
+  final String settingsKey;
   final bool usesGems;
   final String storageKey;
   final String iconPath;
@@ -19,11 +20,23 @@ class PowerUpItem {
     required this.nameKey,
     required this.description,
     required this.descriptionKey,
-    required this.price,
+    required this.defaultPrice,
+    required this.settingsKey,
     required this.usesGems,
     required this.storageKey,
     required this.iconPath,
   });
+
+  /// Returns the backend-configured price if available, otherwise the default.
+  int getPrice(dynamic gamePlaySettings) {
+    if (gamePlaySettings is Map && gamePlaySettings.containsKey(settingsKey)) {
+      final val = gamePlaySettings[settingsKey];
+      if (val is int) return val;
+      if (val is num) return val.toInt();
+      if (val is String) return int.tryParse(val) ?? defaultPrice;
+    }
+    return defaultPrice;
+  }
 
   static const List<PowerUpItem> allPowerUps = [
     PowerUpItem(
@@ -32,7 +45,8 @@ class PowerUpItem {
       nameKey: 'store_fifty_fifty',
       description: 'Remove 2 wrong answers',
       descriptionKey: 'store_fifty_fifty_desc',
-      price: 15000,
+      defaultPrice: 15000,
+      settingsKey: 'fifty_fifty_price',
       usesGems: false,
       storageKey: 'powerup_fifty_fifty',
       iconPath: IconImageRoutes.star,
@@ -43,7 +57,8 @@ class PowerUpItem {
       nameKey: 'store_time_freeze',
       description: 'Extra 30 seconds',
       descriptionKey: 'store_time_freeze_desc',
-      price: 20000,
+      defaultPrice: 20000,
+      settingsKey: 'time_freeze_price',
       usesGems: false,
       storageKey: 'powerup_time_freeze',
       iconPath: IconImageRoutes.greenTimer,
@@ -54,7 +69,8 @@ class PowerUpItem {
       nameKey: 'store_double_coins',
       description: '2x coins next game',
       descriptionKey: 'store_double_coins_desc',
-      price: 10,
+      defaultPrice: 10,
+      settingsKey: 'double_coins_price',
       usesGems: true,
       storageKey: 'powerup_double_coins',
       iconPath: IconImageRoutes.coinIcon,
@@ -65,7 +81,8 @@ class PowerUpItem {
       nameKey: 'store_second_chance',
       description: 'Retry 1 wrong answer',
       descriptionKey: 'store_second_chance_desc',
-      price: 10000,
+      defaultPrice: 10000,
+      settingsKey: 'second_chance_price',
       usesGems: false,
       storageKey: 'powerup_second_chance',
       iconPath: IconImageRoutes.arrowCircleBack,

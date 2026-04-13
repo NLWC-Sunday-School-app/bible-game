@@ -102,8 +102,7 @@ class _QuickGameHomeScreenTabletViewState extends State<QuickGameHomeScreenTable
                   image: AssetImage(ProductImageRoutes.patternTwoBg),
                   fit: BoxFit.cover,
                 )),
-                child: SingleChildScrollView(
-                  child: Column(
+                child: Column(
                   children: [
                     ScreenAppBar(
                       height: null,
@@ -238,93 +237,111 @@ class _QuickGameHomeScreenTabletViewState extends State<QuickGameHomeScreenTable
                             child: CircularProgressIndicator(
                             color: Colors.white,
                           ))
-                        : state.quickGameTopics!.isNotEmpty
-                            ? GridView.builder(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 100,
-                                    vertical: 10),
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  mainAxisSpacing: 20,
-                                ),
-                                itemCount:
-                                    state.quickGameTopics?.length,
-                                itemBuilder: (BuildContext context,
-                                    int index) {
-                                  return TopicTagTabletView(
-                                    topic: state
-                                        .quickGameTopics![index].tag,
-                                    id: state
-                                        .quickGameTopics![index].id,
-                                  );
-                                },
-                              )
-                            : Padding(
-                                padding: EdgeInsets.only(top: 60.h),
-                                child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    ProductImageRoutes.broLukeInfo,
-                                    width: 84.w,
-                                  ),
-                                  SizedBox(
-                                    height: 20.h,
-                                  ),
-                                  Text(
-                                    'No search result for this topic.\nYou can add it to Bible Game!',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white),
-                                  ),
-                                  SizedBox(height: 28.h,),
-                                  GreenButton(
-                                    onTap: (){
-                                      soundManager.playClickSound();
-                                      Navigator.pushNamed(context, AppRoutes.profileScreen);
-                                    },
-                                    buttonIsLoading: false,
-                                    width: 300.w,
-                                    customWidget:  Center(
-                                      child: StrokeText(
-                                        text: 'Add to Bible game questions.',
-                                        textStyle: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w700,
+                        : Expanded(
+                          child: Stack(
+                              children: [
+                                state.quickGameTopics!.isNotEmpty
+                                    ? GridView.builder(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 100),
+                                        shrinkWrap: true,
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3,
+                                          // crossAxisSpacing: 20,
+                                          mainAxisSpacing: 20,
                                         ),
-                                        strokeColor: const Color(0xFF272D39),
-                                        strokeWidth: 3,
+                                        itemCount:
+                                            state.quickGameTopics?.length,
+                                        itemBuilder: (BuildContext context,
+                                            int index) {
+                                          return TopicTagTabletView(
+                                            topic: state
+                                                .quickGameTopics![index].tag,
+                                            id: state
+                                                .quickGameTopics![index].id,
+                                          );
+                                        },
+                                      )
+                                    : state.hasSearched
+                                        ? Center(
+                                            child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Image.asset(
+                                                ProductImageRoutes.broLukeInfo,
+                                                width: 84.w,
+                                              ),
+                                              SizedBox(
+                                                height: 20.h,
+                                              ),
+                                              Text(
+                                                'No search result for this topic.\nYou can add it to Bible Game!',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white),
+                                              ),
+                                              SizedBox(height: 28.h,),
+                                              GreenButton(
+                                                onTap: (){
+                                                  soundManager.playClickSound();
+                                                  Navigator.pushNamed(context, AppRoutes.profileScreen);
+                                                },
+                                                buttonIsLoading: false,
+                                                width: 300.w,
+                                                customWidget:  Center(
+                                                  child: StrokeText(
+                                                    text: 'Add to Bible game questions.',
+                                                    textStyle: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16.sp,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                    strokeColor: const Color(0xFF272D39),
+                                                    strokeWidth: 3,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ))
+                                        : Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                state.selectedGameTopics!.length >= 1
+                                    ? Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(bottom: 20.h),
+                                        child: BlueButtonTabletView(
+                                          buttonText: 'Play now',
+                                          buttonIsLoading: false,
+                                          width: 638.w,
+                                          height: 64.h,
+                                          onTap: () {
+                                            soundManager.playClickSound();
+                                            if (state.selectedGameTopics!
+                                                        .length >=
+                                                    1 &&
+                                                state.selectedGameTopics!
+                                                        .length <
+                                                    5) {
+                                              showUseTimerModalTabletView(context);
+                                            }
+                                            // Navigator.pushNamed(context, AppRoutes.questionLoadingScreen, arguments:{ 'gameType': 'quick_game'});
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                ],
-                              )),
-                    if (state.selectedGameTopics!.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 35.w, vertical: 20.h),
-                        child: BlueButtonTabletView(
-                          buttonText: 'Play now',
-                          buttonIsLoading: false,
-                          width: 638.w,
-                          height: 64.h,
-                          onTap: () {
-                            soundManager.playClickSound();
-                            if (state.selectedGameTopics!.length >= 1 &&
-                                state.selectedGameTopics!.length < 5) {
-                              showUseTimerModalTabletView(context);
-                            }
-                          },
+                                    )
+                                    : SizedBox()
+                              ],
+                            ),
                         ),
-                      ),
                   ],
-                ),
                 ),
               ),
             );

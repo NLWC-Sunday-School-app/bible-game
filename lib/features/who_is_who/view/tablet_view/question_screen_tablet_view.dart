@@ -41,10 +41,10 @@ class _WhoIsWhoQuestionScreenTabletViewState extends State<WhoIsWhoQuestionScree
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
     final selectedLevelDuration =  BlocProvider.of<WhoIsWhoBloc>(context).state.gameDuration;
     gameDuration = whoIsWhoBloc.state.gameDuration!;
-    questionsRequiredToPass = int.parse(
-        settingsBloc.state.gamePlaySettings['whoiswho_questions_passmark']);
-    gameTimePurchasePrice = int.parse(
-        settingsBloc.state.gamePlaySettings['game_time_purchase_price']);
+    questionsRequiredToPass = int.tryParse(
+        settingsBloc.state.gamePlaySettings['whoiswho_questions_passmark']?.toString() ?? '') ?? 20;
+    gameTimePurchasePrice = int.tryParse(
+        settingsBloc.state.gamePlaySettings['game_time_purchase_price']?.toString() ?? '') ?? 1500;
     _initializeAnimationController(Duration(minutes: gameDuration));
   }
 

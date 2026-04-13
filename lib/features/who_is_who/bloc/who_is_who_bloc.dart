@@ -82,7 +82,7 @@ class WhoIsWhoBloc extends Bloc<WhoIsWhoEvent, WhoIsWhoState> {
       int noOfQuestionsAnswered = state.noOfQuestionsAnswered!;
       int noOfCorrectAnswers = state.noOfCorrectAnswers!;
       final pointsPerQuestion =
-      int.parse(settingsState.gamePlaySettings['num_whoiswho_plays']);
+      int.tryParse(settingsState.gamePlaySettings['num_whoiswho_plays']?.toString() ?? '') ?? 80;
       final isCorrect = event.gameQuestion.answer ==
           event.gameQuestion.options[event.selectedOptionIndex];
       noOfQuestionsAnswered++;

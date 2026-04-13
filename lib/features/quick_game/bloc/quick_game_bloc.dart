@@ -51,7 +51,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     Emitter<QuickGameState> emit,
   ) async {
     try {
-      emit(state.copyWith(isLoadingGameTopics: true));
+      emit(state.copyWith(isLoadingGameTopics: true, hasSearched: false));
       final topics = await _quickGameRepository.getQuickGameTopics();
       emit(state.copyWith(quickGameTopics: topics, isLoadingGameTopics: false));
     } catch (_) {
@@ -171,8 +171,8 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
       int noOfCorrectAnswers = state.noOfCorrectAnswers;
       int currentStreak = state.currentStreak;
       int bestStreak = state.bestStreak;
-      final pointsPerQuestion = int.parse(settingsState.gamePlaySettings['base_score_pilgrim_progress']);
-      final durationPerQuestion = int.parse(settingsState.gamePlaySettings['normal_game_speed']);
+      final pointsPerQuestion = int.tryParse(settingsState.gamePlaySettings['base_score_pilgrim_progress']?.toString() ?? '') ?? 300;
+      final durationPerQuestion = int.tryParse(settingsState.gamePlaySettings['normal_game_speed']?.toString() ?? '') ?? 30;
       final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
       final totalTimeSpent = state.totalTimeSpent! + (durationPerQuestion - event.remainingTime);
       final isCorrect = event.gameQuestion.answer == event.gameQuestion.options[event.selectedOptionIndex];
@@ -288,7 +288,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
   Future<void> _onFindQuickGameTopics(
       FindQuickGameTopics event, Emitter<QuickGameState> emit) async {
     try {
-      emit(state.copyWith(isLoadingGameTopics: true));
+      emit(state.copyWith(isLoadingGameTopics: true, hasSearched: true));
       final topics = await _quickGameRepository.findQuickGameTopics(event.code);
       emit(state.copyWith(quickGameTopics: topics, isLoadingGameTopics: false));
     } catch (_) {
@@ -301,6 +301,7 @@ class QuickGameBloc extends Bloc<QuickGameEvent, QuickGameState> {
     ClearQuickGameData event,
     Emitter<QuickGameState> emit,
   ) {
-    emit(QuickGameState());
+    // Preserve topics list so returning to the screen doesn't flash empty state
+    emit(QuickGameState(quickGameTopics: state.quickGameTopics));
   }
 }

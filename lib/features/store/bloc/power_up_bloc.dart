@@ -28,6 +28,7 @@ class PowerUpBloc extends Bloc<PowerUpEvent, PowerUpState> {
       PurchasePowerUp event, Emitter<PowerUpState> emit) async {
     final item =
         PowerUpItem.allPowerUps.firstWhere((p) => p.type == event.type);
+    final price = event.price;
 
     emit(state.copyWith(isPurchasing: true, error: null));
 
@@ -36,7 +37,7 @@ class PowerUpBloc extends Bloc<PowerUpEvent, PowerUpState> {
         // Deduct coins via backend API
         final success = await gameAPI.buyFromStore(
           event.userId,
-          item.price,
+          price,
           description: 'Power-up: ${item.name}',
         );
         if (!success) {

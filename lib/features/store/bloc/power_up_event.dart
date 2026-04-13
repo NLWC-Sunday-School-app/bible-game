@@ -7,7 +7,8 @@ class LoadPowerUps extends PowerUpEvent {}
 class PurchasePowerUp extends PowerUpEvent {
   final PowerUpType type;
   final int userId;
-  PurchasePowerUp(this.type, {required this.userId});
+  final int price;
+  PurchasePowerUp(this.type, {required this.userId, required this.price});
 }
 
 class UsePowerUp extends PowerUpEvent {

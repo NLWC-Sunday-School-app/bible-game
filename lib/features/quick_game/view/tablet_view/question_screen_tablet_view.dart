@@ -49,8 +49,8 @@ class _QuickGameQuestionScreenTabletViewState extends State<QuickGameQuestionScr
     });
 
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
-    durationPerQuestion =
-        int.parse(settingsBloc.state.gamePlaySettings['normal_game_speed']);
+    final gameSpeed = settingsBloc.state.gamePlaySettings['normal_game_speed'];
+    durationPerQuestion = gameSpeed != null ? int.parse(gameSpeed.toString()) : 30;
 
     _initializeAnimationController(hasTimer);
   }

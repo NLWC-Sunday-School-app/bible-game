@@ -87,11 +87,10 @@ class _QuickGameQuestionScreenState
         <String, dynamic>{}) as Map;
     hasTimer = arguments['hasTimer'];
 
-    durationPerQuestion = int.parse(
-      BlocProvider.of<SettingsBloc>(context)
-          .state
-          .gamePlaySettings['normal_game_speed'],
-    );
+    final gameSpeed = BlocProvider.of<SettingsBloc>(context)
+        .state
+        .gamePlaySettings['normal_game_speed'];
+    durationPerQuestion = gameSpeed != null ? int.parse(gameSpeed.toString()) : 30;
 
     initQuestionControllers(
       duration: Duration(seconds: durationPerQuestion),

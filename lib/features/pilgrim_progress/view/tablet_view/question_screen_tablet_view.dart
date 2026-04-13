@@ -38,7 +38,7 @@ class _PilgrimQuestionScreenTabletViewState extends State<PilgrimQuestionScreenT
 
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
     durationPerQuestion =
-        int.parse(settingsBloc.state.gamePlaySettings['normal_game_speed']);
+        int.tryParse(settingsBloc.state.gamePlaySettings['normal_game_speed']?.toString() ?? '') ?? 30;
     _initializeAnimationController();
   }
 

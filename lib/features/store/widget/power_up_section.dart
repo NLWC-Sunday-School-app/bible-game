@@ -15,13 +15,15 @@ class PowerUpSection extends StatelessWidget {
 
   void _handlePurchase(BuildContext context, PowerUpItem item) {
     final authState = context.read<AuthenticationBloc>().state;
+    final settingsState = context.read<SettingsBloc>().state;
     final soundManager = context.read<SettingsBloc>().soundManager;
     final coinBalance = authState.user.coinWalletBalance;
     final gemBalance = authState.user.gems;
+    final price = item.getPrice(settingsState.gamePlaySettings);
 
     final hasEnough = item.usesGems
-        ? gemBalance >= item.price
-        : coinBalance >= item.price;
+        ? gemBalance >= price
+        : coinBalance >= price;
 
     if (!hasEnough) {
       final message = item.usesGems
@@ -40,7 +42,7 @@ class PowerUpSection extends StatelessWidget {
 
     soundManager.playClickSound();
     final userId = context.read<AuthenticationBloc>().state.user.id;
-    context.read<PowerUpBloc>().add(PurchasePowerUp(item.type, userId: userId));
+    context.read<PowerUpBloc>().add(PurchasePowerUp(item.type, userId: userId, price: price));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -113,10 +115,12 @@ class PowerUpSection extends StatelessWidget {
                 crossAxisSpacing: 10.w,
                 childAspectRatio: 0.95,
                 children: PowerUpItem.allPowerUps.map((item) {
+                  final settings = context.read<SettingsBloc>().state.gamePlaySettings;
                   return PowerUpCard(
                     item: item,
                     quantity: powerUpState.getQuantity(item.type),
                     isPurchasing: powerUpState.isPurchasing,
+                    price: item.getPrice(settings),
                     onBuy: () => _handlePurchase(context, item),
                   );
                 }).toList(),

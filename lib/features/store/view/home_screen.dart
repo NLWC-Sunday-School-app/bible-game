@@ -70,12 +70,14 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
 
   void _handlePowerUpPurchase(BuildContext context, PowerUpItem item) {
     final authState = context.read<AuthenticationBloc>().state;
+    final settingsState = context.read<SettingsBloc>().state;
     final soundManager = context.read<SettingsBloc>().soundManager;
     final coinBalance = authState.user.coinWalletBalance;
     final gemBalance = authState.user.gems;
+    final price = item.getPrice(settingsState.gamePlaySettings);
 
     final hasEnough =
-        item.usesGems ? gemBalance >= item.price : coinBalance >= item.price;
+        item.usesGems ? gemBalance >= price : coinBalance >= price;
 
     if (!hasEnough) {
       soundManager.playClickSound();
@@ -88,7 +90,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
 
     soundManager.playClickSound();
     final userId = authState.user.id;
-    context.read<PowerUpBloc>().add(PurchasePowerUp(item.type, userId: userId));
+    context.read<PowerUpBloc>().add(PurchasePowerUp(item.type, userId: userId, price: price));
   }
 
   @override
@@ -365,7 +367,8 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
               // Power-up cards
               ...PowerUpItem.allPowerUps.map((item) {
                 final qty = powerUpState.getQuantity(item.type);
-                return _buildPowerUpCard(context, item, qty);
+                final settings = context.read<SettingsBloc>().state.gamePlaySettings;
+                return _buildPowerUpCard(context, item, qty, price: item.getPrice(settings));
               }),
             ],
           ),
@@ -500,7 +503,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                     );
                     return;
                   }
-                  if (coinBalance >= int.parse(gemPrice)) {
+                  if (coinBalance >= (int.tryParse(gemPrice?.toString() ?? '') ?? 100000)) {
                     context.read<UserBloc>().add(PurchaseGem());
                     Future.delayed(const Duration(seconds: 2), () {
                       context
@@ -577,7 +580,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
     );
   }
 
-  Widget _buildPowerUpCard(BuildContext context, PowerUpItem item, int quantity) {
+  Widget _buildPowerUpCard(BuildContext context, PowerUpItem item, int quantity, {required int price}) {
     // Unique accent color per power-up type
     final Color accentColor;
     switch (item.type) {
@@ -729,7 +732,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                   ),
                   SizedBox(width: 5.w),
                   Text(
-                    NumberFormat('#,###,###').format(item.price),
+                    NumberFormat('#,###,###').format(price),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 13.sp,

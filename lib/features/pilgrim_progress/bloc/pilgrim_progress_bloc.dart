@@ -116,32 +116,32 @@ class PilgrimProgressBloc
     final settingState = _settingsBloc.state;
     final userLevelId = getUserLevelId(_authenticationBloc.state.user.rank);
 
-    final passPointOnFirstTrial =
-        int.parse(settingState.gamePlaySettings['pass_on_first_trial_score']);
+    int _s(String key, int fallback) =>
+        int.tryParse(settingState.gamePlaySettings[key]?.toString() ?? '') ?? fallback;
+
+    final passPointOnFirstTrial = _s('pass_on_first_trial_score', 4200);
     final totalPointsGainedInBabe =
         (state.pilgrimProgressLevelData[0].progress! *
-                int.parse(settingState.gamePlaySettings['babe_to_child_total']))
+                _s('babe_to_child_total', 17000))
             .toInt();
     final totalPointsGainedInChild = (state
                 .pilgrimProgressLevelData[1].progress! *
-            int.parse(
-                settingState.gamePlaySettings['child_to_young_believer_total']))
+            _s('child_to_young_believer_total', 14400))
         .toInt();
     final totalPointsGainedInYB = (state.pilgrimProgressLevelData[2].progress! *
-            int.parse(settingState
-                .gamePlaySettings['young_believer_to_charity_total']))
+            _s('young_believer_to_charity_total', 11400))
         .toInt();
     final totalPointsGainedInCharity = (state
                 .pilgrimProgressLevelData[3].progress! *
-            int.parse(settingState.gamePlaySettings['charity_to_father_total']))
+            _s('charity_to_father_total', 8000))
         .toInt();
     final totalPointsGainedInFather = (state
                 .pilgrimProgressLevelData[4].progress! *
-            int.parse(settingState.gamePlaySettings['father_to_elder_total']))
+            _s('father_to_elder_total', 8200))
         .toInt();
     final totalPointsGainedInElder = (state
                 .pilgrimProgressLevelData[5].progress! *
-            int.parse(settingState.gamePlaySettings['father_to_elder_total']))
+            _s('father_to_elder_total', 8200))
         .toInt();
 
 
@@ -178,15 +178,15 @@ class PilgrimProgressBloc
     try {
       final settingsState = _settingsBloc.state;
       final List<int> trialsPerLevel = [5, 4, 3, 2, 2, 2];
+      int _s(String key, int fallback) =>
+          int.tryParse(settingsState.gamePlaySettings[key]?.toString() ?? '') ?? fallback;
       final List<int> totalCoinsAvailableInAllLevel = [
-        int.parse(settingsState.gamePlaySettings['babe_to_child_total']),
-        int.parse(
-            settingsState.gamePlaySettings['child_to_young_believer_total']),
-        int.parse(
-            settingsState.gamePlaySettings['young_believer_to_charity_total']),
-        int.parse(settingsState.gamePlaySettings['charity_to_father_total']),
-        int.parse(settingsState.gamePlaySettings['father_to_elder_total']),
-        int.parse(settingsState.gamePlaySettings['father_to_elder_total'])
+        _s('babe_to_child_total', 17000),
+        _s('child_to_young_believer_total', 14400),
+        _s('young_believer_to_charity_total', 11400),
+        _s('charity_to_father_total', 8000),
+        _s('father_to_elder_total', 8200),
+        _s('father_to_elder_total', 8200),
       ];
       final selectedLevel = event.selectedLevel;
       final userRank = _authenticationBloc.state.user.rank;
@@ -223,10 +223,10 @@ class PilgrimProgressBloc
       int coinsGained = state.coinsGained ?? 0;
       int totalBonusCoinsGained = state.totalBonusCoinsGained ?? 0;
       int noOfCorrectAnswers = state.noOfCorrectAnswers;
-      final pointsPerQuestion = int.parse(
-          settingsState.gamePlaySettings['base_score_pilgrim_progress']);
+      final pointsPerQuestion = int.tryParse(
+          settingsState.gamePlaySettings['base_score_pilgrim_progress']?.toString() ?? '') ?? 300;
       final durationPerQuestion =
-      int.parse(settingsState.gamePlaySettings['normal_game_speed']);
+      int.tryParse(settingsState.gamePlaySettings['normal_game_speed']?.toString() ?? '') ?? 30;
       final halfOfTotalPointPerQuestion = pointsPerQuestion / 2;
       final totalTimeSpent =
           state.totalTimeSpent! + (durationPerQuestion - event.remainingTime);

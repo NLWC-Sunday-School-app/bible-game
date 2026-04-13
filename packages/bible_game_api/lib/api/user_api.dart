@@ -54,7 +54,19 @@ class UserAPI {
 
   Future<Map<String, dynamic>> getGamePlaySettings() async {
     try {
-      final response = await apiClient.get('/games/play/settings');
+      final response = await apiClient.get('/settings');
+      // The /settings endpoint returns an array of {name, value, ...} objects.
+      // Flatten into a {name: value} map for easy lookup.
+      if (response.data is List) {
+        final Map<String, dynamic> settings = {};
+        for (final item in response.data) {
+          if (item is Map && item['name'] != null) {
+            settings[item['name'] as String] = item['value'];
+          }
+        }
+        return settings;
+      }
+      // Fallback: if already a map (e.g. old endpoint format)
       return response.data;
     } on ApiException catch (e) {
       final errorMessage = e.toString();

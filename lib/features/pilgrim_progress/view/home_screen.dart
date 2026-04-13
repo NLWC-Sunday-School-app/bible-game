@@ -144,7 +144,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     children: <TextSpan>[
                                   TextSpan(
                                       text:
-                                          ' ${formatter.format(int.parse(settingsState.gamePlaySettings['babe_to_child_total']))} points',
+                                          ' ${formatter.format(int.tryParse(settingsState.gamePlaySettings['babe_to_child_total']?.toString() ?? '') ?? 17000)} points',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
                                   const TextSpan(
@@ -177,7 +177,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     children: <TextSpan>[
                                   TextSpan(
                                       text:
-                                          ' ${formatter.format(int.parse(settingsState.gamePlaySettings['child_to_young_believer_total']))} points',
+                                          ' ${formatter.format(int.tryParse(settingsState.gamePlaySettings['child_to_young_believer_total']?.toString() ?? '') ?? 14400)} points',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
                                   const TextSpan(
@@ -210,7 +210,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     children: <TextSpan>[
                                   TextSpan(
                                       text:
-                                          ' ${formatter.format(int.parse(settingsState.gamePlaySettings['young_believer_to_charity_total']))} points',
+                                          ' ${formatter.format(int.tryParse(settingsState.gamePlaySettings['young_believer_to_charity_total']?.toString() ?? '') ?? 11400)} points',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
                                   const TextSpan(
@@ -244,7 +244,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     children: <TextSpan>[
                                   TextSpan(
                                       text:
-                                          ' ${formatter.format(int.parse(settingsState.gamePlaySettings['charity_to_father_total']))} points',
+                                          ' ${formatter.format(int.tryParse(settingsState.gamePlaySettings['charity_to_father_total']?.toString() ?? '') ?? 8000)} points',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
                                   const TextSpan(
@@ -277,7 +277,7 @@ class _PilgrimProgressHomeScreenState extends State<PilgrimProgressHomeScreen> {
                                     children: <TextSpan>[
                                   TextSpan(
                                       text:
-                                          ' ${formatter.format(int.parse(settingsState.gamePlaySettings['father_to_elder_total']))} points',
+                                          ' ${formatter.format(int.tryParse(settingsState.gamePlaySettings['father_to_elder_total']?.toString() ?? '') ?? 8200)} points',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
                                   const TextSpan(

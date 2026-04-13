@@ -108,6 +108,10 @@ class _BgStreakModalTabletViewState extends State<BgStreakModalTabletView> {
 
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final settings = context.read<SettingsBloc>().state.gamePlaySettings;
+    final restoreGemPrice = settings is Map && settings.containsKey('streak_restore_gem_price')
+        ? int.tryParse(settings['streak_restore_gem_price'].toString()) ?? 1
+        : 1;
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
         return Container(
@@ -352,13 +356,14 @@ class _BgStreakModalTabletViewState extends State<BgStreakModalTabletView> {
              showTimer ? lostStreakAfterRestoreTime ? SizedBox() : GestureDetector(
                 onTap: () {
                   soundManager.playClickSound();
+                  if (state.isRestoringStreak) return;
                   if (state.userStreakDetails['isLost'] &&
                       state.userStreakDetails['restoreTimeExpiry'] != null) {
                     if (BlocProvider.of<AuthenticationBloc>(context)
                             .state
                             .user
                             .gems <
-                        1) {
+                        restoreGemPrice) {
                       Flushbar(
                         message: 'Not enough gems',
                         flushbarPosition: FlushbarPosition.TOP,
@@ -433,7 +438,7 @@ class _BgStreakModalTabletViewState extends State<BgStreakModalTabletView> {
                                 width: 5.w,
                               ),
                               StrokeText(
-                                text: '1',
+                                text: '$restoreGemPrice',
                                 textStyle: TextStyle(
                                   color: !state.userStreakDetails['isLost'] &&
                                           state.userStreakDetails[

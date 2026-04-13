@@ -11,12 +11,14 @@ class PowerUpCard extends StatelessWidget {
     required this.quantity,
     required this.onBuy,
     required this.isPurchasing,
+    required this.price,
   });
 
   final PowerUpItem item;
   final int quantity;
   final VoidCallback onBuy;
   final bool isPurchasing;
+  final int price;
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +161,7 @@ class PowerUpCard extends StatelessWidget {
                         ),
                         SizedBox(width: 5.w),
                         Text(
-                          '${item.price}',
+                          '$price',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 13.sp,

@@ -46,10 +46,10 @@ class _WhoIsWhoQuestionScreenState
     final settingsBloc = BlocProvider.of<SettingsBloc>(context);
 
     gameDuration = whoIsWhoBloc.state.gameDuration!;
-    questionsRequiredToPass = int.parse(
-        settingsBloc.state.gamePlaySettings['whoiswho_questions_passmark']);
-    gameTimePurchasePrice = int.parse(
-        settingsBloc.state.gamePlaySettings['game_time_purchase_price']);
+    questionsRequiredToPass = int.tryParse(
+        settingsBloc.state.gamePlaySettings['whoiswho_questions_passmark']?.toString() ?? '') ?? 20;
+    gameTimePurchasePrice = int.tryParse(
+        settingsBloc.state.gamePlaySettings['game_time_purchase_price']?.toString() ?? '') ?? 1500;
 
     initQuestionControllers(
       duration: Duration(minutes: gameDuration),

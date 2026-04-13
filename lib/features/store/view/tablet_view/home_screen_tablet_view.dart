@@ -255,7 +255,7 @@ class _StoreHomeScreenTabletViewState extends State<StoreHomeScreenTabletView> {
                                             .gamePlaySettings['gem_price'];
                                         return GestureDetector(
                                           onTap: (){
-                                            if(coinBalance >= int.parse(gemPrice)){
+                                            if(coinBalance >= (int.tryParse(gemPrice?.toString() ?? '') ?? 100000)){
                                               context.read<UserBloc>().add(PurchaseGem());
                                               Future.delayed(Duration(seconds: 2), (){
                                                 context.read<AuthenticationBloc>().add(FetchUserDataRequested());

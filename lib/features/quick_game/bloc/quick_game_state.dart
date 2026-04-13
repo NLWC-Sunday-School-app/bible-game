@@ -32,6 +32,7 @@ class QuickGameState extends Equatable {
   final bool secondChanceAvailable; // user owns & activated for this game
   final bool secondChanceUsed; // consumed on first wrong answer
   final bool secondChanceTriggered; // true for one frame when second chance fires
+  final bool hasSearched; // true after a search query, used to control empty state
 
   const QuickGameState({
     this.quickGameTopics = const [],
@@ -64,6 +65,7 @@ class QuickGameState extends Equatable {
     this.secondChanceAvailable = false,
     this.secondChanceUsed = false,
     this.secondChanceTriggered = false,
+    this.hasSearched = false,
   });
 
   QuickGameState copyWith({
@@ -97,6 +99,7 @@ class QuickGameState extends Equatable {
     bool? secondChanceAvailable,
     bool? secondChanceUsed,
     bool? secondChanceTriggered,
+    bool? hasSearched,
   }) {
     return QuickGameState(
       quickGameTopics: quickGameTopics ?? this.quickGameTopics,
@@ -133,6 +136,7 @@ class QuickGameState extends Equatable {
       secondChanceAvailable: secondChanceAvailable ?? this.secondChanceAvailable,
       secondChanceUsed: secondChanceUsed ?? this.secondChanceUsed,
       secondChanceTriggered: secondChanceTriggered ?? false,
+      hasSearched: hasSearched ?? this.hasSearched,
     );
   }
 
@@ -167,5 +171,6 @@ class QuickGameState extends Equatable {
         secondChanceAvailable,
         secondChanceUsed,
         secondChanceTriggered,
+        hasSearched,
       ];
 }

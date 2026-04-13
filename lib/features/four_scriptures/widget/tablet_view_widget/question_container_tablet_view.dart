@@ -72,9 +72,9 @@ class _QuestionContainerTabletViewState extends State<QuestionContainerTabletVie
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     noOfHintsUsed = await prefs.getInt('4ScripturesHintUsed') ?? 0;
     gameHintPurchasePrice =
-        int.parse(settingsState.gamePlaySettings['game_time_purchase_price']);
+        int.tryParse(settingsState.gamePlaySettings['game_time_purchase_price']?.toString() ?? '') ?? 1500;
     hintIncrementalScore =
-        int.parse(settingsState.gamePlaySettings['hint_incremental_score']);
+        int.tryParse(settingsState.gamePlaySettings['hint_incremental_score']?.toString() ?? '') ?? 1000;
     BlocProvider.of<FourScripturesOneWordBloc>(context)
         .add(SetGameData(gameHintPurchasePrice, noOfHintsUsed));
   }
