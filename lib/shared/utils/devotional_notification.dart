@@ -32,7 +32,7 @@ class DevotionalNotification {
       content: NotificationContent(
         id: _notificationId,
         channelKey: _channelKey,
-        title: '\u{1F4D6} Daily Devotional',
+        title: '\u{1F4D6} Daily Reading',
         body: 'Today\'s passage: $passage — Tap to read and reflect!',
         notificationLayout: NotificationLayout.Default,
         category: NotificationCategory.Reminder,
