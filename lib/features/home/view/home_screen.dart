@@ -452,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ],
                                             ),
                                           ),
-                                        if (connState.pendingSyncCount > 0)
+                                        if (connState.pendingSyncCount > 0 && !connState.isOnline)
                                           Container(
                                             width: double.infinity,
                                             padding: EdgeInsets.symmetric(
