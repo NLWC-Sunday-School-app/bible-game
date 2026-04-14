@@ -21,7 +21,7 @@
         android:label="Bible Game"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
-        android:extractNativeLibs="false">
+        android:extractNativeLibs="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
