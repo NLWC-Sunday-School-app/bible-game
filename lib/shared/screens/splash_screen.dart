@@ -237,17 +237,6 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
 
-                        SizedBox(height: 14.h),
-
-                        Text(
-                          'v2.2.12',
-                          style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: 11.sp,
-                            color: Colors.white.withValues(alpha: 0.35),
-                            letterSpacing: 1.5,
-                          ),
-                        ),
                       ],
                     ),
                   )
