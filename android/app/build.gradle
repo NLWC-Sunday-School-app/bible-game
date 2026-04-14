@@ -54,6 +54,9 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        ndk {
+            abiFilters 'arm64-v8a', 'x86_64'
+        }
     }
 
     signingConfigs {
@@ -75,7 +78,7 @@ android {
 
     packagingOptions {
         jniLibs {
-            useLegacyPackaging = true
+            useLegacyPackaging = false
         }
     }
 }
