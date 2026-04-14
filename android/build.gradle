@@ -1,64 +1,39 @@
-buildscript {
-    ext.kotlin_version = '1.7.21'
-    repositories {
-        exclusiveContent {
-            forRepository {
-                maven { url 'https://maven.scijava.org/content/repositories/public/' }
-            }
-            filter {
-                includeGroup "me.carda"
-            }
-        }
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath 'com.google.gms:google-services:4.3.8'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://maven.scijava.org/content/repositories/public/' }
+        maven { url 'https://jitpack.io' }
     }
 }
 
-rootProject.buildDir = '../build'
+rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-    project.configurations.all {
-        resolutionStrategy.force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.21'
-        resolutionStrategy.force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.21'
-        resolutionStrategy.force 'org.jetbrains.kotlin:kotlin-stdlib:1.7.21'
-    }
+}
 
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            android {
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_1_8
-                    targetCompatibility JavaVersion.VERSION_1_8
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+// Fix for plugins that don't declare a namespace (required by AGP 8+)
+subprojects { sub ->
+    sub.pluginManager.withPlugin('com.android.library') {
+        sub.android {
+            if (namespace == null || namespace.isEmpty()) {
+                def manifest = file("${sub.projectDir}/src/main/AndroidManifest.xml")
+                if (manifest.exists()) {
+                    def packageName = new XmlParser().parse(manifest).attribute('package')
+                    if (packageName) {
+                        namespace = packageName
+                    }
                 }
             }
         }
     }
 }
 
-subprojects {
-    project.evaluationDependsOn(':app')
-}
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
-}
-
-task printJavaVersion {
-    doLast {
-        println "Java version: ${System.getProperty('java.version')}"
-        println "Java home: ${System.getProperty('java.home')}"
-    }
 }
