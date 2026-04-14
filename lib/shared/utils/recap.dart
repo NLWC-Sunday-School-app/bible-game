@@ -12,13 +12,13 @@ String formatUserTopGameMode (String word){
 
 String formatUserTopGameModeImage (String word){
   if(word == 'WHOISWHO'){
-    return 'assets/images/product/recap/wiw_recap.png';
+    return 'assets/images/product/recap/wiw_recap.webp';
   }else if(word == 'QUICK_GAME'){
     return 'assets/images/product/recap/quick_game_recap.png';
   }else if (word == 'PILGRIM_PROGRESS'){
     return 'assets/images/product/recap/pilgrim_progress_recap.webp';
   }else {
-    return 'assets/images/product/recap/four_scriptures_recap.png';
+    return 'assets/images/product/recap/four_scriptures_recap.webp';
   }
 }
 

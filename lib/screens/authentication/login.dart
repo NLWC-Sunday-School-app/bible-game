@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 350.h, left: 100.w),
-                  child: Image.asset('assets/images/cloud_two.png'),
+                  child: Image.asset('assets/images/cloud_two.webp'),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 150.h),

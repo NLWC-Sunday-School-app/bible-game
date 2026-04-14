@@ -8,12 +8,12 @@ class ProductImageRoutes {
    static const String wiwMask = 'assets/images/product/home/wiw_mask.png';
    static const String mountain = 'assets/images/product/home/mountain.png';
    static const String scroll = 'assets/images/product/home/scroll.png';
-   static const String gcAnnouncementBg = 'assets/images/product/home/gc_announcement_bg.png';
+   static const String gcAnnouncementBg = 'assets/images/product/home/gc_announcement_bg.webp';
    static const String patternBg = 'assets/images/product/shared/pattern_bg.png';
    static const String patternTwoBg = 'assets/images/product/shared/pattern_two_bg.webp';
    static const String modalBg = 'assets/images/product/shared/modal_bg.webp';
    static const String successfulModalBg = 'assets/images/product/shared/successful_modal_bg.webp';
-   static const String blueButtonBg = 'assets/images/product/shared/blue_btn_bg.png';
+   static const String blueButtonBg = 'assets/images/product/shared/blue_btn_bg.webp';
    static const String inactiveBlueButtonBg = 'assets/images/product/shared/inactive_blue_btn.png';
    static const String inactiveQuickGameTag = 'assets/images/product/quick_game/inactive_topic_tag.png';
    static const String activeQuickGameTag = 'assets/images/product/quick_game/active_topic_tag.png';
@@ -24,7 +24,7 @@ class ProductImageRoutes {
    static const String quickTipsBigBg = 'assets/images/product/shared/quick_tips_big_bg.webp';
    static const String questionScreenBg = 'assets/images/product/shared/question_screen_bg.webp';
    static const String clockBg = 'assets/images/product/shared/clock_bg.png';
-   static const String questionFrameBg = 'assets/images/product/shared/question_frame.png';
+   static const String questionFrameBg = 'assets/images/product/shared/question_frame.webp';
    static const String positionBg = 'assets/images/product/leaderboard/position.png';
    static const String defaultBadge = 'assets/images/product/shared/badges/default_badge.png';
    static const String babeBadge = 'assets/images/product/shared/badges/babe_badge.png';
@@ -48,7 +48,7 @@ class ProductImageRoutes {
    static const String waitingForHostBg = 'assets/images/product/multi_player/waiting_for_host_bg.webp';
    static const String gameSummaryBg = 'assets/images/product/shared/game_summary_bg.webp';
    static const String gameSummaryBgTabletView = 'assets/images/product/shared/game_summary_bg_tablet_view.png';
-   static const String threeStars = 'assets/images/product/shared/three_stars.png';
+   static const String threeStars = 'assets/images/product/shared/three_stars.webp';
    static const String trueOrFalseIcon = 'assets/images/product/shared/true_or_false_icon.svg';
    static const String trueOrFalseHomeIllustration = 'assets/images/product/true_or_false/true_or_false_home_illustration.webp';
    static const String trueOrFalseCardHeader = 'assets/images/product/true_or_false/true_or_false_card_header.svg';
@@ -63,7 +63,7 @@ class ProductImageRoutes {
    static const String guideLeft = 'assets/images/product/shared/guide_left.png';
    static const String guideRight = 'assets/images/product/shared/guide_right.png';
    static const String guideFlag = 'assets/images/product/shared/guide_flag.png';
-   static const String treasureBox = 'assets/images/product/shared/treasure_box.png';
+   static const String treasureBox = 'assets/images/product/shared/treasure_box.webp';
    static const String ppActiveBlueBtn = 'assets/images/product/pilgrim_progress/blue_active_btn_bg.png';
    static const String ppInactiveBlueBtn = 'assets/images/product/pilgrim_progress/blue_inactive_btn_bg.png';
    static const String babe = 'assets/images/product/pilgrim_progress/babe.png';
@@ -72,8 +72,8 @@ class ProductImageRoutes {
    static const String charity = 'assets/images/product/pilgrim_progress/charity.png';
    static const String elder = 'assets/images/product/pilgrim_progress/elder.png';
    static const String father = 'assets/images/product/pilgrim_progress/father.png';
-   static const String scriptureWoodenBg = 'assets/images/product/four_scripture/wooden_bg.png';
-   static const String successfulMark = 'assets/images/product/shared/success_mark.png';
+   static const String scriptureWoodenBg = 'assets/images/product/four_scripture/wooden_bg.webp';
+   static const String successfulMark = 'assets/images/product/shared/success_mark.webp';
    static const String defaultAvatar = 'assets/images/product/shared/default_avatar.png';
    static const String newRankBg = 'assets/images/product/pilgrim_progress/new_rank_bg.png';
    static const String retryBg = 'assets/images/product/pilgrim_progress/retry_level_bg.png';
@@ -92,11 +92,11 @@ class ProductImageRoutes {
    static const String broLukeThree = 'assets/images/product/four_scripture/bro_luke_three.svg';
    static const String streakModalBg = 'assets/images/product/home/streak_modal_bg.png';
    static const String streakModalBgTabletView = 'assets/images/product/home/streak_modal_bg_tablet_view.webp';
-   static const String streakBoardBg = 'assets/images/product/home/streak_board_bg.png';
+   static const String streakBoardBg = 'assets/images/product/home/streak_board_bg.webp';
    static const String streakRestoreButtonBg = 'assets/images/product/home/restore_button_bg.png';
    static const String streakRestoreButtonInactiveBg = 'assets/images/product/home/restore_button_inactive_bg.png';
    static const String streakLineDivider ='assets/images/product/home/line_spacer.png';
-   static const String streakFreezeButtonBg = 'assets/images/product/home/Freeze_button_bg.png';
+   static const String streakFreezeButtonBg = 'assets/images/product/home/Freeze_button_bg.webp';
    static const String broLukeInfo = 'assets/images/product/shared/luke_info.png';
    static const String coinsModalBg = 'assets/images/product/home/coins_modal_bg.webp';
    static const String gemsModalBg = 'assets/images/product/home/gems_modal_bg.webp';
@@ -105,11 +105,11 @@ class ProductImageRoutes {
    static const String believerBadge = 'assets/images/product/shared/believer_badge.png';
    static const String joinBtnBg = 'assets/images/product/shared/join_btn_bg.png';
    static const String leaveBtnBg = 'assets/images/product/shared/leave_btn_bg.png';
-   static const String leagueSuccessModalBg = 'assets/images/product/league/success_modal_bg.png';
+   static const String leagueSuccessModalBg = 'assets/images/product/league/success_modal_bg.webp';
    static const String leagueSuccessModalBgTabletView = 'assets/images/product/league/success_modal_bg_tablet_view.webp';
-   static const String fblModalBg = 'assets/images/product/league/fbl_modal_bg.png';
+   static const String fblModalBg = 'assets/images/product/league/fbl_modal_bg.webp';
    static const String multiplayerComingSoon = 'assets/images/product/multi_player/multiplayer_coming_soon.webp';
-   static const String storeGemCard = 'assets/images/product/store/gem_card.png';
+   static const String storeGemCard = 'assets/images/product/store/gem_card.webp';
    static const String theBibleGame = 'assets/images/product/shared/the_bible_game.png';
    static const String rocket = 'assets/images/product/shared/rocket.png';
    static const String welcomeModalBg = 'assets/images/product/shared/welcome_modal_bg.png';
@@ -121,8 +121,8 @@ class ProductImageRoutes {
    static const String recapTwoBg = 'assets/images/product/recap/recap_two_bg.webp';
    static const String recapThreeBg = 'assets/images/product/recap/recap_three_bg.webp';
    static const String recapFourBg = 'assets/images/product/recap/recap_four_bg.webp';
-   static const String recapFiveBg = 'assets/images/product/recap/recap_five_bg.png';
-   static const String recapSixBg = 'assets/images/product/recap/recap_six_bg.png';
+   static const String recapFiveBg = 'assets/images/product/recap/recap_five_bg.webp';
+   static const String recapSixBg = 'assets/images/product/recap/recap_six_bg.webp';
    static const String recapSevenBg = 'assets/images/product/recap/recap_seven_bg.png';
    static const String recapEightBg = 'assets/images/product/recap/recap_eight_bg.png';
    static const String recapHourGlass = 'assets/images/product/recap/recap_hour_bg.png';
@@ -138,7 +138,7 @@ class IconImageRoutes{
   static const String personIcon = 'assets/images/icons/user/person.png';
   static const String coinIcon = 'assets/images/icons/user/coins.png';
   static const String gemIcon = 'assets/images/icons/user/gem.png';
-  static const String bigGemIcon = 'assets/images/icons/user/big_gem.png';
+  static const String bigGemIcon = 'assets/images/icons/user/big_gem.webp';
   static const String blueCopyIcon = 'assets/images/icons/user/blue_copy.png';
 
   static const String blueForwardArrowIcon = 'assets/images/icons/user/blue_arrow.png';
@@ -155,7 +155,7 @@ class IconImageRoutes{
   static const String musicOff = 'assets/images/icons/user/music_off.png';
   static const String eyeOpen = 'assets/images/icons/user/eye_open.png';
   static const String eyeClose = 'assets/images/icons/user/eye_closed.png';
-  static const String arrowCircleBack = 'assets/images/icons/user/arrow_circle_back.png';
+  static const String arrowCircleBack = 'assets/images/icons/user/arrow_circle_back.webp';
   static const String infoCircle = 'assets/images/icons/user/info_circle.png';
   static const String purpleBook = 'assets/images/icons/user/purple_book.png';
   static const String redCircleClose = 'assets/images/icons/user/red_circle_close.png';

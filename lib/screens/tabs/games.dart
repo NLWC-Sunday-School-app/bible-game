@@ -29,7 +29,7 @@ class TabGamesScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Image.asset(
-                    'assets/images/games_cloud.png',
+                    'assets/images/games_cloud.webp',
                     width: 240.w,
                   ),
                 ],
@@ -163,7 +163,7 @@ class TabGamesScreen extends StatelessWidget {
                                     top: Radius.circular(15.r),
                                     bottom: Radius.circular(15.r)),
                                 child: Image.asset(
-                                  'assets/images/baby_jesus.png',
+                                  'assets/images/baby_jesus.webp',
                                   width: Get.width >= 600 ? 120.w : 150.w,
                                   fit: BoxFit.cover,
                                 ),

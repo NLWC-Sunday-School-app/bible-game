@@ -13,24 +13,18 @@ class SoundManager {
 
   bool isSoundOn = true;
   bool isMusicOn = true;
-  bool _assetsLoaded = false;
 
+  /// Tracks which players have had their asset loaded.
+  final Set<AudioPlayer> _loaded = {};
 
-  SoundManager() {
-    _loadAssets();
-  }
-
-  Future<void> _loadAssets() async {
+  /// Loads the asset for [player] if it hasn't been loaded yet.
+  Future<void> _ensureLoaded(AudioPlayer player, String asset) async {
+    if (_loaded.contains(player)) return;
     try {
-      await clickPlayer.setAsset('assets/sounds/click.mp3');
-      await gameMusicPlayer.setAsset('assets/sounds/game_music.mp3');
-      await tabClickPlayer.setAsset('assets/sounds/tab_click.mp3');
-      await achievementPlayer.setAsset('assets/sounds/achievement.mp3');
-      await correctAnswerPlayer.setAsset('assets/sounds/correct_answer.mp3');
-      await wrongAnswerPlayer.setAsset('assets/sounds/wrong_answer.m4a');
-      _assetsLoaded = true;
+      await player.setAsset(asset);
+      _loaded.add(player);
     } catch (e) {
-      debugPrint('SoundManager: could not load audio assets: $e');
+      debugPrint('SoundManager: could not load $asset: $e');
     }
   }
 
@@ -41,15 +35,14 @@ class SoundManager {
     if (!isMusicOn) {
       gameMusicPlayer.stop();
     } else {
-      gameMusicPlayer.setLoopMode(LoopMode.one);
-      gameMusicPlayer.play();
+      playGameMusic();
     }
   }
 
-  Future<void> _safePlay(AudioPlayer player, {double volume = 0.5}) async {
+  Future<void> _safePlay(AudioPlayer player, String asset, {double volume = 0.5}) async {
     if (!isSoundOn) return;
     try {
-      if (!_assetsLoaded) await _loadAssets();
+      await _ensureLoaded(player, asset);
       await player.seek(Duration.zero);
       await player.setVolume(volume);
       await player.play();
@@ -58,14 +51,14 @@ class SoundManager {
     }
   }
 
-  void playClickSound() => _safePlay(clickPlayer);
+  void playClickSound() => _safePlay(clickPlayer, 'assets/sounds/click.mp3');
 
-  void playGameMusic() {
-    if (isMusicOn) {
-      gameMusicPlayer.setLoopMode(LoopMode.one);
-      gameMusicPlayer.setVolume(0.1);
-      gameMusicPlayer.play();
-    }
+  void playGameMusic() async {
+    if (!isMusicOn) return;
+    await _ensureLoaded(gameMusicPlayer, 'assets/sounds/game_music.mp3');
+    gameMusicPlayer.setLoopMode(LoopMode.one);
+    gameMusicPlayer.setVolume(0.1);
+    gameMusicPlayer.play();
   }
 
   void pauseGameMusic(){
@@ -76,13 +69,13 @@ class SoundManager {
     gameMusicPlayer.stop();
   }
 
-  void playTabClickSound() => _safePlay(tabClickPlayer);
+  void playTabClickSound() => _safePlay(tabClickPlayer, 'assets/sounds/tab_click.mp3');
 
-  void playAchievementSound() => _safePlay(achievementPlayer, volume: 1.0);
+  void playAchievementSound() => _safePlay(achievementPlayer, 'assets/sounds/achievement.mp3', volume: 1.0);
 
-  void playCorrectAnswerSound() => _safePlay(correctAnswerPlayer, volume: 1.0);
+  void playCorrectAnswerSound() => _safePlay(correctAnswerPlayer, 'assets/sounds/correct_answer.mp3', volume: 1.0);
 
-  void playWrongAnswerSound() => _safePlay(wrongAnswerPlayer, volume: 1.0);
+  void playWrongAnswerSound() => _safePlay(wrongAnswerPlayer, 'assets/sounds/wrong_answer.m4a', volume: 1.0);
 
   void dispose() {
     clickPlayer.dispose();

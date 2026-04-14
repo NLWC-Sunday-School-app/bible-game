@@ -50,7 +50,7 @@ class SuccessModal extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20,),
-                 Image.asset('assets/images/icons/success_mark.png', width: 80,),
+                 Image.asset('assets/images/icons/success_mark.webp', width: 80,),
                 const SizedBox(height: 50,),
                AutoSizeText(
                     'Your profile has been\n created successfully',

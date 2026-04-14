@@ -38,7 +38,7 @@ class LeaderBoardScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Image.asset(
-                    'assets/images/games_cloud.png',
+                    'assets/images/games_cloud.webp',
                     width: 250.w,
                   ),
                 ],
