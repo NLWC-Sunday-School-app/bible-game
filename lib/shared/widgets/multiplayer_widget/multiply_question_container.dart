@@ -13,6 +13,7 @@ import 'package:bible_game/shared/widgets/question_number_box.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/shared/widgets/quit_modal.dart';
 import 'package:screenshot/screenshot.dart';
+import '../../../features/multi_player/bloc/multiplayer_bloc.dart';
 import '../../../shared/widgets/coins_number_box.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
 import '../multi_avatar.dart';
@@ -109,7 +110,7 @@ class MultiplayerQuestionContainer extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                "100 pts",
+                                "${context.read<MultiplayerBloc>().state.createGameRoomResponse.victoryCondition?.value ?? 'N/A'}",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,

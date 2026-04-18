@@ -1,5 +1,7 @@
 part of 'websocket_cubit.dart';
 
+enum WebsocketConnectionStatus { disconnected, connecting, connected, error }
+
 class WebsocketState extends Equatable{
   final String eventType;
   final WaitingRoomModel playersJoined;
@@ -17,6 +19,7 @@ class WebsocketState extends Equatable{
   final int noOfCorrectAnswers;
   final bool newPlayerJoined;
   final int userRank;
+  final WebsocketConnectionStatus connectionStatus;
 
   const WebsocketState({
     required this.eventType,
@@ -35,6 +38,7 @@ class WebsocketState extends Equatable{
     required this.noOfCorrectAnswers,
     required this.newPlayerJoined,
     required this.userRank,
+    required this.connectionStatus,
   });
 
   factory WebsocketState.initial(){
@@ -55,6 +59,7 @@ class WebsocketState extends Equatable{
         coinsGained: 0,
         userRank:0,
         noOfCorrectAnswers: 0,
+        connectionStatus: WebsocketConnectionStatus.disconnected,
     );
   }
 
@@ -75,6 +80,7 @@ class WebsocketState extends Equatable{
     int? coinsGained,
     int? userRank,
     int? noOfCorrectAnswers,
+    WebsocketConnectionStatus? connectionStatus,
   }) {
     return WebsocketState(
         playersJoined: playersJoined ?? this.playersJoined,
@@ -92,7 +98,8 @@ class WebsocketState extends Equatable{
         noOfCorrectAnswers: noOfCorrectAnswers ?? this.noOfCorrectAnswers,
         playerAnswersDetails: playerAnswersDetails ?? this.playerAnswersDetails,
         positionUpdate: positionUpdate ?? this.positionUpdate,
-      gameFinishedEvent: gameFinishedEvent ?? this.gameFinishedEvent
+      gameFinishedEvent: gameFinishedEvent ?? this.gameFinishedEvent,
+      connectionStatus: connectionStatus ?? this.connectionStatus,
     );
   }
 
@@ -114,6 +121,7 @@ class WebsocketState extends Equatable{
         newPlayerJoined,
         userRank,
         userToastMessage,
-        gameFinishedEvent
+        gameFinishedEvent,
+        connectionStatus,
       ];
 }

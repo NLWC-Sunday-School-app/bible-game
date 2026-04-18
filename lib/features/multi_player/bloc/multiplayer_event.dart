@@ -73,3 +73,11 @@ class Reject extends MultiplayerEvent{
   @override
   List<Object> get props => [inviteId];
 }
+
+class StartPolling extends MultiplayerEvent {
+  const StartPolling();
+}
+
+class StopPolling extends MultiplayerEvent {
+  const StopPolling();
+}

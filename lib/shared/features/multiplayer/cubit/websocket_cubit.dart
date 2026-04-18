@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
@@ -29,36 +30,63 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   final AuthenticationBloc _authenticationBloc;
   final SettingsBloc _settingsBloc;
   final MultiplayerRepository _multiplayerRepository;
-  final Completer<void> _connectedCompleter = Completer<void>();
+  final String _apiBaseUrl;
+  late Completer<void> _connectedCompleter;
   bool _isConnected = false;
+  bool _isConnecting = false;
   Timer? _connectionCheckTimer;
+  final Queue<Map<String, dynamic>> _messageQueue = Queue();
+  String? _currentRoomId;  // Store room ID for re-subscription on reconnect
 
   WebsocketCubit({
     required MultiplayerRepository multiplayerRepository,
     required MultiplayerBloc multiplayerBloc,
     required SettingsBloc settingsBloc,
-    required AuthenticationBloc authenticationBloc
-  })
-      :
-        _multiplayerRepository = multiplayerRepository,
+    required AuthenticationBloc authenticationBloc,
+    required String apiBaseUrl,
+  })  : _multiplayerRepository = multiplayerRepository,
         _multiplayerBloc = multiplayerBloc,
         _settingsBloc = settingsBloc,
         _authenticationBloc = authenticationBloc,
-        super(WebsocketState.initial());
+        _apiBaseUrl = apiBaseUrl,
+        super(WebsocketState.initial()) {
+    _connectedCompleter = Completer<void>();
+  }
+
+  /// Reset the connection completer for reconnection scenarios
+  void _resetConnectedCompleter() {
+    if (_connectedCompleter.isCompleted) {
+      _connectedCompleter = Completer<void>();
+    }
+  }
 
   void connect() {
-    if (_stompClient != null && _isConnected) {
-      debugPrint('⚠️ Already connected');
+    if (_isConnecting || (_stompClient != null && _isConnected)) {
+      debugPrint('⚠️ Already connecting or connected');
       return;
     }
 
+    _isConnecting = true;
+    _resetConnectedCompleter();  // Reset completer for new connection attempt
     debugPrint('🔌 Connecting to WebSocket...');
+    emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.connecting));
+
+    final userToken = GetStorage().read('user_token') as String? ?? '';
+
+    // Build WebSocket URL from API base URL
+    // final wsBase = _apiBaseUrl.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://');
+    final wsBase = _apiBaseUrl;
+    final wsUrl = '$wsBase/ws?token=$userToken';
+
+    debugPrint('📡 WebSocket URL: $wsUrl');
 
     _stompClient = StompClient(
       config: StompConfig.sockJS(
         onConnect: (stompFrame) async {
           debugPrint("✅ Stomp connected: ${_stompClient?.connected}");
           _isConnected = true;
+          _isConnecting = false;
+          emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.connected));
 
           if (!_connectedCompleter.isCompleted) {
             _connectedCompleter.complete();
@@ -74,6 +102,13 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                 destination: '/user/queue/events',
                 callback: (StompFrame frame) {
                   debugPrint("📨 Events frame: ${frame.body}");
+                  // Process events if needed (heartbeat, etc.)
+                  try {
+                    final body = json.decode(frame.body!);
+                    debugPrint("📨 Parsed event: ${body['type']}");
+                  } catch (e) {
+                    debugPrint("⚠️ Could not parse event: $e");
+                  }
                 },
               );
               debugPrint("✅ Subscribed to /user/queue/events");
@@ -82,8 +117,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                   destination: '/user/queue/heartbeat',
                   callback: (frame) {
                     debugPrint('💓 Heartbeat pong: ${frame.body}');
-                  }
-              );
+                  });
               debugPrint("✅ Subscribed to /user/queue/heartbeat");
             } catch (e) {
               debugPrint('❌ Error subscribing in onConnect: $e');
@@ -91,25 +125,41 @@ class WebsocketCubit extends Cubit<WebsocketState> {
           } else {
             debugPrint('⚠️ Connection lost before subscribing');
           }
+
+          // Re-subscribe to room if we have a stored room ID (handles reconnection)
+          if (_currentRoomId != null) {
+            debugPrint('🔄 Re-subscribing to room $_currentRoomId after reconnection');
+            await _subscribeToRoom(_currentRoomId!);
+          }
+
+          // Flush any queued messages
+          _flushMessageQueue();
         },
-        url: 'https://api.staging.biblegame.app/ws?token=${GetStorage().read('user_token')}',
+        url: wsUrl,
         onWebSocketError: (e) {
           debugPrint('🔴 WebSocket Error: $e');
           _isConnected = false;
+          _isConnecting = false;
+          emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.error));
         },
         onStompError: (d) {
           debugPrint("🔴 Stomp error: ${d.body}");
           _isConnected = false;
+          _isConnecting = false;
+          emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.error));
         },
         onDisconnect: (d) {
           debugPrint("🔌 Disconnected");
           _isConnected = false;
+          _isConnecting = false;
+          _resetConnectedCompleter();  // Reset completer so reconnection can use it
+          emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.disconnected));
         },
         stompConnectHeaders: {
-          'Authorization': 'Bearer ${GetStorage().read('user_token')}',
+          'Authorization': 'Bearer $userToken',
         },
         webSocketConnectHeaders: {
-          'Authorization': 'Bearer ${GetStorage().read('user_token')}',
+          'Authorization': 'Bearer $userToken',
         },
         // Add these for better stability
         reconnectDelay: Duration(seconds: 3),
@@ -124,36 +174,14 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     } catch (e) {
       debugPrint('❌ Failed to activate client: $e');
       _isConnected = false;
+      _isConnecting = false;
+      emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.error));
     }
   }
 
-  Future<void> subscribeToWaitingRoom() async {
-    debugPrint('📋 Attempting to subscribe to waiting room...');
-
-    // Wait until connected with timeout
-    if (!_connectedCompleter.isCompleted) {
-      debugPrint('⏳ Waiting for connection...');
-      try {
-        await _connectedCompleter.future.timeout(
-          Duration(seconds: 10),
-          onTimeout: () {
-            debugPrint('❌ Connection timeout');
-            throw TimeoutException('Connection timeout');
-          },
-        );
-      } catch (e) {
-        debugPrint('❌ Connection error: $e');
-        return;
-      }
-    }
-
-    // Additional delay to ensure connection is stable
-    await Future.delayed(Duration(milliseconds: 300));
-
-    emit(state.copyWith(playersJoined: WaitingRoomModel.fromJson({})));
-
+  /// Helper method to subscribe to a room (extracted for reuse on reconnect)
+  Future<void> _subscribeToRoom(String roomId) async {
     if (_stompClient?.connected == true && _isConnected) {
-      final roomId = _multiplayerBloc.state.createGameRoomResponse.id;
       debugPrint('🎮 Subscribing to room: $roomId');
 
       try {
@@ -169,9 +197,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
               if (body["type"] == "GAME_STARTED") {
                 final questionList = body['data']['questions'];
                 final data = json.decode(questionList);
-                final response = (data['data'] as List)
-                    .map((e) => Datum.fromJson(e))
-                    .toList();
+                final response = (data['data'] as List).map((e) => Datum.fromJson(e)).toList();
                 emit(state.copyWith(questionData: response));
               }
 
@@ -186,18 +212,18 @@ class WebsocketCubit extends Cubit<WebsocketState> {
 
               if (body["type"] == "PLAYER_ANSWERED") {
                 emit(state.copyWith(
-                    playerAnswersDetails: PlayerAnswers.fromJson(body),
-                    userToastMessage: ""
-                ));
+                    playerAnswersDetails: PlayerAnswers.fromJson(body), userToastMessage: ""));
 
-                if (state.playersJoined.players.firstWhere(
-                        (element) => element.userId == _authenticationBloc.state.user.id.toString()
-                ).id == state.playerAnswersDetails.playerId) {
+                if (state.playersJoined.players
+                        .firstWhere((element) =>
+                            element.userId == _authenticationBloc.state.user.id.toString())
+                        .id ==
+                    state.playerAnswersDetails.playerId) {
                   emit(state.copyWith(
                       coinsGained: state.playerAnswersDetails.data!.playerScore,
                       userToastMessage: state.playerAnswersDetails.toastNotificationMessage,
                       newPlayerJoined: true,
-                      userPlayerId: state.playerAnswersDetails.playerId
+                      userPlayerId: state.playerAnswersDetails.playerId,
                   ));
                   emit(state.copyWith(newPlayerJoined: false));
                 }
@@ -226,48 +252,106 @@ class WebsocketCubit extends Cubit<WebsocketState> {
             }
           },
         );
-        debugPrint('✅ Successfully subscribed to waiting room');
+        debugPrint('✅ Successfully subscribed to room: $roomId');
       } catch (e) {
-        debugPrint('❌ Failed to subscribe to waiting room: $e');
+        debugPrint('❌ Failed to subscribe to room: $e');
         debugPrint('   Connection status: ${_stompClient?.connected}');
       }
     } else {
-      debugPrint("⚠️ Not connected yet. Connected: ${_stompClient?.connected}, IsConnected: $_isConnected");
+      debugPrint(
+          "⚠️ Not connected. Connected: ${_stompClient?.connected}, IsConnected: $_isConnected");
     }
   }
 
-  void sendGameAnswer(questionIndex, answer, questionStartTime) {
+  Future<void> subscribeToWaitingRoom() async {
+    debugPrint('📋 Attempting to subscribe to waiting room...');
+
+    // Wait until connected with timeout
+    if (!_connectedCompleter.isCompleted) {
+      debugPrint('⏳ Waiting for connection...');
+      try {
+        await _connectedCompleter.future.timeout(
+          Duration(seconds: 10),
+          onTimeout: () {
+            debugPrint('❌ Connection timeout');
+            throw TimeoutException('Connection timeout');
+          },
+        );
+      } catch (e) {
+        debugPrint('❌ Connection error: $e');
+        return;
+      }
+    }
+
+    // Additional delay to ensure connection is stable
+    await Future.delayed(Duration(milliseconds: 300));
+
+    emit(state.copyWith(playersJoined: WaitingRoomModel.fromJson({})));
+
+    final roomId = _multiplayerBloc.state.createGameRoomResponse.id;
+    _currentRoomId = roomId;  // Store room ID for re-subscription on reconnect
+    debugPrint('💾 Stored room ID: $_currentRoomId');
+
+    await _subscribeToRoom(_currentRoomId!);
+    // await _subscribeToRoom(roomId);
+  }
+
+  void sendGameAnswer(int questionIndex, String answer, DateTime? questionStartTime) {
+    final playerId = state.playersJoined.players
+        .firstWhere((element) => element.userId == _authenticationBloc.state.user.id.toString())
+        .id;
+
+    // Graceful response time handling
+    final responseTimeMs =
+        questionStartTime != null ? DateTime.now().difference(questionStartTime).inMilliseconds : 0;
+
+    if (questionStartTime == null) {
+      debugPrint('⚠️ Question start time not set, using response time: 0ms');
+    }
+
+    final message = {
+      'destination': '/app/game.answer',
+      'body': jsonEncode({
+        'playerId': playerId,
+        'roomId': state.playersJoined.roomId,
+        'questionIndex': questionIndex,
+        'answer': answer,
+        'responseTimeMs': responseTimeMs,
+      })
+    };
+
     if (_stompClient?.connected != true) {
-      debugPrint('❌ Cannot send answer: Not connected');
+      debugPrint('📦 Queuing answer (not connected)');
+      _messageQueue.add(message);
       return;
     }
 
-    final playerId = state.playersJoined.players.firstWhere(
-            (element) => element.userId == _authenticationBloc.state.user.id.toString()
-    ).id;
+    _dispatchMessage(message);
+  }
 
-    if (questionStartTime == null) {
-      throw Exception("Question start time not set");
-    }
-
-    final responseTimeMs = DateTime.now().difference(questionStartTime).inMilliseconds;
-
-    debugPrint('📤 Sending answer - Response time: $responseTimeMs ms');
-
+  void _dispatchMessage(Map<String, dynamic> message) {
     try {
       _stompClient!.send(
-          destination: '/app/game.answer',
-          body: jsonEncode({
-            'playerId': playerId,
-            'roomId': state.playersJoined.roomId,
-            'questionIndex': questionIndex,
-            'answer': answer,
-            'responseTimeMs': responseTimeMs,
-          })
+        destination: message['destination'],
+        body: message['body'],
       );
-      debugPrint('✅ Answer sent successfully');
+      debugPrint('📤 Message sent: ${message['destination']}');
     } catch (e) {
-      debugPrint('❌ Failed to send answer: $e');
+      debugPrint('❌ Send failed, re-queuing: $e');
+      _messageQueue.addFirst(message);
+    }
+  }
+
+  void _flushMessageQueue() {
+    debugPrint('📋 Processing ${_messageQueue.length} queued messages...');
+
+    while (_messageQueue.isNotEmpty && (_stompClient?.connected ?? false)) {
+      final message = _messageQueue.removeFirst();
+      _dispatchMessage(message);
+    }
+
+    if (_messageQueue.isNotEmpty) {
+      debugPrint('⚠️ Queue still has ${_messageQueue.length} messages, waiting for connection');
     }
   }
 
@@ -291,8 +375,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
           0,
           0,
           deviceName,
-          deviceOs
-      );
+          deviceOs);
       debugPrint('✅ Game log sent successfully');
     } catch (e) {
       debugPrint('❌ Failed to send game log: $e');
@@ -309,6 +392,10 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     debugPrint('🔌 Closing WebSocket...');
     _connectionCheckTimer?.cancel();
     _isConnected = false;
+    _isConnecting = false;
+    _currentRoomId = null;  // Clear room ID when closing
+    _resetConnectedCompleter();  // Reset completer for next connection
+    emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.disconnected));
 
     if (_stompClient != null) {
       try {
@@ -321,12 +408,14 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     }
   }
 
+  /// Clear the current room (called when game ends or leaving)
+  void clearCurrentRoom() {
+    _currentRoomId = null;
+    debugPrint('🗑️ Cleared current room');
+  }
+
   Future<void> onOptionSelected(
-      int selectedOptionIndex,
-      Datum gameQuestion,
-      int gameQuestionIndex,
-      questionStartTime
-      ) async {
+      int selectedOptionIndex, Datum gameQuestion, int gameQuestionIndex, questionStartTime) async {
     final soundManager = _settingsBloc.soundManager;
     final settingsState = _settingsBloc.state;
 
@@ -334,10 +423,8 @@ class WebsocketCubit extends Cubit<WebsocketState> {
 
     if (!state.hasAnswered) {
       int noOfCorrectAnswers = state.noOfCorrectAnswers;
-      final pointsPerQuestion =
-      int.parse(settingsState.gamePlaySettings['num_whoiswho_plays']);
-      final isCorrect = gameQuestion.correctOption ==
-          gameQuestion.options[selectedOptionIndex];
+      final pointsPerQuestion = int.parse(settingsState.gamePlaySettings['num_whoiswho_plays']);
+      final isCorrect = gameQuestion.correctOption == gameQuestion.options[selectedOptionIndex];
 
       if (isCorrect) {
         noOfCorrectAnswers++;

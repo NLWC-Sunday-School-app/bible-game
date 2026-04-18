@@ -145,13 +145,17 @@ class _ToastWidgetState extends State<_ToastWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  widget.message,
-                  style:
-                  TextStyle(
-                      color: Colors.white,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold
+                Flexible(
+                  child: Text(
+                    widget.message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                    TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold
+                    ),
                   ),
                 ),
               ],
@@ -167,13 +171,17 @@ class _ToastWidgetState extends State<_ToastWidget> {
                   width: 24,
                 ),
                 SizedBox(width: 5.w,),
-                Text(
-                  widget.message,
-                  style:
-                  TextStyle(
-                      color: Colors.white,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold
+                Flexible(
+                  child: Text(
+                    widget.message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                    TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold
+                    ),
                   ),
                 ),
                 SizedBox(width: 5.w,),
@@ -273,38 +281,46 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(width: 5,),
-                  widget.message == null?
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Invite Sent Successfully!",
-                        style:
-                        TextStyle(
-                            color: Color(0xFF014CA3),
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w900
+                  Flexible(
+                    child: widget.message == null?
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Invite Sent Successfully!",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                          TextStyle(
+                              color: Color(0xFF014CA3),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w900
+                          ),
                         ),
-                      ),
-                      Text(
-                        "Your Friend has been sent a Game Invite",
-                        style:
-                        TextStyle(
-                            color: Colors.black,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w500
+                        Text(
+                          "Your Friend has been sent a Game Invite",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                          TextStyle(
+                              color: Colors.black,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w500
+                          ),
                         ),
+                      ],
+                    )
+                        :
+                    Text(
+                      widget.message!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                      TextStyle(
+                          color: Color(0xFF014CA3),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w900
                       ),
-                    ],
-                  )
-                      :
-                  Text(
-                    widget.message!,
-                    style:
-                    TextStyle(
-                        color: Color(0xFF014CA3),
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w900
                     ),
                   ),
 
@@ -322,28 +338,34 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(width: 5.w,),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "ERROR!",
-                        style:
-                        TextStyle(
-                            color: Color(0xFFB71111),
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w900
+                  Flexible(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "ERROR!",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                          TextStyle(
+                              color: Color(0xFFB71111),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w900
+                          ),
                         ),
-                      ),
-                      Text(
-                        "No invite was sent",
-                        style:
-                        TextStyle(
-                            color: Colors.black,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w500
+                        Text(
+                          "No invite was sent",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                          TextStyle(
+                              color: Colors.black,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w500
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   SizedBox(width: 12.w,),
                   Image.asset(

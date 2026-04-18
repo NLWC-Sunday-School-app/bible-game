@@ -120,17 +120,17 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
               Expanded(
                 child: _selectedGlobalChallenge
                     ? GlobalChallengeHomeScreen()
-                    // :
-               // MultiplayerCategory()
-                    :  Container(
-                  // margin: EdgeInsets.only(top: 100.h),
-                  child: Center(
-                    child: Image.asset(
-                      ProductImageRoutes.multiplayerComingSoon,
-                      width: 330.w,
-                    ),
-                  ),
-                )
+                    :
+               MultiplayerCategory()
+                //     :  Container(
+                //   // margin: EdgeInsets.only(top: 100.h),
+                //   child: Center(
+                //     child: Image.asset(
+                //       ProductImageRoutes.multiplayerComingSoon,
+                //       width: 330.w,
+                //     ),
+                //   ),
+                // )
               )
             ],
           ),

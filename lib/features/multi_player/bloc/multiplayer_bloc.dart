@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
 import 'package:bible_game_api/bible_game_api.dart';
 import 'package:bible_game_api/model/game_invites_model.dart';
@@ -12,6 +14,7 @@ part 'multiplayer_state.dart';
 class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
   final MultiplayerRepository _multiplayerRepository;
   final AuthenticationBloc _authenticationBloc;
+  StreamSubscription? _pollSubscription;
 
   MultiplayerBloc(
       {
@@ -32,20 +35,22 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     on<CountInvite>(_onCountInvite);
     on<AcceptAndJoin>(_onAcceptAndJoin);
     on<Reject>(_onReject);
+    on<StartPolling>(_onStartPolling);
+    on<StopPolling>(_onStopPolling);
   }
 
   Future<void> _onCreateGameRoom(
       CreateGameRoom event,
       Emitter<MultiplayerState> emit) async {
     try {
-      emit(state.copyWith(isLoadingCreateGameRoom: true));
+      emit(state.copyWith(isLoadingCreateGameRoom: true, hasCreateGameRoomFailed: false));
       final response =
       await _multiplayerRepository.createGameRoom(_authenticationBloc.state.user.id);
       emit(state.copyWith(
-          createGameRoomResponse: response, isLoadingCreateGameRoom: false, hasCreatedGameRoom: true));
+          createGameRoomResponse: response, isLoadingCreateGameRoom: false, hasCreatedGameRoom: true, hasCreateGameRoomFailed: false));
     } catch (_) {
       emit(state.copyWith(
-          isLoadingCreateGameRoom: false, hasCreatedGameRoom: false));
+          isLoadingCreateGameRoom: false, hasCreatedGameRoom: false, hasCreateGameRoomFailed: true));
     }
   }
 
@@ -97,7 +102,7 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       ConfigureGameRoom event,
       Emitter<MultiplayerState> emit) async {
     try {
-      emit(state.copyWith(isLoadingConfigureGameRoom: true));
+      emit(state.copyWith(isLoadingConfigureGameRoom: true, hasConfigureGameRoomFailed: false));
       final response =
       await _multiplayerRepository.configureGameRoom(
           state.createGameRoomResponse.id,
@@ -108,10 +113,10 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
           event.conditionValue
       );
       emit(state.copyWith(
-          isLoadingConfigureGameRoom: false, hasConfiguredGameRoom: true));
+          isLoadingConfigureGameRoom: false, hasConfiguredGameRoom: true, hasConfigureGameRoomFailed: false));
     } catch (_) {
       emit(state.copyWith(
-          isLoadingCreateGameRoom: false, hasCreatedGameRoom: false));
+          isLoadingConfigureGameRoom: false, hasConfiguredGameRoom: false, hasConfigureGameRoomFailed: true));
     }
   }
 
@@ -193,6 +198,31 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       emit(state.copyWith(
           isLoadingRejectInvite: false, hasRejectedInvite: false));
     }
+  }
+
+  Future<void> _onStartPolling(
+      StartPolling event,
+      Emitter<MultiplayerState> emit) async {
+    // Cancel any existing polling
+    await _pollSubscription?.cancel();
+
+    _pollSubscription = Stream.periodic(
+      const Duration(seconds: 10),
+    ).listen((_) {
+      add(CountInvite());
+    });
+  }
+
+  Future<void> _onStopPolling(
+      StopPolling event,
+      Emitter<MultiplayerState> emit) async {
+    await _pollSubscription?.cancel();
+  }
+
+  @override
+  Future<void> close() async {
+    await _pollSubscription?.cancel();
+    return super.close();
   }
 
 }

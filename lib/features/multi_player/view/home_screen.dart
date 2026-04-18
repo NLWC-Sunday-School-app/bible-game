@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:flutter/material.dart';
@@ -25,34 +23,19 @@ class MultiplayerHomeScreen extends StatefulWidget {
 }
 
 class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with WidgetsBindingObserver{
-  Timer? _timer;
+  late MultiplayerBloc _multiplayerBloc;
 
   @override
   void initState() {
-    // TODO: implement initState
-    _startPeriodicCall();
     super.initState();
-  }
-
-  void _startPeriodicCall() {
-    BlocProvider.of<MultiplayerBloc>(context).add(CountInvite());
-
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      print("called");
-      BlocProvider.of<MultiplayerBloc>(context).add(CountInvite());
-    });
+    _multiplayerBloc = context.read<MultiplayerBloc>();
+    _multiplayerBloc.add(const StartPolling());
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _timer = null;
-    print("TIMER DISPOSED");// Cancel when widget is disposed
+    _multiplayerBloc.add(const StopPolling());
     super.dispose();
-  }
-
-  void cancelTimer() {
-    _timer?.cancel();
   }
 
 
@@ -133,7 +116,7 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with Widg
             ),
             GamePlayCard(
               onTap: (){
-                cancelTimer();
+                context.read<MultiplayerBloc>().add(const StopPolling());
                 BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
                 Navigator.pushNamed(context,
                     AppRoutes.groupGameCategory,

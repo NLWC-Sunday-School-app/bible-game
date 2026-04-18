@@ -3,8 +3,10 @@ part of 'multiplayer_bloc.dart';
 class MultiplayerState extends Equatable{
   final bool isLoadingCreateGameRoom;
   final bool hasCreatedGameRoom;
+  final bool hasCreateGameRoomFailed;
   final bool isLoadingConfigureGameRoom;
   final bool hasConfiguredGameRoom;
+  final bool hasConfigureGameRoomFailed;
   final bool isJoiningRoom;
   final bool hasJoinedRoom;
   final bool isLoadingGameInvite;
@@ -28,9 +30,11 @@ class MultiplayerState extends Equatable{
       {
         required this.isLoadingCreateGameRoom,
         required this.hasCreatedGameRoom,
+        required this.hasCreateGameRoomFailed,
         required this.createGameRoomResponse,
         required this.isLoadingConfigureGameRoom,
         required this.hasConfiguredGameRoom,
+        required this.hasConfigureGameRoomFailed,
         required this.isJoiningRoom,
         required this.hasJoinedRoom,
         required this.isLoadingGameInvite,
@@ -53,8 +57,10 @@ class MultiplayerState extends Equatable{
     return MultiplayerState(
         isLoadingCreateGameRoom: false,
         hasCreatedGameRoom: false,
+        hasCreateGameRoomFailed: false,
         isLoadingConfigureGameRoom: false,
         hasConfiguredGameRoom: false,
+        hasConfigureGameRoomFailed: false,
         createGameRoomResponse: CreateGameRoomModel.fromJson({}),
         isJoiningRoom: false,
         hasJoinedRoom: false,
@@ -79,8 +85,10 @@ MultiplayerState copyWith(
       {
         bool? isLoadingCreateGameRoom,
         bool? hasCreatedGameRoom,
+        bool? hasCreateGameRoomFailed,
         bool? isLoadingConfigureGameRoom,
         bool? hasConfiguredGameRoom,
+        bool? hasConfigureGameRoomFailed,
         bool? isJoiningRoom,
         bool? hasJoinedRoom,
         bool? isLoadingGameInvite,
@@ -102,8 +110,10 @@ MultiplayerState copyWith(
     return MultiplayerState(
         isLoadingCreateGameRoom: isLoadingCreateGameRoom ?? this.isLoadingCreateGameRoom,
         hasCreatedGameRoom: hasCreatedGameRoom ?? this.hasCreatedGameRoom,
+        hasCreateGameRoomFailed: hasCreateGameRoomFailed ?? this.hasCreateGameRoomFailed,
         isLoadingConfigureGameRoom: isLoadingConfigureGameRoom ?? this.isLoadingConfigureGameRoom,
         hasConfiguredGameRoom: hasConfiguredGameRoom ?? this.hasConfiguredGameRoom,
+        hasConfigureGameRoomFailed: hasConfigureGameRoomFailed ?? this.hasConfigureGameRoomFailed,
         createGameRoomResponse: createGameRoomResponse??this.createGameRoomResponse,
         isJoiningRoom: isJoiningRoom ?? this.isJoiningRoom,
         hasJoinedRoom: hasJoinedRoom ?? this.hasJoinedRoom,
@@ -128,8 +138,10 @@ MultiplayerState copyWith(
   List<Object?> get props => [
     isLoadingCreateGameRoom,
     hasCreatedGameRoom,
+    hasCreateGameRoomFailed,
     isLoadingConfigureGameRoom,
     hasConfiguredGameRoom,
+    hasConfigureGameRoomFailed,
     isJoiningRoom,
     hasJoinedRoom,
     isLoadingGameInvite,

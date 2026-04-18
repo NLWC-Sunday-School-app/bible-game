@@ -44,3 +44,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# FVM Version Cache
+.fvm/
+
+# Claude documentation
+CLAUDE.md
+IMPLEMENTATION_SUMMARY.md
+WEBSOCKET_IMPLEMENTATION.md

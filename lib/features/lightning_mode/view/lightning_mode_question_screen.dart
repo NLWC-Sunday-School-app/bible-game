@@ -1,17 +1,15 @@
-import 'dart:async';
-
 import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_leaderboard.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/shared/utils/custom_toast.dart';
 import 'package:bible_game/shared/widgets/multiplayer_widget/multiply_question_container.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/widgets/custom_toast.dart';
 import '../../../shared/widgets/quit_modal.dart';
+import '../../../shared/widgets/modal/network_modal.dart';
 
 class LightningModeQuestionScreen extends StatefulWidget {
 
@@ -25,32 +23,14 @@ class LightningModeQuestionScreen extends StatefulWidget {
 }
 
 class _LightningModeQuestionScreenState extends State<LightningModeQuestionScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver  {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _animationController;
-  late PageController _pageController;
-  int _currentPage =0;
+  late int _currentPage;
   late int durationPerQuestion;
-  bool hasTimer = true;
-  int count = 0;
   DateTime? startTime;
-  bool toastFlag = false;
   bool _isInitialized = false;
+  WebsocketConnectionStatus _lastConnectionStatus = WebsocketConnectionStatus.disconnected;
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //
-  //   // final arguments = (ModalRoute.of(context)?.settings.arguments ??
-  //   //     <String, dynamic>{}) as Map;
-  //   // setState(() {
-  //   //   hasTimer = arguments['hasTimer'];
-  //   // });
-  //
-  //   // final settingsBloc = BlocProvider.of<SettingsBloc>(context);
-  //   // durationPerQuestion = 8;
-  //       // int.parse(settingsBloc.state.gamePlaySettings['normal_game_speed']);
-  //
-  // }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -95,30 +75,40 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     ToastManager.init(context);
-    _loadSavedStateAndInitialize(); // Load state first, then initialize
-    print("I AM INITSTATE BEING CALLED");
-  }
-
-  Future<void> _loadSavedStateAndInitialize() async {
-    // Load saved state BEFORE initializing controllers
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? savedPage = prefs.getInt('currentPage');
-
-    if (savedPage != null) {
-      _currentPage = savedPage;
-    }
-
-    // Now initialize with the correct page
-    _pageController = PageController(initialPage: _currentPage);
-    _initializeAnimationController(hasTimer);
+    _currentPage = 0;
     startTime = DateTime.now();
+    durationPerQuestion = 8;
+    _initializeAnimationController();
 
-    setState(() {
-      _isInitialized = true;
+    // Load saved state and update if needed
+    _loadSavedStateAndInitialize();
+
+    // Start animation after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_animationController.isAnimating) {
+        _animationController.forward();
+      }
     });
   }
 
-  void _initializeAnimationController(bool hasTimer) {
+  Future<void> _loadSavedStateAndInitialize() async {
+    // Load saved state and update page if it exists
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? savedPage = prefs.getInt('currentPage');
+
+    if (savedPage != null && savedPage != _currentPage) {
+      setState(() {
+        _currentPage = savedPage;
+        _isInitialized = true;
+      });
+    } else {
+      setState(() {
+        _isInitialized = true;
+      });
+    }
+  }
+
+  void _initializeAnimationController() {
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 8),
@@ -127,19 +117,18 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
         return;
       }
       if (status == AnimationStatus.completed) {
-        if (context.read<WebsocketCubit>().state.hasAnswered == false) {
+        if (mounted && context.read<WebsocketCubit>().state.hasAnswered == false) {
           context.read<WebsocketCubit>().sendGameAnswer(
               _currentPage,
               "Skipped",
               startTime
           );
           _moveToNextPage();
-        }else{
+        } else if (mounted) {
           _moveToNextPage();
         }
       }
     });
-    _animationController.forward();
   }
 
   void _onAppPaused() async {
@@ -153,68 +142,29 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
     print('App resumed - Refreshing data');
 
     // Just resume the animation - state is already loaded
-    if (_animationController.status != AnimationStatus.completed) {
+    if (mounted && _animationController.status != AnimationStatus.completed && !_animationController.isAnimating) {
       _animationController.forward();
     }
   }
 
-  // @override
-  // void initState() {
-  //   WidgetsBinding.instance.addObserver(this);
-  //   _initializeAnimationController(hasTimer);
-  //   super.initState();
-  //   ToastManager.init(context);
-  //   _pageController = PageController();
-  //   startTime = DateTime.now();
-  //   print("I AM INITSTATE BEING CALLED");
-  // }
-  //
-  // void _initializeAnimationController(bool hasTimer) {
-  //   _animationController = AnimationController(
-  //     vsync: this,
-  //     duration: Duration(seconds: 8),
-  //     // duration: Duration(seconds: durationPerQuestion),
-  //   )..addStatusListener((status) {
-  //     if(status == AnimationStatus.dismissed){
-  //       return;
-  //     }
-  //     if (status == AnimationStatus.completed) {
-  //       if (context.read<WebsocketCubit>().state.hasAnswered == false) {
-  //         context.read<WebsocketCubit>().sendGameAnswer(
-  //             _currentPage,
-  //             "Skipped",
-  //             startTime
-  //         );
-  //         _moveToNextPage();
-  //       }else{
-  //         _moveToNextPage();
-  //       }
-  //     }
-  //   });
-  //   _animationController.forward();
-  // }
-
   void _moveToNextPage() {
-    final lightningGameState = BlocProvider.of<LightningModeBloc>(context).state;
     final websocketState = BlocProvider.of<WebsocketCubit>(context).state;
     context.read<WebsocketCubit>().onMoveToNextPage();
-    print("MOVE TO NEXT SCREEN");
     if (_currentPage < (websocketState.questionData.length ?? 0) - 1) {
-      _currentPage++;
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      _animationController.stop();
       setState(() {
+        _currentPage++;
         startTime = DateTime.now();
       });
-      _animationController.reset();
-      _animationController.forward();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _animationController.isCompleted) {
+          _animationController.reset();
+          _animationController.forward();
+        }
+      });
     } else {
       _animationController.stop();
       gameFinished();
-      // showLeaderboardModal(context, "Lightning Mode");
-
     }
   }
 
@@ -222,13 +172,10 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _animationController.dispose();
-    _pageController.dispose();
     super.dispose();
   }
 
-  void gameFinished()async{
-    _animationController.dispose();
-    _pageController.dispose();
+  void gameFinished() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('currentPage');
   }
@@ -251,6 +198,24 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
       },
       child: BlocConsumer<WebsocketCubit, WebsocketState>(
         listener: (context, websocketState) {
+          // ========== CONNECTION STATUS MONITORING ==========
+          if(websocketState.connectionStatus == WebsocketConnectionStatus.disconnected &&
+              _lastConnectionStatus == WebsocketConnectionStatus.connected) {
+            CustomToast.show(context, "Connection lost. Reconnecting...",
+                duration: Duration(seconds: 6));
+          }
+          if(websocketState.connectionStatus == WebsocketConnectionStatus.connected &&
+              _lastConnectionStatus == WebsocketConnectionStatus.disconnected) {
+            CustomToast.show(context, "Connection restored",
+                duration: Duration(seconds: 2));
+          }
+          if(websocketState.connectionStatus == WebsocketConnectionStatus.error) {
+            showNetworkModal(context, onRetry: () {
+              context.read<WebsocketCubit>().connect();
+            });
+          }
+          _lastConnectionStatus = websocketState.connectionStatus;
+
           ///change newPlayerJoined variable to notification alert
           if(websocketState.eventType == "GAME_FINISHED"){
             // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
@@ -281,49 +246,40 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
                 elevation: 0,
                 toolbarHeight: 0,
                 backgroundColor:
-                Color(0xFF998BBC), // Set background color to transparent
+                Color(0xFF998BBC),
               ),
               body: SafeArea(
                 bottom: false,
-                child: PageView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  controller: _pageController,
-                  itemCount: websocketState.questionData.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return MultiplayerQuestionContainer(
-                      rank: websocketState.userRank,
-                      gameQuestion: websocketState.questionData[index],
-                      animationController: _animationController,
-                      currentPage: _currentPage + 1,
-                      totalQuestions: websocketState.questionData.length,
-                      optionSelectedCallback: (selectedOptionIndex) {
-                        print("SELECTED OPTION INDEX:$selectedOptionIndex");
-                        // final remainingTime = (durationPerQuestion *
-                        //     (1 - _animationController.value))
-                        //     .toInt();
-                        context.read<WebsocketCubit>().onOptionSelected(
-                          selectedOptionIndex,
-                          websocketState.questionData[index],
-                          index,
-                          startTime
-                        );
-                      },
-                      selectedOptionIndex: websocketState.selectedOptionIndex ?? -1,
-                      isCorrectAnswer: websocketState.isCorrectAnswer ?? false,
-                      hasAnswered: websocketState.hasAnswered,
-                      hasTimer: false,
-                      coinsGained:websocketState.coinsGained,
-                      noOfCorrectAnswers: websocketState.noOfCorrectAnswers,
-                      durationPerQuestion: 6,
-                      skipQuestion: () {
-                        _moveToNextPage();
-                        soundManager.playClickSound();
-                      },
-                      isWhoIsWho: true,
-                      gameMode: 'quickgame',
-                    );
-                  },
-                ),
+                child: websocketState.questionData.isNotEmpty
+                    ? MultiplayerQuestionContainer(
+                        rank: websocketState.userRank,
+                        gameQuestion: websocketState.questionData[_currentPage],
+                        animationController: _animationController,
+                        currentPage: _currentPage + 1,
+                        totalQuestions: websocketState.questionData.length,
+                        optionSelectedCallback: (selectedOptionIndex) {
+                          context.read<WebsocketCubit>().onOptionSelected(
+                            selectedOptionIndex,
+                            websocketState.questionData[_currentPage],
+                            _currentPage,
+                            startTime
+                          );
+                        },
+                        selectedOptionIndex: websocketState.selectedOptionIndex ?? -1,
+                        isCorrectAnswer: websocketState.isCorrectAnswer ?? false,
+                        hasAnswered: websocketState.hasAnswered,
+                        hasTimer: true,
+                        coinsGained: websocketState.coinsGained,
+                        noOfCorrectAnswers: websocketState.noOfCorrectAnswers,
+                        durationPerQuestion: durationPerQuestion,
+                        skipQuestion: () {
+                          _moveToNextPage();
+                          soundManager.playClickSound();
+                        },
+                        isWhoIsWho: true,
+                        gameMode: 'Lightning Mode',
+                      )
+                    : const SizedBox.expand(),
               ));
           },
       ),

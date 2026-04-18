@@ -4,6 +4,7 @@ import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/features/multi_player/widget/modal/invite_modal.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +16,7 @@ import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/utils/custom_toast.dart';
 import '../../../../shared/widgets/custom_toast.dart';
 import '../../../../shared/widgets/green_button.dart';
+import '../../../../shared/widgets/modal/network_modal.dart';
 import '../../../lightning_mode/bloc/lightning_mode_bloc.dart';
 import '../multiplayer_button.dart';
 
@@ -62,6 +64,7 @@ class PlayersWaitingModal extends StatefulWidget {
 }
 
 class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
+  WebsocketConnectionStatus _lastConnectionStatus = WebsocketConnectionStatus.disconnected;
 
   @override
   Widget build(BuildContext context) {
@@ -103,13 +106,22 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                           alignment: Alignment.topRight,
                           child: InkWell(
                             onTap: (){
-                              context.read<WebsocketCubit>().closeWebsocket();
-                              final userId = context.read<AuthenticationBloc>().state.user.id;
-                              // BlocProvider.of<MultiplayerBloc>(context).add(
-                              //     LeaveRoom(
-                              //         context.read<WebsocketCubit>().state.playersJoined.players.firstWhere((element) => element.userId == userId).id!
-                              //     )
-                              // );
+                              if(widget.isWaitingForHost){
+                                context.read<WebsocketCubit>().closeWebsocket();
+                                final userId = context.read<AuthenticationBloc>().state.user.id.toString();
+                                print(userId);
+                                final player = context.read<WebsocketCubit>().state.playersJoined.players.firstWhereOrNull((element) => element.userId == userId);
+                                print(player);
+                                if (player?.id != null) {
+                                  print("wemoved");
+                                  BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(player!.id!));
+                                }
+                              }else{
+                                final hostPlayerId = BlocProvider.of<MultiplayerBloc>(context).state.createGameRoomResponse.activePlayers[0];
+                                print(hostPlayerId);
+                                BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(hostPlayerId));
+                                BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
+                              }
                               Navigator.pop(context);
                             },
                             child: Image.asset(
@@ -263,7 +275,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                     :
                                 widget.selectedGroupGame == "First to X"?
                                 Text(
-                                    "${widget.noOfQuestion??context.watch<WebsocketCubit>().state.playersJoined.totalQuestions}",
+                                    "${widget.noOfQuestion ?? context.read<MultiplayerBloc>().state.createGameRoomResponse.victoryCondition?.value ?? 'N/A'}",
                                     style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500
@@ -349,6 +361,24 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                       ),
                       child: BlocConsumer<WebsocketCubit, WebsocketState>(
                         listener: (context, state){
+                            // ========== CONNECTION STATUS MONITORING ==========
+                            if(state.connectionStatus == WebsocketConnectionStatus.disconnected &&
+                                _lastConnectionStatus == WebsocketConnectionStatus.connected) {
+                              CustomToast.show(context, "Connection lost. Reconnecting...",
+                                  duration: Duration(seconds: 6));
+                            }
+                            if(state.connectionStatus == WebsocketConnectionStatus.connected &&
+                                _lastConnectionStatus == WebsocketConnectionStatus.disconnected) {
+                              CustomToast.show(context, "Connection restored",
+                                  duration: Duration(seconds: 2));
+                            }
+                            if(state.connectionStatus == WebsocketConnectionStatus.error) {
+                              showNetworkModal(context, onRetry: () {
+                                context.read<WebsocketCubit>().connect();
+                              });
+                            }
+                            _lastConnectionStatus = state.connectionStatus;
+
                             if(state.eventType == "GAME_STARTED"){
                               Navigator.pop(context);
                               Navigator.pushNamed(context, AppRoutes.questionLoadingScreen, arguments:{ 'gameType': widget.selectedGroupGame});

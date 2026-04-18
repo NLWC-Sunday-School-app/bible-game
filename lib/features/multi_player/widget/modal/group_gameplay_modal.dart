@@ -12,8 +12,10 @@ import 'package:bible_game/features/multi_player/widget/question_type_pill.dart'
 import 'package:bible_game/features/multi_player/widget/toggle_card.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/widgets/blue_button.dart';
+import 'package:bible_game/shared/widgets/custom_toast.dart';
 
 import '../../../../shared/features/multiplayer/cubit/websocket_cubit.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 void showGroupGamePlayModal(BuildContext context, {required selectedGroupGame, required inviteCode}) {
   showDialog(
@@ -153,6 +155,9 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                               noOfQuestion: int.parse(textController.text),
                           );
 
+                        }
+                        if(state.hasConfigureGameRoomFailed){
+                          CustomToast.show(context, "Failed to configure game room");
                         }
                       },
                       builder: (context, state) {

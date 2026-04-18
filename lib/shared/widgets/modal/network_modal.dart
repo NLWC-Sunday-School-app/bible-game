@@ -4,17 +4,18 @@ import 'package:get/get.dart';
 import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/screens/splash_screen.dart';
 
-void showNetworkModal(BuildContext context) {
+void showNetworkModal(BuildContext context, {VoidCallback? onRetry}) {
   showDialog(
       context: context,
       barrierColor: const Color.fromRGBO(40, 40, 40, 0.95),
       builder: (BuildContext context) {
-        return NoNetworkModal();
+        return NoNetworkModal(onRetry: onRetry);
       });
 }
 
 class NoNetworkModal extends StatelessWidget {
-  const NoNetworkModal({Key? key}) : super(key: key);
+  final VoidCallback? onRetry;
+  const NoNetworkModal({Key? key, this.onRetry}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +59,12 @@ class NoNetworkModal extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.splashScreen);
+                  Navigator.pop(context);
+                  if (onRetry != null) {
+                    onRetry!();
+                  } else {
+                    Navigator.pushNamed(context, AppRoutes.splashScreen);
+                  }
                 },
                 child: Container(
                     padding:

@@ -231,14 +231,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
-  awesome_notifications: dd5518ff1c80be03d4f1c40f04da9d9cc2a37af5
-  awesome_notifications_fcm: 707931990883faf918db11438bdddded93b2b3a6
-  connectivity_plus: 2a701ffec2c0ae28a48cf7540e279787e77c447d
-  device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
+  audio_session: f08db0697111ac84ba46191b55488c0563bb29c6
+  awesome_notifications: 0f432b28098d193920b11a44cfa9d2d9313a3888
+  awesome_notifications_fcm: ad14f584c81e2488ae4310ab96331327dcbb5368
+  connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
+  device_info_plus: 335f3ce08d2e174b9fdc3db3db0f4e3b1f66bd89
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
-  firebase_core: 99a37263b3c27536063a7b601d9e2a49400a433c
-  firebase_crashlytics: 986773c0c7ea4c3f5a4ead141b58522fcd9dfdb1
+  firebase_core: 995454a784ff288be5689b796deb9e9fa3601818
+  firebase_crashlytics: 30dcd6dfd2fe895c0848af46722a4227346c19aa
   FirebaseCore: efb3893e5b94f32b86e331e3bd6dadf18b66568e
   FirebaseCoreExtension: edbd30474b5ccf04e5f001470bdf6ea616af2435
   FirebaseCoreInternal: 9afa45b1159304c963da48addb78275ef701c6b4
@@ -247,24 +247,24 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 3b26e2cee503815e01c3701236b020aa9b576f09
   FirebaseRemoteConfigInterop: 1c6135e8a094cc6368949f5faeeca7ee8948b8aa
   FirebaseSessions: b9a92c1c51bbb81e78fc3142cda6d925d700f8e7
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_js: 95929d4e146e8ceb1c8e1889d8c2065c5d840076
-  flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
-  fluttertoast: 21eecd6935e7064cc1fcb733a4c5a428f3f24f0f
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_js: 867813c1830e1d9b2c5d547cdb6f61801e2f2145
+  flutter_native_splash: 9e672d3818957718ee006a491730c09deeecace9
+  fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   IosAwnCore: 653786a911089012092ce831f2945cd339855a89
   IosAwnFcmCore: 1bdb9054b2e00187d00f1ffcfbb1855949a7b82f
-  just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
+  just_audio: 6c031bb61297cf218b4462be616638e81c058e97
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
-  share_plus: c3fef564749587fc939ef86ffb283ceac0baf9f5
-  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
-  sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d
-  url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
+  share_plus: de6030e33b4e106470e09322d87cf2a4258d2d1d
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
+  url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
 
 PODFILE CHECKSUM: bae1b32383e21d8f8db4e1513bc4e3d18165152c
 

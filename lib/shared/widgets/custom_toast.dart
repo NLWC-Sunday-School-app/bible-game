@@ -34,31 +34,37 @@ void showCustomToast(BuildContext context, String message, {Color? color}) {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           color != null ?
-       Row(
-         children: [
-           Container(
-             height: 22.h,
-             width: 22.w,
-             decoration: BoxDecoration(
-               shape: BoxShape.circle,
-               border: Border.all(color: Colors.white),
-               image: DecorationImage(
-                 image: AssetImage(ProductImageRoutes.dp)
-               )
-             ),
-           ),
-           SizedBox(width: 5,),
-           Text(
-             message,
-             style: TextStyle(
-              color: Colors.black,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  height: 22.h,
+                  width: 22.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white),
+                    image: DecorationImage(
+                      image: AssetImage(ProductImageRoutes.dp)
+                    )
+                  ),
+                ),
+                SizedBox(width: 5,),
+                Flexible(
+                  child: Text(
+                    message,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
-                 ),
-         ],
-       )
-              :
+          )
+          :
           StrokeText(
             text: message,
             textStyle: TextStyle(
@@ -114,29 +120,35 @@ class ToastManager {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Container(
-                  height: 22.h,
-                  width: 22.w,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white),
-                      image: DecorationImage(
-                          image: AssetImage(ProductImageRoutes.dp)
-                      )
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    height: 22.h,
+                    width: 22.w,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white),
+                        image: DecorationImage(
+                            image: AssetImage(ProductImageRoutes.dp)
+                        )
+                    ),
                   ),
-                ),
-                SizedBox(width: 5,),
-                Text(
-                  message,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
+                  SizedBox(width: 5,),
+                  Flexible(
+                    child: Text(
+                      message,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             )
           ],
         )

@@ -9,6 +9,7 @@ import '../../../shared/constants/colors.dart';
 import '../../../shared/features/multiplayer/cubit/websocket_cubit.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
 import '../bloc/multiplayer_bloc.dart';
+import '../bloc/multiplayer_event.dart';
 import '../widget/modal/group_gameplay_modal.dart';
 
 class GroupGameCategory extends StatelessWidget {
@@ -38,17 +39,31 @@ class GroupGameCategory extends StatelessWidget {
               ScreenAppBar(
                 height: 70.h,
                 widgets: [
-                  Center(
-                    child: StrokeText(
-                      text: selectedCategory,
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26.sp,
-                        fontWeight: FontWeight.w900,
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Image.asset(
+                          IconImageRoutes.arrowCircleBack,
+                          width: 44.w,
+                        ),
                       ),
-                      strokeColor: AppColors.titleDropShadowColor,
-                      strokeWidth: 6,
-                    ),
+                      Expanded(
+                        child: Center(
+                          child: StrokeText(
+                            text: selectedCategory,
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26.sp,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            strokeColor: AppColors.titleDropShadowColor,
+                            strokeWidth: 6,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 44.w),
+                    ],
                   ),
                   SizedBox(
                     height: 20.h,
@@ -58,7 +73,8 @@ class GroupGameCategory extends StatelessWidget {
               SizedBox(
                 height: 16.h,
               ),
-               BlocConsumer<MultiplayerBloc, MultiplayerState>(
+              Expanded(
+                child: BlocConsumer<MultiplayerBloc, MultiplayerState>(
                  listener: (context, state){
                    if(state.hasCreatedGameRoom){
                      context.read<WebsocketCubit>().connect();
@@ -67,6 +83,40 @@ class GroupGameCategory extends StatelessWidget {
                  builder: (context, state) {
                    if(state.isLoadingCreateGameRoom){
                      return Center(child: CircularProgressIndicator(color: Colors.white,));
+                   }else if(state.hasCreateGameRoomFailed){
+                     return Center(
+                       child: Column(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           Text(
+                             "Game Room couldn't be created",
+                             style: TextStyle(
+                               color: Colors.white,
+                               fontSize: 18.sp,
+                               fontWeight: FontWeight.w600,
+                             ),
+                           ),
+                           SizedBox(height: 20.h),
+                           ElevatedButton(
+                             onPressed: () {
+                               BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
+                             },
+                             style: ElevatedButton.styleFrom(
+                               backgroundColor: Colors.white,
+                               padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 12.h),
+                             ),
+                             child: Text(
+                               'Retry',
+                               style: TextStyle(
+                                 color: Color(0xFF2D6BB6),
+                                 fontWeight: FontWeight.w700,
+                                 fontSize: 16.sp,
+                               ),
+                             ),
+                           ),
+                         ],
+                       ),
+                     );
                    }else{
                      if(state.hasCreatedGameRoom){
                        print(state.createGameRoomResponse.inviteCode);
@@ -102,6 +152,7 @@ class GroupGameCategory extends StatelessWidget {
                                    title: "Time-based Mode",
                                    backgroundColor: Color(0xFFDAD9FF),
                                    cardImage: ProductImageRoutes.timeBasedMode,
+                                   isEnabled: false,
                                    onTap: () => showGroupGamePlayModal(
                                        context,
                                        selectedGroupGame: "Time-based Mode",
@@ -130,6 +181,7 @@ class GroupGameCategory extends StatelessWidget {
                                    title: "Survival Mode",
                                    backgroundColor: Color(0xFFF0FFDC),
                                    cardImage: ProductImageRoutes.survivalMode,
+                                   isEnabled: false,
                                    onTap: () => showGroupGamePlayModal(
                                        context,
                                        selectedGroupGame: "Survival Mode",
@@ -146,7 +198,8 @@ class GroupGameCategory extends StatelessWidget {
                      }
                    }
                  },
-               )
+               ),
+              )
             ],
           ),
         )

@@ -25,7 +25,6 @@ import 'package:bible_game/navigation/widget/tablet_view_widget/bottom%20_tab_na
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/shared/screens/tablet_view/question_loading_screen_tablet_view.dart';
 import 'package:bible_game/shared/screens/tablet_view/splash_screen_tablet_view.dart';
-import 'package:bible_game/shared/utils/web_socket.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -96,6 +95,7 @@ class App extends StatefulWidget {
       required this.fantasyLeagueRepository,
         required this.multiplayerRepository,
         required this.lightningModeRepository,
+        required this.apiBaseUrl,
       });
 
   final SoundManager soundManager;
@@ -110,6 +110,7 @@ class App extends StatefulWidget {
   final TokenNotifier tokenNotifier;
   final MultiplayerRepository multiplayerRepository;
   final LightningModeRepository lightningModeRepository;
+  final String apiBaseUrl;
 
   @override
   State<App> createState() => _AppState();
@@ -209,6 +210,7 @@ class _AppState extends State<App> {
               settingsBloc: BlocProvider.of<SettingsBloc>(context),
               authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
               multiplayerRepository: widget.multiplayerRepository,
+              apiBaseUrl: widget.apiBaseUrl,
             ),
           ),
         ],
