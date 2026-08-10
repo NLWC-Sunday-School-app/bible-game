@@ -1,12 +1,10 @@
 {
   "app_name": "Bible Game",
-
   "nav_store": "Store",
   "nav_board": "Board",
   "nav_home": "Home",
   "nav_arcade": "Arcade",
   "nav_league": "League",
-
   "game_story_mode": "Story Mode",
   "game_story_mode_desc": "Journey through Bible narratives!",
   "game_quick_game": "Quick Game",
@@ -19,7 +17,6 @@
   "game_four_scriptures_desc": "Journey through the Bible!",
   "game_true_or_false": "True or False",
   "game_true_or_false_desc": "Test your knowledge!",
-
   "offline_banner": "You're offline — Story Mode, True or False and Daily Devotional are available!",
   "offline_badge": "OFFLINE",
   "scores_pending_sync": "{count} score{plural} pending sync",
@@ -27,11 +24,9 @@
   "back_online": "You're back online!",
   "syncing_scores": "Syncing your scores...",
   "offline_features_limited": "You're offline. Some features may be limited.",
-
   "daily_devotional": "Daily Reading",
   "daily_devotional_completed": "Completed! Come back tomorrow",
   "daily_devotional_prompt": "Read, reflect & answer today's question",
-
   "did_you_know": "Did you know?",
   "category_bible_numbers": "Bible Numbers",
   "category_bible_geography": "Bible Geography",
@@ -39,7 +34,6 @@
   "category_character_spotlight": "Character Spotlight",
   "category_bible_language": "Bible & Language",
   "category_church_history": "Church History",
-
   "auth_your_profile": "Your Profile",
   "auth_login_prompt": "Log in to your profile to save & continue your game play.",
   "auth_login": "Login",
@@ -51,7 +45,6 @@
   "auth_login_success": "Log in successful!",
   "auth_enjoy_game": "Enjoy the Bible game!",
   "auth_forgot_password": "Forgot Password?",
-
   "auth_create_profile": "Create Profile",
   "auth_create_profile_subtitle": "Create a profile to save your game progress!",
   "auth_nickname_hint": "What's your nick name?",
@@ -59,11 +52,9 @@
   "auth_country_hint": "Select your country",
   "auth_registration_failed": "Registration failed. Please check your details and try again.",
   "auth_profile_created": "Profile created successfully!",
-
   "auth_logout": "Log out",
   "auth_logout_confirm": "Are you sure you want to log out?",
   "auth_logout_yes": "Yes, log me out",
-
   "auth_reset_password": "Reset password",
   "auth_reset_password_subtitle": "Fear not, you can reset your password.",
   "auth_reset_email_hint": "Please input your registered email",
@@ -81,11 +72,9 @@
   "auth_set_new_password": "Set new password",
   "auth_new_password_set": "New password set successfully!",
   "auth_log_in_button": "LOG IN",
-
   "auth_edit_profile": "Edit Profile",
   "auth_edit_profile_subtitle": "You can make updates to your profile",
   "auth_update_profile": "Update Profile",
-
   "profile_title": "Profile",
   "profile_edit": "Edit your profile",
   "profile_log_in": "Log In",
@@ -98,12 +87,10 @@
   "profile_collaborator": "Be a Luke! Set Bible game questions.",
   "profile_collaborator_thanks": "Thank you, a mail has been sent to you!",
   "profile_sign_in": "Sign in...",
-
   "quit_title": "Leaving so soon?",
   "quit_message": "Your progress in this round won't be saved.",
   "quit_keep_playing": "Keep Playing",
   "quit_button": "Quit",
-
   "store_title": "Store",
   "store_not_enough_coins": "You don't have enough coins to get this! Play more games",
   "store_requires_internet": "Purchases require an internet connection.",
@@ -120,19 +107,16 @@
   "store_second_chance_desc": "Retry 1 wrong answer",
   "store_purchased": "purchased!",
   "store_not_enough_gems": "Not enough gems!",
-
   "arcade_title": "Arcade",
   "arcade_global_challenge": "Global Challenge",
   "arcade_multiplayer": "Multiplayer",
   "arcade_offline_message": "Arcade requires an internet connection.\nPlease reconnect to play.",
-
   "leaderboard_title": "Leaderboard",
   "leaderboard_global": "Global",
   "leaderboard_your_country": "Your country",
   "leaderboard_offline_message": "Leaderboard requires an internet connection.\nPlease reconnect to see the rankings.",
   "leaderboard_top": "Top",
   "leaderboard_you": "You",
-
   "tof_title": "True or False",
   "tof_high_score": "High Score",
   "tof_games_played": "Games Played",
@@ -140,14 +124,13 @@
   "tof_how_to_play": "How to Play",
   "tof_instructions": "Read each Bible statement and decide\nif it is TRUE or FALSE.\n\nAnswer quickly for bonus points!\nBuild streaks for multipliers!",
   "tof_play_now": "Play Now",
-
   "story_mode_title": "Story Mode",
   "story_mode_choose": "Choose a story to explore",
-
   "bg_streaks": "BG Streaks",
   "not_enough_gems": "Not enough gems",
-
   "language_english": "English",
   "language_french": "Français",
-  "language_setting": "Language"
+  "language_setting": "Language",
+  "game_memory_verses": "Memory Verses",
+  "game_memory_verses_desc": "Hide the Word in your heart!"
 }
