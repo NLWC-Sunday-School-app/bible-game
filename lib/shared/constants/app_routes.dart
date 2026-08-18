@@ -21,4 +21,6 @@ class AppRoutes {
   static const String storyQuestionScreen = 'story_question_screen';
   static const String trueOrFalseHomeScreen = 'true_or_false_home_screen';
   static const String trueOrFalseQuestionScreen = 'true_or_false_question_screen';
+  static const String memoryVersesScreen = 'memory_verses_screen';
+  static const String memoryVerseTopicScreen = 'memory_verse_topic_screen';
 }

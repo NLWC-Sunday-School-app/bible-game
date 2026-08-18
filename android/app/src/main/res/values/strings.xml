@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="verse_widget_title">Verse of the Hour</string>
+    <string name="verse_widget_description">A new Bible verse on your home screen every hour</string>
+    <string name="verse_widget_placeholder">“Thy word is a lamp unto my feet, and a light unto my path.”</string>
+    <string name="verse_widget_placeholder_ref">Psalm 119:105</string>
+</resources>

@@ -20,6 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bible_game/features/arcade/view/arcade_screen.dart';
+import 'package:bible_game/features/memory_verses/bloc/memory_verses_cubit.dart';
+import 'package:bible_game/features/memory_verses/view/memory_verses_screen.dart';
+import 'package:bible_game/features/memory_verses/view/topic_verses_screen.dart';
 import 'package:bible_game/features/fantasy_league/bloc/fantasy_league_bloc.dart';
 import 'package:bible_game/features/fantasy_league/repository/fantasy_league_repository.dart';
 import 'package:bible_game/features/fantasy_league/view/home_screen.dart';
@@ -162,6 +165,7 @@ class _AppState extends State<App> {
       builder: (BuildContext context, Widget? child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => NavigationCubit()),
+          BlocProvider(create: (_) => MemoryVersesCubit()),
           BlocProvider(create: (_) => PowerUpBloc(
             gameAPI: widget.gameAPI,
           )..add(LoadPowerUps())),
@@ -347,6 +351,10 @@ class _AppState extends State<App> {
                 isTablet ? const TrueOrFalseHomeScreenTabletView() : const TrueOrFalseHomeScreen(),
             AppRoutes.trueOrFalseQuestionScreen: (context) =>
                 isTablet ? const TrueOrFalseQuestionScreenTabletView() : const TrueOrFalseQuestionScreen(),
+            AppRoutes.memoryVersesScreen: (context) =>
+                const MemoryVersesScreen(),
+            AppRoutes.memoryVerseTopicScreen: (context) =>
+                const TopicVersesScreen(),
           },
           home: isTablet?SplashScreenTabletView():SplashScreen(),
         ),

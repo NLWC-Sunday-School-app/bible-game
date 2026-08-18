@@ -1,12 +1,10 @@
 {
   "app_name": "Jeu Biblique",
-
   "nav_store": "Boutique",
   "nav_board": "Classement",
   "nav_home": "Accueil",
   "nav_arcade": "Arcade",
   "nav_league": "Ligue",
-
   "game_story_mode": "Mode Histoire",
   "game_story_mode_desc": "Voyagez à travers les récits bibliques !",
   "game_quick_game": "Jeu Rapide",
@@ -19,7 +17,6 @@
   "game_four_scriptures_desc": "Voyagez à travers la Bible !",
   "game_true_or_false": "Vrai ou Faux",
   "game_true_or_false_desc": "Testez vos connaissances !",
-
   "offline_banner": "Vous êtes hors ligne — Mode Histoire, Vrai ou Faux et Dévotion Quotidienne sont disponibles !",
   "offline_badge": "HORS LIGNE",
   "scores_pending_sync": "{count} score{plural} en attente de synchronisation",
@@ -27,11 +24,9 @@
   "back_online": "Vous êtes de retour en ligne !",
   "syncing_scores": "Synchronisation de vos scores...",
   "offline_features_limited": "Vous êtes hors ligne. Certaines fonctionnalités peuvent être limitées.",
-
   "daily_devotional": "Dévotion Quotidienne",
   "daily_devotional_completed": "Terminé ! Revenez demain",
   "daily_devotional_prompt": "Lisez, réfléchissez et répondez à la question du jour",
-
   "did_you_know": "Le saviez-vous ?",
   "category_bible_numbers": "Chiffres Bibliques",
   "category_bible_geography": "Géographie Biblique",
@@ -39,7 +34,6 @@
   "category_character_spotlight": "Personnage en Vedette",
   "category_bible_language": "Bible & Langue",
   "category_church_history": "Histoire de l'Église",
-
   "auth_your_profile": "Votre Profil",
   "auth_login_prompt": "Connectez-vous à votre profil pour sauvegarder et continuer votre jeu.",
   "auth_login": "Connexion",
@@ -51,7 +45,6 @@
   "auth_login_success": "Connexion réussie !",
   "auth_enjoy_game": "Profitez du jeu biblique !",
   "auth_forgot_password": "Mot de passe oublié ?",
-
   "auth_create_profile": "Créer un Profil",
   "auth_create_profile_subtitle": "Créez un profil pour sauvegarder votre progression !",
   "auth_nickname_hint": "Quel est votre surnom ?",
@@ -59,11 +52,9 @@
   "auth_country_hint": "Sélectionnez votre pays",
   "auth_registration_failed": "L'inscription a échoué. Vérifiez vos informations et réessayez.",
   "auth_profile_created": "Profil créé avec succès !",
-
   "auth_logout": "Déconnexion",
   "auth_logout_confirm": "Êtes-vous sûr de vouloir vous déconnecter ?",
   "auth_logout_yes": "Oui, me déconnecter",
-
   "auth_reset_password": "Réinitialiser le mot de passe",
   "auth_reset_password_subtitle": "N'ayez crainte, vous pouvez réinitialiser votre mot de passe.",
   "auth_reset_email_hint": "Veuillez entrer votre e-mail enregistré",
@@ -81,11 +72,9 @@
   "auth_set_new_password": "Définir le nouveau mot de passe",
   "auth_new_password_set": "Nouveau mot de passe défini avec succès !",
   "auth_log_in_button": "CONNEXION",
-
   "auth_edit_profile": "Modifier le Profil",
   "auth_edit_profile_subtitle": "Vous pouvez mettre à jour votre profil",
   "auth_update_profile": "Mettre à Jour le Profil",
-
   "profile_title": "Profil",
   "profile_edit": "Modifier votre profil",
   "profile_log_in": "Connexion",
@@ -98,30 +87,25 @@
   "profile_collaborator": "Devenez un Luc ! Créez des questions bibliques.",
   "profile_collaborator_thanks": "Merci, un e-mail vous a été envoyé !",
   "profile_sign_in": "Se connecter...",
-
   "quit_title": "Vous partez déjà ?",
   "quit_message": "Votre progression dans cette manche ne sera pas sauvegardée.",
   "quit_keep_playing": "Continuer à Jouer",
   "quit_button": "Quitter",
-
   "store_title": "Boutique",
   "store_not_enough_coins": "Vous n'avez pas assez de pièces pour cela ! Jouez plus de jeux",
   "store_requires_internet": "Les achats nécessitent une connexion internet.",
   "store_buy": "Acheter",
   "store_more_items": "PLUS D'ARTICLES À VENIR",
-
   "arcade_title": "Arcade",
   "arcade_global_challenge": "Défi Mondial",
   "arcade_multiplayer": "Multijoueur",
   "arcade_offline_message": "L'Arcade nécessite une connexion internet.\nVeuillez vous reconnecter pour jouer.",
-
   "leaderboard_title": "Classement",
   "leaderboard_global": "Mondial",
   "leaderboard_your_country": "Votre pays",
   "leaderboard_offline_message": "Le classement nécessite une connexion internet.\nVeuillez vous reconnecter pour voir les classements.",
   "leaderboard_top": "Top",
   "leaderboard_you": "Vous",
-
   "tof_title": "Vrai ou Faux",
   "tof_high_score": "Meilleur Score",
   "tof_games_played": "Parties Jouées",
@@ -129,14 +113,13 @@
   "tof_how_to_play": "Comment Jouer",
   "tof_instructions": "Lisez chaque affirmation biblique et décidez\nsi elle est VRAIE ou FAUSSE.\n\nRépondez vite pour des points bonus !\nEnchaînez les bonnes réponses pour des multiplicateurs !",
   "tof_play_now": "Jouer Maintenant",
-
   "story_mode_title": "Mode Histoire",
   "story_mode_choose": "Choisissez une histoire à explorer",
-
   "bg_streaks": "Séries BG",
   "not_enough_gems": "Pas assez de gemmes",
-
   "language_english": "English",
   "language_french": "Français",
-  "language_setting": "Langue"
+  "language_setting": "Langue",
+  "game_memory_verses": "Versets à mémoriser",
+  "game_memory_verses_desc": "Garde la Parole dans ton cœur !"
 }

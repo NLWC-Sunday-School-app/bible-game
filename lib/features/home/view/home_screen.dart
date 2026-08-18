@@ -147,6 +147,19 @@ const _gameEntries = [
     route: AppRoutes.trueOrFalseHomeScreen,
     requiresNetwork: false,
   ),
+  _GameEntry(
+    bgColor: const Color(0xFF6B4C9A),
+    gameType: 'Memory Verses',
+    gameText: 'Hide the Word in your heart!',
+    gameTypeKey: 'game_memory_verses',
+    gameTextKey: 'game_memory_verses_desc',
+    gameImage: IconImageRoutes.purpleBook,
+    smallWidth: 70,
+    mediumWidth: 80,
+    largeWidth: 90,
+    route: AppRoutes.memoryVersesScreen,
+    requiresNetwork: false,
+  ),
 ];
 
 class HomeScreen extends StatefulWidget {

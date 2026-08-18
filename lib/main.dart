@@ -1,6 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bible_game_api/api/game_api.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_storage/get_storage.dart';
@@ -19,6 +19,7 @@ import 'package:bible_game_api/api/user_api.dart';
 import 'package:bible_game/shared/utils/app_bloc_observer.dart';
 import 'package:bible_game/shared/utils/awesome_notification.dart';
 import 'package:bible_game/shared/utils/devotional_notification.dart';
+import 'package:bible_game/shared/utils/hourly_verse_notification.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'app.dart';
 import 'package:bible_game_api/api/api_client.dart';
@@ -41,7 +42,9 @@ void main() async {
       ),
 
       DevotionalNotification.channel,
-      
+
+      HourlyVerseNotification.channel,
+
     ]);
 
     // Reset the app badge count whenever the app starts
@@ -49,6 +52,15 @@ void main() async {
 
     // Schedule the daily devotional notification at 8 AM
     DevotionalNotification.scheduleDailyReminder();
+
+    // Schedule the hourly lock screen Bible verse notifications
+    HourlyVerseNotification.scheduleHourlyVerses();
+
+    // Debug builds fire one verse 10s after launch so the lock screen can be
+    // checked without waiting for the top of the hour. Stripped from release.
+    if (kDebugMode) {
+      HourlyVerseNotification.showTestVerseNow();
+    }
   }
 
   // GetStorage uses path_provider internally. On iOS hot restart the Pigeon
