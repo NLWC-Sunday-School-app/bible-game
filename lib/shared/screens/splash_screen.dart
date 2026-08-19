@@ -179,7 +179,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                   // Tagline
                   Text(
-                    'Test Your Knowledge of God\'s Word',
+                    'Grow in the Knowledge of God\'s Word',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Quicksand',
