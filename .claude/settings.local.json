@@ -28,7 +28,20 @@
       "Bash(plutil -extract NSExtensionPointIdentifier raw ~/Library/Developer/Xcode/DerivedData/Runner-cluqgfdpnrgddbaoefekzejdrclk/Build/Products/Debug-iphonesimulator/Runner.app/PlugIns/VerseWidget.appex/Info.plist)",
       "Bash(xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO build)",
       "Bash(awk '{print \"file size:\", $5}')",
-      "mcp__visualize__read_me"
+      "mcp__visualize__read_me",
+      "Bash(curl -sI https://play.biblegame.app/flutter.js)",
+      "Bash(curl -sI https://play.biblegame.app/flutter_bootstrap.js)",
+      "Bash(curl -s https://play.biblegame.app/version.json)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games ls-files build/web)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games check-ignore build/web/index.html)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games show --stat 88ae3ca)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games remote -v)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games fetch origin main --quiet)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games log --oneline -3 origin/main)",
+      "Bash(vercel whoami *)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games log --oneline -2 -- build/web)",
+      "Bash(git -C /Users/mac/Documents/Tobi/bible_games log --oneline -1 -- build/web/assets/assets/data/memory_verses.json)",
+      "mcp__claude-in-chrome__tabs_context_mcp"
     ]
   }
 }
