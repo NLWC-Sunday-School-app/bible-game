@@ -19,6 +19,8 @@ class AuthenticationState extends Equatable {
   final bool hasLoggedOut;
   final bool isDeletingAccount;
   final bool hasDeletedAccount;
+  final bool isLoadingGoogleSignIn;
+  final bool failedGoogleSignIn;
 
   const AuthenticationState(
       {this.isLoggedIn = false,
@@ -38,7 +40,9 @@ class AuthenticationState extends Equatable {
       this.failedToRegister = false,
       this.hasLoggedOut = false,
       this.isDeletingAccount = false,
-      this.hasDeletedAccount = false});
+      this.hasDeletedAccount = false,
+      this.isLoadingGoogleSignIn = false,
+      this.failedGoogleSignIn = false});
 
   AuthenticationState copyWith(
       {bool? isLoggedIn,
@@ -58,7 +62,9 @@ class AuthenticationState extends Equatable {
       String? refreshToken,
       bool? failedToLogin,
       bool? failedToRegister,
-      bool? hasLoggedOut}) {
+      bool? hasLoggedOut,
+      bool? isLoadingGoogleSignIn,
+      bool? failedGoogleSignIn}) {
     return AuthenticationState(
         isLoggedIn: isLoggedIn ?? this.isLoggedIn,
         isUnauthenticated: isUnauthenticated ?? this.isUnauthenticated,
@@ -78,7 +84,10 @@ class AuthenticationState extends Equatable {
         refreshToken: refreshToken ?? this.refreshToken,
         failedToLogin: failedToLogin ?? this.failedToLogin,
         failedToRegister: failedToRegister ?? this.failedToRegister,
-        hasLoggedOut: hasLoggedOut ?? this.hasLoggedOut);
+        hasLoggedOut: hasLoggedOut ?? this.hasLoggedOut,
+        isLoadingGoogleSignIn:
+            isLoadingGoogleSignIn ?? this.isLoadingGoogleSignIn,
+        failedGoogleSignIn: failedGoogleSignIn ?? this.failedGoogleSignIn);
   }
 
   @override
@@ -99,6 +108,8 @@ class AuthenticationState extends Equatable {
         refreshToken,
         failedToLogin,
         failedToRegister,
-        hasLoggedOut
+        hasLoggedOut,
+        isLoadingGoogleSignIn,
+        failedGoogleSignIn
       ];
 }

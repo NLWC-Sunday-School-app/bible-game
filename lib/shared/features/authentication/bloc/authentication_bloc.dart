@@ -38,6 +38,7 @@ class AuthenticationBloc
     on<ResetPassword>(_onResetPassword);
     on<DeleteAccount>(_onDeleteAccount);
     on<RestoreSession>(_onRestoreSession);
+    on<AuthenticationGoogleSignInRequested>(_onGoogleSignInRequested);
   }
 
   Future<void> _onAuthenticationStatusChanged(
@@ -271,6 +272,63 @@ class AuthenticationBloc
           isLoggedIn: true,
         ));
       }
+    }
+  }
+
+  Future<void> _onGoogleSignInRequested(
+      AuthenticationGoogleSignInRequested event,
+      Emitter<AuthenticationState> emit) async {
+    emit(state.copyWith(
+        isLoadingGoogleSignIn: true, failedGoogleSignIn: false));
+    try {
+      // Try an existing account first — covers a Google user who already
+      // has a profile from a previous "Continue with Google" sign-in.
+      var response = await _authenticationRepository.logIn(
+          event.email, event.password, event.deviceName, event.deviceOs);
+
+      if (!response.containsKey('token')) {
+        // First time this Google account has signed in — create a profile
+        // using the name/email Google gave us, then log straight in.
+        final registered = await _authenticationRepository.register(
+          event.name,
+          event.email,
+          event.password,
+          event.fcmToken,
+          event.country,
+          event.deviceName,
+          event.deviceOs,
+        );
+        if (registered) {
+          response = await _authenticationRepository.logIn(
+              event.email, event.password, event.deviceName, event.deviceOs);
+        }
+      }
+
+      if (response.containsKey('token')) {
+        emit(state.copyWith(
+          isLoggedIn: true,
+          isLoadingGoogleSignIn: false,
+          token: response['token'],
+          refreshToken: response['refreshToken'],
+          failedGoogleSignIn: false,
+        ));
+        GetStorage().write('user_token', state.token!);
+        GetStorage().write('refresh_token', state.refreshToken!);
+        add(FetchUserDataRequested());
+        add(UpdateFCMToken());
+        emit(state.copyWith(
+            isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
+      } else {
+        emit(state.copyWith(
+            isLoadingGoogleSignIn: false, failedGoogleSignIn: true));
+        emit(state.copyWith(
+            isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
+      }
+    } catch (_) {
+      emit(state.copyWith(
+          isLoadingGoogleSignIn: false, failedGoogleSignIn: true));
+      emit(state.copyWith(
+          isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
     }
   }
 

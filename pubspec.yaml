@@ -92,6 +92,8 @@ dependencies:
     path: './packages/bible_game_api'
   badges: ^3.1.2
   awesome_notifications: ^0.10.0
+  google_sign_in: ^6.2.2
+  crypto: ^3.0.3
   awesome_notifications_fcm: ^0.10.0
   countries_flag: ^0.0.1
   countries_world_map: ^1.0.2

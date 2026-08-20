@@ -91,3 +91,20 @@ class ResetPassword extends AuthenticationEvent {
 }
 
 class DeleteAccount extends AuthenticationEvent {}
+
+class AuthenticationGoogleSignInRequested extends AuthenticationEvent {
+  final String name;
+  final String email;
+  final String password;
+  final String country;
+  final String fcmToken;
+  final deviceName;
+  final deviceOs;
+
+  AuthenticationGoogleSignInRequested(this.name, this.email, this.password,
+      this.country, this.fcmToken, this.deviceName, this.deviceOs);
+
+  @override
+  List<Object> get props =>
+      [name, email, password, country, fcmToken, deviceName, deviceOs];
+}

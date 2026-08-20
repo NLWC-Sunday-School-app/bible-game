@@ -4,8 +4,8 @@
     {
       "name": "built-web",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "build/web"],
-      "port": 8080
+      "runtimeArgs": ["-m", "http.server", "8099", "--directory", "build/web"],
+      "port": 8099
     },
     {
       "name": "flutter-web",

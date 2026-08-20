@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/features/home/widget/modals/create_profile_modal.dart';
+import 'package:bible_game/features/home/widget/modals/google_sign_in_button.dart';
 import 'package:bible_game/features/home/widget/modals/login_modal.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:stroke_text/stroke_text.dart';
@@ -209,6 +210,40 @@ void showAuthModal(BuildContext context) {
                           showCreateProfileModal(context);
                         },
                       ),
+                      SizedBox(height: 18.h),
+
+                      // ── "or" divider ──
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              color: const Color(0xFF1E3A5F),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            child: Text(
+                              tr.t('auth_or_divider'),
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF4A6A8A),
+                                fontFamily: 'Mikado',
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              color: const Color(0xFF1E3A5F),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 18.h),
+
+                      const GoogleSignInButton(),
                       SizedBox(height: 24.h),
 
                       // Settings toggles

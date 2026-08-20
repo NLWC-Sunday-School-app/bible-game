@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:bible_game/features/home/widget/modals/login_modal.dart';
 import 'package:bible_game/features/home/widget/modals/create_profile_modal.dart';
+import 'package:bible_game/features/home/widget/modals/google_sign_in_button.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/widgets/green_button.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
@@ -198,6 +199,47 @@ class _LoginGateWidgetState extends State<LoginGateWidget>
                   ),
                 ),
               ),
+            ),
+            SizedBox(height: 24.h),
+
+            // ── "or" divider ──
+            SizedBox(
+              width: 280.w,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: Colors.white.withOpacity(0.15),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    child: Text(
+                      'OR',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withOpacity(0.4),
+                        fontFamily: 'Mikado',
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: Colors.white.withOpacity(0.15),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20.h),
+
+            // ── Continue with Google ──
+            SizedBox(
+              width: 280.w,
+              child: const GoogleSignInButton(isInsideDialog: false),
             ),
             SizedBox(height: 40.h),
           ],
