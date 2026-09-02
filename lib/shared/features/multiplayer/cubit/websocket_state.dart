@@ -2,9 +2,13 @@ part of 'websocket_cubit.dart';
 
 enum WebsocketConnectionStatus { disconnected, connecting, connected, error }
 
+/// Sentinel used by [WebsocketState.copyWith] so a nullable field can be
+/// explicitly reset to null, distinct from being omitted entirely.
+const _unset = Object();
+
 class WebsocketState extends Equatable{
   final String eventType;
-  final WaitingRoomModel playersJoined;
+  final WaitingRoomModel waitingRoomInfo;
   final PlayerAnswers playerAnswersDetails;
   final PositionUpdate positionUpdate;
   final GameFinishedEvent gameFinishedEvent;
@@ -23,7 +27,7 @@ class WebsocketState extends Equatable{
 
   const WebsocketState({
     required this.eventType,
-    required this.playersJoined,
+    required this.waitingRoomInfo,
     required this.playerAnswersDetails,
     required this.positionUpdate,
     required this.gameFinishedEvent,
@@ -46,7 +50,7 @@ class WebsocketState extends Equatable{
         eventType: "",
         userToastMessage: "",
         userPlayerId: "",
-        playersJoined: WaitingRoomModel.fromJson({}),
+        waitingRoomInfo: WaitingRoomModel.fromJson({}),
         playerAnswersDetails: PlayerAnswers.fromJson({}),
         positionUpdate: PositionUpdate.fromJson({}),
         gameFinishedEvent: GameFinishedEvent.fromJson({}),
@@ -65,17 +69,17 @@ class WebsocketState extends Equatable{
 
   WebsocketState copyWith({
     String? eventType,
-    WaitingRoomModel? playersJoined,
+    WaitingRoomModel? waitingRoomInfo,
     PlayerAnswers? playerAnswersDetails,
     PositionUpdate? positionUpdate,
     GameFinishedEvent? gameFinishedEvent,
     List<Datum>? questionData,
-    String? correctAnswer,
+    Object? correctAnswer = _unset,
     String? userToastMessage,
     String? userPlayerId,
-    int? selectedOptionIndex,
+    Object? selectedOptionIndex = _unset,
     bool? hasAnswered,
-    bool? isCorrectAnswer,
+    Object? isCorrectAnswer = _unset,
     bool? newPlayerJoined,
     int? coinsGained,
     int? userRank,
@@ -83,15 +87,15 @@ class WebsocketState extends Equatable{
     WebsocketConnectionStatus? connectionStatus,
   }) {
     return WebsocketState(
-        playersJoined: playersJoined ?? this.playersJoined,
+        waitingRoomInfo: waitingRoomInfo ?? this.waitingRoomInfo,
         eventType:  eventType ?? this.eventType,
         questionData: questionData ?? this.questionData,
-        correctAnswer: correctAnswer ?? this.correctAnswer,
+        correctAnswer: correctAnswer == _unset ? this.correctAnswer : correctAnswer as String?,
         userToastMessage: userToastMessage ?? this.userToastMessage,
         userPlayerId: userPlayerId ?? this.userPlayerId,
-        selectedOptionIndex: selectedOptionIndex ?? this.selectedOptionIndex,
+        selectedOptionIndex: selectedOptionIndex == _unset ? this.selectedOptionIndex : selectedOptionIndex as int?,
         hasAnswered: hasAnswered ??this.hasAnswered,
-        isCorrectAnswer: isCorrectAnswer ?? this.isCorrectAnswer,
+        isCorrectAnswer: isCorrectAnswer == _unset ? this.isCorrectAnswer : isCorrectAnswer as bool?,
         newPlayerJoined: newPlayerJoined ?? this.newPlayerJoined,
         coinsGained: coinsGained ?? this.coinsGained,
         userRank: userRank ?? this.userRank,
@@ -107,7 +111,7 @@ class WebsocketState extends Equatable{
   List<Object?> get props =>
       [
         userPlayerId,
-       playersJoined,
+       waitingRoomInfo,
         playerAnswersDetails,
         positionUpdate,
         eventType,

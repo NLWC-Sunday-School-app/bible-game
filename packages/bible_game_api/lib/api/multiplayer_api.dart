@@ -179,6 +179,18 @@ class MultiplayerAPI {
     }
   }
 
+  Future<dynamic> roomDetails(roomId) async {
+    try {
+      final response = await apiClient.get(
+          '/multiplayer/rooms/${roomId}',
+      );
+      return StartGameRoomModel.fromJson(response.data);
+    } on ApiException catch (e) {
+      final errorMessage = e.toString();
+      throw errorMessage;
+    }
+  }
+
   Future<bool> gameRestart(roomId, hostId) async {
     try {
       final response = await apiClient.post(

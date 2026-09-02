@@ -206,15 +206,15 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                       body["type"] == "PLAYER_EJECTED" ||
                       body["type"] == "PLAYER_LEFT")) {
                 final response = WaitingRoomModel.fromJson(body);
-                emit(state.copyWith(playersJoined: response, newPlayerJoined: true));
-                emit(state.copyWith(playersJoined: response, newPlayerJoined: false));
+                emit(state.copyWith(waitingRoomInfo: response, newPlayerJoined: true));
+                emit(state.copyWith(waitingRoomInfo: response, newPlayerJoined: false));
               }
 
               if (body["type"] == "PLAYER_ANSWERED") {
                 emit(state.copyWith(
                     playerAnswersDetails: PlayerAnswers.fromJson(body), userToastMessage: ""));
 
-                if (state.playersJoined.players
+                if (state.waitingRoomInfo.players
                         .firstWhere((element) =>
                             element.userId == _authenticationBloc.state.user.id.toString())
                         .id ==
@@ -244,8 +244,22 @@ class WebsocketCubit extends Cubit<WebsocketState> {
 
               if (body["type"] == "GAME_RESTARTED") {
                 final response = WaitingRoomModel.fromJson(body);
-                emit(state.copyWith(playersJoined: response, newPlayerJoined: true));
-                emit(state.copyWith(playersJoined: response, newPlayerJoined: false));
+                emit(state.copyWith(
+                  waitingRoomInfo: response,
+                  newPlayerJoined: true,
+                  hasAnswered: false,
+                  selectedOptionIndex: null,
+                  correctAnswer: null,
+                  isCorrectAnswer: null,
+                  coinsGained: 0,
+                  noOfCorrectAnswers: 0,
+                  userRank: 0,
+                  questionData: [],
+                  playerAnswersDetails: PlayerAnswers.fromJson({}),
+                  positionUpdate: PositionUpdate.fromJson({}),
+                  gameFinishedEvent: GameFinishedEvent.fromJson({}),
+                ));
+                emit(state.copyWith(waitingRoomInfo: response, newPlayerJoined: false));
               }
             } catch (e) {
               debugPrint('❌ Error processing frame: $e');
@@ -286,7 +300,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     // Additional delay to ensure connection is stable
     await Future.delayed(Duration(milliseconds: 300));
 
-    emit(state.copyWith(playersJoined: WaitingRoomModel.fromJson({})));
+    emit(state.copyWith(waitingRoomInfo: WaitingRoomModel.fromJson({})));
 
     final roomId = _multiplayerBloc.state.createGameRoomResponse.id;
     _currentRoomId = roomId;  // Store room ID for re-subscription on reconnect
@@ -297,7 +311,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   }
 
   void sendGameAnswer(int questionIndex, String answer, DateTime? questionStartTime) {
-    final playerId = state.playersJoined.players
+    final playerId = state.waitingRoomInfo.players
         .firstWhere((element) => element.userId == _authenticationBloc.state.user.id.toString())
         .id;
 
@@ -313,7 +327,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
       'destination': '/app/game.answer',
       'body': jsonEncode({
         'playerId': playerId,
-        'roomId': state.playersJoined.roomId,
+        'roomId': state.waitingRoomInfo.roomId,
         'questionIndex': questionIndex,
         'answer': answer,
         'responseTimeMs': responseTimeMs,

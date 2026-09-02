@@ -10,6 +10,7 @@ class WaitingRoomModel extends Equatable {
     required this.maxPlayers,
     required this.totalQuestions,
     required this.gameMode,
+    required this.toastNotificationMessage,
   });
 
   final String? type;
@@ -20,6 +21,7 @@ class WaitingRoomModel extends Equatable {
   final int? maxPlayers;
   final String? totalQuestions;
   final String? gameMode;
+  final String? toastNotificationMessage;
 
   factory WaitingRoomModel.fromJson(Map<String, dynamic> json){
     return WaitingRoomModel(
@@ -31,12 +33,13 @@ class WaitingRoomModel extends Equatable {
       maxPlayers: json["maxPlayers"],
       totalQuestions: json["totalQuestions"],
       gameMode: json["gameMode"],
+      toastNotificationMessage: json["toastNotificationMessage"],
     );
   }
 
   @override
   List<Object?> get props => [
-    type, roomId, players, readyCount, totalPlayers, maxPlayers, gameMode,totalQuestions ];
+    type, roomId, players, readyCount, totalPlayers, maxPlayers, gameMode,totalQuestions, toastNotificationMessage ];
 }
 
 class Player extends Equatable {

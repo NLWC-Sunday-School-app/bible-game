@@ -110,7 +110,7 @@ class MultiplayerQuestionContainer extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                "${context.read<MultiplayerBloc>().state.createGameRoomResponse.victoryCondition?.value ?? 'N/A'}",
+                                "${context.read<MultiplayerBloc>().state.createGameRoomResponse.victoryCondition?.value ?? context.read<MultiplayerBloc>().state.hostVictoryCondition ?? 'N/A'}",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -191,11 +191,11 @@ class MultiplayerQuestionContainer extends StatelessWidget {
                               border: Border.all(color: Color(0xFFD7402D), width: 2)
                           ),
                           child: Center(
-                            child: AvatarWidget(seed: context.read<WebsocketCubit>().state.playersJoined.players[0].userId.toString(), width: 40.w, height: 40.h,),
+                            child: AvatarWidget(seed: context.read<WebsocketCubit>().state.waitingRoomInfo.players[0].userId.toString(), width: 40.w, height: 40.h,),
                           ),
                         ),
                         ...List.generate(
-                          (context.read<WebsocketCubit>().state.playersJoined.totalPlayers! - 1)>=3?3:(context.read<WebsocketCubit>().state.playersJoined.totalPlayers! - 1),
+                          (context.read<WebsocketCubit>().state.waitingRoomInfo.totalPlayers! - 1)>=3?3:(context.read<WebsocketCubit>().state.waitingRoomInfo.totalPlayers! - 1),
                                 (index) => Positioned(
                                   right: 25.w * (index+1),
                                   child: Container(
@@ -208,7 +208,7 @@ class MultiplayerQuestionContainer extends StatelessWidget {
                                         border: Border.all(color: Color(0xFFD7402D), width: 2)
                                     ),
                                     child: Center(
-                                      child: AvatarWidget(seed: context.read<WebsocketCubit>().state.playersJoined.players[(index+1)].userId.toString(), width: 40.w, height: 40.h,),
+                                      child: AvatarWidget(seed: context.read<WebsocketCubit>().state.waitingRoomInfo.players[(index+1)].userId.toString(), width: 40.w, height: 40.h,),
                                     ),
                                   ),
                                 ),

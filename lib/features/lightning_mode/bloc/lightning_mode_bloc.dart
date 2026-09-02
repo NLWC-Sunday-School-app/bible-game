@@ -56,17 +56,32 @@ class LightningModeBloc extends Bloc<LightningModeEvent, LightningModeState> {
   Future<void> _onGameRestart(
       GameRestart event,
       Emitter<LightningModeState> emit) async {
-    try {
-      emit(state.copyWith(isLoadingGameRestart: true,));
-      final response =
-      await _lightningModeRepository.gameRestart(
-          _multiplayerBloc.state.createGameRoomResponse.id,
-          _authenticationBloc.state.user.id
-      );
-      emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: true));
-      emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: false));
-    } catch (_) {
-      emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: false));
+    emit(state.copyWith(isLoadingGameRestart: true,));
+
+    // The backend can still be committing the room's FINISHED status when the
+    // GAME_FINISHED broadcast reaches this client, so an immediate restart can
+    // be rejected with "Game can only be restarted when finished". Retry a
+    // few times with backoff before giving up.
+    const maxAttempts = 3;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await _lightningModeRepository.gameRestart(
+            _multiplayerBloc.state.createGameRoomResponse.id,
+            _authenticationBloc.state.user.id
+        );
+        emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: true));
+        emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: false));
+        return;
+      } catch (e) {
+        final canRetry = attempt < maxAttempts &&
+            e.toString().contains('can only be restarted when finished');
+        if (canRetry) {
+          await Future.delayed(Duration(milliseconds: 600 * attempt));
+          continue;
+        }
+        emit(state.copyWith(isLoadingGameRestart: false, hasRestartedGame: false));
+        return;
+      }
     }
   }
 

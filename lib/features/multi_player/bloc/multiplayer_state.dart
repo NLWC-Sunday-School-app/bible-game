@@ -26,6 +26,8 @@ class MultiplayerState extends Equatable{
   final CreateGameRoomModel createGameRoomResponse;
   final List<GameInviteModel> listOfInvite;
 
+  final dynamic hostVictoryCondition;
+
   const MultiplayerState(
       {
         required this.isLoadingCreateGameRoom,
@@ -51,6 +53,8 @@ class MultiplayerState extends Equatable{
         required this.hasLeaveRoom,
         required this.isLoadingKickOut,
         required this.hasKickedOut,
+        //
+        required this.hostVictoryCondition,
       });
 
   factory MultiplayerState.initial(){
@@ -78,6 +82,7 @@ class MultiplayerState extends Equatable{
       isLoadingKickOut: false,
       hasKickedOut: false,
       inviteCount: 0,
+      hostVictoryCondition: 0,
     );
   }
 
@@ -105,7 +110,8 @@ MultiplayerState copyWith(
         bool? isLoadingKickOut,
         bool? hasKickedOut,
         int? inviteCount,
-        CreateGameRoomModel? createGameRoomResponse
+        CreateGameRoomModel? createGameRoomResponse,
+        int? hostVictoryCondition,
       }) {
     return MultiplayerState(
         isLoadingCreateGameRoom: isLoadingCreateGameRoom ?? this.isLoadingCreateGameRoom,
@@ -131,6 +137,7 @@ MultiplayerState copyWith(
         isLoadingKickOut: isLoadingKickOut ?? this.isLoadingKickOut,
         hasKickedOut: hasKickedOut ?? this.hasKickedOut,
         inviteCount: inviteCount ?? this.inviteCount,
+        hostVictoryCondition: hostVictoryCondition ?? this.hostVictoryCondition,
     );
   }
 
@@ -159,6 +166,7 @@ MultiplayerState copyWith(
     isLoadingKickOut,
     hasKickedOut,
     inviteCount,
+    hostVictoryCondition,
   ];
 }
 

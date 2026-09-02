@@ -194,7 +194,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
               ),
               BlocListener<WebsocketCubit, WebsocketState>(
                 listener: (context, state){
-                  if(state.eventType == "GAME_RESTARTED"){
+                  if(state.eventType == "GAME_RESTARTED" && state.newPlayerJoined){
                     Navigator.of(context).popUntil((route) => route.isFirst);
                     Navigator.pushNamed(context,
                         AppRoutes.multiplayer,
@@ -205,7 +205,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
                     showHostWaitingModal(context,
                         selectedGroupGame: widget.selectedGroupGame,
                         inviteCode: "${context.read<MultiplayerBloc>().state.createGameRoomResponse.inviteCode}",
-                        questionType: "${context.read<WebsocketCubit>().state.playersJoined.gameMode}",
+                        questionType: "${context.read<WebsocketCubit>().state.waitingRoomInfo.gameMode}",
                         noOfQuestion: null
                     );
                     CustomToast.showInviteToast(context, isInviteSuccessful: true);

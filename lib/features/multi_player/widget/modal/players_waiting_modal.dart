@@ -110,10 +110,10 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 context.read<WebsocketCubit>().closeWebsocket();
                                 final userId = context.read<AuthenticationBloc>().state.user.id.toString();
                                 print(userId);
-                                final player = context.read<WebsocketCubit>().state.playersJoined.players.firstWhereOrNull((element) => element.userId == userId);
+                                final player = context.read<WebsocketCubit>().state.waitingRoomInfo.players.firstWhereOrNull((element) => element.userId == userId);
                                 print(player);
                                 if (player?.id != null) {
-                                  print("wemoved");
+                                  // print("wemoved");
                                   BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(player!.id!));
                                 }
                               }else{
@@ -256,7 +256,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    widget.questionType == null?"${context.watch<WebsocketCubit>().state.playersJoined.gameMode}":widget.questionType!,
+                                    widget.questionType == null?"${context.watch<WebsocketCubit>().state.waitingRoomInfo.gameMode}":widget.questionType!,
                                     style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500
@@ -283,7 +283,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 )
                                     :
                                 Text(
-                                    "${widget.noOfQuestion??context.watch<WebsocketCubit>().state.playersJoined.totalQuestions}",
+                                    "${widget.noOfQuestion??context.watch<WebsocketCubit>().state.waitingRoomInfo.totalQuestions}",
                                     style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500
@@ -391,7 +391,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             if(state.newPlayerJoined == true){
                               CustomToast.show(
                                   context,
-                                  "${state.playersJoined.players.last.username} has joined",
+                                  "${state.waitingRoomInfo.toastNotificationMessage}",
                                 isTriggerFromWaitingRoom: true
                               );
                             }
@@ -462,7 +462,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                       ),
                                     ):SizedBox.shrink(),
                                     Text(
-                                      'No of Players: ${state.playersJoined.totalPlayers??0}',
+                                      'No of Players: ${state.waitingRoomInfo.totalPlayers??0}',
                                       style: TextStyle(
                                         fontSize: 13.sp,
                                         fontWeight: FontWeight.w500,
@@ -473,7 +473,7 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 ),
                               ),
                               Expanded(
-                                child: state.playersJoined.players.length == 0?
+                                child: state.waitingRoomInfo.players.length == 0?
                                     Center(
                                       child: Text(
                                         'Waiting for players',
@@ -487,21 +487,21 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                     :
                                 ListView.builder(
                                   padding: EdgeInsets.zero,
-                                  itemCount: state.playersJoined.players.length,
+                                  itemCount: state.waitingRoomInfo.players.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     return PlayerWaitingCard(
                                       onTap: (){
                                         BlocProvider.of<MultiplayerBloc>(context).add(
-                                            KickOut(state.playersJoined.players[index].id!)
+                                            KickOut(state.waitingRoomInfo.players[index].id!)
                                         );
                                       },
                                       position: index+1,
-                                      userName: state.playersJoined.players[index].username??"",
-                                      countryName: state.playersJoined.players[index].country??"N",
-                                      userRank: state.playersJoined.players[index].level??"",
-                                      userId: state.playersJoined.players[index].userId??"",
+                                      userName: state.waitingRoomInfo.players[index].username??"",
+                                      countryName: state.waitingRoomInfo.players[index].country??"N",
+                                      userRank: state.waitingRoomInfo.players[index].level??"",
+                                      userId: state.waitingRoomInfo.players[index].userId??"",
                                       isWaitingForHost: widget.isWaitingForHost,
-                                      isHost:state.playersJoined.players[index].isHost??false,
+                                      isHost:state.waitingRoomInfo.players[index].isHost??false,
                                     );
                                   },
                                 ),
@@ -539,8 +539,8 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                           BlocProvider.of<LightningModeBloc>(context).add(StartGame());
                         }
                       },
-                      buttonText: widget.isWaitingForHost == false ?'Start Game':'Waiting for Host',
-                      isActive: state.playersJoined.players.length <=0?false:widget.isWaitingForHost == false?true:false,
+                      buttonText: widget.isWaitingForHost == false ?' Start Game':'Waiting for Host',
+                      isActive: state.waitingRoomInfo.players.length <=0?false:widget.isWaitingForHost == false?true:false,
                       buttonIsLoading: false,
                       width: 280.w,
                     );

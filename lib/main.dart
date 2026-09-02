@@ -45,8 +45,8 @@ void main() async {
   final String? userToken = await GetStorage().read('user_token');
   final ApiClient apiClient = ApiClient(
       // baseUrl: 'https://plankton-app-ikxuv.ondigitalocean.app',
-      baseUrl: 'https://api.staging.biblegame.app',
-      // baseUrl: 'https://api.biblegame.nlwc.church',
+      // baseUrl: 'https://api.staging.biblegame.app',
+      baseUrl: 'https://api.biblegame.nlwc.church',
       token: userToken ?? '');
   final TokenNotifier tokenNotifier = TokenNotifier();
 
@@ -73,7 +73,8 @@ void main() async {
   final SoundManager soundManager = SoundManager();
   final MultiplayerRepository multiplayerRepository = MultiplayerRepository(multiplayerAPI, gameAPI);
   final LightningModeRepository lightningModeRepository = LightningModeRepository(multiplayerAPI);
-  runApp(App(
+  runApp(
+      App(
     authenticationRepository: authenticationRepository,
     userRepository: userRepository,
     quickGameRepository: quickGameRepository,
@@ -87,5 +88,6 @@ void main() async {
     multiplayerRepository: multiplayerRepository,
     lightningModeRepository: lightningModeRepository,
     apiBaseUrl: apiClient.baseUrl,
-  ));
+  )
+  );
 }

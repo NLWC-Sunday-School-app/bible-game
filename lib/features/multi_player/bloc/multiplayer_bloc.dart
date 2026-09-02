@@ -102,7 +102,7 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       ConfigureGameRoom event,
       Emitter<MultiplayerState> emit) async {
     try {
-      emit(state.copyWith(isLoadingConfigureGameRoom: true, hasConfigureGameRoomFailed: false));
+      emit(state.copyWith(isLoadingConfigureGameRoom: true, hasConfigureGameRoomFailed: false, hostVictoryCondition: event.conditionValue));
       final response =
       await _multiplayerRepository.configureGameRoom(
           state.createGameRoomResponse.id,

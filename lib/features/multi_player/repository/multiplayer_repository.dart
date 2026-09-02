@@ -47,6 +47,10 @@ class MultiplayerRepository {
     return multiplayerAPI.countInvite();
   }
 
+  Future<dynamic> getRoomDetails(roomId) async {
+    return multiplayerAPI.roomDetails(roomId);
+  }
+
   Future<void> sendGameData(
       gameMode,
       totalScore,
