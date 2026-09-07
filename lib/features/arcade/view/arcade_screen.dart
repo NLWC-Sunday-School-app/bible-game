@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/widgets/login_gate_widget.dart';
 import 'package:bible_game/features/multiplayer/view/multiplayer_category.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/view/home_screen.dart';
@@ -129,6 +131,26 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                           subtitle: tr.t('arcade_offline_message'),
                         ),
                       );
+                    }
+                    if (!_selectedGlobalChallenge) {
+                      final isLoggedIn = context
+                              .watch<AuthenticationBloc>()
+                              .state
+                              .user
+                              .id !=
+                          0;
+                      if (!isLoggedIn) {
+                        return SizedBox(
+                          height:
+                              usableHeight - (70.h + 20.h + 72.h + 120.h),
+                          child: const LoginGateWidget(
+                            featureTitle: 'Multiplayer',
+                            subtitle:
+                                'Log in or create a profile\nto play against your friends!',
+                            icon: Icons.groups_rounded,
+                          ),
+                        );
+                      }
                     }
                     return SizedBox(
                       child: _selectedGlobalChallenge
