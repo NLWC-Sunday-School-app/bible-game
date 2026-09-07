@@ -3,8 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../shared/constants/image_routes.dart';
 
 class ToggleCard extends StatefulWidget {
-  const ToggleCard({super.key, required this.onTap, required this.selectedOption, required this.hasTwoOptions, required this.options});
+  const ToggleCard({super.key, required this.onTap, required this.selectedOption, required this.hasTwoOptions, required this.options,this.onValueSelected});
   final VoidCallback? onTap;
+  final ValueChanged<String>? onValueSelected;
   final bool? selectedOption;
   final bool hasTwoOptions;
   final List<String> options;
@@ -19,11 +20,13 @@ class _ToggleCardState extends State<ToggleCard> {
   void toggleListForward() {
     setState(() {
       currentIndex = (currentIndex + 1) % widget.options.length;
+      widget.onValueSelected!(widget.options[currentIndex]);
     });
   }
  void toggleListBackward() {
     setState(() {
       currentIndex = (currentIndex - 1) % widget.options.length;
+      widget.onValueSelected!(widget.options[currentIndex]);
     });
   }
   @override

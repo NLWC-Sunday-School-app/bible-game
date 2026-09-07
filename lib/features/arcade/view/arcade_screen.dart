@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bible_game/features/multiplayer/view/multiplayer_category.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/view/home_screen.dart';
 import 'package:bible_game/features/multi_player/view/home_screen.dart';
@@ -134,13 +135,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                           ? SizedBox(
                           height: usableHeight - (70.h + 20.h + 72.h + 120.h ),
                           child: GlobalChallengeHomeScreen())
-                          :  Container(
-                        margin: EdgeInsets.only(top: 100.h),
-                        child: Image.asset(
-                          ProductImageRoutes.multiplayerComingSoon,
-                          width: 330.w,
-                        ),
-                      )
+                          : const MultiplayerCategory()
                     );
                   },
                 )
