@@ -128,7 +128,7 @@ class ProductImageRoutes {
    static const String recapHourGlass = 'assets/images/product/recap/recap_hour_bg.png';
 
    // Multiplayer
-   static const String groupGame = 'assets/images/product/multi_player/group_game.png';
+   static const String groupGame = 'assets/images/product/multi_player/group_game.webp';
    static const String versusGame = 'assets/images/product/multi_player/versus_game.png';
    static const String lightningMode = 'assets/images/product/multi_player/lightning_mode.png';
    static const String xMode = 'assets/images/product/multi_player/x_mode.png';
@@ -150,9 +150,9 @@ class ProductImageRoutes {
    static const String inviteErrorBg = 'assets/images/product/multi_player/invite_error_bg.png';
    static const String inviteErrorIcon = 'assets/images/product/multi_player/invite_error_icon.png';
    static const String toastSuccess = 'assets/images/product/multi_player/toast_green_success.png';
-   static const String leaderboardBanner = 'assets/images/product/multi_player/leaderboard_banner.png';
-   static const String multiplayerActiveButton = 'assets/images/product/multi_player/multiplayer_active_btn.png';
-   static const String multiplayerInactiveButton = 'assets/images/product/multi_player/multiplayer_inactive_btn.png';
+   static const String leaderboardBanner = 'assets/images/product/multi_player/leaderboard_banner.webp';
+   static const String multiplayerActiveButton = 'assets/images/product/multi_player/multiplayer_active_btn.webp';
+   static const String multiplayerInactiveButton = 'assets/images/product/multi_player/multiplayer_inactive_btn.webp';
 }
 
 class IconImageRoutes{
