@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/widgets/login_gate_widget.dart';
 import 'package:bible_game/features/multiplayer/view/multiplayer_category.dart';
@@ -24,7 +25,6 @@ class ArcadeScreen extends StatefulWidget {
 }
 
 class _ArcadeScreenState extends State<ArcadeScreen> {
-  bool _selectedGlobalChallenge = true;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +32,8 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
     final double usableHeight = screenHeight - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom;
     final soundManager = context.read<SettingsBloc>().soundManager;
     final tr = AppLocalization.tr(context);
+    final _selectedGlobalChallenge =
+        context.watch<ArcadeTabCubit>().state == ArcadeTab.globalChallenge;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -99,9 +101,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                           buttonSelected: !_selectedGlobalChallenge,
                           onTap: () {
                             soundManager.playClickSound();
-                            setState(() {
-                              _selectedGlobalChallenge = false;
-                            });
+                            context.read<ArcadeTabCubit>().showMultiplayer();
                           },
                         ),
                         TabButton(
@@ -110,9 +110,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                           buttonSelected: _selectedGlobalChallenge,
                           onTap: () {
                             soundManager.playClickSound();
-                            setState(() {
-                              _selectedGlobalChallenge = true;
-                            });
+                            context.read<ArcadeTabCubit>().showGlobalChallenge();
                           },
                         )
                       ],

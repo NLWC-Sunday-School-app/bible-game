@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -180,6 +181,7 @@ class _AppState extends State<App> {
       builder: (BuildContext context, Widget? child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => NavigationCubit()),
+          BlocProvider(create: (_) => ArcadeTabCubit()),
           BlocProvider(create: (_) => MemoryVersesCubit()),
           BlocProvider(create: (_) => PowerUpBloc(
             gameAPI: widget.gameAPI,

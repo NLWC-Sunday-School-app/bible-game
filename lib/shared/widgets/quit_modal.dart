@@ -1,4 +1,5 @@
 import 'package:bible_game/features/global_challenge/bloc/global_challenge_bloc.dart';
+import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 import 'package:bible_game/features/story_mode/bloc/story_mode_bloc.dart';
 import 'package:bible_game/features/true_or_false/bloc/true_or_false_bloc.dart';
 import 'package:flutter/material.dart';
@@ -65,8 +66,14 @@ class QuitModal extends StatelessWidget {
     } else if (gameMode == 'globalchallenge') {
       BlocProvider.of<GlobalChallengeBloc>(context)
           .add(ClearGlobalChallengeGameData());
+      context.read<ArcadeTabCubit>().showGlobalChallenge();
       Navigator.pushReplacementNamed(context, AppRoutes.home);
       context.read<NavigationCubit>().selectTab(3);
+    } else if (gameMode == 'multiplayer') {
+      context.read<ArcadeTabCubit>().showMultiplayer();
+      context.read<NavigationCubit>().selectTab(3);
+      Navigator.pushNamedAndRemoveUntil(
+          context, AppRoutes.home, (Route<dynamic> route) => false);
     } else if (gameMode == 'storyMode') {
       BlocProvider.of<StoryModeBloc>(context).add(ResetStoryGame());
       Navigator.pushNamedAndRemoveUntil(

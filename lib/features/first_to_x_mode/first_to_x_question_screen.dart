@@ -123,7 +123,7 @@ class _FirstToXQuestionScreenState extends State<FirstToXQuestionScreen>
       barrierColor: const Color.fromRGBO(40, 40, 40, 0.9),
       context: context,
       builder: (BuildContext context) {
-        return QuitModal();
+        return const QuitModal(gameMode: 'multiplayer');
       });
 
   @override

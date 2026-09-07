@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -113,6 +114,7 @@ class _GlobalQuestionScreenState
             context
                 .read<GlobalChallengeBloc>()
                 .add(ClearGlobalChallengeGameData());
+            context.read<ArcadeTabCubit>().showGlobalChallenge();
             Navigator.pushReplacementNamed(context, AppRoutes.home);
             context.read<NavigationCubit>().selectTab(3);
           },

@@ -1,4 +1,6 @@
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
+import 'package:bible_game/navigation/cubit/navigation_cubit.dart';
+import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:flutter/material.dart';
 import 'package:bible_game/features/multi_player/widget/game_play_card.dart';
@@ -70,6 +72,8 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with Widg
                     InkWell(
                       onTap: () {
                         soundManager.playClickSound();
+                        context.read<ArcadeTabCubit>().showMultiplayer();
+                        context.read<NavigationCubit>().selectTab(3);
                         Navigator.pushNamedAndRemoveUntil(
                             context,
                             AppRoutes.home,
