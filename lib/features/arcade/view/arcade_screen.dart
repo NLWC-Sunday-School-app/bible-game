@@ -95,23 +95,23 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                       children: [
                         TabButton(
                           width: 164,
-                          buttonText: tr.t('arcade_global_challenge'),
-                          buttonSelected: _selectedGlobalChallenge,
-                          onTap: () {
-                            soundManager.playClickSound();
-                            setState(() {
-                              _selectedGlobalChallenge = true;
-                            });
-                          },
-                        ),
-                        TabButton(
-                          width: 164,
                           buttonText: tr.t('arcade_multiplayer'),
                           buttonSelected: !_selectedGlobalChallenge,
                           onTap: () {
                             soundManager.playClickSound();
                             setState(() {
                               _selectedGlobalChallenge = false;
+                            });
+                          },
+                        ),
+                        TabButton(
+                          width: 164,
+                          buttonText: tr.t('arcade_global_challenge'),
+                          buttonSelected: _selectedGlobalChallenge,
+                          onTap: () {
+                            soundManager.playClickSound();
+                            setState(() {
+                              _selectedGlobalChallenge = true;
                             });
                           },
                         )
