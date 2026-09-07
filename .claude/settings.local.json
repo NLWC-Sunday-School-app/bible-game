@@ -41,7 +41,23 @@
       "Bash(vercel whoami *)",
       "Bash(git -C /Users/mac/Documents/Tobi/bible_games log --oneline -2 -- build/web)",
       "Bash(git -C /Users/mac/Documents/Tobi/bible_games log --oneline -1 -- build/web/assets/assets/data/memory_verses.json)",
-      "mcp__claude-in-chrome__tabs_context_mcp"
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "Bash(curl -s http://localhost:8080/assets/assets/translations/en.json)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\('auth_continue_with_google'\\)\\); print\\(d.get\\('auth_or_divider'\\)\\)\")",
+      "Bash(node /private/tmp/claude-501/bundled-skills/2.1.234/29e390570296f2a66c1e06283a13c15c/design/seed-canvas.mjs --template /private/tmp/claude-501/bundled-skills/2.1.234/29e390570296f2a66c1e06283a13c15c/design/payload.template.html --out bible-game-revamp.html --title 'Bible Game Revamp' --artboard Main.dc.html --artboard Gameplay.dc.html --artboard Profile.dc.html --artboard Store.dc.html --artboard Modal.dc.html --canvas canvas.json)",
+      "Bash(node \"/private/tmp/claude-501/bundled-skills/2.1.234/29e390570296f2a66c1e06283a13c15c/design/seed-canvas.mjs\" --check bible-game-revamp.html)",
+      "mcp__9368cc77-f9b3-489f-8679-f6215ac06361__models_explore",
+      "mcp__9368cc77-f9b3-489f-8679-f6215ac06361__generate_image",
+      "Bash(mkdir -p assets)",
+      "Bash(sips -Z 220 '__TRACKED_VAR__/ChatGPT Image Aug 21, 2026, 09_21_06 AM.png' --out assets/nav-store-chest.png)",
+      "Bash(sips -Z 220 '__TRACKED_VAR__/ChatGPT Image Aug 21, 2026, 09_27_01 AM.png' --out assets/nav-board-trophy.png)",
+      "Bash(sips -Z 220 '__TRACKED_VAR__/ChatGPT Image Aug 21, 2026, 10_31_45 AM.png' --out assets/nav-home-book.png)",
+      "Bash(sips -Z 220 '__TRACKED_VAR__/ChatGPT Image Aug 21, 2026, 09_30_42 AM.png' --out assets/nav-arcade-swords.png)",
+      "Bash(git --version)",
+      "Bash(awk -F/ '{print $1\"/\"$2}')",
+      "Bash(git worktree *)",
+      "Bash(sort -k2)",
+      "Bash(echo \"assets exit=$?\")"
     ]
   }
 }
