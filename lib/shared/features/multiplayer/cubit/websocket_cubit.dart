@@ -37,6 +37,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   Timer? _connectionCheckTimer;
   final Queue<Map<String, dynamic>> _messageQueue = Queue();
   String? _currentRoomId;  // Store room ID for re-subscription on reconnect
+  StreamSubscription<AuthenticationState>? _authSubscription;
 
   WebsocketCubit({
     required MultiplayerRepository multiplayerRepository,
@@ -51,6 +52,16 @@ class WebsocketCubit extends Cubit<WebsocketState> {
         _apiBaseUrl = apiBaseUrl,
         super(WebsocketState.initial()) {
     _connectedCompleter = Completer<void>();
+
+    // Tear the socket down when the session ends. Without this the connection
+    // stays open on the previous user's token until the app is killed.
+    _authSubscription = _authenticationBloc.stream.listen((authState) {
+      if (isClosed) return;
+      if (!authState.isLoggedIn && (_isConnected || _isConnecting)) {
+        debugPrint('🔒 Session ended — closing WebSocket');
+        closeWebsocket();
+      }
+    });
   }
 
   /// Reset the connection completer for reconnection scenarios
@@ -71,14 +82,27 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     debugPrint('🔌 Connecting to WebSocket...');
     emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.connecting));
 
-    final userToken = GetStorage().read('user_token') as String? ?? '';
+    // Prefer the live session over GetStorage: the bloc is cleared on logout,
+    // the stored copy is not, so reading storage first can connect a logged-out
+    // user on a stale token.
+    final userToken = _authenticationBloc.state.token ??
+        (GetStorage().read('user_token') as String? ?? '');
+
+    if (userToken.isEmpty) {
+      debugPrint('🚫 Refusing to connect: no auth token');
+      _isConnecting = false;
+      emit(state.copyWith(
+          connectionStatus: WebsocketConnectionStatus.disconnected));
+      return;
+    }
 
     // Build WebSocket URL from API base URL
     // final wsBase = _apiBaseUrl.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://');
     final wsBase = _apiBaseUrl;
     final wsUrl = '$wsBase/ws?token=$userToken';
 
-    debugPrint('📡 WebSocket URL: $wsUrl');
+    // Never log wsUrl — it carries the user's JWT as a query parameter.
+    debugPrint('📡 WebSocket host: $wsBase');
 
     _stompClient = StompClient(
       config: StompConfig.sockJS(
@@ -398,6 +422,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
 
   @override
   Future<void> close() {
+    _authSubscription?.cancel();
     closeWebsocket();
     return super.close();
   }

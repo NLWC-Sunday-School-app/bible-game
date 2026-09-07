@@ -59,14 +59,11 @@ class AuthenticationBloc
         if (loggedOut) {
           // Clear cached user data on logout
           GetStorage().remove(_cachedUserKey);
-          emit(state.copyWith(
+          // Emit a fresh state rather than copyWith: copyWith resolves token
+          // as `token ?? this.token`, so passing null there leaves the old
+          // token in place and the session is never really cleared.
+          emit(const AuthenticationState(
               isUnauthenticated: true,
-              isLoadingLogin: false,
-              isLoggingOut: false,
-              user: emptyUser,
-              token: null,
-              refreshToken: null,
-              isLoggedIn: false,
               hasLoggedOut: true));
           emit(state.copyWith(hasLoggedOut: false));
           // final SharedPreferences prefs = await SharedPreferences.getInstance();

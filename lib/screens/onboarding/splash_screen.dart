@@ -25,7 +25,6 @@ class SplashScreen extends StatelessWidget {
     if(authController.isLoggedIn.isTrue){
       await UserService.getUserData();
       await UserService.getUserPilgrimProgress();
-      print(GetStorage().read('user_token'));
   }
   }
 

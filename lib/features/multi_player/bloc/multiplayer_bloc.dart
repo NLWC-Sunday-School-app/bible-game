@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
 import 'package:bible_game_api/bible_game_api.dart';
@@ -148,7 +149,8 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       await _multiplayerRepository.fetchGameInvite();
       emit(state.copyWith(
           isFetchingListOfGameInvite: false, hasFetchedGameInvite: true, listOfInvite: response));
-    } catch (_) {
+    } catch (e) {
+      debugPrint('⚠️ fetchGameInvite failed: $e');
       emit(state.copyWith(
           isFetchingListOfGameInvite: false, hasFetchedGameInvite: false));
     }
@@ -161,8 +163,10 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       final response =
       await _multiplayerRepository.countInvite();
       emit(state.copyWith(inviteCount:response['count']));
-    } catch (_) {
-
+    } catch (e) {
+      // Keep the previous count, but do not fail silently — a broken badge
+      // with no trace was previously indistinguishable from "no invites".
+      debugPrint('⚠️ countInvite failed: $e');
     }
   }
 

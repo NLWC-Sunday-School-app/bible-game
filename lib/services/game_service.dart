@@ -13,7 +13,6 @@ class GameService {
 
 
   static Future<List<Question>> getGameQuestions(gameMode, userRank, tags) async {
-    print('olp: ${ GetStorage().read('user_token')}');
     var response = await http.post(Uri.parse('$baseUrl/games/play'), headers: headers, body: jsonEncode({'gameMode': gameMode, 'userRank': userRank, 'tags': tags}));
     return questionFromJson(response.body);
   }
