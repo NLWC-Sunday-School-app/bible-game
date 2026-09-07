@@ -3,8 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/constants/image_routes.dart';
 class GameRequestCard extends StatelessWidget {
-  const GameRequestCard({super.key, required this.onTap});
+  const GameRequestCard({super.key, required this.onTap, required this.count});
   final VoidCallback onTap;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,9 @@ class GameRequestCard extends StatelessWidget {
                           color: Color(0xFFD43824),
                           shape: BoxShape.circle
                       ),
-                      child: Text('0', style: TextStyle(
+                      child: Text(
+                        '$count',
+                        style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w900,
                           color: Colors.white

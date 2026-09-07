@@ -21,8 +21,11 @@ import 'package:bible_game/shared/utils/awesome_notification.dart';
 import 'package:bible_game/shared/utils/devotional_notification.dart';
 import 'package:bible_game/shared/utils/hourly_verse_notification.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
+import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
+import 'package:bible_game/features/lightning_mode/repository/lightning_mode_repository.dart';
 import 'app.dart';
 import 'package:bible_game_api/api/api_client.dart';
+import 'package:bible_game_api/api/multiplayer_api.dart';
 import 'package:bible_game_api/api/authentication_api.dart';
 
 void main() async {
@@ -94,6 +97,7 @@ void main() async {
   final UserAPI userAPI = UserAPI(apiClient);
   final AuthenticationAPI authenticationAPI = AuthenticationAPI(apiClient);
   final GameAPI gameAPI = GameAPI(apiClient);
+  final MultiplayerAPI multiplayerAPI = MultiplayerAPI(apiClient);
   final AuthenticationRepository authenticationRepository =
       AuthenticationRepository(authenticationAPI);
   final UserRepository userRepository = UserRepository(userAPI);
@@ -103,6 +107,8 @@ void main() async {
   final GlobalChallengeRepository globalChallengeRepository = GlobalChallengeRepository(gameAPI);
   final FourScripturesOneWordRepository fourScripturesOneWordRepository = FourScripturesOneWordRepository(gameAPI);
   final FantasyLeagueRepository fantasyLeagueRepository = FantasyLeagueRepository(gameAPI);
+  final MultiplayerRepository multiplayerRepository = MultiplayerRepository(multiplayerAPI, gameAPI);
+  final LightningModeRepository lightningModeRepository = LightningModeRepository(multiplayerAPI);
   final SoundManager soundManager = SoundManager();
   final OfflineSyncQueue offlineSyncQueue = OfflineSyncQueue();
   runApp(App(
@@ -118,5 +124,8 @@ void main() async {
     soundManager: soundManager,
     gameAPI: gameAPI,
     offlineSyncQueue: offlineSyncQueue,
+    multiplayerRepository: multiplayerRepository,
+    lightningModeRepository: lightningModeRepository,
+    apiBaseUrl: apiClient.baseUrl,
   ));
 }

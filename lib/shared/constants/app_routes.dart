@@ -13,6 +13,12 @@ class AppRoutes {
   static const String globalChallengeQuestionScreen = 'global_challenge_question_screen';
   static const String profileScreen ='profile_screen';
   static const String arcadeScreen = 'arcade_screen';
+
+  static const String multiplayer = 'multiplayer_home_screen';
+  static const String groupGameCategory = 'group_game_category';
+  static const String lightningModeQuestionScreen = 'lightning_mode_question_screen';
+  static const String firstToXQuestionScreen = 'first_to_x_question_screen';
+
   static const String myLeagueScreen = 'my_league_screen';
   static const String fantasyBibleLeagueHomeScreen = 'fbl_home_screen';
   static const String dailyDevotionalScreen = 'daily_devotional_screen';
