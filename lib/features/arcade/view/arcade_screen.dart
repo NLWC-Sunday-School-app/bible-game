@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/widgets/login_gate_widget.dart';
-import 'package:bible_game/features/multiplayer/view/multiplayer_category.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/features/global_challenge/view/home_screen.dart';
 import 'package:bible_game/features/multi_player/view/home_screen.dart';
@@ -151,11 +150,10 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                       }
                     }
                     return SizedBox(
+                      height: usableHeight - (70.h + 20.h + 72.h + 120.h),
                       child: _selectedGlobalChallenge
-                          ? SizedBox(
-                          height: usableHeight - (70.h + 20.h + 72.h + 120.h ),
-                          child: GlobalChallengeHomeScreen())
-                          : const MultiplayerCategory()
+                          ? GlobalChallengeHomeScreen()
+                          : MultiplayerHomeBody(bottomSpacing: 20.h),
                     );
                   },
                 )

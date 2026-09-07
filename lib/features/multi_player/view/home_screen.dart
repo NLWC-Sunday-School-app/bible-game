@@ -17,35 +17,16 @@ import '../../../shared/constants/colors.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../shared/widgets/screen_app_bar.dart';
 
-class MultiplayerHomeScreen extends StatefulWidget {
+/// Route-level multiplayer screen: app bar + back button around
+/// [MultiplayerHomeBody].
+///
+/// The arcade's Multiplayer tab renders [MultiplayerHomeBody] directly, so the
+/// chrome lives here rather than in the body itself.
+class MultiplayerHomeScreen extends StatelessWidget {
   const MultiplayerHomeScreen({super.key});
 
   @override
-  State<MultiplayerHomeScreen> createState() => _MultiplayerHomeScreenState();
-}
-
-class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with WidgetsBindingObserver{
-  late MultiplayerBloc _multiplayerBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _multiplayerBloc = context.read<MultiplayerBloc>();
-    _multiplayerBloc.add(const StartPolling());
-  }
-
-  @override
-  void dispose() {
-    _multiplayerBloc.add(const StopPolling());
-    super.dispose();
-  }
-
-
-  @override
   Widget build(BuildContext context) {
-    final arguments = (ModalRoute.of(context)?.settings.arguments ??
-        <String, dynamic>{}) as Map;
-    final selectedCategory = arguments['selectedCategory'];
     final soundManager = context.read<SettingsBloc>().soundManager;
 
     return Scaffold(
@@ -104,61 +85,92 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> with Widg
                 )
               ],
             ),
-            SizedBox(
-              height: 16.h,
-            ),
-            Text(
-             selectedCategory,
-              style: TextStyle(
-                color: Color(0xFFFFFAD3),
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            SizedBox(
-              height: 20.h,
-            ),
-            GamePlayCard(
-              onTap: (){
-                context.read<MultiplayerBloc>().add(const StopPolling());
-                BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
-                Navigator.pushNamed(context,
-                    AppRoutes.groupGameCategory,
-                    arguments: {
-                      'selectedCategory': selectedCategory
-                    }
-                );
-              },
-              title: 'Create a gameplay',
-              text: 'Be the host and invite your friends',
-              backgroundImage: ProductImageRoutes.createGameCardBg,
-              swordImage: ProductImageRoutes.createSword,
-            ),
-            GamePlayCard(
-              onTap: () => showJoinGamePlayModal(context),
-              title: 'Join gameplay',
-              text: 'Enjoy the thrills with your  friends',
-              backgroundImage: ProductImageRoutes.joinGameCardBg,
-              swordImage: ProductImageRoutes.joinSword,
-            ),
-            Spacer(),
-            BlocBuilder<MultiplayerBloc, MultiplayerState>(
-              builder: (context, state) {
-                return GameRequestCard(
-                  onTap: (){
-                    BlocProvider.of<MultiplayerBloc>(context).add(FetchGameInvites());
-                    showGameRequestModal(context);
-                    },
-                  count: state.inviteCount,
-            );
-                },
-            ),
-            SizedBox(
-              height: 100.h,
-            )
+            const Expanded(child: MultiplayerHomeBody()),
           ],
         ),
       )
+    );
+  }
+}
+
+/// The multiplayer landing content: create, join, and pending game requests.
+///
+/// Carries no app bar or background of its own so it can be embedded in the
+/// arcade's Multiplayer tab, which supplies both.
+class MultiplayerHomeBody extends StatefulWidget {
+  const MultiplayerHomeBody({super.key, this.bottomSpacing});
+
+  /// Trailing space under the game-requests card. The full-screen route needs
+  /// room to clear the home indicator; inside the arcade tab the bottom nav
+  /// already provides it, so that caller passes a smaller value.
+  final double? bottomSpacing;
+
+  @override
+  State<MultiplayerHomeBody> createState() => _MultiplayerHomeBodyState();
+}
+
+class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
+  late MultiplayerBloc _multiplayerBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _multiplayerBloc = context.read<MultiplayerBloc>();
+    _multiplayerBloc.add(const StartPolling());
+  }
+
+  @override
+  void dispose() {
+    _multiplayerBloc.add(const StopPolling());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 16.h,
+        ),
+        GamePlayCard(
+          onTap: (){
+            context.read<MultiplayerBloc>().add(const StopPolling());
+            BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
+            Navigator.pushNamed(context,
+                AppRoutes.groupGameCategory,
+                arguments: {
+                  'selectedCategory': 'Group Game'
+                }
+            );
+          },
+          title: 'Create a gameplay',
+          text: 'Be the host and invite your friends',
+          backgroundImage: ProductImageRoutes.createGameCardBg,
+          swordImage: ProductImageRoutes.createSword,
+        ),
+        GamePlayCard(
+          onTap: () => showJoinGamePlayModal(context),
+          title: 'Join gameplay',
+          text: 'Enjoy the thrills with your  friends',
+          backgroundImage: ProductImageRoutes.joinGameCardBg,
+          swordImage: ProductImageRoutes.joinSword,
+        ),
+        Spacer(),
+        BlocBuilder<MultiplayerBloc, MultiplayerState>(
+          builder: (context, state) {
+            return GameRequestCard(
+              onTap: (){
+                BlocProvider.of<MultiplayerBloc>(context).add(FetchGameInvites());
+                showGameRequestModal(context);
+                },
+              count: state.inviteCount,
+            );
+            },
+        ),
+        SizedBox(
+          height: widget.bottomSpacing ?? 100.h,
+        )
+      ],
     );
   }
 }
