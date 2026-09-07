@@ -31,7 +31,13 @@ import 'package:bible_game_api/api/authentication_api.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Bloc.observer = AppBlocObserver();
+  // Debug only: the observer prints every event, transition and change, and
+  // the larger states (PilgrimProgressState has 33 props, QuickGameState 30)
+  // stringify into kilobytes on each emit. That is pure overhead in release,
+  // and keeps anything a state or event happens to carry out of device logs.
+  if (kDebugMode) {
+    Bloc.observer = AppBlocObserver();
+  }
 
   // Notifications and Firebase are mobile-only (not supported on web)
   if (!kIsWeb) {
