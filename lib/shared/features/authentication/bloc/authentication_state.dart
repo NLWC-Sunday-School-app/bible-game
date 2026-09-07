@@ -112,4 +112,17 @@ class AuthenticationState extends Equatable {
         isLoadingGoogleSignIn,
         failedGoogleSignIn
       ];
+
+  // props still carries the real token so equality/emit behaviour is unchanged,
+  // but AppBlocObserver prints every transition — the default Equatable
+  // stringification would put the raw JWT in the console on every auth change.
+  @override
+  String toString() => 'AuthenticationState('
+      'isLoggedIn: $isLoggedIn, '
+      'isUnauthenticated: $isUnauthenticated, '
+      'isLoggingOut: $isLoggingOut, '
+      'hasLoggedOut: $hasLoggedOut, '
+      'user: ${user.id}, '
+      'token: ${token == null ? 'null' : '<redacted>'}, '
+      'refreshToken: ${refreshToken == null ? 'null' : '<redacted>'})';
 }

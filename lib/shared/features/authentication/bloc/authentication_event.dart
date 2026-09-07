@@ -27,6 +27,11 @@ class AuthenticationLoginRequested extends AuthenticationEvent {
 
   @override
   List<Object> get props => [email, password, deviceName, deviceOs];
+
+  // AppBlocObserver prints every event; keep the password out of the console.
+  @override
+  String toString() =>
+      'AuthenticationLoginRequested(email: $email, password: <redacted>)';
 }
 
 class AuthenticationRefreshTokenRequested extends AuthenticationEvent {
@@ -36,6 +41,10 @@ class AuthenticationRefreshTokenRequested extends AuthenticationEvent {
 
   @override
   List<Object> get props => [refreshToken];
+
+  @override
+  String toString() =>
+      'AuthenticationRefreshTokenRequested(refreshToken: <redacted>)';
 }
 
 class AuthenticationLogoutRequested extends AuthenticationEvent {}
@@ -55,6 +64,10 @@ class AuthenticationRegisterRequested extends AuthenticationEvent {
   @override
   List<Object> get props =>
       [name, email, password, fcmToken, country, deviceName, deviceOs];
+
+  @override
+  String toString() => 'AuthenticationRegisterRequested(name: $name, '
+      'email: $email, password: <redacted>)';
 }
 
 class FetchUserDataRequested extends AuthenticationEvent {}
@@ -79,6 +92,9 @@ class VerifyOTP extends AuthenticationEvent {
 
   @override
   List<Object> get props => [this.OTP];
+
+  @override
+  String toString() => 'VerifyOTP(OTP: <redacted>)';
 }
 
 class ResetPassword extends AuthenticationEvent {
@@ -88,6 +104,9 @@ class ResetPassword extends AuthenticationEvent {
 
   @override
   List<Object> get props => [this.newPassword];
+
+  @override
+  String toString() => 'ResetPassword(newPassword: <redacted>)';
 }
 
 class DeleteAccount extends AuthenticationEvent {}
@@ -107,4 +126,8 @@ class AuthenticationGoogleSignInRequested extends AuthenticationEvent {
   @override
   List<Object> get props =>
       [name, email, password, country, fcmToken, deviceName, deviceOs];
+
+  @override
+  String toString() => 'AuthenticationGoogleSignInRequested(name: $name, '
+      'email: $email, password: <redacted>)';
 }
