@@ -1,7 +1,5 @@
 class ProductImageRoutes {
-   static const String defaultSplashScreen = 'assets/images/product/splash_screen/splash_screen_bg.webp';
-   static const String splashScreenLoaderBg = 'assets/images/product/splash_screen/splash_screen.webp';
-   static const String splashScreenLoaderBgTabletView = 'assets/images/product/splash_screen/splash_screen_tablet_view.png';
+   static const String splashScreenLoaderBgTabletView = 'assets/images/product/splash_screen/splash_screen_tablet_view.webp';
    static const String homeScreenBg = 'assets/images/product/home/screen_bg.webp';
    static const String homeScreenPlayButtonBg = 'assets/images/product/home/play_button_bg.png';
    static const String crossBible = 'assets/images/product/home/cross_bible.png';
@@ -18,7 +16,7 @@ class ProductImageRoutes {
    static const String inactiveQuickGameTag = 'assets/images/product/quick_game/inactive_topic_tag.png';
    static const String activeQuickGameTag = 'assets/images/product/quick_game/active_topic_tag.png';
    static const String questionLoadingBg = 'assets/images/product/shared/question_loading_bg.webp';
-   static const String questionLoadingBgTabletView = 'assets/images/product/shared/question_loading_bg_tablet_view.png';
+   static const String questionLoadingBgTabletView = 'assets/images/product/shared/question_loading_bg_tablet_view.webp';
    static const String quickTipsBg = 'assets/images/product/shared/quick_tips_bg.webp';
    static const String quickTipsTabletView = 'assets/images/product/shared/quick_tip_banner_tablet_view.webp';
    static const String quickTipsBigBg = 'assets/images/product/shared/quick_tips_big_bg.webp';
@@ -47,7 +45,7 @@ class ProductImageRoutes {
    static const String speedChest = 'assets/images/product/multi_player/speed_chest.png';
    static const String waitingForHostBg = 'assets/images/product/multi_player/waiting_for_host_bg.webp';
    static const String gameSummaryBg = 'assets/images/product/shared/game_summary_bg.webp';
-   static const String gameSummaryBgTabletView = 'assets/images/product/shared/game_summary_bg_tablet_view.png';
+   static const String gameSummaryBgTabletView = 'assets/images/product/shared/game_summary_bg_tablet_view.webp';
    static const String threeStars = 'assets/images/product/shared/three_stars.webp';
    static const String trueOrFalseIcon = 'assets/images/product/shared/true_or_false_icon.svg';
    static const String trueOrFalseHomeIllustration = 'assets/images/product/true_or_false/true_or_false_home_illustration.webp';
@@ -75,8 +73,8 @@ class ProductImageRoutes {
    static const String scriptureWoodenBg = 'assets/images/product/four_scripture/wooden_bg.webp';
    static const String successfulMark = 'assets/images/product/shared/success_mark.webp';
    static const String defaultAvatar = 'assets/images/product/shared/default_avatar.png';
-   static const String newRankBg = 'assets/images/product/pilgrim_progress/new_rank_bg.png';
-   static const String retryBg = 'assets/images/product/pilgrim_progress/retry_level_bg.png';
+   static const String newRankBg = 'assets/images/product/pilgrim_progress/new_rank_bg.webp';
+   static const String retryBg = 'assets/images/product/pilgrim_progress/retry_level_bg.webp';
    static const String groupStar = 'assets/images/product/pilgrim_progress/group_star.webp';
    static const String timeUpBg = 'assets/images/product/who_is_who/time_up_bg.webp';
    static const String notEnoughCoinsBg = 'assets/images/product/who_is_who/not_enough_coins_bg.webp';
@@ -117,7 +115,7 @@ class ProductImageRoutes {
    static const String tryAgainModalBg = 'assets/images/product/who_is_who/try_again_bg.webp';
    static const String inviteBtnBg = 'assets/images/product/league/invite_btn.png';
 
-   static const String recapOneBg = 'assets/images/product/recap/recap_one_bg.png';
+   static const String recapOneBg = 'assets/images/product/recap/recap_one_bg.webp';
    static const String recapTwoBg = 'assets/images/product/recap/recap_two_bg.webp';
    static const String recapThreeBg = 'assets/images/product/recap/recap_three_bg.webp';
    static const String recapFourBg = 'assets/images/product/recap/recap_four_bg.webp';
@@ -125,7 +123,7 @@ class ProductImageRoutes {
    static const String recapSixBg = 'assets/images/product/recap/recap_six_bg.webp';
    static const String recapSevenBg = 'assets/images/product/recap/recap_seven_bg.png';
    static const String recapEightBg = 'assets/images/product/recap/recap_eight_bg.png';
-   static const String recapHourGlass = 'assets/images/product/recap/recap_hour_bg.png';
+   static const String recapHourGlass = 'assets/images/product/recap/recap_hourglass.webp';
 
    // Multiplayer
    static const String groupGame = 'assets/images/product/multi_player/group_game.webp';

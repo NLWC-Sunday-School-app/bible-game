@@ -54,13 +54,13 @@ String formatBiblePersonalityBackgroundImage (int percentile){
   if(percentile >= 1 && percentile <= 3){
     return 'assets/images/product/recap/david_recap_bg.webp';
   }else if(percentile >= 4 && percentile <= 25){
-    return 'assets/images/product/recap/moses_recap_bg.png';
+    return 'assets/images/product/recap/moses_recap_bg.webp';
   }else if (percentile >= 26 && percentile <= 45){
     return 'assets/images/product/recap/daniel_recap_bg.webp';
   } else if(percentile >= 46 && percentile <= 60){
-    return 'assets/images/product/recap/jacob_recap_bg.png';
+    return 'assets/images/product/recap/jacob_recap_bg.webp';
   }else {
-    return 'assets/images/product/recap/onesimus_recap_bg.png';
+    return 'assets/images/product/recap/onesimus_recap_bg.webp';
   }
 }
 

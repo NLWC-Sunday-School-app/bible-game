@@ -50,7 +50,7 @@ class RecapSixScreen extends StatelessWidget {
                 height: 25.h,
               ),
               Image.asset(
-                'assets/images/product/recap/recap_hourglass.png',
+                'assets/images/product/recap/recap_hourglass.webp',
                 width: 240.w,
               ).animate().move(
                     delay: 900.ms,
