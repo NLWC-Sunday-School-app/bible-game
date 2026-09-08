@@ -1,4 +1,7 @@
 import 'package:bible_game/features/global_challenge/view/tablet_view/home_screen_tablet_view.dart';
+import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/widgets/login_gate_widget.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,13 +23,14 @@ class ArcadeScreenTabletView extends StatefulWidget {
 }
 
 class _ArcadeScreenTabletViewState extends State<ArcadeScreenTabletView> {
-  bool _selectedGlobalChallenge = true;
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     final double usableHeight = screenHeight - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom;
     final soundManager = context.read<SettingsBloc>().soundManager;
+    final _selectedGlobalChallenge =
+        context.watch<ArcadeTabCubit>().state == ArcadeTab.globalChallenge;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -89,25 +93,21 @@ class _ArcadeScreenTabletViewState extends State<ArcadeScreenTabletView> {
                     children: [
                       TabButton(
                         width: 239,
-                        buttonText: 'Global Challenge',
-                        buttonSelected: _selectedGlobalChallenge,
+                        buttonText: 'Multiplayer',
+                        buttonSelected: !_selectedGlobalChallenge,
                         onTap: () {
                           soundManager.playClickSound();
-                          setState(() {
-                            _selectedGlobalChallenge = true;
-                          });
+                          context.read<ArcadeTabCubit>().showMultiplayer();
                         },
                       ),
                       SizedBox(width: 50.w,),
                       TabButton(
                         width: 239,
-                        buttonText: 'Multiplayer',
-                        buttonSelected: !_selectedGlobalChallenge,
+                        buttonText: 'Global Challenge',
+                        buttonSelected: _selectedGlobalChallenge,
                         onTap: () {
                           soundManager.playClickSound();
-                          setState(() {
-                            _selectedGlobalChallenge = false;
-                          });
+                          context.read<ArcadeTabCubit>().showGlobalChallenge();
                         },
                       )
                     ],
@@ -120,14 +120,25 @@ class _ArcadeScreenTabletViewState extends State<ArcadeScreenTabletView> {
               Expanded(
                 child: _selectedGlobalChallenge
                     ? GlobalChallengeHomeScreenTabletView()
-                    :  Container(
-                  child: Center(
-                    child: Image.asset(
-                      ProductImageRoutes.multiplayerComingSoon,
-                      width: 491.w,
-                    ),
-                  ),
-                ),
+                    : Builder(
+                        builder: (context) {
+                          final isLoggedIn = context
+                                  .watch<AuthenticationBloc>()
+                                  .state
+                                  .user
+                                  .id !=
+                              0;
+                          if (!isLoggedIn) {
+                            return const LoginGateWidget(
+                              featureTitle: 'Multiplayer',
+                              subtitle:
+                                  'Log in or create a profile\nto play against your friends!',
+                              icon: Icons.groups_rounded,
+                            );
+                          }
+                          return const MultiplayerHomeBody(bottomSpacing: 20);
+                        },
+                      ),
               )
             ],
           ),
