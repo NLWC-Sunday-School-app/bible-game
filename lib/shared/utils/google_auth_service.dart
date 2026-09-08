@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'platform_info.dart';
+
 class GoogleProfile {
   final String id;
   final String email;
@@ -13,18 +15,33 @@ class GoogleProfile {
 }
 
 class GoogleAuthService {
-  // Auto-provisioned "Web application" OAuth client for the bible-game-e2616
-  // Firebase project (see android/app/google-services.json oauth_client[0]
-  // and ios/GoogleService-Info.plist CLIENT_ID). Used as clientId on web and
-  // serverClientId on Android/iOS so all platforms resolve to the same
-  // Google Cloud project.
-  static const _googleClientId =
+  // "Web application" OAuth client for the bible-game-e2616 Firebase project
+  // (android/app/google-services.json oauth_client[0], client_type 3). This is
+  // the audience the backend would verify against, so it is the serverClientId
+  // on every platform, and the clientId on web.
+  static const _webClientId =
       '242806293668-qh1o5db6qievge5nrqeelrpcukp8vud4.apps.googleusercontent.com';
+
+  // iOS OAuth client, from ios/GoogleService-Info.plist CLIENT_ID. It must
+  // match the REVERSED_CLIENT_ID URL scheme registered in ios/Runner/Info.plist,
+  // otherwise the callback has nowhere to land.
+  static const _iosClientId =
+      '242806293668-kthsbqf9g782mlgso7kb3dq2g17ua5ek.apps.googleusercontent.com';
+
+  // clientId is per-platform: iOS needs its own client, Android takes it from
+  // google-services.json (passing one there is rejected), and web uses the web
+  // client. Previously the web client was passed on all three, so on iOS the
+  // client being authenticated did not match the URL scheme it redirects to.
+  static String? get _clientId {
+    if (PlatformInfo.isWeb) return _webClientId;
+    if (PlatformInfo.isIOS) return _iosClientId;
+    return null; // Android: resolved from google-services.json
+  }
 
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: const ['email'],
-    clientId: _googleClientId,
-    serverClientId: _googleClientId,
+    clientId: _clientId,
+    serverClientId: PlatformInfo.isWeb ? null : _webClientId,
   );
 
   /// Signs the user in with Google and returns a sanitized profile.
