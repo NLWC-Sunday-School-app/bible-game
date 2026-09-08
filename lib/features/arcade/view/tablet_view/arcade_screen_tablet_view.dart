@@ -136,7 +136,10 @@ class _ArcadeScreenTabletViewState extends State<ArcadeScreenTabletView> {
                               icon: Icons.groups_rounded,
                             );
                           }
-                          return const MultiplayerHomeBody(bottomSpacing: 20);
+                          return MultiplayerHomeBody(
+                            maxContentWidth: 620.w,
+                            bottomSpacing: 24.h,
+                          );
                         },
                       ),
               )

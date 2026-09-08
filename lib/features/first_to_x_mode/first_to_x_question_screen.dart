@@ -17,7 +17,12 @@ class FirstToXQuestionScreen extends StatefulWidget {
 
   const FirstToXQuestionScreen(
       {super.key,
+      this.maxContentWidth,
       });
+
+  /// Caps the question card width. Null on phones; the tablet route passes a
+  /// value so options do not stretch across the full screen.
+  final double? maxContentWidth;
 
   @override
   State<FirstToXQuestionScreen> createState() =>
@@ -225,6 +230,7 @@ class _FirstToXQuestionScreenState extends State<FirstToXQuestionScreen>
                         },
                         isWhoIsWho: true,
                         gameMode: 'First to X',
+                        maxContentWidth: widget.maxContentWidth,
                       )
                     : const SizedBox.expand(),
               ));

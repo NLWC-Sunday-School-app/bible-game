@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'package:bible_game/features/multi_player/view/tablet_view/home_screen_tablet_view.dart';
+import 'package:bible_game/features/multi_player/view/tablet_view/group_game_category_tablet_view.dart';
+import 'package:bible_game/features/lightning_mode/view/tablet_view/lightning_mode_question_screen_tablet_view.dart';
+import 'package:bible_game/features/first_to_x_mode/tablet_view/first_to_x_question_screen_tablet_view.dart';
 import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 import 'dart:convert';
 
@@ -376,10 +380,10 @@ class _AppState extends State<App> {
               globalChallengeRepository: widget.globalChallengeRepository,
             ),
             AppRoutes.arcadeScreen: (context) => ArcadeScreen(),
-            AppRoutes.multiplayer: (context) => MultiplayerHomeScreen(),
-            AppRoutes.groupGameCategory: (context) => GroupGameCategory(),
-            AppRoutes.lightningModeQuestionScreen: (context) => LightningModeQuestionScreen(),
-            AppRoutes.firstToXQuestionScreen: (context) => FirstToXQuestionScreen(),
+            AppRoutes.multiplayer: (context) => isTablet?MultiplayerHomeScreenTabletView():MultiplayerHomeScreen(),
+            AppRoutes.groupGameCategory: (context) => isTablet?GroupGameCategoryTabletView():GroupGameCategory(),
+            AppRoutes.lightningModeQuestionScreen: (context) => isTablet?LightningModeQuestionScreenTabletView():LightningModeQuestionScreen(),
+            AppRoutes.firstToXQuestionScreen: (context) => isTablet?FirstToXQuestionScreenTabletView():FirstToXQuestionScreen(),
             AppRoutes.fantasyBibleLeagueHomeScreen: (context) =>
                 BottomTabNavigation(),
             AppRoutes.myLeagueScreen: (context) => MyLeagueScreen(),

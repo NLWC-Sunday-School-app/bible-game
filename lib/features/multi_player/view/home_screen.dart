@@ -98,12 +98,17 @@ class MultiplayerHomeScreen extends StatelessWidget {
 /// Carries no app bar or background of its own so it can be embedded in the
 /// arcade's Multiplayer tab, which supplies both.
 class MultiplayerHomeBody extends StatefulWidget {
-  const MultiplayerHomeBody({super.key, this.bottomSpacing});
+  const MultiplayerHomeBody({super.key, this.bottomSpacing, this.maxContentWidth});
 
   /// Trailing space under the game-requests card. The full-screen route needs
   /// room to clear the home indicator; inside the arcade tab the bottom nav
   /// already provides it, so that caller passes a smaller value.
   final double? bottomSpacing;
+
+  /// Caps the content width. Left null on phones, where full width is right;
+  /// tablets pass a value so the cards do not stretch into wide banners with
+  /// the text stranded on the left edge.
+  final double? maxContentWidth;
 
   @override
   State<MultiplayerHomeBody> createState() => _MultiplayerHomeBodyState();
@@ -127,7 +132,9 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final isConstrained = widget.maxContentWidth != null;
+    final column = Column(
+      mainAxisSize: isConstrained ? MainAxisSize.min : MainAxisSize.max,
       children: [
         SizedBox(
           height: 16.h,
@@ -155,7 +162,7 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
           backgroundImage: ProductImageRoutes.joinGameCardBg,
           swordImage: ProductImageRoutes.joinSword,
         ),
-        Spacer(),
+        isConstrained ? SizedBox(height: 48.h) : const Spacer(),
         BlocBuilder<MultiplayerBloc, MultiplayerState>(
           builder: (context, state) {
             return GameRequestCard(
@@ -171,6 +178,16 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
           height: widget.bottomSpacing ?? 100.h,
         )
       ],
+    );
+
+    if (!isConstrained) return column;
+    return Center(
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: widget.maxContentWidth!),
+          child: column,
+        ),
+      ),
     );
   }
 }

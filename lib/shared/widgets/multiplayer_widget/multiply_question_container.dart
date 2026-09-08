@@ -42,6 +42,7 @@ class MultiplayerQuestionContainer extends StatelessWidget {
     this.rank= 0,
     this.noOfCorrectAnswers = 0,
     required this.gameMode,
+    this.maxContentWidth,
   });
 
   final Datum gameQuestion;
@@ -62,10 +63,15 @@ class MultiplayerQuestionContainer extends StatelessWidget {
   final int? noOfCorrectAnswers;
   final String gameMode;
 
+  /// Caps the width of the question card. Null on phones, where full
+  /// width is correct; tablets pass a value so options do not stretch
+  /// across the whole screen.
+  final double? maxContentWidth;
+
   @override
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
-    return Container(
+    final card = Container(
       padding: EdgeInsets.only(left: 13, right: 13),
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
@@ -355,6 +361,14 @@ class MultiplayerQuestionContainer extends StatelessWidget {
             height: 20.h,
           ),
         ],
+      ),
+    );
+
+    if (maxContentWidth == null) return card;
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxContentWidth!),
+        child: card,
       ),
     );
   }

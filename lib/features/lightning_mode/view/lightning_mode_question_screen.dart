@@ -15,7 +15,12 @@ class LightningModeQuestionScreen extends StatefulWidget {
 
   const LightningModeQuestionScreen(
       {super.key,
+      this.maxContentWidth,
       });
+
+  /// Caps the question card width. Null on phones; the tablet route passes a
+  /// value so options do not stretch across the full screen.
+  final double? maxContentWidth;
 
   @override
   State<LightningModeQuestionScreen> createState() =>
@@ -278,6 +283,7 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
                         },
                         isWhoIsWho: true,
                         gameMode: 'Lightning Mode',
+                        maxContentWidth: widget.maxContentWidth,
                       )
                     : const SizedBox.expand(),
               ));

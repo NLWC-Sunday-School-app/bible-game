@@ -73,8 +73,30 @@ class GroupGameCategory extends StatelessWidget {
               SizedBox(
                 height: 16.h,
               ),
-              Expanded(
-                child: BlocConsumer<MultiplayerBloc, MultiplayerState>(
+              const Expanded(child: GroupGameCategoryBody()),
+            ],
+          ),
+        )
+    );
+  }
+}
+
+
+/// The game-mode grid shown after a room is created.
+///
+/// Split out of [GroupGameCategory] so the tablet variant can reuse it with a
+/// width cap rather than duplicating the mode list and its bloc wiring.
+class GroupGameCategoryBody extends StatelessWidget {
+  const GroupGameCategoryBody({super.key, this.maxContentWidth});
+
+  /// Caps the content width. Null on phones; tablets pass a value so the mode
+  /// cards do not stretch across the full width.
+  final double? maxContentWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget content =
+                BlocConsumer<MultiplayerBloc, MultiplayerState>(
                  listener: (context, state){
                    if(state.hasCreatedGameRoom){
                      context.read<WebsocketCubit>().connect();
@@ -198,11 +220,14 @@ class GroupGameCategory extends StatelessWidget {
                      }
                    }
                  },
-               ),
-              )
-            ],
-          ),
-        )
+               );
+
+    if (maxContentWidth == null) return content;
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxContentWidth!),
+        child: content,
+      ),
     );
   }
 }
