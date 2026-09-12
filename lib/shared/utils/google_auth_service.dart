@@ -20,7 +20,7 @@ class GoogleAuthService {
   // the audience the backend would verify against, so it is the serverClientId
   // on every platform, and the clientId on web.
   static const _webClientId =
-      '242806293668-qh1o5db6qievge5nrqeelrpcukp8vud4.apps.googleusercontent.com';
+      '242806293668-m9po3eictcocq4514cbti85dadilef0b.apps.googleusercontent.com';
 
   // iOS OAuth client, from ios/GoogleService-Info.plist CLIENT_ID. It must
   // match the REVERSED_CLIENT_ID URL scheme registered in ios/Runner/Info.plist,
