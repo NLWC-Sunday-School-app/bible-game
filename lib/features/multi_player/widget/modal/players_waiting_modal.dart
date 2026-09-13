@@ -364,12 +364,12 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             // ========== CONNECTION STATUS MONITORING ==========
                             if(state.connectionStatus == WebsocketConnectionStatus.disconnected &&
                                 _lastConnectionStatus == WebsocketConnectionStatus.connected) {
-                              CustomToast.show(context, "Connection lost. Reconnecting...",
+                              CustomToast.showStatus(context, "Connection lost. Reconnecting...",
                                   duration: Duration(seconds: 6));
                             }
                             if(state.connectionStatus == WebsocketConnectionStatus.connected &&
                                 _lastConnectionStatus == WebsocketConnectionStatus.disconnected) {
-                              CustomToast.show(context, "Connection restored",
+                              CustomToast.showStatus(context, "Connection restored",
                                   duration: Duration(seconds: 2));
                             }
                             if(state.connectionStatus == WebsocketConnectionStatus.error) {
@@ -405,11 +405,20 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                               );
                             }
                             if(state.newPlayerJoined == true){
-                              CustomToast.show(
-                                  context,
-                                  "${state.waitingRoomInfo.toastNotificationMessage}",
-                                isTriggerFromWaitingRoom: true
-                              );
+                              // Null for your own join -- the server writes this
+                              // text for the *other* players -- and interpolating
+                              // it into a string turned null into a toast reading
+                              // "null". Nothing to say means no toast.
+                              final joinMessage =
+                                  state.waitingRoomInfo.toastNotificationMessage;
+                              if (joinMessage != null &&
+                                  joinMessage.trim().isNotEmpty) {
+                                CustomToast.show(
+                                    context,
+                                    joinMessage,
+                                    isTriggerFromWaitingRoom: true
+                                );
+                              }
                             }
                         },
                         builder: (context, state) {

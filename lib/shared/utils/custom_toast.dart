@@ -39,6 +39,32 @@ class CustomToast {
     overlay.insert(overlayEntry!);
   }
 
+  /// Neutral status toast -- no success tick, no coin, no ribbon art.
+  /// For messages that are neither a win nor a reward (connection state, etc).
+  /// The green ribbon asset is 570x105 with 59% of its width taken up by
+  /// decorative end caps, leaving only a narrow middle band for content, so
+  /// anything longer than a few words landed on top of the caps.
+  static void showStatus(BuildContext context, String message,
+      {Duration duration = const Duration(seconds: 3)}) {
+    removeOverlay();
+    final overlay = Overlay.of(context);
+    const animationDuration = Duration(milliseconds: 300);
+
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        return _ToastWidget(
+          message: message,
+          duration: duration,
+          animationDuration: animationDuration,
+          onDismissed: () => removeOverlay(),
+          isStatus: true,
+        );
+      },
+    );
+
+    overlay.insert(overlayEntry!);
+  }
+
   static void showInviteToast(BuildContext context,
       {Duration duration = const Duration(seconds: 2), required bool isInviteSuccessful, String? message}) {
     // Remove any existing overlay first
@@ -71,6 +97,7 @@ class _ToastWidget extends StatefulWidget {
   final Duration animationDuration;
   final VoidCallback onDismissed;
   final bool? isTriggerFromWaitingRoom;
+  final bool isStatus;
 
   const _ToastWidget({
     Key? key,
@@ -79,6 +106,7 @@ class _ToastWidget extends StatefulWidget {
     required this.animationDuration,
     required this.onDismissed,
     this.isTriggerFromWaitingRoom,
+    this.isStatus = false,
   }) : super(key: key);
 
   @override
@@ -132,7 +160,36 @@ class _ToastWidgetState extends State<_ToastWidget> {
         duration: widget.animationDuration,
         child: Material(
           color: Colors.transparent,
-          child: Container(
+          child: widget.isStatus
+              ? Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F2957),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: const Color(0xFF047AEE), width: 1.5),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x55000000),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    widget.message,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                )
+              : Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               image: DecorationImage(

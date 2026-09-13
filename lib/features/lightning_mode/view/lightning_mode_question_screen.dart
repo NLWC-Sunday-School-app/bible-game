@@ -206,12 +206,12 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
           // ========== CONNECTION STATUS MONITORING ==========
           if(websocketState.connectionStatus == WebsocketConnectionStatus.disconnected &&
               _lastConnectionStatus == WebsocketConnectionStatus.connected) {
-            CustomToast.show(context, "Connection lost. Reconnecting...",
+            CustomToast.showStatus(context, "Connection lost. Reconnecting...",
                 duration: Duration(seconds: 6));
           }
           if(websocketState.connectionStatus == WebsocketConnectionStatus.connected &&
               _lastConnectionStatus == WebsocketConnectionStatus.disconnected) {
-            CustomToast.show(context, "Connection restored",
+            CustomToast.showStatus(context, "Connection restored",
                 duration: Duration(seconds: 2));
           }
           if(websocketState.connectionStatus == WebsocketConnectionStatus.error) {
@@ -230,11 +230,14 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
             showLeaderboardModal(context, "Lightning Mode");
           }
           if((websocketState.eventType == "POSITION_UPDATED" && websocketState.newPlayerJoined)){
-            CustomToast.removeOverlay();
-            ToastManager.showCustomToast(
-                context,
-                websocketState.positionUpdate.toastNotificationMessage!
-            );
+            // Was a bare null-assert: a POSITION_UPDATED frame without a
+            // message threw rather than simply showing nothing.
+            final positionMessage =
+                websocketState.positionUpdate.toastNotificationMessage;
+            if (positionMessage != null && positionMessage.trim().isNotEmpty) {
+              CustomToast.removeOverlay();
+              ToastManager.showCustomToast(context, positionMessage);
+            }
           }else if((websocketState.eventType == "PLAYER_ANSWERED" && websocketState.newPlayerJoined)){
             if(websocketState.userToastMessage != null && websocketState.userToastMessage!.isNotEmpty){
               ToastManager.dismissAll();
