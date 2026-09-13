@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "242806293668",
     "project_id": "bible-game-e2616",
-    "storage_bucket": "bible-game-e2616.appspot.com"
+    "storage_bucket": "bible-game-e2616.firebasestorage.app"
   },
   "client": [
     {
