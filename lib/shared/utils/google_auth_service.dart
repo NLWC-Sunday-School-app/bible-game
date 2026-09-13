@@ -38,8 +38,13 @@ class GoogleAuthService {
     return null; // Android: resolved from google-services.json
   }
 
+  // 'profile' is required on web: google_sign_in_web resolves displayName and
+  // photoUrl through the People API, and without this scope that call comes
+  // back 403 Forbidden, leaving displayName null. The native SDKs read the
+  // name straight out of the ID token, which is why mobile worked without it.
+  // Both scopes are non-sensitive, so neither needs OAuth verification.
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: const ['email'],
+    scopes: const ['email', 'profile'],
     clientId: _clientId,
     serverClientId: PlatformInfo.isWeb ? null : _webClientId,
   );
