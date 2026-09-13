@@ -64,7 +64,12 @@ class GoogleAuthService {
   /// Google display names rarely fit that, so derive a compliant handle
   /// from it instead of prompting the user to pick one.
   static String _usernameFrom(String? displayName, String email) {
-    String base = (displayName ?? '').replaceAll(RegExp(r'[^A-Za-z0-9#-]'), '');
+    // First name only. Using the whole display name meant a 10-character
+    // truncation cut people mid-surname -- "Tobi Egbayelo" became
+    // "TobiEgbaye".
+    final firstName =
+        (displayName ?? '').trim().split(RegExp(r'\s+')).first;
+    String base = firstName.replaceAll(RegExp(r'[^A-Za-z0-9#-]'), '');
     if (base.isEmpty) {
       base = email.split('@').first.replaceAll(RegExp(r'[^A-Za-z0-9#-]'), '');
     }
