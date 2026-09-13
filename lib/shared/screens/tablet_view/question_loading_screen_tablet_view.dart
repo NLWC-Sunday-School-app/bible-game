@@ -208,7 +208,7 @@ class _QuestionLoadingScreenTabletViewState extends State<QuestionLoadingScreenT
             return Align(
               alignment: Alignment.center,
               child: CarouselSlider.builder(
-                itemCount: state.adContent!.length,
+                itemCount: state.adContent?.length ?? 0,
                 itemBuilder:
                     (BuildContext context, int index, int pageViewIndex) {
                   return Container(

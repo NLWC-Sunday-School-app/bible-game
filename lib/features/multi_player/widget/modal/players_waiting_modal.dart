@@ -380,8 +380,24 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             _lastConnectionStatus = state.connectionStatus;
 
                             if(state.eventType == "GAME_STARTED"){
+                              // Multiplayer questions arrive on this very frame
+                              // (WebsocketCubit fills questionData from the
+                              // GAME_STARTED payload), so there is nothing to
+                              // fetch. The generic questionLoadingScreen has no
+                              // branch for these game modes -- it fell through to
+                              // FetchGlobalChallengeQuestions and never navigated
+                              // on, leaving the player stuck. Go straight to the
+                              // mode's own screen, which reads WebsocketCubit.
+                              final mode = widget.selectedGroupGame.isNotEmpty
+                                  ? widget.selectedGroupGame
+                                  : (state.waitingRoomInfo.gameMode ?? '');
                               Navigator.pop(context);
-                              Navigator.pushNamed(context, AppRoutes.questionLoadingScreen, arguments:{ 'gameType': widget.selectedGroupGame});
+                              Navigator.pushNamed(
+                                context,
+                                mode == "First to X" || mode == "FIRST_TO_X"
+                                    ? AppRoutes.firstToXQuestionScreen
+                                    : AppRoutes.lightningModeQuestionScreen,
+                              );
                               CustomToast.showInviteToast(
                                   context,
                                   message: "Game has started",
