@@ -1,3 +1,4 @@
+import 'package:bible_game/features/multi_player/widget/modal/multiplayer_tip_modal.dart';
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -173,6 +174,19 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
          }
        });
 
+      }else if(gameType == "Lightning Mode" || gameType == "First to X" ||
+          gameType == "Time-based Mode" || gameType == "Survival Mode"){
+        // Multiplayer questions arrive over the websocket with the
+        // GAME_STARTED frame, so there is nothing to fetch here -- only the
+        // Quick Tips to show, which then routes to the mode's own screen.
+        // Without this branch these game modes fell through to the Global
+        // Challenge fetch below and the player was stranded.
+        Timer(Duration(seconds: 3), () {
+          if(mounted && !_isModalShown){
+            showMultiplayerTipsModal(context, gameMode: gameType);
+            _isModalShown = true;
+          }
+        });
       }else {
         context.read<GlobalChallengeBloc>().add(FetchGlobalChallengeQuestions(gameType));
         context.read<GlobalChallengeBloc>().stream.listen((state){

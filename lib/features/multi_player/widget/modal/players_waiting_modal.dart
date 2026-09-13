@@ -380,24 +380,24 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             _lastConnectionStatus = state.connectionStatus;
 
                             if(state.eventType == "GAME_STARTED"){
-                              // Multiplayer questions arrive on this very frame
-                              // (WebsocketCubit fills questionData from the
-                              // GAME_STARTED payload), so there is nothing to
-                              // fetch. The generic questionLoadingScreen has no
-                              // branch for these game modes -- it fell through to
-                              // FetchGlobalChallengeQuestions and never navigated
-                              // on, leaving the player stuck. Go straight to the
-                              // mode's own screen, which reads WebsocketCubit.
-                              final mode = widget.selectedGroupGame.isNotEmpty
+                              // questionLoadingScreen shows the multiplayer Quick
+                              // Tips and then routes to the mode's own screen.
+                              // It matches on the display name, so fall back to
+                              // the room's gameMode and normalise the server's
+                              // enum -- the join modal passes an empty string
+                              // when victoryCondition.type is neither LIGHTNING
+                              // nor FIRST_TO_X, which would otherwise fall
+                              // through to the Global Challenge branch.
+                              var mode = widget.selectedGroupGame.isNotEmpty
                                   ? widget.selectedGroupGame
                                   : (state.waitingRoomInfo.gameMode ?? '');
+                              if (mode == "LIGHTNING") mode = "Lightning Mode";
+                              if (mode == "FIRST_TO_X") mode = "First to X";
                               Navigator.pop(context);
                               Navigator.pushNamed(
-                                context,
-                                mode == "First to X" || mode == "FIRST_TO_X"
-                                    ? AppRoutes.firstToXQuestionScreen
-                                    : AppRoutes.lightningModeQuestionScreen,
-                              );
+                                  context,
+                                  AppRoutes.questionLoadingScreen,
+                                  arguments: {'gameType': mode});
                               CustomToast.showInviteToast(
                                   context,
                                   message: "Game has started",
