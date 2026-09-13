@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/utils/awesome_notification.dart';
 import 'dart:async';
 import 'package:bible_game/features/multi_player/view/tablet_view/home_screen_tablet_view.dart';
 import 'package:bible_game/features/multi_player/view/tablet_view/group_game_category_tablet_view.dart';
@@ -411,13 +412,17 @@ class _AppState extends State<App> {
     );
   }
 
-  getFcmToken() async {
-    var firebaseAppToken =
-    await AwesomeNotificationsFcm().requestFirebaseAppToken();
+  Future<void> getFcmToken() async {
+    // Goes through AwesomeNotification rather than calling the plugin direct:
+    // startup no longer blocks on Firebase, so this needs to wait for that
+    // deferred init (bounded) and tolerate FCM being unavailable. Calling
+    // requestFirebaseAppToken() here threw an unhandled PlatformException
+    // whenever Firebase had not come up yet.
+    final firebaseAppToken =
+        await AwesomeNotification.getFirebaseMessagingToken();
+    if (firebaseAppToken.isEmpty) return;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('fcmToken', firebaseAppToken);
-    print('fb token: $firebaseAppToken');
-    // await prefs.remove('user_token');
   }
 
   @override

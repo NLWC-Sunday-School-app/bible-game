@@ -3,8 +3,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 
 class AwesomeNotification {
-  static Future<void> initializeRemoteNotifications(
-      {required bool debug}) async {
+  static Future<void>? _remoteInit;
+
+  /// Idempotent. Startup kicks this off without awaiting it, so anything that
+  /// genuinely needs Firebase -- the FCM token at login -- awaits this same
+  /// future rather than racing it or initialising a second time.
+  static Future<void> initializeRemoteNotifications({required bool debug}) =>
+      _remoteInit ??= _initializeRemote(debug);
+
+  static Future<void> _initializeRemote(bool debug) async {
     await Firebase.initializeApp();
     await AwesomeNotificationsFcm().initialize(
         onFcmSilentDataHandle: AwesomeNotification.mySilentDataHandle,
@@ -34,6 +41,17 @@ class AwesomeNotification {
   // Request FCM token to Firebase
   static Future<String> getFirebaseMessagingToken() async {
     String firebaseAppToken = '';
+
+    // Startup no longer blocks on Firebase, so it may still be coming up.
+    // Bounded, because a wedged FCM registration must not hang login -- the
+    // caller treats an empty token as "no push for this session".
+    try {
+      await _remoteInit?.timeout(const Duration(seconds: 20));
+    } catch (exception) {
+      debugPrint('FCM not ready, continuing without a token: $exception');
+      return firebaseAppToken;
+    }
+
     if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
       try {
         firebaseAppToken =

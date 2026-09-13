@@ -1,6 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bible_game_api/api/game_api.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'dart:async';
+
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb, debugPrint;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_storage/get_storage.dart';
@@ -59,17 +61,7 @@ void main() async {
     // Reset the app badge count whenever the app starts
     AwesomeNotifications().resetGlobalBadge();
 
-    // Schedule the daily devotional notification at 8 AM
-    DevotionalNotification.scheduleDailyReminder();
-
-    // Schedule the hourly lock screen Bible verse notifications
-    HourlyVerseNotification.scheduleHourlyVerses();
-
-    // Debug builds fire one verse 10s after launch so the lock screen can be
-    // checked without waiting for the top of the hour. Stripped from release.
-    if (kDebugMode) {
-      HourlyVerseNotification.showTestVerseNow();
-    }
+    unawaited(_scheduleLocalNotifications());
   }
 
   // GetStorage uses path_provider internally. On iOS hot restart the Pigeon
@@ -79,12 +71,6 @@ void main() async {
   } catch (_) {
     await Future.delayed(const Duration(milliseconds: 400));
     await GetStorage.init();
-  }
-
-  // Firebase/FCM is mobile-only
-  if (!kIsWeb) {
-    await AwesomeNotification.initializeRemoteNotifications(
-      debug: true,);
   }
 
   final String? userToken = await GetStorage().read('user_token');
@@ -117,6 +103,18 @@ void main() async {
   final LightningModeRepository lightningModeRepository = LightningModeRepository(multiplayerAPI);
   final SoundManager soundManager = SoundManager();
   final OfflineSyncQueue offlineSyncQueue = OfflineSyncQueue();
+  // Firebase/FCM deliberately does NOT gate the first frame. It awaits
+  // Firebase.initializeApp() plus FCM registration, and on a cold device --
+  // Play Services still starting, no network -- that can stall for minutes,
+  // stranding the user on the native launch screen with no way forward.
+  // Started after runApp instead; getFirebaseMessagingToken() awaits the same
+  // future, so login still gets a token.
+  if (!kIsWeb) {
+    unawaited(AwesomeNotification.initializeRemoteNotifications(
+      debug: kDebugMode,
+    ).catchError((e) => debugPrint('⚠️ Remote notifications unavailable: $e')));
+  }
+
   runApp(App(
     authenticationRepository: authenticationRepository,
     userRepository: userRepository,
@@ -134,4 +132,24 @@ void main() async {
     lightningModeRepository: lightningModeRepository,
     apiBaseUrl: apiClient.baseUrl,
   ));
+}
+
+/// Scheduling throws INSUFFICIENT_PERMISSIONS until the user grants the
+/// notification permission, which is requested from the widget tree well after
+/// this runs. These are fire-and-forget, so without a catch every cold start
+/// logged an unhandled PlatformException.
+Future<void> _scheduleLocalNotifications() async {
+  try {
+    // Daily devotional at 8 AM, plus the hourly lock screen verses.
+    await DevotionalNotification.scheduleDailyReminder();
+    await HourlyVerseNotification.scheduleHourlyVerses();
+
+    // Debug builds fire one verse 10s after launch so the lock screen can be
+    // checked without waiting for the top of the hour. Stripped from release.
+    if (kDebugMode) {
+      await HourlyVerseNotification.showTestVerseNow();
+    }
+  } catch (e) {
+    debugPrint('⚠️ Notification scheduling skipped: $e');
+  }
 }

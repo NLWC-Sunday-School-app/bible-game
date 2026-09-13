@@ -177,6 +177,9 @@ class AuthenticationBloc
       UpdateFCMToken event, Emitter<AuthenticationState> emit) async {
     try {
       final fcmToken = await AwesomeNotification.getFirebaseMessagingToken();
+      // An empty token means FCM was not ready, not that push was revoked.
+      // Sending it would clear a perfectly good token on the server.
+      if (fcmToken.isEmpty) return;
       await _userRepository.updateUserFCMToken(fcmToken);
     } catch (_) {}
   }
