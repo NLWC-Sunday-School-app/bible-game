@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:equatable/equatable.dart';
 import 'package:bible_game_api/model/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -319,12 +320,21 @@ class AuthenticationBloc
         emit(state.copyWith(
             isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
       } else {
+        // Status and message only -- never the whole body, which carries
+        // tokens on the success path.
+        debugPrint('\u26A0\uFE0F Google sign-in: no token back from the backend '
+            '(status ${response['status']}: '
+            '${response['error'] ?? response['message']})');
         emit(state.copyWith(
             isLoadingGoogleSignIn: false, failedGoogleSignIn: true));
         emit(state.copyWith(
             isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
       }
-    } catch (_) {
+    } catch (error) {
+      // register() rethrows ApiException while login() swallows it, so this
+      // is usually registration -- most often the email already having a
+      // password account, which the derived password cannot match.
+      debugPrint('\u26A0\uFE0F Google sign-in threw: $error');
       emit(state.copyWith(
           isLoadingGoogleSignIn: false, failedGoogleSignIn: true));
       emit(state.copyWith(

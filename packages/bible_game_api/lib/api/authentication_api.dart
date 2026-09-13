@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bible_game_api/api/api_client.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
 
@@ -5,6 +7,25 @@ class AuthenticationAPI {
   final ApiClient apiClient;
 
   AuthenticationAPI(this.apiClient);
+
+  /// Dio hands back whatever it managed to parse: a String when the body is
+  /// not JSON, or is JSON served under a non-JSON content type. Returning that
+  /// straight out of a Future<Map<String, dynamic>> throws
+  /// "type 'String' is not a subtype of type 'Map<String, dynamic>'" before the
+  /// caller ever sees the response.
+  static Map<String, dynamic> _asMap(dynamic data) {
+    if (data is Map<String, dynamic>) return data;
+    if (data is String) {
+      try {
+        final decoded = jsonDecode(data);
+        if (decoded is Map<String, dynamic>) return decoded;
+      } catch (_) {
+        // Not JSON at all -- fall through and surface it as a message.
+      }
+      return {'message': data};
+    }
+    return {'message': data?.toString() ?? ''};
+  }
 
   Future<bool> register(name, email, password, fcmToken, country, String deviceName, String deviceOs) async {
     try {
@@ -35,7 +56,7 @@ class AuthenticationAPI {
           'deviceOs': deviceOs
         },
       );
-      return response.data;
+      return _asMap(response.data);
     } on ApiException catch (e) {
       return e.message;
     }
@@ -46,7 +67,7 @@ class AuthenticationAPI {
       final response = await apiClient.post('/auth/refresh-token', data: {
         'refreshToken': refreshToken,
       });
-      return response.data;
+      return _asMap(response.data);
     } on ApiException catch (e) {
       return e.message;
     }
@@ -86,10 +107,16 @@ class AuthenticationAPI {
   Future<bool> logout() async {
     try {
       final response = await apiClient.get('/auth/logout');
-      var test =  response.statusCode == 200;
-      return test;
-    } on ApiException catch (e) {
+      return response.statusCode == 200;
+    } on ApiException catch (_) {
       return false;
+    } finally {
+      // The interceptor attaches the bearer token to EVERY request, including
+      // /auth/login, and nothing ever cleared it. After logging out the token
+      // is revoked server-side but kept being sent, so the next login went out
+      // carrying a dead credential. Cleared even when the call fails: the user
+      // asked to log out, so the local credential goes either way.
+      apiClient.updateToken('');
     }
   }
 
