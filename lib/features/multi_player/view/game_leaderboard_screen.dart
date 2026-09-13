@@ -31,11 +31,23 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Written as an overlay on the game, but showLeaderboardModal pushes it as
+    // an opaque fullscreen route -- so the original 80% black sat over nothing
+    // and rendered as flat black. Carry the question screen's own backdrop
+    // through unmodified: no scrim, because the game screen has none either
+    // and any darkening reads as a different screen rather than a continuation.
+    // The cards supply their own contrast.
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.8),
-      body: SafeArea(
+      backgroundColor: const Color(0xFF998BBC),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(ProductImageRoutes.questionScreenBg),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
         child: Container(
-          color: Colors.black.withOpacity(0.8),
           padding: EdgeInsets.only(top: 30.h),
           child: Stack(
             children: [
@@ -233,6 +245,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
