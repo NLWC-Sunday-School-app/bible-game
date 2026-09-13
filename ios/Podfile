@@ -45,6 +45,20 @@ post_install do |installer|
   require awesome_pod_file
   update_awesome_pod_build_settings(installer)
   ################  Awesome Notifications pod modification 1  ###################
+
+  # Must run last: the awesome_notifications_fcm scripts above leave
+  # IosAwnFcmCore without SKIP_INSTALL, and absent defaults to NO. Xcode then
+  # installs the framework to Products/Library/Frameworks, which makes the
+  # archive a *generic* archive rather than an iOS App Archive -- Organizer
+  # shows blank Version/Status and will not offer Validate or Distribute.
+  # The framework is still embedded in the app and the service extension via
+  # their embed-frameworks phases; this only stops it being archived as a
+  # deliverable of its own.
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['SKIP_INSTALL'] = 'YES'
+    end
+  end
 end
 
 ################  Awesome Notifications pod modification 2  ###################
