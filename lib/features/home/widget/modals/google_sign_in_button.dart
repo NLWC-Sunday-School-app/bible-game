@@ -91,14 +91,16 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
     }
   }
 
-  void _showError(BuildContext context) {
+  void _showError(BuildContext context, {bool alreadyRegistered = false}) {
     final tr = AppLocalization.tr(context);
     Flushbar(
-      message: tr.t('auth_google_signin_failed'),
+      message: tr.t(alreadyRegistered
+          ? 'auth_google_email_already_registered'
+          : 'auth_google_signin_failed'),
       flushbarPosition: FlushbarPosition.TOP,
       flushbarStyle: FlushbarStyle.GROUNDED,
       backgroundColor: Colors.red,
-      duration: const Duration(seconds: 3),
+      duration: Duration(seconds: alreadyRegistered ? 5 : 3),
     ).show(context);
   }
 
@@ -110,11 +112,17 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
     return BlocConsumer<AuthenticationBloc, AuthenticationState>(
       listenWhen: (prev, curr) =>
           prev.failedGoogleSignIn != curr.failedGoogleSignIn ||
+          prev.googleEmailAlreadyRegistered !=
+              curr.googleEmailAlreadyRegistered ||
           prev.token != curr.token,
       listener: (context, state) {
         if (state.failedGoogleSignIn) {
           setState(() => _isBusy = false);
           _showError(context);
+        }
+        if (state.googleEmailAlreadyRegistered) {
+          setState(() => _isBusy = false);
+          _showError(context, alreadyRegistered: true);
         }
         if (state.token != null) {
           setState(() => _isBusy = false);

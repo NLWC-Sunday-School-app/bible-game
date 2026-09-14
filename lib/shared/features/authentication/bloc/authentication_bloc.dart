@@ -332,13 +332,23 @@ class AuthenticationBloc
       }
     } catch (error) {
       // register() rethrows ApiException while login() swallows it, so this
-      // is usually registration -- most often the email already having a
-      // password account, which the derived password cannot match.
+      // is usually registration.
       debugPrint('\u26A0\uFE0F Google sign-in threw: $error');
+
+      // The common case: the email already has a password profile, so login
+      // rejects the derived password and register rejects the duplicate. Not
+      // retryable -- flagged separately so the UI can send them to Log In
+      // rather than offering "try again" on something that cannot succeed.
+      final alreadyRegistered =
+          error.toString().toLowerCase().contains('already exist');
       emit(state.copyWith(
-          isLoadingGoogleSignIn: false, failedGoogleSignIn: true));
+          isLoadingGoogleSignIn: false,
+          failedGoogleSignIn: !alreadyRegistered,
+          googleEmailAlreadyRegistered: alreadyRegistered));
       emit(state.copyWith(
-          isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
+          isLoadingGoogleSignIn: false,
+          failedGoogleSignIn: false,
+          googleEmailAlreadyRegistered: false));
     }
   }
 

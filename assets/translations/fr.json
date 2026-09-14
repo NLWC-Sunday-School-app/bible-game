@@ -124,5 +124,6 @@
   "language_french": "Français",
   "language_setting": "Langue",
   "game_memory_verses": "Versets à mémoriser",
-  "game_memory_verses_desc": "Garde la Parole dans ton cœur !"
+  "game_memory_verses_desc": "Garde la Parole dans ton cœur !",
+  "auth_google_email_already_registered": "Cet e-mail est déjà associé à un compte. Connectez-vous avec votre mot de passe."
 }

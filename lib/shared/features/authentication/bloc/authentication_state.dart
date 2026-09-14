@@ -22,6 +22,12 @@ class AuthenticationState extends Equatable {
   final bool isLoadingGoogleSignIn;
   final bool failedGoogleSignIn;
 
+  /// The Google account's email already has a password profile. Distinct from
+  /// failedGoogleSignIn because it is not a fault the user can retry past --
+  /// the derived password can never match one they set themselves, and
+  /// register refuses the duplicate email. They have to use that password.
+  final bool googleEmailAlreadyRegistered;
+
   const AuthenticationState(
       {this.isLoggedIn = false,
       this.isUnauthenticated = false,
@@ -42,7 +48,8 @@ class AuthenticationState extends Equatable {
       this.isDeletingAccount = false,
       this.hasDeletedAccount = false,
       this.isLoadingGoogleSignIn = false,
-      this.failedGoogleSignIn = false});
+      this.failedGoogleSignIn = false,
+      this.googleEmailAlreadyRegistered = false});
 
   AuthenticationState copyWith(
       {bool? isLoggedIn,
@@ -64,7 +71,8 @@ class AuthenticationState extends Equatable {
       bool? failedToRegister,
       bool? hasLoggedOut,
       bool? isLoadingGoogleSignIn,
-      bool? failedGoogleSignIn}) {
+      bool? failedGoogleSignIn,
+      bool? googleEmailAlreadyRegistered}) {
     return AuthenticationState(
         isLoggedIn: isLoggedIn ?? this.isLoggedIn,
         isUnauthenticated: isUnauthenticated ?? this.isUnauthenticated,
@@ -87,7 +95,9 @@ class AuthenticationState extends Equatable {
         hasLoggedOut: hasLoggedOut ?? this.hasLoggedOut,
         isLoadingGoogleSignIn:
             isLoadingGoogleSignIn ?? this.isLoadingGoogleSignIn,
-        failedGoogleSignIn: failedGoogleSignIn ?? this.failedGoogleSignIn);
+        failedGoogleSignIn: failedGoogleSignIn ?? this.failedGoogleSignIn,
+        googleEmailAlreadyRegistered:
+            googleEmailAlreadyRegistered ?? this.googleEmailAlreadyRegistered);
   }
 
   @override
@@ -110,7 +120,8 @@ class AuthenticationState extends Equatable {
         failedToRegister,
         hasLoggedOut,
         isLoadingGoogleSignIn,
-        failedGoogleSignIn
+        failedGoogleSignIn,
+        googleEmailAlreadyRegistered
       ];
 
   // props still carries the real token so equality/emit behaviour is unchanged,
