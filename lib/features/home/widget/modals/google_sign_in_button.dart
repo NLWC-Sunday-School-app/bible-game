@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/utils/registration_push_token.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
@@ -56,8 +57,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
         return;
       }
 
-      final prefs = await SharedPreferences.getInstance();
-      final fcmToken = prefs.getString('fcmToken') ?? '';
+      final fcmToken = await registrationPushToken();
       final deviceInfo = await _deviceInfoService.getDeviceInfo();
 
       if (!mounted) return;

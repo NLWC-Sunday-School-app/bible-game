@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/utils/registration_push_token.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
@@ -540,8 +541,7 @@ class _CreateProfileModalState extends State<CreateProfileModal>
     soundManager.playClickSound();
     FocusScope.of(context).unfocus();
     if (_registerFormKey.currentState!.validate()) {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final fcmToken = prefs.getString('fcmToken') ?? '';
+      final fcmToken = await registrationPushToken();
       final deviceName = _deviceInfoLoaded
           ? (_deviceInfo['deviceName'] ?? 'Unknown')
           : 'Unknown';
