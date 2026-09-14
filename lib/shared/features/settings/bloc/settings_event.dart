@@ -13,6 +13,9 @@ class ToggleMusic extends SettingsEvent {}
 
 class ToggleNotification extends SettingsEvent {}
 
+/// Restores the persisted notification preference on launch.
+class LoadNotificationSetting extends SettingsEvent {}
+
 class UpdateSoundState extends SettingsEvent {
   final bool isMusicOn;
   final bool isSoundOn;

@@ -488,9 +488,7 @@ class _SettingsTogglesRow extends StatelessWidget {
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w),
           child: Row(
-            mainAxisAlignment: isLoggedIn
-                ? MainAxisAlignment.spaceBetween
-                : MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _ToggleItem(
                 label: tr.t('profile_music'),
@@ -510,6 +508,19 @@ class _SettingsTogglesRow extends StatelessWidget {
                 onTap: () {
                   soundManager.playClickSound();
                   context.read<SettingsBloc>().add(ToggleSound());
+                },
+              ),
+              // The only way to switch the hourly verse and daily devotional
+              // notifications off: showGameSettingsModal, which held the
+              // original toggle, is commented out at both of its call sites.
+              _ToggleItem(
+                label: tr.t('profile_verse_notifications'),
+                iconPath: state.isNotificationOn
+                    ? IconImageRoutes.versesOn
+                    : IconImageRoutes.versesOff,
+                onTap: () {
+                  soundManager.playClickSound();
+                  context.read<SettingsBloc>().add(ToggleNotification());
                 },
               ),
               if (isLoggedIn)

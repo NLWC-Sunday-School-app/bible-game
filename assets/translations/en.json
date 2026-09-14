@@ -136,5 +136,6 @@
   "language_setting": "Language",
   "game_memory_verses": "Memory Verses",
   "game_memory_verses_desc": "Hide the Word in your heart!",
-  "auth_google_email_already_registered": "That email already has an account. Please log in with your password instead."
+  "auth_google_email_already_registered": "That email already has an account. Please log in with your password instead.",
+  "profile_verse_notifications": "Verses"
 }

@@ -375,8 +375,8 @@ class _ProfileScreenTabletViewState extends State<ProfileScreenTabletView> {
                                         .user
                                         .id !=
                                     0
-                                ? MainAxisAlignment.spaceBetween
-                                : MainAxisAlignment.center,
+                                ? MainAxisAlignment.spaceEvenly
+                                : MainAxisAlignment.spaceEvenly,
                             children: [
                               Column(
                                 children: [
@@ -426,6 +426,37 @@ class _ProfileScreenTabletViewState extends State<ProfileScreenTabletView> {
                                   ),
                                   Text(
                                     'Sound',
+                                    style: TextStyle(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white),
+                                  )
+                                ],
+                              ),
+                              // Matches the phone layout: the original toggle
+                              // lived in showGameSettingsModal, which is
+                              // commented out at both of its call sites.
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(8.w),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        soundManager.playClickSound();
+                                        context
+                                            .read<SettingsBloc>()
+                                            .add(ToggleNotification());
+                                      },
+                                      child: Image.asset(
+                                        state.isNotificationOn
+                                            ? IconImageRoutes.versesOn
+                                            : IconImageRoutes.versesOff,
+                                        width: 64.w,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Verses',
                                     style: TextStyle(
                                         fontSize: 13.sp,
                                         fontWeight: FontWeight.w700,

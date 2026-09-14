@@ -140,6 +140,15 @@ void main() async {
 /// logged an unhandled PlatformException.
 Future<void> _scheduleLocalNotifications() async {
   try {
+    // Respect the user's choice. Without this the schedules were rebuilt on
+    // every launch, so turning verse notifications off lasted until restart.
+    final prefs = await SharedPreferences.getInstance();
+    if (!(prefs.getBool('isNotificationOn') ?? true)) {
+      await DevotionalNotification.cancelDailyReminder();
+      await HourlyVerseNotification.cancelHourlyVerses();
+      return;
+    }
+
     // Daily devotional at 8 AM, plus the hourly lock screen verses.
     await DevotionalNotification.scheduleDailyReminder();
     await HourlyVerseNotification.scheduleHourlyVerses();

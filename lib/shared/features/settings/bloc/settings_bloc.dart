@@ -1,7 +1,11 @@
 import 'package:bible_game_api/model/game_ads.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../utils/devotional_notification.dart';
+import '../../../utils/hourly_verse_notification.dart';
 
 import '../../user/repository/user_repository.dart';
 import '../sound_manager.dart';
@@ -23,6 +27,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<FetchGamePlaySettings>(_onFetchGamePlaySettings);
     on<FetchAds>(_onFetchAds);
     on<UpdateSoundState>(_onUpdateSoundState);
+    on<LoadNotificationSetting>(_onLoadNotificationSetting);
+
+    // Restore the stored preference so the toggle reflects reality on launch.
+    add(LoadNotificationSetting());
+  }
+
+  Future<void> _onLoadNotificationSetting(
+      LoadNotificationSetting event, Emitter<SettingsState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    emit(state.copyWith(
+        isNotificationOn: prefs.getBool('isNotificationOn') ?? true));
   }
 
   void _onToggleSound(ToggleSound event, Emitter<SettingsState> emit)async {
@@ -42,10 +57,28 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     soundManager.updateSettings(newState);
   }
 
-  void _onToggleNotification(
-      ToggleNotification event, Emitter<SettingsState> emit) {
-    final newState = state.copyWith(isNotificationOn: !state.isNotificationOn);
-    emit(newState);
+  /// The toggle used to flip a flag in memory and nothing else -- it neither
+  /// persisted nor touched the schedules, so verses kept arriving after it was
+  /// switched off and it reset on every launch.
+  Future<void> _onToggleNotification(
+      ToggleNotification event, Emitter<SettingsState> emit) async {
+    final enabled = !state.isNotificationOn;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isNotificationOn', enabled);
+    emit(state.copyWith(isNotificationOn: enabled));
+
+    try {
+      if (enabled) {
+        await DevotionalNotification.scheduleDailyReminder();
+        await HourlyVerseNotification.scheduleHourlyVerses();
+      } else {
+        await DevotionalNotification.cancelDailyReminder();
+        await HourlyVerseNotification.cancelHourlyVerses();
+      }
+    } catch (e) {
+      // Scheduling throws if the notification permission was never granted.
+      debugPrint('\u26A0\uFE0F Notification toggle: $e');
+    }
   }
 
   Future<void> _onFetchAds(FetchAds event, Emitter<SettingsState> emit) async {
