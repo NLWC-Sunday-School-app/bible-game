@@ -1,3 +1,4 @@
+import 'package:bible_game/features/multi_player/widget/modal/game_mode_info_modal.dart';
 import 'package:bible_game/features/multi_player/widget/group_game_card.dart';
 import 'package:flutter/material.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
@@ -142,7 +143,11 @@ class GroupGameCategoryBody extends StatelessWidget {
                    }else{
                      if(state.hasCreatedGameRoom){
                        print(state.createGameRoomResponse.inviteCode);
-                       return Column(
+                       // Scrollable rather than a bare Column: the grid sits
+                       // in a tight slot, so a couple of extra pixels of card
+                       // height -- the info icon's padding, say -- overflowed it.
+                       return SingleChildScrollView(
+                         child: Column(
                          children: [
                            Text(
                              "Select Game Mode",
@@ -165,20 +170,43 @@ class GroupGameCategoryBody extends StatelessWidget {
                                    onTap: () => showGroupGamePlayModal(
                                        context,
                                        selectedGroupGame: "Lightning Mode",
-                                       inviteCode: state.createGameRoomResponse.inviteCode
+                                       inviteCode: state.createGameRoomResponse.inviteCode,
+                                   ),
+                                   onInfoTap: () => showGameModeInfoModal(
+                                     context,
+                                     title: "Lightning Mode",
+                                     image: ProductImageRoutes.lightningMode,
+                                     summary: "A race through a fixed set of questions. Everyone sees the same question at the same time.",
+                                     rules: const [
+                                       "You choose how many questions the round runs for.",
+                                       "8 seconds per question -- it moves on whether you answer or not.",
+                                       "Answer correctly and quickly: the faster you are, the more you score.",
+                                       "Highest total when the questions run out takes first place.",
+                                     ],
                                    ),
                                  ),
                                ),
                                Expanded(
                                  child: GroupGameCard(
-                                   title: "Time-based Mode",
-                                   backgroundColor: Color(0xFFDAD9FF),
-                                   cardImage: ProductImageRoutes.timeBasedMode,
-                                   isEnabled: false,
+                                   title: "First to X",
+                                   backgroundColor: Color(0xFFFFEBD9),
+                                   cardImage: ProductImageRoutes.xMode,
                                    onTap: () => showGroupGamePlayModal(
                                        context,
-                                       selectedGroupGame: "Time-based Mode",
-                                       inviteCode: state.createGameRoomResponse.inviteCode
+                                       selectedGroupGame: "First to X",
+                                       inviteCode: state.createGameRoomResponse.inviteCode,
+                                   ),
+                                   onInfoTap: () => showGameModeInfoModal(
+                                     context,
+                                     title: "First to X",
+                                     image: ProductImageRoutes.xMode,
+                                     summary: "A race to a coin target rather than through a set number of questions.",
+                                     rules: const [
+                                       "You set the target coins when creating the game.",
+                                       "8 seconds per question, same as Lightning Mode.",
+                                       "Correct answers earn coins; speed earns more of them.",
+                                       "The first player to reach the target wins -- the round ends there.",
+                                     ],
                                    ),
                                  ),
                                )
@@ -188,13 +216,26 @@ class GroupGameCategoryBody extends StatelessWidget {
                              children: [
                                Expanded(
                                  child: GroupGameCard(
-                                   title: "First to X",
-                                   backgroundColor: Color(0xFFFFEBD9),
-                                   cardImage: ProductImageRoutes.xMode,
+                                   title: "Time-based Mode",
+                                   backgroundColor: Color(0xFFDAD9FF),
+                                   cardImage: ProductImageRoutes.timeBasedMode,
+                                   isEnabled: false,
                                    onTap: () => showGroupGamePlayModal(
                                        context,
-                                       selectedGroupGame: "First to X",
-                                     inviteCode: state.createGameRoomResponse.inviteCode,
+                                       selectedGroupGame: "Time-based Mode",
+                                       inviteCode: state.createGameRoomResponse.inviteCode,
+                                   ),
+                                   onInfoTap: () => showGameModeInfoModal(
+                                     context,
+                                     title: "Time-based Mode",
+                                     image: ProductImageRoutes.timeBasedMode,
+                                     summary: "A race against the clock instead of a question count.",
+                                     rules: const [
+                                       "You pick how many minutes the round lasts.",
+                                       "Answer as many questions as you can before time runs out.",
+                                       "Most points when the clock stops wins.",
+                                     ],
+                                     comingSoonNote: "Not playable yet. The create screen is built, the game behind it is not.",
                                    ),
                                  ),
                                ),
@@ -207,14 +248,25 @@ class GroupGameCategoryBody extends StatelessWidget {
                                    onTap: () => showGroupGamePlayModal(
                                        context,
                                        selectedGroupGame: "Survival Mode",
-                                     inviteCode: state.createGameRoomResponse.inviteCode,
+                                       inviteCode: state.createGameRoomResponse.inviteCode,
+                                   ),
+                                   onInfoTap: () => showGameModeInfoModal(
+                                     context,
+                                     title: "Survival Mode",
+                                     image: ProductImageRoutes.survivalMode,
+                                     summary: "Last player standing.",
+                                     rules: const [
+                                       "Play continues until players are knocked out.",
+                                       "The final rules are still being decided.",
+                                     ],
+                                     comingSoonNote: "Not playable yet, and the rules above are provisional.",
                                    ),
                                  ),
                                )
                              ],
                            ),
                          ],
-                       );
+                       ));
                      }else{
                        return Container();
                      }
