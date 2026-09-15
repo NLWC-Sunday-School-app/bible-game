@@ -40,8 +40,10 @@ class _JoinGamePlayModalState extends State<JoinGamePlayModal> {
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
       backgroundColor: Colors.transparent,
-      insetAnimationCurve: Curves.bounceInOut,
-      insetAnimationDuration: const Duration(milliseconds: 500),
+      // Runs on every inset change, so a bouncing curve makes the modal
+      // spring about whenever the keyboard opens.
+      insetAnimationCurve: Curves.easeOut,
+      insetAnimationDuration: const Duration(milliseconds: 220),
       child: SizedBox(
         height: 400.h,
         child: Column(
