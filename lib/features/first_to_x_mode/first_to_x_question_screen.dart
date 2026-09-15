@@ -55,7 +55,8 @@ class _FirstToXQuestionScreenState extends State<FirstToXQuestionScreen>
     _currentPage = 0;
     startTime = DateTime.now();
     // MOVED FROM didChangeDependencies for better initialization order
-    durationPerQuestion = 8;
+    durationPerQuestion =
+        context.read<WebsocketCubit>().state.secondsPerQuestion;
     _initializeAnimationController(hasTimer);
 
     // Start animation only if game is not already finished

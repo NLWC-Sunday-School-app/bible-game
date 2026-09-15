@@ -111,7 +111,8 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
           event.gameType,
           event.questionType,
           event.conditionType,
-          event.conditionValue
+          event.conditionValue,
+          event.secondsPerQuestion
       );
       emit(state.copyWith(
           isLoadingConfigureGameRoom: false, hasConfiguredGameRoom: true, hasConfigureGameRoomFailed: false));

@@ -1,3 +1,4 @@
+import 'package:bible_game/features/multi_player/question_timing.dart';
 import 'package:equatable/equatable.dart';
 
 class MultiplayerEvent extends Equatable{
@@ -39,10 +40,17 @@ class ConfigureGameRoom extends MultiplayerEvent{
   final int conditionValue;
   final String conditionType;
 
+  /// Seconds each question stays on screen, chosen by the host. Sent to the
+  /// server rather than applied locally: every player has to run the same
+  /// clock, so it reaches the others through the GAME_STARTED frame.
+  final int secondsPerQuestion;
 
-  ConfigureGameRoom(this.gameType, this.questionType, this.conditionValue, this.conditionType);
+  ConfigureGameRoom(this.gameType, this.questionType, this.conditionValue,
+      this.conditionType,
+      {this.secondsPerQuestion = kDefaultSecondsPerQuestion});
   @override
-  List<Object> get props => [gameType, questionType, conditionType, conditionValue];
+  List<Object> get props =>
+      [gameType, questionType, conditionType, conditionValue, secondsPerQuestion];
 }
 
 class GameInvites extends MultiplayerEvent{

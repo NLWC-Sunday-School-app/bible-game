@@ -1,4 +1,5 @@
 
+import 'package:bible_game/features/multi_player/question_timing.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
@@ -37,6 +38,10 @@ class GroupGamePlayModal extends StatefulWidget {
 class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
   List<String> questionType = ['Who is Who','Scripture Quiz'];
   String selectedValue = "Who is Who";
+
+  /// Seconds per question for this round. Sent on configure so every player
+  /// runs the same clock -- applying it locally would only change the host's.
+  int secondsPerQuestion = kDefaultSecondsPerQuestion;
   final textController = TextEditingController();
   String  errorMessage= '';
 
@@ -49,17 +54,40 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
+      // Vertical inset was 0, so with the keyboard up the dialog ran into the
+      // screen edges with nothing to breathe against.
+      insetPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 24.h),
       backgroundColor: Colors.transparent,
-      insetAnimationCurve: Curves.bounceInOut,
-      insetAnimationDuration: const Duration(milliseconds: 500),
+      // This animation runs on every inset change, not just on open -- so a
+      // bouncing curve over half a second made the modal spring about each
+      // time the keyboard came up. Match the keyboard's own motion instead.
+      insetAnimationCurve: Curves.easeOut,
+      insetAnimationDuration: const Duration(milliseconds: 220),
       child: GestureDetector(
         onTap: (){
           FocusScope.of(context).unfocus();
         },
-        child: SizedBox(
-          height: 550.h,
+        // maxHeight, not a fixed height: Dialog already shrinks its available
+        // space by the keyboard inset, but a fixed 550.h insisted on the full
+        // height anyway, so the content was clipped instead of scrolling. Now
+        // it takes 550.h when there is room and whatever is left when there is
+        // not, and the focused field scrolls into view on its own.
+        child: ConstrainedBox(
+          // size.height is the whole screen and ignores the keyboard, so with
+          // it up the cap stayed larger than the space actually left and the
+          // form overflowed. Subtract the inset first, then clamp so a tall
+          // keyboard on a short device cannot drive this to nothing.
+          constraints: BoxConstraints(
+            maxHeight: ((MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).viewInsets.bottom) *
+                    0.88)
+                .clamp(220.0, double.infinity),
+          ),
           child: SingleChildScrollView(
+            keyboardDismissBehavior:
+                ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 12.h : 0),
             child: Column(
               children: [
                 Container(
@@ -130,7 +158,11 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                   padding: EdgeInsets.symmetric(horizontal: 10.w),
                   child: Container(
                     width: double.infinity,
-                    height: 460.h,
+                    // No fixed height: it was 460.h, and every control added to
+                    // the form -- the seconds picker most recently -- pushed the
+                    // column past it and overflowed. It wraps its content now,
+                    // and the scroll view above handles anything taller than the
+                    // screen.
                     decoration: BoxDecoration(
                         color: Color(0xFFFFF2EB),
                         border: Border(
@@ -162,7 +194,12 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                       },
                       builder: (context, state) {
                         if(state.isLoadingConfigureGameRoom){
-                          return Center(child: CircularProgressIndicator(),);
+                          // Keeps the panel from collapsing to the spinner's
+                          // size now that its height comes from its content.
+                          return SizedBox(
+                            height: 240.h,
+                            child: Center(child: CircularProgressIndicator()),
+                          );
                         }else{
                           return Column(
                             children: [
@@ -359,8 +396,39 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                                   :
                               SizedBox.shrink(),
                               SizedBox(
-                                height: 10.h,
+                                height: 2.h,
                               ),
+                              // Both playable modes take the same timer, so
+                              // the control sits outside their per-mode blocks.
+                              widget.selectedGroupGame == "Lightning Mode" ||
+                                      widget.selectedGroupGame == "First to X"
+                                  ? Column(
+                                      children: [
+                                        Text(
+                                          'Seconds per question',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14.sp,
+                                          ),
+                                        ),
+                                        SizedBox(height: 9.5.h),
+                                        ToggleCard(
+                                          onTap: null,
+                                          selectedOption: false,
+                                          hasTwoOptions: false,
+                                          options: const ['8', '10', '12', '6'],
+                                          onValueSelected: (value) {
+                                            setState(() {
+                                              secondsPerQuestion =
+                                                  resolveSecondsPerQuestion(value);
+                                            });
+                                          },
+                                        ),
+                                        SizedBox(height: 4.h),
+                                      ],
+                                    )
+                                  : SizedBox.shrink(),
+
                               widget.selectedGroupGame == "Lightning Mode"?
                               Column(
                                 children: [
@@ -449,7 +517,13 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                                   color: Color(0xFFF7E1D7),
                                 ),
                               ),
-                              Spacer(),
+                              // Was a Spacer, which pinned the button to the
+                              // bottom of the old fixed-height panel. With the
+                              // panel sized by its content there is no remaining
+                              // space to expand into, and Spacer throws on an
+                              // unbounded column -- a plain gap is what it was
+                              // actually providing.
+                              SizedBox(height: 26.h),
                               BlueButton(
                                 onTap: () {
                                   if(widget.selectedGroupGame == "Lightning Mode"){
@@ -500,7 +574,8 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
           "LIGHTNING",
           selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
           int.parse(textController.text),
-          "BEST_OF_ROUNDS"));
+          "BEST_OF_ROUNDS",
+          secondsPerQuestion: secondsPerQuestion));
     }
   }
 
@@ -526,7 +601,8 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
           "FIRST_TO_X",
           selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
           int.parse(textController.text),
-          "BEST_OF_ROUNDS"));
+          "BEST_OF_ROUNDS",
+          secondsPerQuestion: secondsPerQuestion));
     }
   }
 

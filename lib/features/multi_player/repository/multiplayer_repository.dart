@@ -23,8 +23,10 @@ class MultiplayerRepository {
     return multiplayerAPI.kickOut(roomId, playerId);
   }
 
-  Future<bool> configureGameRoom(roomId, hostId, gameType, questionType, conditionType, condition) async {
-    return multiplayerAPI.configureGameRoom(roomId, hostId, gameType, questionType, conditionType, condition);
+  Future<bool> configureGameRoom(roomId, hostId, gameType, questionType,
+      conditionType, condition, int secondsPerQuestion) async {
+    return multiplayerAPI.configureGameRoom(roomId, hostId, gameType,
+        questionType, conditionType, condition, secondsPerQuestion);
   }
 
   Future<bool> gameInvite(inviteeUsername, roomId, gameType) async {

@@ -20,6 +20,10 @@ class WebsocketState extends Equatable{
   final bool hasAnswered;
   final bool? isCorrectAnswer;
   final int coinsGained;
+
+  /// Seconds per question for this round, as the server configured it.
+  /// Falls back to kDefaultSecondsPerQuestion until the backend sends one.
+  final int secondsPerQuestion;
   final int noOfCorrectAnswers;
   final bool newPlayerJoined;
   final int userRank;
@@ -39,6 +43,7 @@ class WebsocketState extends Equatable{
     required this.hasAnswered,
     required this.isCorrectAnswer,
     required this.coinsGained,
+    this.secondsPerQuestion = kDefaultSecondsPerQuestion,
     required this.noOfCorrectAnswers,
     required this.newPlayerJoined,
     required this.userRank,
@@ -82,6 +87,7 @@ class WebsocketState extends Equatable{
     Object? isCorrectAnswer = _unset,
     bool? newPlayerJoined,
     int? coinsGained,
+    int? secondsPerQuestion,
     int? userRank,
     int? noOfCorrectAnswers,
     WebsocketConnectionStatus? connectionStatus,
@@ -98,6 +104,7 @@ class WebsocketState extends Equatable{
         isCorrectAnswer: isCorrectAnswer == _unset ? this.isCorrectAnswer : isCorrectAnswer as bool?,
         newPlayerJoined: newPlayerJoined ?? this.newPlayerJoined,
         coinsGained: coinsGained ?? this.coinsGained,
+        secondsPerQuestion: secondsPerQuestion ?? this.secondsPerQuestion,
         userRank: userRank ?? this.userRank,
         noOfCorrectAnswers: noOfCorrectAnswers ?? this.noOfCorrectAnswers,
         playerAnswersDetails: playerAnswersDetails ?? this.playerAnswersDetails,
@@ -121,6 +128,7 @@ class WebsocketState extends Equatable{
         hasAnswered,
         isCorrectAnswer,
         coinsGained,
+       secondsPerQuestion,
         noOfCorrectAnswers,
         newPlayerJoined,
         userRank,

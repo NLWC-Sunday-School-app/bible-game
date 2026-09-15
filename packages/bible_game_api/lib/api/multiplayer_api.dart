@@ -38,7 +38,8 @@ class MultiplayerAPI {
     }
   }
 
-  Future<bool> configureGameRoom(roomId, hostId, gameType, questionType, conditionType, condition) async {
+  Future<bool> configureGameRoom(roomId, hostId, gameType, questionType,
+      conditionType, condition, int secondsPerQuestion) async {
     try {
       final response = await apiClient.post(
           '/multiplayer/rooms/$roomId/configure',
@@ -52,7 +53,12 @@ class MultiplayerAPI {
           "winCondition": {
             "type": conditionType,
             "value": condition
-          }
+          },
+          // Top level rather than inside victoryCondition: that object says how
+          // a round is won, this says how fast it moves, and it is the same
+          // setting in every mode. The server echoes it on GAME_STARTED so all
+          // players run the same clock.
+          "secondsPerQuestion": secondsPerQuestion
         }
       );
       return response.statusCode == 200;
@@ -69,8 +75,7 @@ class MultiplayerAPI {
         data: {
           "inviteeUsername": inviteeUsername,
           "roomId": roomId,
-          "gameMode": gameType,
-          "message": "interesting"
+          "gameMode": gameType
         }
       );
       return response.statusCode == 200;

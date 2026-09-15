@@ -4,11 +4,13 @@ import 'dart:convert';
 
 import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
+import 'package:bible_game/features/multi_player/question_timing.dart';
 import 'package:bible_game/features/multi_player/widget/modal/player_answers.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/utils/custom_toast.dart';
 import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:bible_game_api/bible_game_api.dart';
+import 'package:collection/collection.dart';
 import 'package:bible_game_api/model/game_finished_event.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -222,7 +224,14 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                 final questionList = body['data']['questions'];
                 final data = json.decode(questionList);
                 final response = (data['data'] as List).map((e) => Datum.fromJson(e)).toList();
-                emit(state.copyWith(questionData: response));
+                // Every player has to run the same clock, so it comes from the
+                // frame rather than each client deciding for itself. Falls back
+                // to the default until the backend sends the field.
+                emit(state.copyWith(
+                  questionData: response,
+                  secondsPerQuestion: resolveSecondsPerQuestion(
+                      body['data']['secondsPerQuestion']),
+                ));
               }
 
               if ((body['players'] != null) &&
@@ -235,19 +244,38 @@ class WebsocketCubit extends Cubit<WebsocketState> {
               }
 
               if (body["type"] == "PLAYER_ANSWERED") {
+                final answers = PlayerAnswers.fromJson(body);
                 emit(state.copyWith(
-                    playerAnswersDetails: PlayerAnswers.fromJson(body), userToastMessage: ""));
+                    playerAnswersDetails: answers, userToastMessage: ""));
 
-                if (state.waitingRoomInfo.players
-                        .firstWhere((element) =>
-                            element.userId == _authenticationBloc.state.user.id.toString())
-                        .id ==
-                    state.playerAnswersDetails.playerId) {
+                // "Is this frame about me?" used to be answered only by looking
+                // my playerId up in waitingRoomInfo.players -- a list filled
+                // exclusively by PLAYER_JOINED/EJECTED/LEFT frames. Join last
+                // and nobody joins after you and it is still empty, so the
+                // firstWhere threw, the enclosing catch swallowed it, and the
+                // score silently never moved. The frame carries userId, so
+                // prefer that and keep the playerId lookup as a fallback.
+                final myUserId =
+                    _authenticationBloc.state.user.id.toString();
+                final myPlayer = state.waitingRoomInfo.players
+                    .firstWhereOrNull((element) => element.userId == myUserId);
+                final isMe = answers.userId?.toString() == myUserId ||
+                    (myPlayer != null && myPlayer.id == answers.playerId);
+
+                if (isMe) {
+                  // playerScore is int?, and copyWith treats null as "leave it
+                  // alone" -- so a frame without a score used to look exactly
+                  // like a score that had not changed.
+                  final score = answers.data?.playerScore;
+                  if (score == null) {
+                    debugPrint('\u26A0\uFE0F PLAYER_ANSWERED carried no '
+                        'playerScore: ${body["data"]}');
+                  }
                   emit(state.copyWith(
-                      coinsGained: state.playerAnswersDetails.data!.playerScore,
-                      userToastMessage: state.playerAnswersDetails.toastNotificationMessage,
+                      coinsGained: score,
+                      userToastMessage: answers.toastNotificationMessage,
                       newPlayerJoined: true,
-                      userPlayerId: state.playerAnswersDetails.playerId,
+                      userPlayerId: answers.playerId,
                   ));
                   emit(state.copyWith(newPlayerJoined: false));
                 }

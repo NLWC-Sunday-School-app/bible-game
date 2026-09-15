@@ -82,7 +82,8 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
     ToastManager.init(context);
     _currentPage = 0;
     startTime = DateTime.now();
-    durationPerQuestion = 8;
+    durationPerQuestion =
+        context.read<WebsocketCubit>().state.secondsPerQuestion;
     _initializeAnimationController();
 
     // Load saved state and update if needed
