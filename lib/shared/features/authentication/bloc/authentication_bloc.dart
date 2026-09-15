@@ -282,28 +282,16 @@ class AuthenticationBloc
     emit(state.copyWith(
         isLoadingGoogleSignIn: true, failedGoogleSignIn: false));
     try {
-      // Try an existing account first — covers a Google user who already
-      // has a profile from a previous "Continue with Google" sign-in.
-      var response = await _authenticationRepository.logIn(
-          event.email, event.password, event.deviceName, event.deviceOs);
-
-      if (!response.containsKey('token')) {
-        // First time this Google account has signed in — create a profile
-        // using the name/email Google gave us, then log straight in.
-        final registered = await _authenticationRepository.register(
-          event.name,
-          event.email,
-          event.password,
-          event.fcmToken,
-          event.country,
-          event.deviceName,
-          event.deviceOs,
-        );
-        if (registered) {
-          response = await _authenticationRepository.logIn(
-              event.email, event.password, event.deviceName, event.deviceOs);
-        }
-      }
+      // One call. The backend verifies the token with Google and creates or
+      // links the account itself, so there is no password to invent and no
+      // login-then-register guessing to do.
+      final response = await _authenticationRepository.googleSignIn(
+        event.idToken,
+        event.deviceName,
+        event.deviceOs,
+        event.fcmToken,
+        event.country,
+      );
 
       if (response.containsKey('token')) {
         emit(state.copyWith(
@@ -320,8 +308,6 @@ class AuthenticationBloc
         emit(state.copyWith(
             isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
       } else {
-        // Status and message only -- never the whole body, which carries
-        // tokens on the success path.
         debugPrint('\u26A0\uFE0F Google sign-in: no token back from the backend '
             '(status ${response['status']}: '
             '${response['error'] ?? response['message']})');
@@ -331,24 +317,11 @@ class AuthenticationBloc
             isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
       }
     } catch (error) {
-      // register() rethrows ApiException while login() swallows it, so this
-      // is usually registration.
       debugPrint('\u26A0\uFE0F Google sign-in threw: $error');
-
-      // The common case: the email already has a password profile, so login
-      // rejects the derived password and register rejects the duplicate. Not
-      // retryable -- flagged separately so the UI can send them to Log In
-      // rather than offering "try again" on something that cannot succeed.
-      final alreadyRegistered =
-          error.toString().toLowerCase().contains('already exist');
       emit(state.copyWith(
-          isLoadingGoogleSignIn: false,
-          failedGoogleSignIn: !alreadyRegistered,
-          googleEmailAlreadyRegistered: alreadyRegistered));
+          isLoadingGoogleSignIn: false, failedGoogleSignIn: true));
       emit(state.copyWith(
-          isLoadingGoogleSignIn: false,
-          failedGoogleSignIn: false,
-          googleEmailAlreadyRegistered: false));
+          isLoadingGoogleSignIn: false, failedGoogleSignIn: false));
     }
   }
 

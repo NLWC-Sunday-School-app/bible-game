@@ -22,6 +22,12 @@ class AuthenticationRepository {
     return await authenticationAPI.login(email.trim(), password.trim(), deviceName, deviceOs);
   }
 
+  Future<Map<String, dynamic>> googleSignIn(String idToken, String deviceName,
+      String deviceOs, String fcmToken, String country) async {
+    return await authenticationAPI.googleSignIn(
+        idToken, deviceName, deviceOs, fcmToken, country);
+  }
+
   Future<Map<String, dynamic>> refreshToken(refreshToken) async {
     return await authenticationAPI.refreshToken(refreshToken);
   }

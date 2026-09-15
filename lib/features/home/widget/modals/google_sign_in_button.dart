@@ -50,8 +50,8 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
     setState(() => _isBusy = true);
 
     try {
-      final profile = await GoogleAuthService.signIn();
-      if (profile == null) {
+      final idToken = await GoogleAuthService.signIn();
+      if (idToken == null) {
         // User cancelled the Google account picker.
         if (mounted) setState(() => _isBusy = false);
         return;
@@ -63,9 +63,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
       if (!mounted) return;
       context.read<AuthenticationBloc>().add(
             AuthenticationGoogleSignInRequested(
-              profile.username,
-              profile.email,
-              GoogleAuthService.derivePassword(profile.id),
+              idToken,
               _detectCountryName(),
               fcmToken,
               deviceInfo['deviceName'] ?? 'Unknown',
@@ -91,16 +89,14 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
     }
   }
 
-  void _showError(BuildContext context, {bool alreadyRegistered = false}) {
+  void _showError(BuildContext context) {
     final tr = AppLocalization.tr(context);
     Flushbar(
-      message: tr.t(alreadyRegistered
-          ? 'auth_google_email_already_registered'
-          : 'auth_google_signin_failed'),
+      message: tr.t('auth_google_signin_failed'),
       flushbarPosition: FlushbarPosition.TOP,
       flushbarStyle: FlushbarStyle.GROUNDED,
       backgroundColor: Colors.red,
-      duration: Duration(seconds: alreadyRegistered ? 5 : 3),
+      duration: const Duration(seconds: 3),
     ).show(context);
   }
 
@@ -112,17 +108,11 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
     return BlocConsumer<AuthenticationBloc, AuthenticationState>(
       listenWhen: (prev, curr) =>
           prev.failedGoogleSignIn != curr.failedGoogleSignIn ||
-          prev.googleEmailAlreadyRegistered !=
-              curr.googleEmailAlreadyRegistered ||
           prev.token != curr.token,
       listener: (context, state) {
         if (state.failedGoogleSignIn) {
           setState(() => _isBusy = false);
           _showError(context);
-        }
-        if (state.googleEmailAlreadyRegistered) {
-          setState(() => _isBusy = false);
-          _showError(context, alreadyRegistered: true);
         }
         if (state.token != null) {
           setState(() => _isBusy = false);

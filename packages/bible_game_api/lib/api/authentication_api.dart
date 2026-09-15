@@ -51,6 +51,30 @@ class AuthenticationAPI {
     }
   }
 
+  /// Exchanges a Google ID token for a session. The backend verifies the
+  /// token with Google and creates or links the account, so no password is
+  /// involved on either side.
+  Future<Map<String, dynamic>> googleSignIn(
+    String idToken,
+    String deviceName,
+    String deviceOs,
+    String fcmToken,
+    String country,
+  ) async {
+    try {
+      final response = await apiClient.post('/auth/google', data: {
+        'idToken': idToken,
+        'deviceName': deviceName,
+        'deviceOs': deviceOs,
+        'fcmToken': fcmToken,
+        'country': country,
+      });
+      return _asMap(response.data);
+    } on ApiException catch (e) {
+      return e.message;
+    }
+  }
+
   Future<Map<String, dynamic>> login(email, password, deviceName, deviceOs) async {
     try {
       final response = await apiClient.post(

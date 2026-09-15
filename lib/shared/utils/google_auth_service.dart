@@ -1,24 +1,22 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'platform_info.dart';
 
-class GoogleProfile {
-  final String id;
-  final String email;
-  final String username;
-
-  GoogleProfile({required this.id, required this.email, required this.username});
+/// Thrown when Google signs the user in but hands back no ID token. Without
+/// one there is nothing to send to /auth/google, and the caller should surface
+/// a failure rather than treat it as a cancelled sign-in.
+class MissingGoogleIdTokenException implements Exception {
+  @override
+  String toString() => 'Google returned no ID token';
 }
 
 class GoogleAuthService {
-  // "Web application" OAuth client for the bible-game-e2616 Firebase project
-  // (android/app/google-services.json oauth_client[0], client_type 3). This is
-  // the audience the backend would verify against, so it is the serverClientId
-  // on every platform, and the clientId on web.
+  // "Web application" OAuth client for the bible-game-e2616 Firebase project.
+  // The backend verifies that every ID token carries this as its `aud`, so it
+  // is the serverClientId on mobile and the clientId on web -- one audience
+  // across all three platforms.
   static const _webClientId =
       '242806293668-m9po3eictcocq4514cbti85dadilef0b.apps.googleusercontent.com';
 
@@ -30,18 +28,15 @@ class GoogleAuthService {
 
   // clientId is per-platform: iOS needs its own client, Android takes it from
   // google-services.json (passing one there is rejected), and web uses the web
-  // client. Previously the web client was passed on all three, so on iOS the
-  // client being authenticated did not match the URL scheme it redirects to.
+  // client.
   static String? get _clientId {
     if (PlatformInfo.isWeb) return _webClientId;
     if (PlatformInfo.isIOS) return _iosClientId;
     return null; // Android: resolved from google-services.json
   }
 
-  // 'profile' is required on web: google_sign_in_web resolves displayName and
-  // photoUrl through the People API, and without this scope that call comes
-  // back 403 Forbidden, leaving displayName null. The native SDKs read the
-  // name straight out of the ID token, which is why mobile worked without it.
+  // 'profile' is required on web: google_sign_in_web resolves the display name
+  // through the People API, and without this scope that call comes back 403.
   // Both scopes are non-sensitive, so neither needs OAuth verification.
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: const ['email', 'profile'],
@@ -49,53 +44,42 @@ class GoogleAuthService {
     serverClientId: PlatformInfo.isWeb ? null : _webClientId,
   );
 
-  /// Signs the user in with Google and returns a sanitized profile.
-  /// Returns null if the user cancels the flow.
-  static Future<GoogleProfile?> signIn() async {
+  /// Signs the user in with Google and returns the ID token to send to
+  /// /auth/google. Returns null if the user cancels the account picker.
+  ///
+  /// The token is the whole of what the app contributes: the backend verifies
+  /// it with Google and reads the email, name and account id from the verified
+  /// claims, so none of that is sent from here.
+  static Future<String?> signIn() async {
     final account = await _googleSignIn.signIn();
-    if (account == null) return null;
+    if (account == null) return null; // cancelled
 
-    return GoogleProfile(
-      id: account.id,
-      email: account.email,
-      username: _usernameFrom(account.displayName, account.email),
-    );
+    final idToken = (await account.authentication).idToken;
+    if (idToken == null || idToken.isEmpty) {
+      throw MissingGoogleIdTokenException();
+    }
+
+    if (kDebugMode) await _copyIdTokenForBackendTesting(idToken);
+    return idToken;
+  }
+
+  /// Puts the ID token on the clipboard so the backend can develop against a
+  /// real one. Debug builds only -- kDebugMode is a compile-time constant, so
+  /// this and the call to it are tree-shaken out of release.
+  ///
+  /// The token is a live credential for roughly an hour: it is the whole of
+  /// what proves identity to /auth/google. Treat it like a password -- hand it
+  /// over directly, never paste it into a ticket, chat or screenshot. Once the
+  /// backend has a browser page issuing its own tokens, this can go.
+  static Future<void> _copyIdTokenForBackendTesting(String idToken) async {
+    try {
+      await Clipboard.setData(ClipboardData(text: idToken));
+      debugPrint('\u{1F511} Google ID token copied to the clipboard '
+          '(expires in ~1h, treat it like a password).');
+    } catch (e) {
+      debugPrint('\u{1F511} Could not copy the Google ID token: $e');
+    }
   }
 
   static Future<void> signOut() => _googleSignIn.signOut();
-
-  /// The app's register form caps usernames to 5-10 chars of [A-Za-z0-9#-]
-  /// (see Validator.validateName / the CreateProfileModal input formatter).
-  /// Google display names rarely fit that, so derive a compliant handle
-  /// from it instead of prompting the user to pick one.
-  static String _usernameFrom(String? displayName, String email) {
-    // First name only. Using the whole display name meant a 10-character
-    // truncation cut people mid-surname -- "Tobi Egbayelo" became
-    // "TobiEgbaye".
-    final firstName =
-        (displayName ?? '').trim().split(RegExp(r'\s+')).first;
-    String base = firstName.replaceAll(RegExp(r'[^A-Za-z0-9#-]'), '');
-    if (base.isEmpty) {
-      base = email.split('@').first.replaceAll(RegExp(r'[^A-Za-z0-9#-]'), '');
-    }
-    if (base.isEmpty) base = 'Player';
-    if (base.length > 10) base = base.substring(0, 10);
-
-    final rnd = Random();
-    while (base.length < 5) {
-      base += rnd.nextInt(10).toString();
-    }
-    return base;
-  }
-
-  /// The backend has no Google-auth endpoint, so we sign in with Google
-  /// purely for identity (name + email) and reuse the existing
-  /// email/password register+login flow. This derives a stable "password"
-  /// from the Google account's own id, so the same Google account maps to
-  /// the same backend password across devices/reinstalls without ever
-  /// asking the user to set or remember one.
-  static String derivePassword(String googleId) {
-    final bytes = utf8.encode('bible_game_google_auth_v1:$googleId');
-    return sha256.convert(bytes).toString();
-  }
 }

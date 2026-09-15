@@ -112,22 +112,22 @@ class ResetPassword extends AuthenticationEvent {
 class DeleteAccount extends AuthenticationEvent {}
 
 class AuthenticationGoogleSignInRequested extends AuthenticationEvent {
-  final String name;
-  final String email;
-  final String password;
+  final String idToken;
   final String country;
   final String fcmToken;
   final deviceName;
   final deviceOs;
 
-  AuthenticationGoogleSignInRequested(this.name, this.email, this.password,
-      this.country, this.fcmToken, this.deviceName, this.deviceOs);
+  AuthenticationGoogleSignInRequested(
+      this.idToken, this.country, this.fcmToken, this.deviceName, this.deviceOs);
 
   @override
   List<Object> get props =>
-      [name, email, password, country, fcmToken, deviceName, deviceOs];
+      [idToken, country, fcmToken, deviceName, deviceOs];
 
+  // The ID token is a credential. Name and email are no longer carried at all:
+  // the backend reads them from the verified token.
   @override
-  String toString() => 'AuthenticationGoogleSignInRequested(name: $name, '
-      'email: $email, password: <redacted>)';
+  String toString() =>
+      'AuthenticationGoogleSignInRequested(idToken: <redacted>)';
 }
