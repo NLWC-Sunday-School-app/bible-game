@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:bible_game/shared/utils/google_auth_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:equatable/equatable.dart';
@@ -53,27 +54,40 @@ class AuthenticationBloc
     AuthenticationLogoutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    if (state.user.id != 0) {
-      emit(state.copyWith(isLoggingOut: true, hasLoggedOut: false));
-      try {
-        final loggedOut = await _authenticationRepository.logOut();
-        if (loggedOut) {
-          // Clear cached user data on logout
-          GetStorage().remove(_cachedUserKey);
-          // Emit a fresh state rather than copyWith: copyWith resolves token
-          // as `token ?? this.token`, so passing null there leaves the old
-          // token in place and the session is never really cleared.
-          emit(const AuthenticationState(
-              isUnauthenticated: true,
-              hasLoggedOut: true));
-          emit(state.copyWith(hasLoggedOut: false));
-          // final SharedPreferences prefs = await SharedPreferences.getInstance();
-          // await prefs.remove('user_token');
-        }
-      } catch (_) {
-        emit(state.copyWith(isLoggingOut: false, hasLoggedOut: false));
-      }
+    emit(state.copyWith(isLoggingOut: true, hasLoggedOut: false));
+
+    // Best effort, and deliberately not conditional on the result. The server
+    // call used to gate everything below it: any non-200 made logOut() return
+    // false, nothing was emitted, and isLoggingOut stayed true -- the spinner
+    // ran forever with no way out. The whole handler also sat behind
+    // `state.user.id != 0`, so a logout before the profile landed did nothing
+    // at all, spinner already showing. The user asked to log out; the local
+    // session goes regardless of what the server says.
+    try {
+      await _authenticationRepository.logOut();
+    } catch (e) {
+      debugPrint('\u26A0\uFE0F Server logout failed, clearing locally: $e');
     }
+
+    // The Google plugin keeps its own session, and nothing was clearing it.
+    // signIn() kept returning the cached account with no picker, so you could
+    // not switch Google accounts and the logout looked like it had not taken.
+    try {
+      await GoogleAuthService.signOut();
+    } catch (e) {
+      debugPrint('\u26A0\uFE0F Google sign-out failed: $e');
+    }
+
+    GetStorage().remove(_cachedUserKey);
+    GetStorage().remove('user_token');
+    GetStorage().remove('refresh_token');
+
+    // A fresh state rather than copyWith: copyWith resolves token as
+    // `token ?? this.token`, so passing null there leaves the old token in
+    // place and the session is never really cleared.
+    emit(const AuthenticationState(
+        isUnauthenticated: true, hasLoggedOut: true));
+    emit(const AuthenticationState(isUnauthenticated: true));
   }
 
   Future<void> _onAuthenticationLoginRequested(
