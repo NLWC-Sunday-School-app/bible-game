@@ -8,7 +8,16 @@ class ApiClient {
   String? token;
 
   ApiClient({required this.baseUrl, required this.token,})
-      : dio = Dio(BaseOptions(baseUrl: baseUrl)) {
+      : dio = Dio(BaseOptions(
+          baseUrl: baseUrl,
+          // Without these Dio has no timeouts, so a request against an
+          // unreachable host reports failure against a zero duration --
+          // "took longer than 0:00:00.000000", which reads like a
+          // misconfiguration rather than a server that is not answering.
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 30),
+          sendTimeout: const Duration(seconds: 30),
+        )) {
     _setupInterceptors();
   }
 
@@ -94,10 +103,19 @@ class ApiClient {
               code: response.statusCode!, message: toMap(response.data));
       }
     } else {
-      throw ApiException(
-        code: -1,
-        message: {'error': error.message ?? 'Network error. Check your connection.'},
-      );
+      // Dio's own text names internals the user cannot act on. Say what
+      // actually happened instead.
+      final reason = switch (error.type) {
+        DioExceptionType.connectionTimeout ||
+        DioExceptionType.connectionError =>
+          'Could not reach the server. Check your connection and try again.',
+        DioExceptionType.receiveTimeout ||
+        DioExceptionType.sendTimeout =>
+          'The server took too long to respond. Please try again.',
+        DioExceptionType.cancel => 'Request cancelled.',
+        _ => 'Network error. Check your connection.',
+      };
+      throw ApiException(code: -1, message: {'error': reason});
     }
   }
 }
