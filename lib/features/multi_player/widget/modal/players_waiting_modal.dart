@@ -1,3 +1,4 @@
+import 'package:bible_game/features/multi_player/game_mode_codes.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
@@ -454,7 +455,14 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                         children: [
                                           GestureDetector(
                                             onTap: (){
-                                              showInviteModal(context);
+                                              showInviteModal(
+                                                context,
+                                                gameMode: gameModeCode(
+                                                  widget.selectedGroupGame.isNotEmpty
+                                                      ? widget.selectedGroupGame
+                                                      : state.waitingRoomInfo.gameMode,
+                                                ),
+                                              );
                                             },
                                             child: Container(
                                               height: 31.h,

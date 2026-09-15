@@ -10,16 +10,21 @@ import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/utils/custom_toast.dart';
 import '../../../../shared/widgets/blue_button.dart';
 
-void showInviteModal(BuildContext context) {
+void showInviteModal(BuildContext context, {required String gameMode}) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
-        return InviteModal();
+        return InviteModal(gameMode: gameMode);
       });
 }
 
 class InviteModal extends StatelessWidget {
-  InviteModal({super.key});
+  InviteModal({super.key, required this.gameMode});
+
+  /// Already an API code -- see gameModeCode(). Invites used to hardcode
+  /// MULTIPLAYER_GROUP for every mode, which is why the push notification
+  /// always read "multiplayer group game" whatever you were playing.
+  final String gameMode;
 
   final textController = TextEditingController();
 
@@ -29,8 +34,10 @@ class InviteModal extends StatelessWidget {
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 10.w),
       backgroundColor: Colors.transparent,
-      insetAnimationCurve: Curves.bounceInOut,
-      insetAnimationDuration: const Duration(milliseconds: 500),
+      // Runs on every inset change, so a bouncing curve makes the modal
+      // spring about whenever the keyboard opens.
+      insetAnimationCurve: Curves.easeOut,
+      insetAnimationDuration: const Duration(milliseconds: 220),
       child: SizedBox(
         height: 400.h,
         child: BlocConsumer<MultiplayerBloc, MultiplayerState>(
@@ -162,7 +169,7 @@ class InviteModal extends StatelessWidget {
                                 alignment: Alignment.bottomCenter,
                                 child: BlueButton(
                                   onTap: () {
-                                    BlocProvider.of<MultiplayerBloc>(context).add(GameInvites(textController.text, "MULTIPLAYER_GROUP"));
+                                    BlocProvider.of<MultiplayerBloc>(context).add(GameInvites(textController.text, gameMode));
                                   },
                                   buttonText: 'Send Invite',
                                   buttonIsLoading: state.isLoadingGameInvite,
