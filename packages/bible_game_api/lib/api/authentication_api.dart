@@ -39,8 +39,14 @@ class AuthenticationAPI {
         'deviceOs': deviceOs,
       });
       return response.statusCode == 200 || response.statusCode == 201;
-    } on ApiException catch (e) {
-      ApiException.errorMessage = e.message['error'] ?? e.message['message'] ?? 'Registration failed';
+    } on ApiException {
+      // ApiException's constructor already assigns the whole message map to
+      // ApiException.errorMessage. This used to reassign it to
+      // e.message['error'], a String, over a Map<String, dynamic> field --
+      // which threw "type 'String' is not a subtype of type
+      // 'Map<String, dynamic>'" from inside the catch block, so the real
+      // ApiException never reached the caller. Every registration failure
+      // surfaced as that TypeError instead of the server's actual message.
       rethrow;
     }
   }
