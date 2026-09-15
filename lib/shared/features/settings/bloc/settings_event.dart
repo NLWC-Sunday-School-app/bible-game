@@ -16,6 +16,14 @@ class ToggleNotification extends SettingsEvent {}
 /// Restores the persisted notification preference on launch.
 class LoadNotificationSetting extends SettingsEvent {}
 
+/// Sets how many hours apart lock screen verses arrive.
+class SetVerseFrequency extends SettingsEvent {
+  final int hours;
+  SetVerseFrequency(this.hours);
+  @override
+  List<Object> get props => [hours];
+}
+
 class UpdateSoundState extends SettingsEvent {
   final bool isMusicOn;
   final bool isSoundOn;

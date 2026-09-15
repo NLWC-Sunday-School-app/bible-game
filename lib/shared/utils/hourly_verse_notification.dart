@@ -1,10 +1,14 @@
 import 'dart:ui';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bible_game/features/memory_verses/model/memory_verse.dart';
+import 'package:bible_game/shared/utils/verse_frequency.dart';
 
-/// Shows a Bible verse on the lock screen every hour by pre-scheduling one
-/// silent repeating notification per hour of the day. Rescheduled on every
-/// app launch so the verse rotation advances day by day.
+/// Shows a Bible verse on the lock screen by pre-scheduling one silent
+/// repeating notification per delivery hour. Rescheduled on every app launch
+/// so the verse rotation advances day by day.
+///
+/// How often is the user's choice -- see [kVerseFrequencyOptions]. Every hour
+/// is 24 a day, which suits some people and is far too many for others.
 class HourlyVerseNotification {
   static const String _channelKey = 'hourly_verse';
 
@@ -23,16 +27,26 @@ class HourlyVerseNotification {
         defaultColor: const Color(0xFF6B4C9A),
       );
 
-  static Future<void> scheduleHourlyVerses() async {
+  /// [everyHours] is the gap between verses: 1 delivers on every hour, 3 on
+  /// 0:00, 3:00, 6:00 and so on. Anything outside the supported set falls back
+  /// to the default rather than scheduling something unexpected.
+  static Future<void> scheduleHourlyVerses({int? everyHours}) async {
+    final step = kVerseFrequencyOptions.containsKey(everyHours)
+        ? everyHours!
+        : kDefaultVerseFrequencyHours;
+
     final verses = await MemoryVerseData.loadAllVerses();
     if (verses.isEmpty) return;
 
+    // Always clear the whole channel first: dropping from hourly to twice a
+    // day has to remove the schedules the old setting left behind, or the
+    // user keeps getting the ones in between.
     await AwesomeNotifications().cancelSchedulesByChannelKey(_channelKey);
 
     final now = DateTime.now();
     final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
 
-    for (var hour = 0; hour < 24; hour++) {
+    for (var hour = 0; hour < 24; hour += step) {
       final verse = verses[(dayOfYear * 24 + hour) % verses.length];
       await AwesomeNotifications().createNotification(
         content: NotificationContent(

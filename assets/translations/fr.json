@@ -125,5 +125,8 @@
   "language_setting": "Langue",
   "game_memory_verses": "Versets à mémoriser",
   "game_memory_verses_desc": "Garde la Parole dans ton cœur !",
-  "profile_verse_notifications": "Versets"
+  "profile_verse_notifications": "Versets",
+  "profile_verse_frequency": "Fréquence",
+  "profile_preferences": "PRÉFÉRENCES",
+  "profile_account": "COMPTE"
 }

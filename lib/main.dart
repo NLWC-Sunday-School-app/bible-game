@@ -23,6 +23,7 @@ import 'package:bible_game/shared/utils/awesome_notification.dart';
 import 'package:bible_game/shared/utils/devotional_notification.dart';
 import 'package:bible_game/shared/utils/hourly_verse_notification.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
+import 'package:bible_game/shared/utils/verse_frequency.dart';
 import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
 import 'package:bible_game/features/lightning_mode/repository/lightning_mode_repository.dart';
 import 'app.dart';
@@ -151,7 +152,8 @@ Future<void> _scheduleLocalNotifications() async {
 
     // Daily devotional at 8 AM, plus the hourly lock screen verses.
     await DevotionalNotification.scheduleDailyReminder();
-    await HourlyVerseNotification.scheduleHourlyVerses();
+    await HourlyVerseNotification.scheduleHourlyVerses(
+        everyHours: resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)));
 
     // Debug builds fire one verse 10s after launch so the lock screen can be
     // checked without waiting for the top of the hour. Stripped from release.

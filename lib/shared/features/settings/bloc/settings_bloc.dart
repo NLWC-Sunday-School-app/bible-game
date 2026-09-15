@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/devotional_notification.dart';
 import '../../../utils/hourly_verse_notification.dart';
+import '../../../utils/verse_frequency.dart';
 
 import '../../user/repository/user_repository.dart';
 import '../sound_manager.dart';
@@ -28,6 +29,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<FetchAds>(_onFetchAds);
     on<UpdateSoundState>(_onUpdateSoundState);
     on<LoadNotificationSetting>(_onLoadNotificationSetting);
+    on<SetVerseFrequency>(_onSetVerseFrequency);
 
     // Restore the stored preference so the toggle reflects reality on launch.
     add(LoadNotificationSetting());
@@ -37,7 +39,27 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       LoadNotificationSetting event, Emitter<SettingsState> emit) async {
     final prefs = await SharedPreferences.getInstance();
     emit(state.copyWith(
-        isNotificationOn: prefs.getBool('isNotificationOn') ?? true));
+      isNotificationOn: prefs.getBool('isNotificationOn') ?? true,
+      verseFrequencyHours:
+          resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)),
+    ));
+  }
+
+  /// Changing the frequency reschedules immediately, so the choice takes
+  /// effect now rather than at the next launch.
+  Future<void> _onSetVerseFrequency(
+      SetVerseFrequency event, Emitter<SettingsState> emit) async {
+    final hours = resolveVerseFrequency(event.hours);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(kVerseFrequencyPrefKey, hours);
+    emit(state.copyWith(verseFrequencyHours: hours));
+
+    if (!state.isNotificationOn) return;
+    try {
+      await HourlyVerseNotification.scheduleHourlyVerses(everyHours: hours);
+    } catch (e) {
+      debugPrint('\u26A0\uFE0F Could not reschedule verses: $e');
+    }
   }
 
   void _onToggleSound(ToggleSound event, Emitter<SettingsState> emit)async {
@@ -70,7 +92,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       if (enabled) {
         await DevotionalNotification.scheduleDailyReminder();
-        await HourlyVerseNotification.scheduleHourlyVerses();
+        await HourlyVerseNotification.scheduleHourlyVerses(
+            everyHours: state.verseFrequencyHours);
       } else {
         await DevotionalNotification.cancelDailyReminder();
         await HourlyVerseNotification.cancelHourlyVerses();

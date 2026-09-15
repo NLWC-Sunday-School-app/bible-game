@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/utils/verse_frequency.dart';
 import 'package:bible_game/shared/widgets/modal/delete_account_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -151,14 +152,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             soundManager: soundManager,
                             isLoggedIn: state.user.id != 0,
                           ),
-                          SizedBox(height: 20.h),
-                          if (state.user.id != 0 &&
-                              state.user.role.toLowerCase() != 'collaborator')
-                            _CollaboratorButton(),
-                          SizedBox(height: 10.h),
+                          SizedBox(height: 16.h),
+                          _VerseFrequencySetting(),
+                          SizedBox(height: 24.h),
+                          _SectionDivider(label: tr.t('profile_preferences')),
+                          SizedBox(height: 16.h),
                           _LanguageSetting(),
                           if (state.user.id != 0) ...[
-                            SizedBox(height: 20.h),
+                            SizedBox(height: 24.h),
+                            _SectionDivider(label: tr.t('profile_account')),
+                            SizedBox(height: 16.h),
+                            if (state.user.role.toLowerCase() != 'collaborator') ...[
+                              _CollaboratorButton(),
+                              SizedBox(height: 14.h),
+                            ],
                             GestureDetector(
                               onTap: () => showDeleteAccountModal(context),
                               child: Text(
@@ -643,6 +650,96 @@ class _CollaboratorButton extends StatelessWidget {
                         ],
                       ),
               ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Only shown when verse notifications are on -- a frequency for something
+/// switched off is a setting with no effect.
+class _VerseFrequencySetting extends StatelessWidget {
+  const _VerseFrequencySetting();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      buildWhen: (prev, curr) =>
+          prev.isNotificationOn != curr.isNotificationOn ||
+          prev.verseFrequencyHours != curr.verseFrequencyHours,
+      builder: (context, state) {
+        if (!state.isNotificationOn) return const SizedBox.shrink();
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14.r),
+              color: const Color(0xFF0D2550).withOpacity(0.6),
+              border: Border.all(
+                color: const Color(0xFF4A8AD4).withOpacity(0.2),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Row(
+                    children: [
+                      Icon(Icons.schedule_rounded,
+                          color: Colors.white.withOpacity(0.6), size: 20.sp),
+                      SizedBox(width: 10.w),
+                      Flexible(
+                        child: Text(
+                          AppLocalization.tr(context).t('profile_verse_frequency'),
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A3A6B),
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(
+                      color: const Color(0xFF4A8AD4).withOpacity(0.3),
+                    ),
+                  ),
+                  child: DropdownButton<int>(
+                    value: state.verseFrequencyHours,
+                    dropdownColor: const Color(0xFF1A3A6B),
+                    underline: const SizedBox(),
+                    isDense: true,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                    icon: Icon(Icons.arrow_drop_down,
+                        color: Colors.white.withOpacity(0.6), size: 20.sp),
+                    items: kVerseFrequencyOptions.entries
+                        .map((e) => DropdownMenuItem(
+                              value: e.key,
+                              child: Text(e.value),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      context.read<SettingsBloc>().add(SetVerseFrequency(value));
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         );

@@ -136,5 +136,8 @@
   "language_setting": "Language",
   "game_memory_verses": "Memory Verses",
   "game_memory_verses_desc": "Hide the Word in your heart!",
-  "profile_verse_notifications": "Verses"
+  "profile_verse_notifications": "Verses",
+  "profile_verse_frequency": "How often",
+  "profile_preferences": "PREFERENCES",
+  "profile_account": "ACCOUNT"
 }
