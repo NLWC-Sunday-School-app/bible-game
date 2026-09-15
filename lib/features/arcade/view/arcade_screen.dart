@@ -1,3 +1,5 @@
+import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
+import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:flutter/material.dart';
 import 'package:bible_game/features/arcade/cubit/arcade_tab_cubit.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
@@ -24,6 +26,16 @@ class ArcadeScreen extends StatefulWidget {
 }
 
 class _ArcadeScreenState extends State<ArcadeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    // Belongs to the Arcade screen rather than MultiplayerHomeBody: that body
+    // only mounts on the Multiplayer sub-tab, so sitting on Global Challenge
+    // meant the Game Requests count never refreshed at all. Entering the tab
+    // refreshes it either way.
+    context.read<MultiplayerBloc>().add(CountInvite());
+  }
 
   @override
   Widget build(BuildContext context) {
