@@ -211,6 +211,15 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     // Cancel any existing polling
     await _pollSubscription?.cancel();
 
+    // Stream.periodic does not emit until the first interval has elapsed, so
+    // arriving on the tab meant a 10 second wait before the count was fetched
+    // at all -- the badge sat on whatever was already in state, which is 0 on a
+    // fresh launch. Fetch straight away, then poll.
+    add(CountInvite());
+    // The list too, so opening Game Requests shows its contents rather than an
+    // empty panel while the request is still in flight.
+    add(FetchGameInvites());
+
     _pollSubscription = Stream.periodic(
       const Duration(seconds: 10),
     ).listen((_) {
