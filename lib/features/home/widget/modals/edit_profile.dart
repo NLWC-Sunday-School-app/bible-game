@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/widgets/modal/country_update_modal.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
 import 'package:flutter/material.dart';
@@ -252,6 +253,67 @@ class _EditProfileState extends State<EditProfileModal>
                             action: TextInputAction.done,
                             onSubmit: (_) => _submitUpdate(soundManager),
                             validator: (t) => Validator.validateName(t!),
+                          ),
+                          SizedBox(height: 16.h),
+                          // Country had no way in at all: registration asks for
+                          // it, Google sign-in guesses it from the device's
+                          // locale region, and nothing let you correct it
+                          // afterwards. Reuses the existing country modal
+                          // rather than a second picker that could drift from
+                          // it.
+                          BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                            builder: (context, authState) {
+                              final country = authState.user.country;
+                              return GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () {
+                                  soundManager.playClickSound();
+                                  showCountryUpdateModal(context,
+                                      dismissible: true);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.w, vertical: 14.h),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14.r),
+                                    color: const Color(0xFF0D2550)
+                                        .withOpacity(0.6),
+                                    border: Border.all(
+                                      color: const Color(0xFF4A8AD4)
+                                          .withOpacity(0.2),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.public_rounded,
+                                          color:
+                                              Colors.white.withOpacity(0.6),
+                                          size: 20.sp),
+                                      SizedBox(width: 12.w),
+                                      Expanded(
+                                        child: Text(
+                                          (country == null || country.isEmpty)
+                                              ? tr.t('auth_country_hint')
+                                              : country,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white
+                                                .withOpacity(0.85),
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(Icons.chevron_right_rounded,
+                                          color:
+                                              Colors.white.withOpacity(0.5),
+                                          size: 22.sp),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                           SizedBox(height: 28.h),
                           BlocConsumer<UserBloc, UserState>(

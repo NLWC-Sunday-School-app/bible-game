@@ -12,10 +12,14 @@ import 'package:bible_game/shared/widgets/blue_button.dart';
 
 import '../../constants/image_routes.dart';
 
-void showCountryUpdateModal(BuildContext context) {
+/// [dismissible] is false for the forced prompt the bottom nav shows when the
+/// backend reports no country on the account -- there is nowhere to go until
+/// it is answered. It is true when the user opened it themselves from Edit
+/// profile, where trapping them would be wrong.
+void showCountryUpdateModal(BuildContext context, {bool dismissible = false}) {
   showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: dismissible,
       builder: (BuildContext context) {
         return CountryUpdateModal();
       });
