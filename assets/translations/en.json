@@ -137,7 +137,8 @@
   "game_memory_verses": "Memory Verses",
   "game_memory_verses_desc": "Hide the Word in your heart!",
   "profile_verse_notifications": "Verses",
-  "profile_verse_frequency": "How often",
+  "profile_verse_frequency": "Bible verses",
   "profile_preferences": "PREFERENCES",
-  "profile_account": "ACCOUNT"
+  "profile_account": "ACCOUNT",
+  "profile_verse_frequency_hint": "On your lock screen"
 }

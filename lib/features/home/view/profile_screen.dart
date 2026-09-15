@@ -693,13 +693,36 @@ class _VerseFrequencySetting extends StatelessWidget {
                           color: Colors.white.withOpacity(0.6), size: 20.sp),
                       SizedBox(width: 10.w),
                       Flexible(
-                        child: Text(
-                          AppLocalization.tr(context).t('profile_verse_frequency'),
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
+                        // Two lines: the title names what this is about, the
+                        // second says where it shows up. "Verse frequency"
+                        // alone only reads correctly if you already know what
+                        // the feature is.
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppLocalization.tr(context)
+                                  .t('profile_verse_frequency'),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              AppLocalization.tr(context)
+                                  .t('profile_verse_frequency_hint'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
