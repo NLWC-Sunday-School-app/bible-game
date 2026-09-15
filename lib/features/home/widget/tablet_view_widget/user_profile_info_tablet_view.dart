@@ -26,9 +26,11 @@ class UserProfileInfoTabletView extends StatelessWidget {
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
     return GestureDetector(
+      // Same as the phone chip: deferToChild meant taps landing in the gaps
+      // between the plates and around the avatar did nothing.
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         soundManager.playClickSound();
-        // showGameSettingsModal(context, user!);
         Navigator.pushNamed(context, AppRoutes.profileScreen);
       },
       child: SizedBox(

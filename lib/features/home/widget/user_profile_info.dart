@@ -29,9 +29,14 @@ class UserProfileInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final soundManager = context.read<SettingsBloc>().soundManager;
     return GestureDetector(
+      // deferToChild is the default, so only taps landing on a painted child
+      // counted -- and this chip is mostly gaps: between the name and badge
+      // plates, right of the badge, and around the circular avatar. Taps there
+      // fell through and the profile did not open. opaque makes the whole
+      // 185.w box the target.
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         soundManager.playClickSound();
-        // showGameSettingsModal(context, user!);
         Navigator.pushNamed(context, AppRoutes.profileScreen);
       },
       child: SizedBox(
