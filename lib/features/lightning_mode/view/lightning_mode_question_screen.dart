@@ -117,7 +117,10 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
   void _initializeAnimationController() {
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 8),
+      // The controller decides when a question times out and advances, so a
+      // hardcoded 8 here meant the displayed countdown could follow the round's
+      // setting while the actual cutoff did not. First to X already read this.
+      duration: Duration(seconds: durationPerQuestion),
     )..addStatusListener((status) {
       if(status == AnimationStatus.dismissed){
         return;
