@@ -16,6 +16,7 @@ export 'model/game_ads.dart';
 export 'model/game_question.dart';
 export 'model/global_game.dart';
 export 'model/leaderboard.dart';
+export 'model/online_player.dart';
 export 'model/quick_game_topic.dart';
 export 'model/user.dart';
 export 'model/who_is_who_level.dart';

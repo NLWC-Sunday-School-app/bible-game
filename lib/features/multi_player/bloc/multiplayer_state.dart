@@ -11,6 +11,8 @@ class MultiplayerState extends Equatable{
   final bool hasJoinedRoom;
   final bool isLoadingGameInvite;
   final bool hasInvitedUser;
+  final List<OnlinePlayer> onlinePlayers;
+  final bool isFetchingOnlinePlayers;
   final bool isFetchingListOfGameInvite;
   final bool hasFetchedGameInvite;
   final bool isLoadingAcceptInvite;
@@ -41,7 +43,9 @@ class MultiplayerState extends Equatable{
         required this.hasJoinedRoom,
         required this.isLoadingGameInvite,
         required this.hasInvitedUser,
-        required this.isFetchingListOfGameInvite,
+        this.onlinePlayers = const [],
+    this.isFetchingOnlinePlayers = false,
+    required this.isFetchingListOfGameInvite,
         required this.hasFetchedGameInvite,
         required this.listOfInvite,
         required this.isLoadingAcceptInvite,
@@ -98,7 +102,9 @@ MultiplayerState copyWith(
         bool? hasJoinedRoom,
         bool? isLoadingGameInvite,
         bool? hasInvitedUser,
-        bool? isFetchingListOfGameInvite,
+        List<OnlinePlayer>? onlinePlayers,
+    bool? isFetchingOnlinePlayers,
+    bool? isFetchingListOfGameInvite,
         bool? hasFetchedGameInvite,
         List<GameInviteModel>? listOfInvite,
         bool? isLoadingAcceptInvite,
@@ -125,7 +131,9 @@ MultiplayerState copyWith(
         hasJoinedRoom: hasJoinedRoom ?? this.hasJoinedRoom,
         isLoadingGameInvite: isLoadingGameInvite ?? this.isLoadingGameInvite,
         hasInvitedUser: hasInvitedUser ?? this.hasInvitedUser,
-        isFetchingListOfGameInvite: isFetchingListOfGameInvite ?? this.isFetchingListOfGameInvite,
+        onlinePlayers: onlinePlayers ?? this.onlinePlayers,
+      isFetchingOnlinePlayers: isFetchingOnlinePlayers ?? this.isFetchingOnlinePlayers,
+      isFetchingListOfGameInvite: isFetchingListOfGameInvite ?? this.isFetchingListOfGameInvite,
         hasFetchedGameInvite: hasFetchedGameInvite ?? this.hasFetchedGameInvite,
         listOfInvite: listOfInvite ?? this.listOfInvite,
         isLoadingAcceptInvite: isLoadingAcceptInvite ?? this.isLoadingAcceptInvite,

@@ -33,6 +33,7 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     on<ConfigureGameRoom>(_onConfigureGameRoom);
     on<GameInvites>(_onGameInvites);
     on<FetchGameInvites>(_onFetchGameInvite);
+    on<FetchOnlinePlayers>(_onFetchOnlinePlayers);
     on<CountInvite>(_onCountInvite);
     on<AcceptAndJoin>(_onAcceptAndJoin);
     on<Reject>(_onReject);
@@ -154,6 +155,21 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       debugPrint('⚠️ fetchGameInvite failed: $e');
       emit(state.copyWith(
           isFetchingListOfGameInvite: false, hasFetchedGameInvite: false));
+    }
+  }
+
+  Future<void> _onFetchOnlinePlayers(
+      FetchOnlinePlayers event, Emitter<MultiplayerState> emit) async {
+    emit(state.copyWith(isFetchingOnlinePlayers: true));
+    try {
+      final players = await _multiplayerRepository.fetchOnlinePlayers();
+      emit(state.copyWith(
+          isFetchingOnlinePlayers: false, onlinePlayers: players));
+    } catch (e) {
+      // Keep whatever was listed; an empty tab with a trace beats a blank one
+      // with none.
+      debugPrint('\u26A0\uFE0F fetchOnlinePlayers failed: $e');
+      emit(state.copyWith(isFetchingOnlinePlayers: false));
     }
   }
 

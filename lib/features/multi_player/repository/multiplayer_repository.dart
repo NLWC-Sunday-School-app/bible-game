@@ -29,6 +29,10 @@ class MultiplayerRepository {
         questionType, conditionType, condition, secondsPerQuestion);
   }
 
+  Future<List<OnlinePlayer>> fetchOnlinePlayers() async {
+    return multiplayerAPI.fetchOnlinePlayers();
+  }
+
   Future<bool> gameInvite(inviteeUsername, roomId, gameType) async {
     return multiplayerAPI.gameInvite(inviteeUsername, roomId, gameType);
   }

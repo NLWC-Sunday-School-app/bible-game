@@ -64,6 +64,9 @@ class GameInvites extends MultiplayerEvent{
 
 class FetchGameInvites extends MultiplayerEvent{}
 
+/// Loads the players available to invite right now.
+class FetchOnlinePlayers extends MultiplayerEvent{}
+
 class CountInvite extends MultiplayerEvent{}
 
 class AcceptAndJoin extends MultiplayerEvent{
