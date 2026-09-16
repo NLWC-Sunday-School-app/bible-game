@@ -175,6 +175,8 @@ MultiplayerState copyWith(
     hasKickedOut,
     inviteCount,
     hostVictoryCondition,
+    onlinePlayers,
+    isFetchingOnlinePlayers,
   ];
 }
 

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/features/multi_player/widget/modal/players_waiting_modal.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
@@ -40,6 +42,21 @@ class _InviteModalState extends State<InviteModal> {
   /// username you already know is the fallback.
   bool _showOnline = true;
 
+  /// Who has already been invited this session, so their row can say so
+  /// instead of offering a second invite that the server would reject.
+  final Set<String> _invited = {};
+
+  /// The row currently waiting on a response. The bloc only carries a single
+  /// isLoadingGameInvite flag, so without this every row would spin at once.
+  String? _pendingInvite;
+
+  /// Presence goes stale while the modal sits open -- people connect and drop
+  /// while you are reading the list. Cancelled in dispose, so it cannot
+  /// outlive the modal.
+  Timer? _onlineRefreshTimer;
+
+  static const _onlineRefreshInterval = Duration(seconds: 15);
+
   @override
   void initState() {
     super.initState();
@@ -49,10 +66,18 @@ class _InviteModalState extends State<InviteModal> {
     debugPrint('\u{1F50E} my socket: ${ws.state.connectionStatus} '
         '(isConnected: ${ws.isConnected})');
     context.read<MultiplayerBloc>().add(FetchOnlinePlayers());
+
+    _onlineRefreshTimer = Timer.periodic(_onlineRefreshInterval, (_) {
+      // Nothing to refresh behind the username tab, and a request in flight
+      // would only race the one we are waiting on.
+      if (!mounted || !_showOnline || _pendingInvite != null) return;
+      context.read<MultiplayerBloc>().add(FetchOnlinePlayers());
+    });
   }
 
   @override
   void dispose() {
+    _onlineRefreshTimer?.cancel();
     textController.dispose();
     super.dispose();
   }
@@ -70,8 +95,26 @@ class _InviteModalState extends State<InviteModal> {
       child: SizedBox(
         height: 400.h,
         child: BlocConsumer<MultiplayerBloc, MultiplayerState>(
+          // Both tabs invite through the same event, so the result is handled
+          // here rather than inside either branch. Only react to the moment the
+          // request finishes -- keying off hasInvitedUser alone would fire on
+          // every unrelated emission, the online-players fetch included.
+          listenWhen: (previous, current) =>
+              previous.isLoadingGameInvite && !current.isLoadingGameInvite,
           listener: (context, state) {
+            final invitee = _pendingInvite;
+            setState(() {
+              _pendingInvite = null;
+              if (state.hasInvitedUser && invitee != null) _invited.add(invitee);
+            });
 
+            CustomToast.showInviteToast(context,
+                isInviteSuccessful: state.hasInvitedUser);
+
+            // The username tab is a one-shot, so closing is the right ending.
+            // The online list is not -- you usually want to invite more than
+            // one person, and the row now says "Invited" instead.
+            if (state.hasInvitedUser && !_showOnline) Navigator.pop(context);
           },
           builder: (context, state) {
             return Column(
@@ -135,7 +178,10 @@ class _InviteModalState extends State<InviteModal> {
                           if (_showOnline) ...[
                             Expanded(
                               child: _OnlinePlayersList(
+                                invited: _invited,
+                                pendingInvite: _pendingInvite,
                                 onInvite: (username) {
+                                  setState(() => _pendingInvite = username);
                                   BlocProvider.of<MultiplayerBloc>(context)
                                       .add(GameInvites(
                                           username, widget.gameMode));
@@ -195,16 +241,7 @@ class _InviteModalState extends State<InviteModal> {
                             ),
                           ),
                           SizedBox(height: 32.h,),
-                          BlocConsumer<MultiplayerBloc, MultiplayerState>(
-                            listener: (context, state) {
-                              // TODO: implement listener
-                              if(state.hasInvitedUser){
-                                Navigator.pop(context);
-                                CustomToast.showInviteToast(context, isInviteSuccessful: true);
-                              }else if(!state.hasInvitedUser && !state.isLoadingGameInvite){
-                                CustomToast.showInviteToast(context, isInviteSuccessful: false);
-                              }
-                            },
+                          BlocBuilder<MultiplayerBloc, MultiplayerState>(
                             builder: (context, state) {
                               return Align(
                                 alignment: Alignment.bottomCenter,
@@ -287,18 +324,33 @@ class _InviteTabs extends StatelessWidget {
 }
 
 class _OnlinePlayersList extends StatelessWidget {
-  const _OnlinePlayersList({required this.onInvite});
+  const _OnlinePlayersList({
+    required this.onInvite,
+    required this.invited,
+    required this.pendingInvite,
+  });
 
   final ValueChanged<String> onInvite;
+  final Set<String> invited;
+  final String? pendingInvite;
 
   @override
   Widget build(BuildContext context) {
+    // The endpoint returns everyone online, the signed-in user included. You
+    // cannot invite yourself, so drop that row rather than showing a tap that
+    // fails -- which is also why the empty copy below says "no one else".
+    final currentUserId = context.read<AuthenticationBloc>().state.user.id;
+
     return BlocBuilder<MultiplayerBloc, MultiplayerState>(
       builder: (context, state) {
-        if (state.isFetchingOnlinePlayers && state.onlinePlayers.isEmpty) {
+        final players = state.onlinePlayers
+            .where((player) => player.userId != currentUserId)
+            .toList();
+
+        if (state.isFetchingOnlinePlayers && players.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (state.onlinePlayers.isEmpty) {
+        if (players.isEmpty) {
           return Center(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -316,16 +368,21 @@ class _OnlinePlayersList extends StatelessWidget {
         }
         return ListView.separated(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
-          itemCount: state.onlinePlayers.length,
+          itemCount: players.length,
           separatorBuilder: (_, __) => SizedBox(height: 8.h),
           itemBuilder: (context, index) {
-            final player = state.onlinePlayers[index];
+            final player = players[index];
+            final isInvited = invited.contains(player.username);
+            final isPending = pendingInvite == player.username;
+            final isTappable = !isInvited && pendingInvite == null;
+
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: state.isLoadingGameInvite
-                  ? null
-                  : () => onInvite(player.username),
-              child: Container(
+              onTap: isTappable ? () => onInvite(player.username) : null,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 150),
+                opacity: isTappable || isPending ? 1 : 0.55,
+                child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -370,29 +427,70 @@ class _OnlinePlayersList extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF014CA3),
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                      child: Text(
-                        'Invite',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                    _InvitePill(isInvited: isInvited, isPending: isPending),
                   ],
+                ),
                 ),
               ),
             );
           },
         );
       },
+    );
+  }
+}
+
+/// The three states of an invite, in place, so the row itself answers "did
+/// that work?" rather than leaving the toast to do it alone.
+class _InvitePill extends StatelessWidget {
+  const _InvitePill({required this.isInvited, required this.isPending});
+
+  final bool isInvited;
+  final bool isPending;
+
+  @override
+  Widget build(BuildContext context) {
+    const blue = Color(0xFF014CA3);
+
+    if (isPending) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
+        child: SizedBox(
+          width: 16.w,
+          height: 16.w,
+          child: const CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation(blue),
+          ),
+        ),
+      );
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: isInvited ? Colors.transparent : blue,
+        border: isInvited ? Border.all(color: blue, width: 1.5) : null,
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isInvited) ...[
+            Icon(Icons.check_rounded, size: 13.sp, color: blue),
+            SizedBox(width: 3.w),
+          ],
+          Text(
+            isInvited ? 'Invited' : 'Invite',
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w700,
+              color: isInvited ? blue : Colors.white,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

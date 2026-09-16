@@ -136,7 +136,9 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       );
       emit(state.copyWith(
           isLoadingGameInvite: false, hasInvitedUser: true));
-    } catch (_) {
+    } catch (e) {
+      debugPrint('⚠️ invite to ${event.inviteeUsername} failed '
+          '(room ${state.createGameRoomResponse.id}): $e');
       emit(state.copyWith(
           isLoadingGameInvite: false, hasInvitedUser: false,));
     }
