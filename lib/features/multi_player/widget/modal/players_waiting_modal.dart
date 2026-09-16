@@ -108,7 +108,12 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                           child: InkWell(
                             onTap: (){
                               if(widget.isWaitingForHost){
-                                context.read<WebsocketCubit>().closeWebsocket();
+                                // Leave the room, keep the session. The server
+                                // derives presence from live connections, so
+                                // closing the socket here dropped the user off
+                                // the online players list the moment they left
+                                // a waiting room.
+                                context.read<WebsocketCubit>().clearCurrentRoom();
                                 final userId = context.read<AuthenticationBloc>().state.user.id.toString();
                                 print(userId);
                                 final player = context.read<WebsocketCubit>().state.waitingRoomInfo.players.firstWhereOrNull((element) => element.userId == userId);

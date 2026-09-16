@@ -37,6 +37,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   bool _isConnected = false;
   bool _isConnecting = false;
   Timer? _connectionCheckTimer;
+  Timer? _heartbeatTimer;
   final Queue<Map<String, dynamic>> _messageQueue = Queue();
   String? _currentRoomId;  // Store room ID for re-subscription on reconnect
   StreamSubscription<AuthenticationState>? _authSubscription;
@@ -55,10 +56,26 @@ class WebsocketCubit extends Cubit<WebsocketState> {
         super(WebsocketState.initial()) {
     _connectedCompleter = Completer<void>();
 
-    // Tear the socket down when the session ends. Without this the connection
-    // stays open on the previous user's token until the app is killed.
+    // The socket follows the session, not the screen.
+    //
+    // It used to be opened only from inside the multiplayer flow -- creating a
+    // room, joining by code, opening Game Requests. The server derives presence
+    // from live connections, so "online" meant "is setting up a game this very
+    // moment", and the online players list showed almost nobody. Connecting on
+    // login means a signed-in user is present for as long as they are using the
+    // app.
+    if (_authenticationBloc.state.isLoggedIn) {
+      connect();
+    }
+
     _authSubscription = _authenticationBloc.stream.listen((authState) {
       if (isClosed) return;
+      if (authState.isLoggedIn && !_isConnected && !_isConnecting) {
+        debugPrint('🔓 Session started — opening WebSocket');
+        connect();
+      }
+      // Tear the socket down when the session ends. Without this the connection
+      // stays open on the previous user's token until the app is killed.
       if (!authState.isLoggedIn && (_isConnected || _isConnecting)) {
         debugPrint('🔒 Session ended — closing WebSocket');
         closeWebsocket();
@@ -145,6 +162,15 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                     debugPrint('💓 Heartbeat pong: ${frame.body}');
                   });
               debugPrint("✅ Subscribed to /user/queue/heartbeat");
+
+              // The server treats a connection as stale after 60s without an
+              // application-level ping and sweeps it every 30s, which is why
+              // every session vanished from the online players list a minute
+              // after connecting. StompConfig's heartbeatOutgoing is protocol
+              // level -- raw frames that keep the socket open but never reach
+              // @MessageMapping("/heartbeat.ping"), so they do not refresh
+              // lastHeartbeat. 20s leaves room for one to be missed.
+              _startHeartbeat();
             } catch (e) {
               debugPrint('❌ Error subscribing in onConnect: $e');
             }
@@ -458,6 +484,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   void closeWebsocket() {
     debugPrint('🔌 Closing WebSocket...');
     _connectionCheckTimer?.cancel();
+    _heartbeatTimer?.cancel();
     _isConnected = false;
     _isConnecting = false;
     _currentRoomId = null;  // Clear room ID when closing
@@ -476,6 +503,23 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   }
 
   /// Clear the current room (called when game ends or leaving)
+  void _startHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _sendHeartbeat();
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 20), (_) {
+      if (!_isConnected || _stompClient?.connected != true) return;
+      _sendHeartbeat();
+    });
+  }
+
+  void _sendHeartbeat() {
+    try {
+      _stompClient?.send(destination: '/app/heartbeat.ping', body: '{}');
+    } catch (e) {
+      debugPrint('\u26A0\uFE0F Heartbeat send failed: $e');
+    }
+  }
+
   void clearCurrentRoom() {
     _currentRoomId = null;
     debugPrint('🗑️ Cleared current room');

@@ -172,7 +172,10 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
                                 InkWell(
                                   onTap: (){
                                     Navigator.of(context).popUntil((route) => route.isFirst);
-                                    context.read<WebsocketCubit>().closeWebsocket();
+                                    // Finishing a game leaves the room, not the
+                                    // session -- the connection is what makes
+                                    // the user visible to others as online.
+                                    context.read<WebsocketCubit>().clearCurrentRoom();
                                   },
                                   child: Image.asset(
                                     IconImageRoutes.redCircleClose,

@@ -295,6 +295,12 @@ class _AppState extends State<App> {
             ),
           ),
           BlocProvider<WebsocketCubit>(
+            // Not lazy: BlocProvider builds on first read, and the only readers
+            // are inside the multiplayer flow -- so the cubit did not exist
+            // until a user opened it, and its connect-on-login never ran. The
+            // server derives presence from live connections, so a user who
+            // never entered multiplayer was invisible to everyone else.
+            lazy: false,
             create: (context) => WebsocketCubit(
               multiplayerBloc: BlocProvider.of<MultiplayerBloc>(context),
               settingsBloc: BlocProvider.of<SettingsBloc>(context),
