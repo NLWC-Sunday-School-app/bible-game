@@ -16,6 +16,7 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
   final MultiplayerRepository _multiplayerRepository;
   final AuthenticationBloc _authenticationBloc;
   StreamSubscription? _pollSubscription;
+  StreamSubscription? _authSubscription;
 
   MultiplayerBloc(
       {
@@ -39,6 +40,17 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     on<Reject>(_onReject);
     on<StartPolling>(_onStartPolling);
     on<StopPolling>(_onStopPolling);
+
+    // Polling used to start and stop with the multiplayer screen, so an invite
+    // arriving anywhere else in the app went unnoticed until you happened to
+    // open that tab. Tie it to the session instead, the way the websocket is.
+    if (_authenticationBloc.state.isLoggedIn) add(const StartPolling());
+    _authSubscription = _authenticationBloc.stream.listen((authState) {
+      if (authState.isLoggedIn && _pollSubscription == null) {
+        add(const StartPolling());
+      }
+      if (!authState.isLoggedIn) add(const StopPolling());
+    });
   }
 
   Future<void> _onCreateGameRoom(
@@ -242,6 +254,9 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       const Duration(seconds: 10),
     ).listen((_) {
       add(CountInvite());
+      // The list too, not just the count: the banner needs to know who invited
+      // you and to what, and the count alone cannot say.
+      add(FetchGameInvites());
     });
   }
 
@@ -249,11 +264,13 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       StopPolling event,
       Emitter<MultiplayerState> emit) async {
     await _pollSubscription?.cancel();
+    _pollSubscription = null;
   }
 
   @override
   Future<void> close() async {
     await _pollSubscription?.cancel();
+    await _authSubscription?.cancel();
     return super.close();
   }
 

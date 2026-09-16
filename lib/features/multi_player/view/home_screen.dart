@@ -126,7 +126,8 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
 
   @override
   void dispose() {
-    _multiplayerBloc.add(const StopPolling());
+    // Polling is session-scoped now -- stopping it here would switch off invite
+    // banners everywhere else in the app the moment this tab was left.
     super.dispose();
   }
 
@@ -141,7 +142,6 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
         ),
         GamePlayCard(
           onTap: (){
-            context.read<MultiplayerBloc>().add(const StopPolling());
             BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
             Navigator.pushNamed(context,
                 AppRoutes.groupGameCategory,

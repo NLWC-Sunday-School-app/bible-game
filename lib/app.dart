@@ -107,9 +107,16 @@ import 'navigation/cubit/navigation_cubit.dart';
 import 'features/store/bloc/power_up_bloc.dart';
 import 'features/store/bloc/power_up_event.dart';
 import 'shared/features/localization/app_localization.dart';
+import 'shared/features/multiplayer/game_invite_watcher.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
+
+/// The invite banner lives above the Navigator, so accepting from it needs a
+/// context that is below one to push the waiting-room modal.
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+final CurrentRouteObserver currentRouteObserver = CurrentRouteObserver();
 
 class App extends StatefulWidget {
   const App(
@@ -314,6 +321,12 @@ class _AppState extends State<App> {
           changeLocale: _changeLocale,
           child: MaterialApp(
           scaffoldMessengerKey: scaffoldMessengerKey,
+          navigatorKey: navigatorKey,
+          navigatorObservers: [currentRouteObserver],
+          // Above every route, so an invite arriving while the user is on any
+          // screen still surfaces.
+          builder: (context, child) =>
+              GameInviteWatcher(child: child ?? const SizedBox.shrink()),
           locale: _locale,
           supportedLocales: AppLocalization.supportedLocales,
           localizationsDelegates: const [
