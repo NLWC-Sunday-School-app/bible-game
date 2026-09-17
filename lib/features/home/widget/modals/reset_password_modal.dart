@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +8,7 @@ import 'package:stroke_text/stroke_text.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
 import '../../../../shared/utils/validation.dart';
 import '../../../../shared/widgets/blue_button.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 void showResetPasswordModal(BuildContext context) {
   showDialog(
@@ -301,13 +301,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
                             listener: (context, state) {
                               if (state.forgotPasswordMailSent) {
                                 Navigator.pop(context);
-                                Flushbar(
-                                  message: tr.t('auth_otp_sent'),
-                                  flushbarPosition: FlushbarPosition.TOP,
-                                  flushbarStyle: FlushbarStyle.GROUNDED,
-                                  backgroundColor: Colors.green,
-                                  duration: const Duration(seconds: 3),
-                                ).show(context);
+                                CustomToast.showBanner(context, tr.t('auth_otp_sent'));
                                 showEnterResetPasswordCodeModal(context);
                               }
                             },

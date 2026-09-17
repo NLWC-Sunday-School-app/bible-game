@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/widgets/custom_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +11,7 @@ import 'package:bible_game/shared/features/user/model/user.dart';
 
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 void showStreakModalTabletView(BuildContext context) {
   showDialog(
@@ -379,13 +379,7 @@ class _BgStreakModalTabletViewState extends State<BgStreakModalTabletView> {
                             .user
                             .gems <
                         restoreGemPrice) {
-                      Flushbar(
-                        message: 'Not enough gems',
-                        flushbarPosition: FlushbarPosition.TOP,
-                        flushbarStyle: FlushbarStyle.GROUNDED,
-                        backgroundColor: Colors.red,
-                        duration: Duration(seconds: 3),
-                      ).show(context);
+                      CustomToast.showBanner(context, 'Not enough gems', isError: true);
                     } else {
                       context.read<UserBloc>().add(RestoreStreak());
                       showCustomToast(context, 'Restored Successfully');

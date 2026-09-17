@@ -31,6 +31,14 @@ class FirstToXQuestionScreen extends StatefulWidget {
 
 class _FirstToXQuestionScreenState extends State<FirstToXQuestionScreen>
     with SingleTickerProviderStateMixin {
+  /// One leaderboard per finished game.
+  ///
+  /// A single GAME_FINISHED frame produces two emissions -- one setting
+  /// eventType, one attaching the result -- and a listener keyed on eventType
+  /// alone ran on both, pushing the screen twice. The first push also arrived
+  /// before the result did, so the copy underneath was the emptier one.
+  bool _leaderboardShown = false;
+
   late AnimationController _animationController;
   late int _currentPage;
   late int durationPerQuestion;
@@ -161,7 +169,10 @@ class _FirstToXQuestionScreenState extends State<FirstToXQuestionScreen>
           _lastConnectionStatus = websocketState.connectionStatus;
 
           ///change newPlayerJoined variable to notification alert
-          if(websocketState.eventType == "GAME_FINISHED"){
+          if (websocketState.eventType == "GAME_FINISHED" &&
+              websocketState.gameFinishedEvent.data != null &&
+              !_leaderboardShown) {
+            _leaderboardShown = true;
             _animationController.stop();
             // OLD APPROACH: Using Navigator.pushAndRemoveUntil - kept for reference
             // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(

@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/features/multi_player/widget/modal/multiplayer_tip_modal.dart';
 import 'dart:async';
 import 'package:bible_game/features/four_scriptures/widget/tablet_view_modal/quick_tips_modal_tablet_view.dart';
@@ -171,16 +172,20 @@ class _QuestionLoadingScreenTabletViewState extends State<QuestionLoadingScreenT
       }else if(gameType == "Lightning Mode" || gameType == "First to X" ||
           gameType == "Time-based Mode" || gameType == "Survival Mode"){
         // Multiplayer questions arrive over the websocket with the
-        // GAME_STARTED frame, so there is nothing to fetch here -- only the
-        // Quick Tips to show, which then routes to the mode's own screen.
+        // GAME_STARTED frame, so there is nothing to fetch here. The Quick
+        // Tips open straight away and hold the screen for their full window,
+        // then start the round once the questions are actually in hand.
         // Without this branch these game modes fell through to the Global
         // Challenge fetch below and the player was stranded.
-        Timer(Duration(seconds: 3), () {
-          if(mounted && !_isModalShown){
-            showMultiplayerTipsModal(context, gameMode: gameType);
-            _isModalShown = true;
-          }
-        });
+        if (!_isModalShown) {
+          _isModalShown = true;
+          showMultiplayerTipsModal(
+            context,
+            gameMode: gameType,
+            secondsPerQuestion:
+                context.read<WebsocketCubit>().state.secondsPerQuestion,
+          );
+        }
       }else {
         context.read<GlobalChallengeBloc>().add(FetchGlobalChallengeQuestions(gameType));
         context.read<GlobalChallengeBloc>().stream.listen((state){

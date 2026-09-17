@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +18,7 @@ import '../../../../shared/widgets/blue_button.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
 
 import '../../../global_challenge/bloc/global_challenge_bloc.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 void showLoginModal(BuildContext context) {
   showDialog(
@@ -414,13 +414,7 @@ class _LoginModalState extends State<LoginModal>
                                 if (errorMsg.isNotEmpty) {
                                   ApiException.showSnackBar(context);
                                 } else {
-                                  Flushbar(
-                                    message: tr.t('auth_login_failed'),
-                                    flushbarPosition: FlushbarPosition.TOP,
-                                    flushbarStyle: FlushbarStyle.GROUNDED,
-                                    backgroundColor: Colors.red,
-                                    duration: const Duration(seconds: 3),
-                                  ).show(context);
+                                  CustomToast.showBanner(context, tr.t('auth_login_failed'), isError: true);
                                 }
                               }
                               if (state.token != null) {

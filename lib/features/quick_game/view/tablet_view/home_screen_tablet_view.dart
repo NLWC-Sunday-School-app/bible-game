@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/quick_game/widget/tablet_view_modal/use_timer_modal_tablet_view.dart';
 import 'package:bible_game/features/quick_game/widget/tablet_view_widget/search_box_tablet_view.dart';
 import 'package:bible_game/features/quick_game/widget/tablet_view_widget/selected_topic_pill_tablet_view.dart';
@@ -21,6 +20,7 @@ import 'package:bible_game/shared/widgets/screen_app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 class QuickGameHomeScreenTabletView extends StatefulWidget {
   const QuickGameHomeScreenTabletView({super.key});
@@ -83,13 +83,7 @@ class _QuickGameHomeScreenTabletViewState extends State<QuickGameHomeScreenTable
           listener: (context, state) {
             if (state.hasReachedMaximumTopicSelection != null &&
                 state.hasReachedMaximumTopicSelection!) {
-              Flushbar(
-                message: 'You cannot select more than 4 topics',
-                flushbarPosition: FlushbarPosition.TOP,
-                flushbarStyle: FlushbarStyle.GROUNDED,
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 3),
-              ).show(context);
+              CustomToast.showBanner(context, 'You cannot select more than 4 topics', isError: true);
             }
           },
           builder: (context, state) {

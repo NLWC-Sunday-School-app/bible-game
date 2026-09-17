@@ -1,6 +1,5 @@
 
 import 'package:bible_game/features/multi_player/question_timing.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:flutter/material.dart';
@@ -260,13 +259,7 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                                     onTap: () {
                                       Clipboard.setData(
                                           ClipboardData(text: widget.inviteCode));
-                                      Flushbar(
-                                        message: 'Copied',
-                                        flushbarPosition: FlushbarPosition.TOP,
-                                        flushbarStyle: FlushbarStyle.GROUNDED,
-                                        backgroundColor: Colors.green,
-                                        duration: const Duration(seconds: 3),
-                                      ).show(context);
+                                      CustomToast.showBanner(context, 'Copied');
                                     },
                                     child: Container(
                                       height: 36.h,

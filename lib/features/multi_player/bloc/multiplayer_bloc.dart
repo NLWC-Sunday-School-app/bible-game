@@ -58,7 +58,13 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       CreateGameRoom event,
       Emitter<MultiplayerState> emit) async {
     try {
-      emit(state.copyWith(isLoadingCreateGameRoom: true, hasCreateGameRoomFailed: false));
+      // hasCreatedGameRoom has to go back down before it can go up again: the
+      // listener waiting on it fires on the false->true edge, and a flag left
+      // latched at true from the previous room never produces another one.
+      emit(state.copyWith(
+          isLoadingCreateGameRoom: true,
+          hasCreatedGameRoom: false,
+          hasCreateGameRoomFailed: false));
       final response =
       await _multiplayerRepository.createGameRoom(_authenticationBloc.state.user.id);
       emit(state.copyWith(
@@ -117,7 +123,15 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       ConfigureGameRoom event,
       Emitter<MultiplayerState> emit) async {
     try {
-      emit(state.copyWith(isLoadingConfigureGameRoom: true, hasConfigureGameRoomFailed: false, hostVictoryCondition: event.conditionValue));
+      // Likewise, and this one was reaching players: configuring a second room
+      // in one session left hasConfiguredGameRoom already true, so the guarded
+      // listener saw no edge, never opened the waiting room, and the host was
+      // returned to the form they had just submitted.
+      emit(state.copyWith(
+          isLoadingConfigureGameRoom: true,
+          hasConfiguredGameRoom: false,
+          hasConfigureGameRoomFailed: false,
+          hostVictoryCondition: event.conditionValue));
       final response =
       await _multiplayerRepository.configureGameRoom(
           state.createGameRoomResponse.id,

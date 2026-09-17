@@ -1,3 +1,4 @@
+import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/features/multi_player/widget/modal/multiplayer_tip_modal.dart';
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -22,7 +23,6 @@ import 'package:stroke_text/stroke_text.dart';
 import '../../features/four_scriptures/bloc/four_scriptures_one_word_bloc.dart';
 import '../../features/quick_game/bloc/quick_game_bloc.dart';
 import '../../features/quick_game/widget/modal/quick_tips_modal.dart';
-import '../constants/app_routes.dart';
 
 class QuestionLoadingScreen extends StatefulWidget {
   const QuestionLoadingScreen({super.key});
@@ -177,16 +177,20 @@ class _QuestionLoadingScreenState extends State<QuestionLoadingScreen> {
       }else if(gameType == "Lightning Mode" || gameType == "First to X" ||
           gameType == "Time-based Mode" || gameType == "Survival Mode"){
         // Multiplayer questions arrive over the websocket with the
-        // GAME_STARTED frame, so there is nothing to fetch here -- only the
-        // Quick Tips to show, which then routes to the mode's own screen.
+        // GAME_STARTED frame, so there is nothing to fetch here. The Quick
+        // Tips open straight away and hold the screen for their full window,
+        // then start the round once the questions are actually in hand.
         // Without this branch these game modes fell through to the Global
         // Challenge fetch below and the player was stranded.
-        Timer(Duration(seconds: 3), () {
-          if(mounted && !_isModalShown){
-            showMultiplayerTipsModal(context, gameMode: gameType);
-            _isModalShown = true;
-          }
-        });
+        if (!_isModalShown) {
+          _isModalShown = true;
+          showMultiplayerTipsModal(
+            context,
+            gameMode: gameType,
+            secondsPerQuestion:
+                context.read<WebsocketCubit>().state.secondsPerQuestion,
+          );
+        }
       }else {
         context.read<GlobalChallengeBloc>().add(FetchGlobalChallengeQuestions(gameType));
         context.read<GlobalChallengeBloc>().stream.listen((state){

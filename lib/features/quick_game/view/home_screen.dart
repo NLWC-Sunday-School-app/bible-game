@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/widgets/green_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +14,7 @@ import 'package:bible_game/shared/widgets/screen_app_bar.dart';
 import '../../../shared/constants/image_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
+import '../../../shared/utils/custom_toast.dart';
 
 class QuickGameHomeScreen extends StatefulWidget {
   const QuickGameHomeScreen({super.key});
@@ -225,13 +225,7 @@ class _QuickGameHomeScreenState extends State<QuickGameHomeScreen> {
               curr.hasReachedMaximumTopicSelection == true &&
               prev.hasReachedMaximumTopicSelection != true,
           listener: (context, state) {
-            Flushbar(
-              message: 'You can select up to 4 topics',
-              flushbarPosition: FlushbarPosition.TOP,
-              flushbarStyle: FlushbarStyle.GROUNDED,
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
-            ).show(context);
+            CustomToast.showBanner(context, 'You can select up to 4 topics', isError: true, duration: const Duration(seconds: 2));
           },
           builder: (context, state) {
             final soundManager = context.read<SettingsBloc>().soundManager;

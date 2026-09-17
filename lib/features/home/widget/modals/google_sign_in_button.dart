@@ -1,5 +1,4 @@
 import 'package:bible_game/shared/utils/registration_push_token.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
@@ -18,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../global_challenge/bloc/global_challenge_bloc.dart';
 import 'successful_login_modal.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 /// "Continue with Google" — signs the user in with Google purely for
 /// identity (name + email), then reuses the existing register/login
@@ -91,13 +91,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
 
   void _showError(BuildContext context) {
     final tr = AppLocalization.tr(context);
-    Flushbar(
-      message: tr.t('auth_google_signin_failed'),
-      flushbarPosition: FlushbarPosition.TOP,
-      flushbarStyle: FlushbarStyle.GROUNDED,
-      backgroundColor: Colors.red,
-      duration: const Duration(seconds: 3),
-    ).show(context);
+    CustomToast.showBanner(context, tr.t('auth_google_signin_failed'), isError: true);
   }
 
   @override

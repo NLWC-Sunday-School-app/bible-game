@@ -1,5 +1,4 @@
 import 'package:bible_game/shared/utils/registration_push_token.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:bible_game_api/utils/api_exception.dart';
 
 import '../../../global_challenge/bloc/global_challenge_bloc.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 void showCreateProfileModal(BuildContext context) {
   showDialog(
@@ -488,14 +488,7 @@ class _CreateProfileModalState extends State<CreateProfileModal>
                                 if (errorMsg.isNotEmpty) {
                                   ApiException.showSnackBar(context);
                                 } else {
-                                  Flushbar(
-                                    message:
-                                        tr.t('auth_registration_failed'),
-                                    flushbarPosition: FlushbarPosition.TOP,
-                                    flushbarStyle: FlushbarStyle.GROUNDED,
-                                    backgroundColor: Colors.red,
-                                    duration: const Duration(seconds: 3),
-                                  ).show(context);
+                                  CustomToast.showBanner(context, tr.t('auth_registration_failed'), isError: true);
                                 }
                               }
                               if (state.token != null) {

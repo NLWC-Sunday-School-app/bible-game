@@ -65,6 +65,37 @@ class CustomToast {
     overlay.insert(overlayEntry!);
   }
 
+  /// The app's general-purpose message banner: "Copied", "Not enough gems",
+  /// "Invalid invite code".
+  ///
+  /// These were Flushbars -- a full-bleed Material bar in flat green or red,
+  /// the one piece of stock Android styling in a game built out of cream
+  /// cards, hard shadows and ribbon art. Same idiom as the cards now: inset
+  /// from the edges, cream ground, coloured border and an offset shadow with
+  /// no blur.
+  static void showBanner(BuildContext context, String message,
+      {bool isError = false,
+      Duration duration = const Duration(seconds: 3)}) {
+    removeOverlay();
+
+    final overlay = Overlay.of(context);
+    const animationDuration = Duration(milliseconds: 260);
+
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        return _BannerToastWidget(
+          message: message,
+          isError: isError,
+          duration: duration,
+          animationDuration: animationDuration,
+          onDismissed: () => removeOverlay(),
+        );
+      },
+    );
+
+    overlay.insert(overlayEntry!);
+  }
+
   static void showInviteToast(BuildContext context,
       {Duration duration = const Duration(seconds: 2), required bool isInviteSuccessful, String? message}) {
     // Remove any existing overlay first
@@ -438,6 +469,161 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
                   ),
                 ],
               )
+          ),
+        ),
+      ),
+    );
+  }
+}
+/// The banner behind [CustomToast.showBanner].
+///
+/// Slides down from behind the status bar and fades as it goes, rather than
+/// appearing fully formed the way the opacity-only toasts above do -- a bar
+/// that drops in reads as part of the game instead of a system notice.
+class _BannerToastWidget extends StatefulWidget {
+  final String message;
+  final bool isError;
+  final Duration duration;
+  final Duration animationDuration;
+  final VoidCallback onDismissed;
+
+  const _BannerToastWidget({
+    Key? key,
+    required this.message,
+    required this.isError,
+    required this.duration,
+    required this.animationDuration,
+    required this.onDismissed,
+  }) : super(key: key);
+
+  @override
+  State<_BannerToastWidget> createState() => _BannerToastWidgetState();
+}
+
+class _BannerToastWidgetState extends State<_BannerToastWidget> {
+  bool _shown = false;
+  bool _isDismissed = false;
+
+  /// Cream ground, so it reads as one of the game's cards rather than a system
+  /// bar. The tone only ever colours the border, the shadow and the badge.
+  static const _cream = Color(0xFFFFEED6);
+  static const _ink = Color(0xFF122F52);
+
+  static const _successBorder = Color(0xFF1F8A4C);
+  static const _successShadow = Color(0xFF125C32);
+  static const _errorBorder = Color(0xFFDB0C34);
+  static const _errorShadow = Color(0xFF94142E);
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _shown = true);
+    });
+
+    Future.delayed(widget.duration, () {
+      if (!mounted || _isDismissed) return;
+      setState(() => _shown = false);
+      Future.delayed(widget.animationDuration, _dismiss);
+    });
+  }
+
+  @override
+  void dispose() {
+    // A pending dismissal outlives this widget by one animation: without this
+    // flag, a banner replaced mid-fade would call removeOverlay() afterwards
+    // and take the *replacing* banner off screen with it.
+    _isDismissed = true;
+    super.dispose();
+  }
+
+  void _dismiss() {
+    if (_isDismissed || !mounted) return;
+    _isDismissed = true;
+    widget.onDismissed();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final border = widget.isError ? _errorBorder : _successBorder;
+    final shadow = widget.isError ? _errorShadow : _successShadow;
+
+    return Positioned(
+      // Clear of the status bar and the notch, and inset from the edges: the
+      // Flushbar ran the full width and butted against the top of the screen.
+      top: MediaQuery.of(context).padding.top + 12.h,
+      left: 16.w,
+      right: 16.w,
+      child: Material(
+        color: Colors.transparent,
+        child: AnimatedSlide(
+          duration: widget.animationDuration,
+          curve: Curves.easeOutBack,
+          offset: _shown ? Offset.zero : const Offset(0, -1.4),
+          child: AnimatedOpacity(
+            duration: widget.animationDuration,
+            opacity: _shown ? 1 : 0,
+            child: GestureDetector(
+              // Tapping it takes it away, rather than waiting out the three
+              // seconds with it sitting over the screen.
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                setState(() => _shown = false);
+                Future.delayed(widget.animationDuration, _dismiss);
+              },
+              child: Container(
+                padding:
+                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 11.h),
+                decoration: BoxDecoration(
+                  color: _cream,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: border, width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: shadow,
+                      offset: const Offset(2, 4),
+                      blurRadius: 0,
+                      spreadRadius: -2,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 26.w,
+                      height: 26.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: border,
+                      ),
+                      child: Icon(
+                        widget.isError
+                            ? Icons.priority_high_rounded
+                            : Icons.check_rounded,
+                        size: 17.sp,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Text(
+                        widget.message,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _ink,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

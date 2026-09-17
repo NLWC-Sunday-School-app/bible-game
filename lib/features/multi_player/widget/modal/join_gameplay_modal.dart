@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +7,7 @@ import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/features/multiplayer/cubit/websocket_cubit.dart';
 import '../../../../shared/widgets/blue_button.dart';
 import '../../bloc/multiplayer_bloc.dart';
+import '../../../../shared/utils/custom_toast.dart';
 
 void showJoinGamePlayModal(BuildContext context) {
   showDialog(
@@ -213,21 +213,9 @@ class _JoinGamePlayModalState extends State<JoinGamePlayModal> {
 
   void validate(BuildContext context){
     if(textController.text.isEmpty){
-      Flushbar(
-        message: 'Fill up field',
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.GROUNDED,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ).show(context);
+      CustomToast.showBanner(context, 'Fill up field', isError: true);
     }else if(textController.text.length < 6 ){
-      Flushbar(
-        message: 'Invalid invite code',
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.GROUNDED,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ).show(context);
+      CustomToast.showBanner(context, 'Invalid invite code', isError: true);
     }else{
       //MOSA5A
       setState(() {

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bible_game/features/multi_player/game_mode_codes.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/features/multi_player/widget/modal/invite_modal.dart';
@@ -463,36 +462,36 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 ),
                               ),
                               Expanded(
-                                child: state.waitingRoomInfo.players.length == 0?
-                                    _EmptyRoom(
-                                      isWaitingForHost: widget.isWaitingForHost,
-                                      onlineCount: _onlineCount(context),
-                                      onInvite: () => _openInviteModal(
-                                          state.waitingRoomInfo.gameMode),
-                                    )
-                                    :
-                                ListView.builder(
-                                  // Clear of the Start Game button, which floats
-                                  // over the bottom of this panel.
-                                  padding: EdgeInsets.only(bottom: 80.h),
-                                  itemCount: state.waitingRoomInfo.players.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return PlayerWaitingCard(
-                                      onTap: (){
-                                        BlocProvider.of<MultiplayerBloc>(context).add(
-                                            KickOut(state.waitingRoomInfo.players[index].id!)
-                                        );
-                                      },
-                                      position: index+1,
-                                      userName: state.waitingRoomInfo.players[index].username??"",
-                                      countryName: state.waitingRoomInfo.players[index].country??"N",
-                                      userRank: state.waitingRoomInfo.players[index].level??"",
-                                      userId: state.waitingRoomInfo.players[index].userId??"",
-                                      isWaitingForHost: widget.isWaitingForHost,
-                                      isHost:state.waitingRoomInfo.players[index].isHost??false,
-                                    );
-                                  },
-                                ),
+                                child: state.waitingRoomInfo.players.isEmpty
+                                    ? _EmptyRoom(
+                                        isWaitingForHost:
+                                            widget.isWaitingForHost,
+                                        onlineCount: _onlineCount(context),
+                                        onInvite: () => _openInviteModal(
+                                            state.waitingRoomInfo.gameMode),
+                                      )
+                                    : ListView.builder(
+                                        // Clear of the Start Game button, which
+                                        // floats over the bottom of this panel.
+                                        padding: EdgeInsets.only(bottom: 80.h),
+                                        itemCount: state.waitingRoomInfo.players.length,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          return PlayerWaitingCard(
+                                            onTap: (){
+                                              BlocProvider.of<MultiplayerBloc>(context).add(
+                                                  KickOut(state.waitingRoomInfo.players[index].id!)
+                                              );
+                                            },
+                                            position: index+1,
+                                            userName: state.waitingRoomInfo.players[index].username??"",
+                                            countryName: state.waitingRoomInfo.players[index].country??"N",
+                                            userRank: state.waitingRoomInfo.players[index].level??"",
+                                            userId: state.waitingRoomInfo.players[index].userId??"",
+                                            isWaitingForHost: widget.isWaitingForHost,
+                                            isHost:state.waitingRoomInfo.players[index].isHost??false,
+                                          );
+                                        },
+                                      ),
                               ),
                             ],
                           );
@@ -547,13 +546,7 @@ class _ShareCodeRow extends StatelessWidget {
       // is a 24px hit area for the one thing this row exists to do.
       onTap: () {
         Clipboard.setData(ClipboardData(text: inviteCode));
-        Flushbar(
-          message: 'Copied',
-          flushbarPosition: FlushbarPosition.TOP,
-          flushbarStyle: FlushbarStyle.GROUNDED,
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ).show(context);
+        CustomToast.showBanner(context, 'Copied');
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
