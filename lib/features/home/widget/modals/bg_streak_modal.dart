@@ -45,7 +45,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
   @override
   void initState() {
     super.initState();
-    timeLeft = Duration(hours: 0, minutes: 0, seconds: 0);
+    timeLeft = Duration.zero;
     manageStreakTime();
   }
 
@@ -75,6 +75,11 @@ class _BgStreakModalState extends State<BgStreakModal> {
         DateTime.parse(streakDetails['restoreTimeExpiry']);
         timeLeft = restoreTime.difference(DateTime.now());
         showTimer = !timeLeft.isNegative;
+        // Settle this up front: it used to flip only on the first timer
+        // tick, so an already-expired window offered a gem restore for a
+        // second before correcting itself.
+        lostStreakAfterRestoreTime = timeLeft.isNegative;
+        if (timeLeft.isNegative) timeLeft = Duration.zero;
         timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
           setState(() {
             timeLeft = restoreTime.difference(DateTime.now());
@@ -113,6 +118,17 @@ class _BgStreakModalState extends State<BgStreakModal> {
         : 1;
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
+        // userStreakDetails is the raw API map and defaults to {}, so every
+        // key is null until the fetch lands. isLost was read straight as a
+        // bool, which threw a TypeError on that first build.
+        final details = state.userStreakDetails;
+        final streak = (details['streak'] as num?)?.toInt() ?? 0;
+        final previousStreak = (details['previousStreak'] as num?)?.toInt() ?? 0;
+        final isLost = details['isLost'] == true;
+        final hasRestoreWindow = details['restoreTimeExpiry'] != null;
+        // Restoring needs a lost streak AND a window that has not run out.
+        final canRestore =
+            isLost && hasRestoreWindow && !lostStreakAfterRestoreTime;
         return Container(
           width: 500.w,
           decoration: BoxDecoration(
@@ -168,7 +184,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                 ),
                showTimer ?
                lostStreakAfterRestoreTime ? SizedBox() : Container(
-                  width: state.userStreakDetails['restoreTimeExpiry'] != null
+                  width: hasRestoreWindow
                       ? 220.w
                       : 160.w,
                   padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
@@ -185,7 +201,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                       SizedBox(
                         width: 10.w,
                       ),
-                      state.userStreakDetails['restoreTimeExpiry'] != null
+                      hasRestoreWindow
                           ? Text(
                               'Time left for restore ${formatDuration(timeLeft)}',
                               style: TextStyle(
@@ -225,8 +241,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                               child: Stack(
                                 children: [
                                   Text(
-                                    state.userStreakDetails['streak']
-                                        .toString(),
+                                    '$streak',
                                     style: TextStyle(
                                       fontSize: 92.sp,
                                       foreground: Paint()
@@ -236,8 +251,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                                     ),
                                   ),
                                   Text(
-                                    state.userStreakDetails['streak']
-                                        .toString(),
+                                    '$streak',
                                     style: TextStyle(
                                       fontSize: 92.sp,
                                       color: Color(0xFFC48D8A),
@@ -251,7 +265,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                                 offset: const Offset(0, -30),
                                 // Adjust offset for subscript
                                 child: Text(
-                                  state.userStreakDetails['streak'] == 1 ? 'Day' : 'Days',
+                                  streak == 1 ? 'Day' : 'Days',
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     color: Color(0xFF925B58),
@@ -281,7 +295,9 @@ class _BgStreakModalState extends State<BgStreakModal> {
                         width: 64.w,
                       ),
                       Text(
-                        "Don't lose your streak;\nPlay a game today.",
+                        isLost
+                            ? 'Your streak has ended;\nPlay a game to start again.'
+                            : "Don't lose your streak;\nPlay a game today.",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -298,7 +314,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                 SizedBox(
                   height: 10.h,
                 ),
-                state.userStreakDetails['restoreTimeExpiry'] != null
+                isLost
                     ? Stack(
                         children: [
                           Container(
@@ -326,7 +342,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                                       children: [
                                     TextSpan(
                                         text:
-                                            ' ${state.userStreakDetails['previousStreak']} ${state.userStreakDetails['previousStreak'] == 1 ? 'day ' : 'days '}',
+                                            ' $previousStreak ${previousStreak == 1 ? 'day ' : 'days '}',
                                         style: TextStyle(
                                             color: Color(0xFF436B98))),
                                     TextSpan(
@@ -354,8 +370,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                   onTap: () {
                     soundManager.playClickSound();
                     if (state.isRestoringStreak) return;
-                    if (state.userStreakDetails['isLost'] &&
-                        state.userStreakDetails['restoreTimeExpiry'] != null) {
+                    if (canRestore) {
                       if (BlocProvider.of<AuthenticationBloc>(context)
                               .state
                               .user
@@ -386,10 +401,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage(
-                            !state.userStreakDetails['isLost'] &&
-                                    state.userStreakDetails[
-                                            'restoreTimeExpiry'] ==
-                                        null
+                            !canRestore
                                 ? ProductImageRoutes
                                     .streakRestoreButtonInactiveBg
                                 : ProductImageRoutes.streakRestoreButtonBg,
@@ -412,10 +424,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                                 StrokeText(
                                   text: 'Restore  for',
                                   textStyle: TextStyle(
-                                    color: !state.userStreakDetails['isLost'] &&
-                                            state.userStreakDetails[
-                                                    'restoreTimeExpiry'] ==
-                                                null
+                                    color: !canRestore
                                         ? Colors.white.withOpacity(0.5)
                                         : Colors.white,
                                     fontSize: 18.sp,
@@ -437,10 +446,7 @@ class _BgStreakModalState extends State<BgStreakModal> {
                                 StrokeText(
                                   text: '$restoreGemPrice',
                                   textStyle: TextStyle(
-                                    color: !state.userStreakDetails['isLost'] &&
-                                            state.userStreakDetails[
-                                                    'restoreTimeExpiry'] ==
-                                                null
+                                    color: !canRestore
                                         ? Colors.white.withOpacity(0.5)
                                         : Colors.white,
                                     fontSize: 18.sp,
