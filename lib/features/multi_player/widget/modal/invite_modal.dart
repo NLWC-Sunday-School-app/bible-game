@@ -466,25 +466,141 @@ class _InviteModalState extends State<InviteModal> {
                               onInvite: _invite,
                             )
                           : const _NoOneOnline())
-                      : ListView.separated(
-                          padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                          itemCount: players.length,
-                          separatorBuilder: (_, __) => SizedBox(height: 10.h),
-                          itemBuilder: (context, index) {
-                            final player = players[index];
-                            return _PlayerRow(
-                              player: player,
-                              isInvited: _invited.contains(player.username),
-                              isPending: _pendingInvite == player.username,
-                              anyPending: _pendingInvite != null,
-                              onInvite: _invite,
-                            );
-                          },
-                        ),
+                      : Builder(builder: (context) {
+                          // Having results must not remove the ability to
+                          // invite the name you typed. Searching "tobi" while
+                          // "tobilove" is online used to return that one row
+                          // and leave an offline "tobi" unreachable, with no
+                          // way out of the state.
+                          final isSelf = query.toLowerCase() ==
+                              context
+                                  .read<AuthenticationBloc>()
+                                  .state
+                                  .user
+                                  .name
+                                  .toLowerCase();
+                          final exactMatch = players.any((p) =>
+                              p.username.toLowerCase() == query.toLowerCase());
+                          final showTyped = searching && !exactMatch && !isSelf;
+
+                          return ListView.separated(
+                            padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                            itemCount: players.length + (showTyped ? 1 : 0),
+                            separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                            itemBuilder: (context, index) {
+                              if (index == players.length) {
+                                return _InviteTypedName(
+                                  query: query,
+                                  isInvited: _invited.contains(query),
+                                  isPending: _pendingInvite == query,
+                                  anyPending: _pendingInvite != null,
+                                  onInvite: _invite,
+                                );
+                              }
+                              final player = players[index];
+                              return _PlayerRow(
+                                player: player,
+                                isInvited: _invited.contains(player.username),
+                                isPending: _pendingInvite == player.username,
+                                anyPending: _pendingInvite != null,
+                                onInvite: _invite,
+                              );
+                            },
+                          );
+                        }),
             ),
           ],
         );
       },
+    );
+  }
+}
+
+/// The name as typed, offered alongside whatever the search matched.
+///
+/// The endpoint only searches players who are connected, but an invite does
+/// not require them to be -- so a username you know is always sendable, even
+/// when the person is offline or the search matched somebody else.
+class _InviteTypedName extends StatelessWidget {
+  const _InviteTypedName({
+    required this.query,
+    required this.isInvited,
+    required this.isPending,
+    required this.anyPending,
+    required this.onInvite,
+  });
+
+  final String query;
+  final bool isInvited;
+  final bool isPending;
+  final bool anyPending;
+  final ValueChanged<String> onInvite;
+
+  static const _blue = Color(0xFF014CA3);
+
+  @override
+  Widget build(BuildContext context) {
+    final canInvite = !isInvited && !anyPending;
+
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 150),
+      opacity: canInvite || isPending ? 1 : 0.55,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: const Color(0xFFE7CDBF)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38.w,
+              height: 38.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _blue.withValues(alpha: 0.08),
+              ),
+              child: Icon(Icons.alternate_email_rounded,
+                  size: 18.sp, color: _blue.withValues(alpha: 0.55)),
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    query,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w800,
+                      color: _blue,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    'Send to this username',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF122F52).withValues(alpha: 0.55),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 8.w),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: canInvite ? () => onInvite(query) : null,
+              child: _InvitePill(isInvited: isInvited, isPending: isPending),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
