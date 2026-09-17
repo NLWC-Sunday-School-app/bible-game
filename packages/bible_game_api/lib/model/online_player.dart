@@ -11,6 +11,7 @@ class OnlinePlayer extends Equatable {
     required this.username,
     required this.profileUrl,
     required this.country,
+    this.level,
   });
 
   final int userId;
@@ -19,6 +20,16 @@ class OnlinePlayer extends Equatable {
   /// Avatar seed, the same shape AvatarWidget already takes elsewhere.
   final String profileUrl;
   final String country;
+
+  /// Rank -- "babe", "elder" and the rest, as the waiting room calls it.
+  /// Null or empty when the endpoint does not send one, in which case the row
+  /// leaves the badge off rather than drawing the default for everybody.
+  ///
+  /// Nullable on purpose. A non-nullable field added to a class whose
+  /// instances already exist reads back as null after a hot reload -- those
+  /// objects have no storage for it -- and every bloc emission then threw
+  /// while Equatable stringified the state. Nullable degrades to "no badge".
+  final String? level;
 
   static String _pick(Map<String, dynamic> json, List<String> keys) {
     for (final key in keys) {
@@ -45,10 +56,11 @@ class OnlinePlayer extends Equatable {
         username: _pick(json, ['username', 'userName', 'name']),
         profileUrl: _pick(json, ['profileUrl', 'avatar', 'avatarUrl']),
         country: _pick(json, ['country', 'countryName']),
+        level: _pick(json, ['level', 'rank', 'userRank']).toLowerCase(),
       );
 
   @override
-  List<Object?> get props => [userId, username, profileUrl, country];
+  List<Object?> get props => [userId, username, profileUrl, country, level];
 }
 
 /// One page of online players, plus how many there are in total.
