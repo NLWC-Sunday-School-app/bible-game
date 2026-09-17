@@ -2,18 +2,15 @@
 import 'package:bible_game/features/multi_player/question_timing.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
-import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/features/multi_player/widget/modal/players_waiting_modal.dart';
-import 'package:bible_game/features/multi_player/widget/question_type_pill.dart';
 import 'package:bible_game/features/multi_player/widget/toggle_card.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/widgets/blue_button.dart';
-import 'package:bible_game/shared/widgets/custom_toast.dart';
 
 import '../../../../shared/features/multiplayer/cubit/websocket_cubit.dart';
 import '../../../../shared/utils/custom_toast.dart';
@@ -21,6 +18,10 @@ import '../../../../shared/utils/custom_toast.dart';
 void showGroupGamePlayModal(BuildContext context, {required selectedGroupGame, required inviteCode}) {
   showDialog(
       context: context,
+      // The game room is created on the server before this opens, so a stray
+      // tap on the barrier abandoned a live room and its code. Closing is the
+      // red button's job.
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return GroupGamePlayModal(selectedGroupGame: selectedGroupGame, inviteCode: inviteCode,);
       });
@@ -42,8 +43,17 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
   /// Seconds per question for this round. Sent on configure so every player
   /// runs the same clock -- applying it locally would only change the host's.
   int secondsPerQuestion = kDefaultSecondsPerQuestion;
-  final textController = TextEditingController();
   String  errorMessage= '';
+
+  /// Stepped rather than typed, so the value is always in range and the
+  /// keyboard never covers the modal. Both start on their first option, which
+  /// is what ToggleCard shows before anything is tapped -- it only reports a
+  /// value on change, so the defaults have to match options.first.
+  static const _questionCountOptions = ['10', '15', '20', '25', '30'];
+  static const _targetCoinOptions = ['1,000', '1,500', '2,000', '2,500', '3,000'];
+
+  int noOfQuestions = 10;
+  int targetCoins = 1000;
 
   @override
   void initState() {
@@ -58,11 +68,11 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
       // screen edges with nothing to breathe against.
       insetPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 24.h),
       backgroundColor: Colors.transparent,
-      // This animation runs on every inset change, not just on open -- so a
-      // bouncing curve over half a second made the modal spring about each
-      // time the keyboard came up. Match the keyboard's own motion instead.
-      insetAnimationCurve: Curves.easeOut,
-      insetAnimationDuration: const Duration(milliseconds: 220),
+      // This animation runs on every inset change, not just on open. The
+      // keyboard reports its inset frame by frame as it slides, so any non-zero
+      // duration eases toward a target that has already moved and the modal
+      // trails behind it. Zero tracks the keyboard's own curve exactly.
+      insetAnimationDuration: Duration.zero,
       child: GestureDetector(
         onTap: (){
           FocusScope.of(context).unfocus();
@@ -176,6 +186,17 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                         )),
                     child: 
                     BlocConsumer<MultiplayerBloc, MultiplayerState>(
+                      // Only the moment configuring finishes. hasConfiguredGameRoom
+                      // is never reset in the bloc, so without this the listener
+                      // re-fired on every unrelated emission -- and now that invite
+                      // polling runs for the whole session rather than only on the
+                      // multiplayer screen, that is every ten seconds: popping the
+                      // route again and parsing an empty field.
+                      listenWhen: (previous, current) =>
+                          (!previous.hasConfiguredGameRoom &&
+                              current.hasConfiguredGameRoom) ||
+                          (!previous.hasConfigureGameRoomFailed &&
+                              current.hasConfigureGameRoomFailed),
                       listener: (context, state) {
                         if(state.hasConfiguredGameRoom){
                           Navigator.pop(context);
@@ -184,7 +205,10 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                               selectedGroupGame: widget.selectedGroupGame,
                               inviteCode: widget.inviteCode,
                               questionType: selectedValue,
-                              noOfQuestion: int.parse(textController.text),
+                              noOfQuestion:
+                                  widget.selectedGroupGame == "First to X"
+                                      ? targetCoins
+                                      : noOfQuestions,
                           );
 
                         }
@@ -201,9 +225,17 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                             child: Center(child: CircularProgressIndicator()),
                           );
                         }else{
+                          final isTimed = widget.selectedGroupGame ==
+                                  "Time-based Mode" ||
+                              widget.selectedGroupGame == "Survival Mode";
+                          final isFirstToX =
+                              widget.selectedGroupGame == "First to X";
+                          final isLightning =
+                              widget.selectedGroupGame == "Lightning Mode";
+
                           return Column(
                             children: [
-                              SizedBox(height: 24.h,),
+                              SizedBox(height: 24.h),
                               Text(
                                 'Game Code:',
                                 style: TextStyle(
@@ -211,40 +243,40 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                                   fontSize: 14.sp,
                                 ),
                               ),
-                              SizedBox(height: 11.h,),
+                              SizedBox(height: 11.h),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     widget.inviteCode,
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 24.sp,
-                                        color: Color(0xFF014CA3)
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 24.sp,
+                                      color: const Color(0xFF014CA3),
                                     ),
                                   ),
-                                  SizedBox(width: 19.w,),
+                                  SizedBox(width: 19.w),
                                   GestureDetector(
-                                    onTap: (){
-                                      Clipboard.setData(ClipboardData(text: widget.inviteCode));
+                                    onTap: () {
+                                      Clipboard.setData(
+                                          ClipboardData(text: widget.inviteCode));
                                       Flushbar(
                                         message: 'Copied',
                                         flushbarPosition: FlushbarPosition.TOP,
                                         flushbarStyle: FlushbarStyle.GROUNDED,
                                         backgroundColor: Colors.green,
-                                        duration: Duration(seconds: 3),
+                                        duration: const Duration(seconds: 3),
                                       ).show(context);
                                     },
                                     child: Container(
                                       height: 36.h,
                                       width: 36.w,
                                       decoration: BoxDecoration(
-                                          color: Color(0xFF365B87),
-                                          border: Border.all(
-                                              width: 1,
-                                              color: Color(0xFF002959)
-                                          ),
-                                          shape: BoxShape.circle
+                                        color: const Color(0xFF365B87),
+                                        border: Border.all(
+                                            width: 1,
+                                            color: const Color(0xFF002959)),
+                                        shape: BoxShape.circle,
                                       ),
                                       child: Center(
                                         child: Image.asset(
@@ -254,281 +286,114 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                                         ),
                                       ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
-                              SizedBox(
-                                height: 5.h,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(top: 10.h),
-                                width: 270.w,
-                                child: Divider(
-                                  thickness: 1.w,
-                                  color: Color(0xFFF7E1D7),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5.h,
-                              ),
-                              Text(
-                                'Select question type',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14.sp,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10.h,
-                              ),
+                              SizedBox(height: 15.h),
+                              _PanelDivider(),
+                              SizedBox(height: 15.h),
+
+                              _FieldLabel('Select question type'),
+                              SizedBox(height: 10.h),
                               ToggleCard(
-                                onTap:null,
+                                onTap: null,
                                 onValueSelected: (value) {
-                                  setState(() {
-                                    selectedValue = value;
-                                    print(selectedValue);//; update parent with selected
-                                  });
+                                  setState(() => selectedValue = value);
                                 },
                                 selectedOption: false,
                                 hasTwoOptions: false,
                                 options: questionType,
                               ),
-                              SizedBox(
-                                height: 10.h,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(top: 10.h),
-                                width: 270.w,
-                                child: Divider(
-                                  thickness: 1.w,
-                                  color: Color(0xFFF7E1D7),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10.h,
-                              ),
-                              widget.selectedGroupGame == "Time-based Mode" || widget.selectedGroupGame == "Survival Mode" ?
-                              Column(
-                                children: [
-                                  SizedBox(height: 20.h,),
-                                  Text(
-                                    'Duration of the game (minutes)',
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10.h,),
-                                  ToggleCard(
-                                    onTap:null,
-                                    selectedOption: false,
-                                    onValueSelected: (value) {
-                                    },
-                                    hasTwoOptions: false,
-                                    options: ['1', '2', '3', '4'],
-                                  )
-                                ],
-                              )
-                                  :
-                              SizedBox.shrink(),
 
-                              widget.selectedGroupGame == "First to X"?
-                              Column(
-                                children: [
-                                  Text(
-                                    'Target Coins',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14.sp,
-                                    ),
-                                  ),
-                                  SizedBox(height: 9.5.h,),
-                                  SizedBox(
-                                    width: 255.w,
-                                    height: 50.h,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border:
-                                        Border.all(color: Color(0xFFF8E7DE)),
-                                        borderRadius: BorderRadius.circular(4.r),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black26,
-                                          ),
-                                          BoxShadow(
-                                            color: Color(0xFFFEEDE4),
-                                            offset: Offset(0, 1),
-                                            spreadRadius: 1.0,
-                                            blurRadius: 2.0,
-                                          ),
-                                        ],
-                                      ),
-                                      child:
-                                      TextField(
-                                        keyboardType: TextInputType.number,
-                                        textAlign: TextAlign.center,
-                                        controller: textController,
-                                        style: TextStyle(
-                                            color: Color(0xFF014CA3),
-                                            fontWeight: FontWeight.w500),
-                                        decoration: InputDecoration(
-                                          hintText: 'Target Coins',
-                                          hintStyle:
-                                          TextStyle(color: Color(0xFFF4E7E1)),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(10.r),
-                                            borderSide: const BorderSide(
-                                                color: Color(0xFFF8E7DE), width: 0),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(10.r),
-                                            borderSide: const BorderSide(
-                                                color: Color(0xFFF8E7DE), width: 0),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                                  :
-                              SizedBox.shrink(),
-                              SizedBox(
-                                height: 2.h,
-                              ),
+                              if (isTimed) ...[
+                                SizedBox(height: 15.h),
+                                _PanelDivider(),
+                                SizedBox(height: 15.h),
+                                _FieldLabel('Duration of the game (minutes)'),
+                                SizedBox(height: 10.h),
+                                ToggleCard(
+                                  onTap: null,
+                                  selectedOption: false,
+                                  onValueSelected: (value) {},
+                                  hasTwoOptions: false,
+                                  options: const ['1', '2', '3', '4'],
+                                ),
+                              ],
+
                               // Both playable modes take the same timer, so
                               // the control sits outside their per-mode blocks.
-                              widget.selectedGroupGame == "Lightning Mode" ||
-                                      widget.selectedGroupGame == "First to X"
-                                  ? Column(
-                                      children: [
-                                        Text(
-                                          'Seconds per question',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 14.sp,
-                                          ),
-                                        ),
-                                        SizedBox(height: 9.5.h),
-                                        ToggleCard(
-                                          onTap: null,
-                                          selectedOption: false,
-                                          hasTwoOptions: false,
-                                          options: const ['8', '10', '12', '6'],
-                                          onValueSelected: (value) {
-                                            setState(() {
-                                              secondsPerQuestion =
-                                                  resolveSecondsPerQuestion(value);
-                                            });
-                                          },
-                                        ),
-                                        SizedBox(height: 4.h),
-                                      ],
-                                    )
-                                  : SizedBox.shrink(),
-
-                              widget.selectedGroupGame == "Lightning Mode"?
-                              Column(
-                                children: [
-                                  Text(
-                                    'No. of questions',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14.sp,
-                                    ),
-                                  ),
-                                  SizedBox(height: 9.5.h,),
-                                  SizedBox(
-                                    width: 255.w,
-                                    height: 50.h,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border:
-                                        Border.all(color: Color(0xFFF8E7DE)),
-                                        borderRadius: BorderRadius.circular(4.r),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black26,
-                                          ),
-                                          BoxShadow(
-                                            color: Color(0xFFFEEDE4),
-                                            offset: Offset(0, 1),
-                                            spreadRadius: 1.0,
-                                            blurRadius: 2.0,
-                                          ),
-                                        ],
-                                      ),
-                                      child:
-                                      TextField(
-                                        keyboardType: TextInputType.number,
-                                        textAlign: TextAlign.center,
-                                        controller: textController,
-                                        style: TextStyle(
-                                            color: Color(0xFF014CA3),
-                                            fontWeight: FontWeight.w500),
-                                        decoration: InputDecoration(
-                                          hintText: 'Enter the Number of questions',
-                                          hintStyle:
-                                          TextStyle(
-                                            color: Color(0xFF627F8F),
-                                            fontSize: 12.sp,
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(10.r),
-                                            borderSide: const BorderSide(
-                                                color: Color(0xFFF8E7DE), width: 0),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(10.r),
-                                            borderSide: const BorderSide(
-                                                color: Color(0xFFF8E7DE), width: 0),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    '(must be between 10 and 30)',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 10.sp,
-                                        color: Color(0xFF7E7E7E)
-                                    ),
-                                  ),
-                                  Text(
-                                    errorMessage,
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 13.w,
-                                    ),
-                                  ),
-                                ],
-                              )
-                                  :
-                              Container(
-                                margin: EdgeInsets.only(top: 10.h),
-                                width: 270.w,
-                                child: Divider(
-                                  thickness: 1.w,
-                                  color: Color(0xFFF7E1D7),
+                              if (isLightning || isFirstToX) ...[
+                                SizedBox(height: 15.h),
+                                _PanelDivider(),
+                                SizedBox(height: 15.h),
+                                _FieldLabel('Seconds per question'),
+                                SizedBox(height: 10.h),
+                                ToggleCard(
+                                  onTap: null,
+                                  selectedOption: false,
+                                  hasTwoOptions: false,
+                                  options: const ['8', '10', '12', '6'],
+                                  onValueSelected: (value) {
+                                    setState(() {
+                                      secondsPerQuestion =
+                                          resolveSecondsPerQuestion(value);
+                                    });
+                                  },
                                 ),
-                              ),
-                              // Was a Spacer, which pinned the button to the
-                              // bottom of the old fixed-height panel. With the
-                              // panel sized by its content there is no remaining
-                              // space to expand into, and Spacer throws on an
-                              // unbounded column -- a plain gap is what it was
-                              // actually providing.
+                              ],
+
+                              if (isLightning) ...[
+                                SizedBox(height: 15.h),
+                                _PanelDivider(),
+                                SizedBox(height: 15.h),
+                                _FieldLabel('No. of questions'),
+                                SizedBox(height: 10.h),
+                                ToggleCard(
+                                  onTap: null,
+                                  selectedOption: false,
+                                  hasTwoOptions: false,
+                                  options: _questionCountOptions,
+                                  onValueSelected: (value) {
+                                    setState(() =>
+                                        noOfQuestions = int.parse(value));
+                                  },
+                                ),
+                              ],
+
+                              if (isFirstToX) ...[
+                                SizedBox(height: 15.h),
+                                _PanelDivider(),
+                                SizedBox(height: 15.h),
+                                _FieldLabel('Target coins'),
+                                SizedBox(height: 10.h),
+                                ToggleCard(
+                                  onTap: null,
+                                  selectedOption: false,
+                                  hasTwoOptions: false,
+                                  options: _targetCoinOptions,
+                                  onValueSelected: (value) {
+                                    setState(() => targetCoins =
+                                        int.parse(value.replaceAll(',', '')));
+                                  },
+                                ),
+                              ],
+
+                              if (errorMessage.isNotEmpty) ...[
+                                SizedBox(height: 8.h),
+                                Text(
+                                  errorMessage,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 13.sp),
+                                ),
+                              ],
+
                               SizedBox(height: 26.h),
                               BlueButton(
                                 onTap: () {
-                                  if(widget.selectedGroupGame == "Lightning Mode"){
+                                  if (isLightning) {
                                     lightningModeValidation();
-                                  }else if(widget.selectedGroupGame == "First to X"){
+                                  } else if (isFirstToX) {
                                     firstToXValidation();
                                   }
                                 },
@@ -536,7 +401,7 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
                                 buttonIsLoading: false,
                                 width: 267.w,
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(height: 10.h),
                             ],
                           );
                         }
@@ -553,63 +418,60 @@ class _GroupGamePlayModalState extends State<GroupGamePlayModal> {
   }
 
   void lightningModeValidation(){
-    if(textController.text.isEmpty){
-      Flushbar(
-        message: 'fill up field',
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.GROUNDED,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ).show(context);
-    }else if(int.parse(textController.text)<10 || int.parse(textController.text) > 30){
-      Flushbar(
-        message: 'Try keeping the number of questions between 10 and 30',
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.GROUNDED,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ).show(context);
-    }else{
-      BlocProvider.of<MultiplayerBloc>(context).add(ConfigureGameRoom(
-          "LIGHTNING",
-          selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
-          int.parse(textController.text),
-          "BEST_OF_ROUNDS",
-          secondsPerQuestion: secondsPerQuestion));
-    }
+    // No range check: the stepper only offers 10-30 in fives, so an invalid
+    // value cannot be produced. This was a typed field guarded by
+    // int.parse on a possibly-empty string.
+    BlocProvider.of<MultiplayerBloc>(context).add(ConfigureGameRoom(
+        "LIGHTNING",
+        selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
+        noOfQuestions,
+        "BEST_OF_ROUNDS",
+        secondsPerQuestion: secondsPerQuestion));
   }
 
   void firstToXValidation(){
-    if(textController.text.isEmpty){
-      Flushbar(
-        message: 'fill up field',
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.GROUNDED,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ).show(context);
-    }else if(int.parse(textController.text)<1000 || int.parse(textController.text) > 5000){
-      Flushbar(
-        message: 'coins is between 1000-3000',
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.GROUNDED,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ).show(context);
-    }else{
-      BlocProvider.of<MultiplayerBloc>(context).add(ConfigureGameRoom(
-          "FIRST_TO_X",
-          selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
-          int.parse(textController.text),
-          "BEST_OF_ROUNDS",
-          secondsPerQuestion: secondsPerQuestion));
-    }
+    // Likewise 1,000-3,000 in five hundreds.
+    BlocProvider.of<MultiplayerBloc>(context).add(ConfigureGameRoom(
+        "FIRST_TO_X",
+        selectedValue == "Who is Who"?"WHO_IS_WHO":"SCRIPTURE_QUIZ",
+        targetCoins,
+        "BEST_OF_ROUNDS",
+        secondsPerQuestion: secondsPerQuestion));
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    textController.dispose();
     super.dispose();
+  }
+}
+
+
+/// The thin rule between sections of the panel.
+class _PanelDivider extends StatelessWidget {
+  const _PanelDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 270.w,
+      child: Divider(thickness: 1.w, color: const Color(0xFFF7E1D7)),
+    );
+  }
+}
+
+/// A section heading inside the panel.
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14.sp),
+    );
   }
 }

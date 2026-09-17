@@ -11,10 +11,9 @@ class GroupGameCard extends StatelessWidget {
   final VoidCallback onTap;
   final bool isEnabled;
 
-  /// Opens the explanation of this mode. The icon is only drawn when this is
-  /// supplied, and it sits above the card's own tap target so it still works
-  /// on a disabled card -- a mode you cannot play yet is exactly the one you
-  /// are most likely to want explained.
+  /// Opens the explanation of this mode. The icon is drawn only when this is
+  /// supplied and the card is enabled: a Coming Soon card is inert all over,
+  /// so there is nothing on it that responds to a tap.
   final VoidCallback? onInfoTap;
 
   @override
@@ -98,7 +97,7 @@ class GroupGameCard extends StatelessWidget {
               ],
             ),
           ),
-              if (onInfoTap != null)
+              if (onInfoTap != null && isEnabled)
                 Positioned(
                   top: 2.h,
                   right: 2.w,

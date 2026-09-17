@@ -98,6 +98,12 @@ class GroupGameCategoryBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final Widget content =
                 BlocConsumer<MultiplayerBloc, MultiplayerState>(
+                 // hasCreatedGameRoom is never reset, so an unguarded listener
+                 // re-ran on every emission -- which, with session-wide invite
+                 // polling, is every ten seconds. connect() no-ops when already
+                 // connected, but there is no reason to ask it that often.
+                 listenWhen: (previous, current) =>
+                     !previous.hasCreatedGameRoom && current.hasCreatedGameRoom,
                  listener: (context, state){
                    if(state.hasCreatedGameRoom){
                      context.read<WebsocketCubit>().connect();
@@ -178,8 +184,8 @@ class GroupGameCategoryBody extends StatelessWidget {
                                      image: ProductImageRoutes.lightningMode,
                                      summary: "A race through a fixed set of questions. Everyone sees the same question at the same time.",
                                      rules: const [
-                                       "You choose how many questions the round runs for.",
-                                       "8 seconds per question -- it moves on whether you answer or not.",
+                                       "You choose how many questions the round runs for, from 10 up to 30.",
+                                       "You set the seconds per question, from 6 to 12 -- it moves on whether you answer or not.",
                                        "Answer correctly and quickly: the faster you are, the more you score.",
                                        "Highest total when the questions run out takes first place.",
                                      ],
@@ -202,8 +208,8 @@ class GroupGameCategoryBody extends StatelessWidget {
                                      image: ProductImageRoutes.xMode,
                                      summary: "A race to a coin target rather than through a set number of questions.",
                                      rules: const [
-                                       "You set the target coins when creating the game.",
-                                       "8 seconds per question, same as Lightning Mode.",
+                                       "You set the target coins when creating the game, from 1,000 up to 3,000.",
+                                       "You set the seconds per question, from 6 to 12, same as Lightning Mode.",
                                        "Correct answers earn coins; speed earns more of them.",
                                        "The first player to reach the target wins -- the round ends there.",
                                      ],

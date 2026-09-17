@@ -3,12 +3,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../shared/constants/image_routes.dart';
 
 class ToggleCard extends StatefulWidget {
-  const ToggleCard({super.key, required this.onTap, required this.selectedOption, required this.hasTwoOptions, required this.options,this.onValueSelected});
+  const ToggleCard({super.key, required this.onTap, required this.selectedOption, required this.hasTwoOptions, required this.options,this.onValueSelected, this.width, this.height});
   final VoidCallback? onTap;
   final ValueChanged<String>? onValueSelected;
   final bool? selectedOption;
   final bool hasTwoOptions;
   final List<String> options;
+
+  /// Defaults keep every existing caller as it was; the compact rows in the
+  /// create-gameplay modal pass a narrower size.
+  final double? width;
+  final double? height;
 
   @override
   State<ToggleCard> createState() => _ToggleCardState();
@@ -40,48 +45,43 @@ class _ToggleCardState extends State<ToggleCard> {
             onTap:  widget.hasTwoOptions ? widget.onTap : () => toggleListBackward(),
             child: Image.asset(
               IconImageRoutes.greenLeftCircleArrow,
-              width: 29.w,
+              width: 26.w,
             ),
           ),
 
-         widget.hasTwoOptions ? Text(
-            widget.selectedOption! ? 'against a bible gamer' : 'more than 2+ players',
-            style: TextStyle(
-                fontSize: 14.sp,
-                color: Color(0xFF014CA3),
-                fontWeight: FontWeight.w500),
-          ) : Text(
-             widget.options[currentIndex],
-           style: TextStyle(
-               fontSize: 14.sp,
-               color: Color(0xFF014CA3),
-               fontWeight: FontWeight.w500),
+         Expanded(
+           child: Text(
+             widget.hasTwoOptions
+                 ? (widget.selectedOption!
+                     ? 'against a bible gamer'
+                     : 'more than 2+ players')
+                 : widget.options[currentIndex],
+             textAlign: TextAlign.center,
+             maxLines: 1,
+             overflow: TextOverflow.ellipsis,
+             style: TextStyle(
+                 fontSize: 14.sp,
+                 color: const Color(0xFF014CA3),
+                 fontWeight: FontWeight.w600),
+           ),
          ),
           InkWell(
             onTap:widget.hasTwoOptions ? widget.onTap : () => toggleListForward(),
             child: Image.asset(
               IconImageRoutes.greenRightCircleArrow,
-              width: 29.w,
+              width: 26.w,
             ),
           ),
         ],
       ),
-      height: 50.h,
-      width: 255.w,
+      height: widget.height ?? 50.h,
+      width: widget.width ?? 255.w,
+      // Matches the text fields: a real border on white, rather than a
+      // borderless box outlined by a blurred black26 shadow.
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFFF8E7DE)),
-        borderRadius: BorderRadius.circular(4.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-          ),
-          BoxShadow(
-            color: Color(0xFFFEEDE4),
-            offset: Offset(0, 1),
-            spreadRadius: 1.0,
-            blurRadius: 5.0,
-          ),
-        ],
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE7CDBF), width: 1.5),
+        borderRadius: BorderRadius.circular(10.r),
       ),
     );
   }
