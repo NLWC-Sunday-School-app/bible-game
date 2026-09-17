@@ -400,7 +400,10 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "ERROR!",
+                          // "ERROR!" shouted at the player without saying what
+                          // went wrong. When the API gives a reason -- already
+                          // written for players -- the heading just frames it.
+                          widget.message == null ? "ERROR!" : "Invite not sent",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style:
@@ -411,14 +414,17 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
                           ),
                         ),
                         Text(
-                          "No invite was sent",
-                          maxLines: 1,
+                          // The failure branch accepted a message and then
+                          // ignored it; only the success branch ever used it.
+                          widget.message ?? "No invite was sent",
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style:
                           TextStyle(
                               color: Colors.black,
                               fontSize: 10.sp,
-                              fontWeight: FontWeight.w500
+                              fontWeight: FontWeight.w500,
+                              height: 1.25,
                           ),
                         ),
                       ],

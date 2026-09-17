@@ -50,3 +50,24 @@ class OnlinePlayer extends Equatable {
   @override
   List<Object?> get props => [userId, username, profileUrl, country];
 }
+
+/// One page of online players, plus how many there are in total.
+///
+/// The endpoint is paginated and defaults to 20 per page, so the length of
+/// [players] is a page size, not a population. Anything that reports "N online"
+/// has to read [total] instead, or it stops counting at 20 and stays there.
+class OnlinePlayersPage extends Equatable {
+  const OnlinePlayersPage({required this.players, required this.total});
+
+  const OnlinePlayersPage.empty() : players = const [], total = 0;
+
+  final List<OnlinePlayer> players;
+
+  /// Everyone online, the signed-in user included -- the endpoint does not
+  /// exclude the caller. Falls back to the page length when the response
+  /// carries no total, which at least never overstates it.
+  final int total;
+
+  @override
+  List<Object?> get props => [players, total];
+}

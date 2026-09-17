@@ -75,7 +75,7 @@ class MultiplayerAPI {
   /// Returns an empty list rather than throwing when the endpoint is missing
   /// or the payload is not a list -- an empty "Online" tab is a better failure
   /// than a modal that cannot open.
-  Future<List<OnlinePlayer>> fetchOnlinePlayers({
+  Future<OnlinePlayersPage> fetchOnlinePlayers({
     int page = 0,
     int size = 20,
     String? search,
@@ -107,14 +107,40 @@ class MultiplayerAPI {
         // "we could not read the response".
         debugPrint('\u26A0\uFE0F online players: no list in the response '
             '(keys: ${data is Map ? data.keys.toList() : data.runtimeType})');
-        return const [];
+        return const OnlinePlayersPage.empty();
       }
-      debugPrint('\u{1F7E2} online players: ${list.length} returned');
-      return list
+
+      final players = list
           .whereType<Map<String, dynamic>>()
           .map(OnlinePlayer.fromJson)
           .where((p) => p.username.isNotEmpty)
           .toList();
+
+      // Spring pages call it totalElements; the others are the spellings a
+      // hand-rolled wrapper tends to use. Without one of them a caller can
+      // only see a page size, which is how "N online" got stuck at 20.
+      int total = players.length;
+      if (data is Map) {
+        for (final key in [
+          'totalElements',
+          'totalCount',
+          'total',
+          'count',
+          'totalOnline',
+        ]) {
+          final value = data[key];
+          final parsed = value is int ? value : int.tryParse('${value ?? ''}');
+          if (parsed != null && parsed >= players.length) {
+            total = parsed;
+            break;
+          }
+        }
+      }
+
+      debugPrint('\u{1F7E2} online players: ${players.length} returned '
+          'of $total total (page $page, size $size'
+          '${search != null && search.trim().isNotEmpty ? ', search "$search"' : ''})');
+      return OnlinePlayersPage(players: players, total: total);
     } on ApiException catch (e) {
       // Surfaced, not swallowed: a 404 while the endpoint is still being
       // deployed should not look the same as an empty room.
@@ -135,8 +161,11 @@ class MultiplayerAPI {
       );
       return response.statusCode == 200;
     } on ApiException catch (e) {
-      final errorMessage = e.toString();
-      throw errorMessage;
+      // e.toString() is "ApiException: 400 - {errors: [...]}", which is not
+      // something to put in front of a player. The API's own strings are
+      // already written for them -- "An invite has already been sent to this
+      // player for this room." -- so pass those through instead.
+      throw firstApiError(e.message) ?? 'Your invite could not be sent.';
     }
   }
 
@@ -268,4 +297,21 @@ class MultiplayerAPI {
 
 
 
+}
+
+
+/// Pulls the human-readable reason out of the API's error envelope, which is
+/// {"errors": ["..."]} on this backend and occasionally {"error": "..."}.
+String? firstApiError(dynamic message) {
+  if (message is Map) {
+    final errors = message['errors'];
+    if (errors is List && errors.isNotEmpty) {
+      final first = errors.first;
+      if (first != null && '$first'.trim().isNotEmpty) return '$first'.trim();
+    }
+    final error = message['error'];
+    if (error is String && error.trim().isNotEmpty) return error.trim();
+  }
+  if (message is String && message.trim().isNotEmpty) return message.trim();
+  return null;
 }

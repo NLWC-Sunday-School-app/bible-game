@@ -67,6 +67,19 @@ class FetchGameInvites extends MultiplayerEvent{}
 /// Loads the players available to invite right now.
 class FetchOnlinePlayers extends MultiplayerEvent{}
 
+/// Looks up players by username as the host types.
+///
+/// Kept apart from [FetchOnlinePlayers] because they write to different parts
+/// of the state: a search would otherwise overwrite the browse list, and with
+/// it the "N online" count on the invite button.
+class SearchOnlinePlayers extends MultiplayerEvent {
+  final String query;
+
+  SearchOnlinePlayers(this.query);
+  @override
+  List<Object> get props => [query];
+}
+
 class CountInvite extends MultiplayerEvent{}
 
 class AcceptAndJoin extends MultiplayerEvent{

@@ -35,6 +35,7 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     on<GameInvites>(_onGameInvites);
     on<FetchGameInvites>(_onFetchGameInvite);
     on<FetchOnlinePlayers>(_onFetchOnlinePlayers);
+    on<SearchOnlinePlayers>(_onSearchOnlinePlayers);
     on<CountInvite>(_onCountInvite);
     on<AcceptAndJoin>(_onAcceptAndJoin);
     on<Reject>(_onReject);
@@ -147,12 +148,22 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
           event.gameType
       );
       emit(state.copyWith(
-          isLoadingGameInvite: false, hasInvitedUser: true));
+          isLoadingGameInvite: false,
+          hasInvitedUser: true,
+          gameInviteError: ''));
     } catch (e) {
       debugPrint('⚠️ invite to ${event.inviteeUsername} failed '
           '(room ${state.createGameRoomResponse.id}): $e');
+      // The API layer throws the server's own wording for this endpoint, which
+      // is already written for players. Anything else is a network or parsing
+      // failure and gets a generic line rather than a stack trace.
+      final reason = e is String && e.trim().isNotEmpty
+          ? e.trim()
+          : 'Your invite could not be sent. Please try again.';
       emit(state.copyWith(
-          isLoadingGameInvite: false, hasInvitedUser: false,));
+          isLoadingGameInvite: false,
+          hasInvitedUser: false,
+          gameInviteError: reason));
     }
   }
 
@@ -176,14 +187,51 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       FetchOnlinePlayers event, Emitter<MultiplayerState> emit) async {
     emit(state.copyWith(isFetchingOnlinePlayers: true));
     try {
-      final players = await _multiplayerRepository.fetchOnlinePlayers();
+      final page = await _multiplayerRepository.fetchOnlinePlayers();
       emit(state.copyWith(
-          isFetchingOnlinePlayers: false, onlinePlayers: players));
+          isFetchingOnlinePlayers: false,
+          onlinePlayers: page.players,
+          onlinePlayersTotal: page.total));
     } catch (e) {
       // Keep whatever was listed; an empty tab with a trace beats a blank one
       // with none.
       debugPrint('\u26A0\uFE0F fetchOnlinePlayers failed: $e');
       emit(state.copyWith(isFetchingOnlinePlayers: false));
+    }
+  }
+
+  /// The query the host last typed. Responses arrive in whatever order the
+  /// network returns them, so a slow "to" landing after a fast "tobi" would
+  /// otherwise replace the results with the ones for a prefix already gone.
+  String _latestSearchQuery = '';
+
+  Future<void> _onSearchOnlinePlayers(
+      SearchOnlinePlayers event, Emitter<MultiplayerState> emit) async {
+    final query = event.query.trim();
+    _latestSearchQuery = query;
+
+    if (query.isEmpty) {
+      emit(state.copyWith(
+          playerSearchResults: const [],
+          isSearchingPlayers: false,
+          playerSearchQuery: ''));
+      return;
+    }
+
+    emit(state.copyWith(isSearchingPlayers: true, playerSearchQuery: query));
+    try {
+      final page = await _multiplayerRepository.fetchOnlinePlayers(
+          search: query, size: 20);
+      if (query != _latestSearchQuery) return;
+      emit(state.copyWith(
+          isSearchingPlayers: false, playerSearchResults: page.players));
+    } catch (e) {
+      debugPrint('\u26A0\uFE0F searchOnlinePlayers("$query") failed: $e');
+      if (query != _latestSearchQuery) return;
+      // An empty result and a failed request must not look the same: the UI
+      // offers "invite anyway" on empty, which would be wrong advice here.
+      emit(state.copyWith(
+          isSearchingPlayers: false, playerSearchResults: const []));
     }
   }
 

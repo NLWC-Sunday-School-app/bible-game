@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bible_game_api/bible_game_api.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
@@ -10,11 +11,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/utils/custom_toast.dart';
-import '../../../../shared/widgets/blue_button.dart';
 import '../../../../shared/widgets/multi_avatar.dart';
 
-void showInviteModal(BuildContext context, {required String gameMode}) {
-  showDialog(
+/// Returns when the modal closes, so a caller can refresh presence it was
+/// showing behind the modal.
+Future<void> showInviteModal(BuildContext context, {required String gameMode}) {
+  return showDialog(
       context: context,
       builder: (BuildContext context) {
         return InviteModal(gameMode: gameMode);
@@ -53,7 +55,12 @@ class _InviteModalState extends State<InviteModal> {
   /// outlive the modal.
   Timer? _onlineRefreshTimer;
 
+  /// Waits for a pause in typing before asking the server. Without it every
+  /// keystroke is a request, and the answers race each other back.
+  Timer? _searchDebounce;
+
   static const _onlineRefreshInterval = Duration(seconds: 15);
+  static const _searchDebounceDelay = Duration(milliseconds: 300);
 
   @override
   void initState() {
@@ -76,8 +83,32 @@ class _InviteModalState extends State<InviteModal> {
   @override
   void dispose() {
     _onlineRefreshTimer?.cancel();
+    _searchDebounce?.cancel();
     textController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _searchDebounce?.cancel();
+    // Clearing the field should empty the results at once -- waiting 300ms to
+    // drop them leaves stale names under an empty box.
+    if (query.trim().isEmpty) {
+      context.read<MultiplayerBloc>().add(SearchOnlinePlayers(''));
+      setState(() {});
+      return;
+    }
+    // Rebuild now so the field's clear button and the stale-results check see
+    // the new text before the request goes out.
+    setState(() {});
+    _searchDebounce = Timer(_searchDebounceDelay, () {
+      if (!mounted) return;
+      context.read<MultiplayerBloc>().add(SearchOnlinePlayers(query));
+    });
+  }
+
+  void _invite(String username) {
+    setState(() => _pendingInvite = username);
+    context.read<MultiplayerBloc>().add(GameInvites(username, widget.gameMode));
   }
 
 
@@ -103,18 +134,34 @@ class _InviteModalState extends State<InviteModal> {
               previous.isLoadingGameInvite && !current.isLoadingGameInvite,
           listener: (context, state) {
             final invitee = _pendingInvite;
+            // "already been sent" means the row is, in fact, invited -- so mark
+            // it as such rather than leaving a button that will fail again.
+            final alreadyInvited = !state.hasInvitedUser &&
+                state.gameInviteError.toLowerCase().contains('already been sent');
             setState(() {
               _pendingInvite = null;
-              if (state.hasInvitedUser && invitee != null) _invited.add(invitee);
+              if ((state.hasInvitedUser || alreadyInvited) && invitee != null) {
+                _invited.add(invitee);
+              }
             });
 
-            CustomToast.showInviteToast(context,
-                isInviteSuccessful: state.hasInvitedUser);
+            CustomToast.showInviteToast(
+              context,
+              isInviteSuccessful: state.hasInvitedUser,
+              // Say why. Re-inviting someone came back as a bare "ERROR!",
+              // where the server had actually explained itself.
+              message: state.hasInvitedUser || state.gameInviteError.isEmpty
+                  ? null
+                  : state.gameInviteError,
+              duration: state.hasInvitedUser
+                  ? const Duration(seconds: 2)
+                  : const Duration(seconds: 4),
+            );
 
-            // The username tab is a one-shot, so closing is the right ending.
-            // The online list is not -- you usually want to invite more than
-            // one person, and the row now says "Invited" instead.
-            if (state.hasInvitedUser && !_showOnline) Navigator.pop(context);
+            // Neither tab closes on success now. The username tab used to,
+            // back when it was one blind field and one send -- but it lists
+            // matches too, and closing the modal under someone about to invite
+            // a second name is the wrong ending. Both tabs say "Invited".
           },
           child: Column(
               children: [
@@ -187,18 +234,15 @@ class _InviteModalState extends State<InviteModal> {
                                       key: const ValueKey('online'),
                                       invited: _invited,
                                       pendingInvite: _pendingInvite,
-                                      onInvite: (username) {
-                                        setState(
-                                            () => _pendingInvite = username);
-                                        context.read<MultiplayerBloc>().add(
-                                            GameInvites(
-                                                username, widget.gameMode));
-                                      },
+                                      onInvite: _invite,
                                     )
                                   : _ByUsernameForm(
                                       key: const ValueKey('username'),
                                       controller: textController,
-                                      gameMode: widget.gameMode,
+                                      invited: _invited,
+                                      pendingInvite: _pendingInvite,
+                                      onQueryChanged: _onSearchChanged,
+                                      onInvite: _invite,
                                     ),
                             ),
                           ),
@@ -333,76 +377,99 @@ class _OnlinePlayersList extends StatelessWidget {
           separatorBuilder: (_, __) => SizedBox(height: 8.h),
           itemBuilder: (context, index) {
             final player = players[index];
-            final isInvited = invited.contains(player.username);
-            final isPending = pendingInvite == player.username;
-            final isTappable = !isInvited && pendingInvite == null;
-
-            // Only the pill invites. Tapping the card did too, which made an
-            // irreversible action reachable by a stray tap anywhere in the row.
-            return AnimatedOpacity(
-                duration: const Duration(milliseconds: 150),
-                opacity: isTappable || isPending ? 1 : 0.55,
-                child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.r),
-                  border: Border.all(color: const Color(0xFFF8E7DE), width: 2),
-                ),
-                child: Row(
-                  children: [
-                    // Seeded on the user id like every other avatar in the app,
-                    // so a player looks the same here as on the leaderboard.
-                    // profileUrl is no good as a seed: most accounts share one
-                    // default placeholder URL, which gave them all one face.
-                    AvatarWidget(
-                        seed: player.userId.toString(),
-                        width: 34.w,
-                        height: 34.w),
-                    SizedBox(width: 10.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            player.username,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF014CA3),
-                            ),
-                          ),
-                          if (player.country.isNotEmpty)
-                            Text(
-                              player.country,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black.withValues(alpha: 0.45),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap:
-                          isTappable ? () => onInvite(player.username) : null,
-                      child: _InvitePill(
-                          isInvited: isInvited, isPending: isPending),
-                    ),
-                  ],
-                ),
-                ),
+            return _PlayerRow(
+              player: player,
+              isInvited: invited.contains(player.username),
+              isPending: pendingInvite == player.username,
+              anyPending: pendingInvite != null,
+              onInvite: onInvite,
             );
           },
         );
       },
+    );
+  }
+}
+
+/// One invitable player. Shared by the browse list and the search results so
+/// a name looks and behaves the same whichever way you arrived at it.
+class _PlayerRow extends StatelessWidget {
+  const _PlayerRow({
+    required this.player,
+    required this.isInvited,
+    required this.isPending,
+    required this.anyPending,
+    required this.onInvite,
+  });
+
+  final OnlinePlayer player;
+  final bool isInvited;
+  final bool isPending;
+  final bool anyPending;
+  final ValueChanged<String> onInvite;
+
+  @override
+  Widget build(BuildContext context) {
+    final isTappable = !isInvited && !anyPending;
+
+    // Only the pill invites. Tapping the card did too, which made an
+    // irreversible action reachable by a stray tap anywhere in the row.
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 150),
+      opacity: isTappable || isPending ? 1 : 0.55,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(color: const Color(0xFFF8E7DE), width: 2),
+        ),
+        child: Row(
+          children: [
+            // Seeded on the user id like every other avatar in the app,
+            // so a player looks the same here as on the leaderboard.
+            // profileUrl is no good as a seed: most accounts share one
+            // default placeholder URL, which gave them all one face.
+            AvatarWidget(
+                seed: player.userId.toString(), width: 34.w, height: 34.w),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    player.username,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF014CA3),
+                    ),
+                  ),
+                  if (player.country.isNotEmpty)
+                    Text(
+                      player.country,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black.withValues(alpha: 0.45),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: isTappable ? () => onInvite(player.username) : null,
+              child: _InvitePill(isInvited: isInvited, isPending: isPending),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -462,57 +529,52 @@ class _InvitePill extends StatelessWidget {
   }
 }
 
-/// The typed-username fallback, as its own widget so both tabs are a single
-/// child of the same Expanded. That is what keeps the tab row from moving:
-/// previously the list filled the column and the form did not, so the column's
-/// centring pulled the tabs down on this tab and not the other.
+/// Find-a-player-by-name, as its own widget so both tabs are a single child of
+/// the same Expanded. That is what keeps the tab row from moving: previously
+/// the list filled the column and the form did not, so the column's centring
+/// pulled the tabs down on this tab and not the other.
+///
+/// The field searches as you type. It used to be a blind text box whose only
+/// feedback was the invite coming back "user not found" -- you had to know the
+/// username exactly, and a typo cost a round trip to find out.
+///
+/// The endpoint only searches players who are ONLINE, so a friend who is not
+/// connected will never appear here however carefully you spell them. That is
+/// why the typed name stays sendable: no match is a reason to offer the invite
+/// anyway, not to block it.
 class _ByUsernameForm extends StatelessWidget {
   const _ByUsernameForm({
     super.key,
     required this.controller,
-    required this.gameMode,
+    required this.invited,
+    required this.pendingInvite,
+    required this.onQueryChanged,
+    required this.onInvite,
   });
 
   final TextEditingController controller;
-  final String gameMode;
+  final Set<String> invited;
+  final String? pendingInvite;
+  final ValueChanged<String> onQueryChanged;
+  final ValueChanged<String> onInvite;
 
   static const _blue = Color(0xFF014CA3);
 
-  void _send(BuildContext context) {
-    final username = controller.text.trim();
-    if (username.isEmpty) return;
-    context.read<MultiplayerBloc>().add(GameInvites(username, gameMode));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 22.w),
-      child: Column(
-        children: [
-          SizedBox(height: 14.h),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Username',
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.4,
-                color: _blue.withValues(alpha: 0.65),
-              ),
-            ),
-          ),
-          SizedBox(height: 6.h),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
           // Was a borderless field on a peach panel with a black26 shadow
           // bleeding out of it -- no edge to see, and the hint was the same
           // blue as typed text, so it read as a value rather than a prompt.
-          TextField(
+          child: TextField(
             controller: controller,
             autocorrect: false,
             enableSuggestions: false,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _send(context),
+            textInputAction: TextInputAction.search,
+            onChanged: onQueryChanged,
             style: TextStyle(
               color: _blue,
               fontSize: 14.sp,
@@ -523,11 +585,26 @@ class _ByUsernameForm extends StatelessWidget {
               filled: true,
               fillColor: Colors.white,
               contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.w, vertical: 13.h),
-              prefixIcon: Icon(Icons.alternate_email_rounded,
-                  size: 17.sp, color: _blue.withValues(alpha: 0.45)),
+                  EdgeInsets.symmetric(horizontal: 12.w, vertical: 11.h),
+              prefixIcon: Icon(Icons.search_rounded,
+                  size: 18.sp, color: _blue.withValues(alpha: 0.45)),
               prefixIconConstraints: BoxConstraints(minWidth: 38.w),
-              hintText: 'Enter their username',
+              suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: controller,
+                builder: (context, value, _) {
+                  if (value.text.isEmpty) return const SizedBox.shrink();
+                  return GestureDetector(
+                    onTap: () {
+                      controller.clear();
+                      onQueryChanged('');
+                    },
+                    child: Icon(Icons.close_rounded,
+                        size: 17.sp, color: _blue.withValues(alpha: 0.45)),
+                  );
+                },
+              ),
+              suffixIconConstraints: BoxConstraints(minWidth: 34.w),
+              hintText: 'Search by username',
               hintStyle: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w500,
@@ -544,27 +621,210 @@ class _ByUsernameForm extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 26.h),
-          // Nothing to send until something is typed. A dimmed button says that
-          // up front, rather than a request that comes back "user not found".
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: controller,
-            builder: (context, value, _) {
-              final canSend = value.text.trim().isNotEmpty;
-              return BlocBuilder<MultiplayerBloc, MultiplayerState>(
-                builder: (context, state) {
-                  return BlueButton(
-                    onTap: canSend ? () => _send(context) : null,
-                    isActive: canSend,
-                    buttonText: 'Send Invite',
-                    buttonIsLoading: state.isLoadingGameInvite,
-                    width: 280.w,
+        ),
+        SizedBox(height: 10.h),
+        Expanded(
+          child: BlocBuilder<MultiplayerBloc, MultiplayerState>(
+            builder: (context, state) {
+              final typed = controller.text.trim();
+              if (typed.isEmpty) return const _SearchPrompt();
+
+              // The results belong to whatever was last typed; while the
+              // debounce is still pending they are for an older prefix, so
+              // treat that gap as loading rather than as an answer.
+              final isStale = state.playerSearchQuery != typed;
+              if (state.isSearchingPlayers || isStale) {
+                return const _LoadingRows();
+              }
+
+              // Searching your own name matches you -- the endpoint does not
+              // exclude the caller, and the browse list's filter does not
+              // reach here. Without this, "tobi" offers Tobi1 an Invite
+              // button that the server will only reject.
+              final currentUserId =
+                  context.read<AuthenticationBloc>().state.user.id;
+              final results = state.playerSearchResults
+                  .where((player) => player.userId != currentUserId)
+                  .toList();
+
+              if (results.isEmpty) {
+                return _NoSearchMatch(
+                  query: typed,
+                  // Offering "invite anyway" on your own name would send an
+                  // invite to yourself, which only comes back an error.
+                  isSelf: typed.toLowerCase() ==
+                      context
+                          .read<AuthenticationBloc>()
+                          .state
+                          .user
+                          .name
+                          .toLowerCase(),
+                  isInvited: invited.contains(typed),
+                  isPending: pendingInvite == typed,
+                  anyPending: pendingInvite != null,
+                  onInvite: onInvite,
+                );
+              }
+
+              return ListView.separated(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                itemCount: results.length,
+                separatorBuilder: (_, __) => SizedBox(height: 8.h),
+                itemBuilder: (context, index) {
+                  final player = results[index];
+                  return _PlayerRow(
+                    player: player,
+                    isInvited: invited.contains(player.username),
+                    isPending: pendingInvite == player.username,
+                    anyPending: pendingInvite != null,
+                    onInvite: onInvite,
                   );
                 },
               );
             },
           ),
-        ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Before anything is typed. Says what the field searches, since it only
+/// reaches people who are connected right now.
+class _SearchPrompt extends StatelessWidget {
+  const _SearchPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    const blue = Color(0xFF014CA3);
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 28.w),
+        child: Text(
+          'Start typing to find a player.\nYou can invite someone who is offline too.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+            height: 1.45,
+            color: blue.withValues(alpha: 0.55),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Nobody online matches. The typed name is still sendable -- they may simply
+/// be offline, and the invite endpoint does not require them to be connected.
+class _NoSearchMatch extends StatelessWidget {
+  const _NoSearchMatch({
+    required this.query,
+    required this.isSelf,
+    required this.isInvited,
+    required this.isPending,
+    required this.anyPending,
+    required this.onInvite,
+  });
+
+  final String query;
+  final bool isSelf;
+  final bool isInvited;
+  final bool isPending;
+  final bool anyPending;
+  final ValueChanged<String> onInvite;
+
+  static const _blue = Color(0xFF014CA3);
+
+  @override
+  Widget build(BuildContext context) {
+    if (isSelf) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 28.w),
+          child: Text(
+            "That's you.\nSearch for someone else to invite.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              height: 1.45,
+              color: _blue.withValues(alpha: 0.55),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final canInvite = !isInvited && !anyPending;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'No one online called "$query"',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w700,
+                color: _blue,
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              'They may be offline. Send it anyway and they will see it next time they open the app.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+                color: _blue.withValues(alpha: 0.55),
+              ),
+            ),
+            SizedBox(height: 14.h),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: canInvite ? () => onInvite(query) : null,
+              child: Opacity(
+                opacity: canInvite || isPending ? 1 : 0.55,
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+                  decoration: BoxDecoration(
+                    color: isInvited ? Colors.transparent : _blue,
+                    border:
+                        isInvited ? Border.all(color: _blue, width: 1.5) : null,
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: isPending
+                      ? SizedBox(
+                          width: 16.w,
+                          height: 16.w,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          isInvited ? 'Invited' : 'Invite "$query" anyway',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w700,
+                            color: isInvited ? _blue : Colors.white,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

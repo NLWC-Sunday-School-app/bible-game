@@ -13,6 +13,20 @@ class MultiplayerState extends Equatable{
   final bool hasInvitedUser;
   final List<OnlinePlayer> onlinePlayers;
   final bool isFetchingOnlinePlayers;
+
+  /// Everyone online, not just the page in [onlinePlayers]. The endpoint pages
+  /// at 20, so counting the list caps any "N online" badge at 20 forever.
+  final int onlinePlayersTotal;
+
+  /// The username search, kept apart from the browse list so a search cannot
+  /// overwrite it -- and with it the count on the invite button.
+  final List<OnlinePlayer> playerSearchResults;
+  final bool isSearchingPlayers;
+  final String playerSearchQuery;
+
+  /// Why the last invite failed, in the API's own words. Empty when the last
+  /// attempt succeeded or none has been made.
+  final String gameInviteError;
   final bool isFetchingListOfGameInvite;
   final bool hasFetchedGameInvite;
   final bool isLoadingAcceptInvite;
@@ -45,6 +59,11 @@ class MultiplayerState extends Equatable{
         required this.hasInvitedUser,
         this.onlinePlayers = const [],
     this.isFetchingOnlinePlayers = false,
+    this.onlinePlayersTotal = 0,
+    this.playerSearchResults = const [],
+    this.isSearchingPlayers = false,
+    this.playerSearchQuery = '',
+    this.gameInviteError = '',
     required this.isFetchingListOfGameInvite,
         required this.hasFetchedGameInvite,
         required this.listOfInvite,
@@ -104,6 +123,11 @@ MultiplayerState copyWith(
         bool? hasInvitedUser,
         List<OnlinePlayer>? onlinePlayers,
     bool? isFetchingOnlinePlayers,
+    int? onlinePlayersTotal,
+    List<OnlinePlayer>? playerSearchResults,
+    bool? isSearchingPlayers,
+    String? playerSearchQuery,
+    String? gameInviteError,
     bool? isFetchingListOfGameInvite,
         bool? hasFetchedGameInvite,
         List<GameInviteModel>? listOfInvite,
@@ -132,7 +156,12 @@ MultiplayerState copyWith(
         isLoadingGameInvite: isLoadingGameInvite ?? this.isLoadingGameInvite,
         hasInvitedUser: hasInvitedUser ?? this.hasInvitedUser,
         onlinePlayers: onlinePlayers ?? this.onlinePlayers,
+      gameInviteError: gameInviteError ?? this.gameInviteError,
       isFetchingOnlinePlayers: isFetchingOnlinePlayers ?? this.isFetchingOnlinePlayers,
+      onlinePlayersTotal: onlinePlayersTotal ?? this.onlinePlayersTotal,
+      playerSearchResults: playerSearchResults ?? this.playerSearchResults,
+      isSearchingPlayers: isSearchingPlayers ?? this.isSearchingPlayers,
+      playerSearchQuery: playerSearchQuery ?? this.playerSearchQuery,
       isFetchingListOfGameInvite: isFetchingListOfGameInvite ?? this.isFetchingListOfGameInvite,
         hasFetchedGameInvite: hasFetchedGameInvite ?? this.hasFetchedGameInvite,
         listOfInvite: listOfInvite ?? this.listOfInvite,
@@ -177,6 +206,11 @@ MultiplayerState copyWith(
     hostVictoryCondition,
     onlinePlayers,
     isFetchingOnlinePlayers,
+    onlinePlayersTotal,
+    playerSearchResults,
+    isSearchingPlayers,
+    playerSearchQuery,
+    gameInviteError,
   ];
 }
 

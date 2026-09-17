@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bible_game/features/multi_player/game_mode_codes.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
@@ -11,12 +13,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bible_game/features/multi_player/widget/player_waiting_card.dart';
-import 'package:bible_game/shared/widgets/blue_button.dart';
 import '../../../../shared/constants/app_routes.dart';
 import '../../../../shared/constants/image_routes.dart';
 import '../../../../shared/utils/custom_toast.dart';
-import '../../../../shared/widgets/custom_toast.dart';
-import '../../../../shared/widgets/green_button.dart';
 import '../../../../shared/widgets/modal/network_modal.dart';
 import '../../../lightning_mode/bloc/lightning_mode_bloc.dart';
 import '../multiplayer_button.dart';
@@ -67,6 +66,134 @@ class PlayersWaitingModal extends StatefulWidget {
 class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
   WebsocketConnectionStatus _lastConnectionStatus = WebsocketConnectionStatus.disconnected;
 
+  /// Presence for the invite button's count. The invite modal polls this too,
+  /// but the count has to be on the button *before* it is tapped -- that is
+  /// what makes it worth tapping.
+  Timer? _onlineRefreshTimer;
+
+  /// The invite modal runs its own 15s poll while it is open, so this one
+  /// stands down rather than doubling the requests.
+  bool _inviteModalOpen = false;
+
+  static const _onlineRefreshInterval = Duration(seconds: 20);
+
+  @override
+  void initState() {
+    super.initState();
+    // Guests have no invite button, so nothing here to feed.
+    if (widget.isWaitingForHost) return;
+    context.read<MultiplayerBloc>().add(FetchOnlinePlayers());
+    _onlineRefreshTimer = Timer.periodic(_onlineRefreshInterval, (_) {
+      if (!mounted || _inviteModalOpen) return;
+      context.read<MultiplayerBloc>().add(FetchOnlinePlayers());
+    });
+  }
+
+  @override
+  void dispose() {
+    _onlineRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Everyone connected but you -- the endpoint includes the signed-in user,
+  /// and you cannot invite yourself, so counting yourself would promise a row
+  /// the invite list does not show.
+  ///
+  /// Reads the page's total rather than its length. The endpoint pages at 20,
+  /// so counting the loaded list showed "19 online" from the twentieth
+  /// concurrent player onwards, however many were really there.
+  int _onlineCount(BuildContext context) {
+    final total = context.watch<MultiplayerBloc>().state.onlinePlayersTotal;
+    return total > 0 ? total - 1 : 0;
+  }
+
+  Future<void> _openInviteModal(String? roomGameMode) async {
+    setState(() => _inviteModalOpen = true);
+    await showInviteModal(
+      context,
+      gameMode: gameModeCode(
+        widget.selectedGroupGame.isNotEmpty
+            ? widget.selectedGroupGame
+            : roomGameMode,
+      ),
+    );
+    if (!mounted) return;
+    setState(() => _inviteModalOpen = false);
+    // Whoever was listed is 20s stale by now, and someone may have just been
+    // invited out of the list.
+    context.read<MultiplayerBloc>().add(FetchOnlinePlayers());
+  }
+
+  /// The four modes differ only by icon and label, which a lookup says more
+  /// plainly than the chain of conditionals this replaced.
+  Widget _modeHeader() {
+    final String asset;
+    final String label;
+    switch (widget.selectedGroupGame) {
+      case 'Lightning Mode':
+        asset = ProductImageRoutes.lightningMode;
+        label = 'Lightning Mode';
+        break;
+      case 'Time-based Mode':
+        asset = ProductImageRoutes.timeBasedMode;
+        label = 'Time-Based Mode';
+        break;
+      case 'First to X':
+        asset = ProductImageRoutes.xMode;
+        label = 'First to X Mode';
+        break;
+      default:
+        asset = ProductImageRoutes.survivalMode;
+        label = 'Survival Mode';
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(asset, height: 34.h, width: 34.w),
+        SizedBox(width: 5.w),
+        Text(
+          label,
+          style: TextStyle(
+              color: Color(0xFF014CA3),
+              fontWeight: FontWeight.w700,
+              fontSize: 16.sp),
+        ),
+      ],
+    );
+  }
+
+  /// The settings the host picked seconds ago, on one line. They were a
+  /// two-column block taking a third of the card to confirm a choice already
+  /// made -- worth a glance, not the space.
+  String _gameSummary(BuildContext context) {
+    final parts = <String>[];
+
+    final type = widget.questionType ??
+        context.watch<WebsocketCubit>().state.waitingRoomInfo.gameMode;
+    if (type != null && type.isNotEmpty) parts.add(type);
+
+    if (widget.selectedGroupGame == 'Time-based Mode' ||
+        widget.selectedGroupGame == 'Survival Mode') {
+      parts.add('10 minutes');
+    } else if (widget.selectedGroupGame == 'First to X') {
+      final target = widget.noOfQuestion ??
+          context
+              .read<MultiplayerBloc>()
+              .state
+              .createGameRoomResponse
+              .victoryCondition
+              ?.value;
+      parts.add('target ${target ?? 'N/A'}');
+    } else {
+      final count = widget.noOfQuestion ??
+          context.watch<WebsocketCubit>().state.waitingRoomInfo.totalQuestions;
+      if (count != null) parts.add('$count questions');
+    }
+
+    return parts.join('  ·  ');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -101,7 +228,29 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                       ],
                       color: Color(0xFFFFEED6),
                     ),
-                    child: Column(
+                    // The glow used to be a screen-level Positioned sized to a
+                    // card that filled half the screen. Now that the card is
+                    // short it belongs inside it, clipped -- otherwise the
+                    // bokeh spills onto the players panel below.
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 4,
+                            left: 0,
+                            right: 0,
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Image.asset(
+                                ProductImageRoutes.glowIcon,
+                                fit: BoxFit.contain,
+                                width: 273.w,
+                                height: 130.h,
+                              ),
+                            ),
+                          ),
+                          Column(
                       children: [
                         Align(
                           alignment: Alignment.topRight,
@@ -136,225 +285,24 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             ),
                           ),
                         ),
-                        widget.selectedGroupGame == "Lightning Mode"
-                            ?
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              ProductImageRoutes.lightningMode,
-                              height: 40.h,
-                              width: 40.w,
-                            ),
-                            SizedBox(width: 5,),
-                            Text(
-                              'Lightning Mode',
-                              style: TextStyle(
-                                  color: Color(0xFF014CA3),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16.sp),
-                            ),
-                          ],
-                        )
-                            :
-                        widget.selectedGroupGame == "Time-based Mode"?
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              ProductImageRoutes.timeBasedMode,
-                              height: 40.h,
-                              width: 40.w,
-                            ),
-                            SizedBox(width: 5,),
-                            Text(
-                              'Time-Based Mode',
-                              style: TextStyle(
-                                  color: Color(0xFF014CA3),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16.sp),
-                            ),
-                          ],
-                        )
-                            :
-                        widget.selectedGroupGame == "First to X"?
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              ProductImageRoutes.xMode,
-                              height: 40.h,
-                              width: 40.w,
-                            ),
-                            SizedBox(width: 5,),
-                            Text(
-                              'First to X Mode',
-                              style: TextStyle(
-                                  color: Color(0xFF014CA3),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16.sp),
-                            ),
-                          ],
-                        )
-                            :
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              ProductImageRoutes.survivalMode,
-                              height: 40.h,
-                              width: 40.w,
-                            ),
-                            SizedBox(width: 5,),
-                            Text(
-                              'Survival Mode',
-                              style: TextStyle(
-                                  color: Color(0xFF014CA3),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16.sp),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    "Question type: ",
-                                    style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400
-                                    )
-                                ),
-
-                                SizedBox(height: 10.h,),
-                                widget.selectedGroupGame == "Time-based Mode"||widget.selectedGroupGame == "Survival Mode"?
-                                Text(
-                                    "Duration: ",
-                                    style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400
-                                    )
-                                )
-                                    :
-                                widget.selectedGroupGame == "First to X"?
-                                Text(
-                                    "Target Point X: ",
-                                    style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400
-                                    )
-                                )
-                                    :
-                                Text(
-                                    "No of Questions:   ",
-                                    style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400
-                                    )
-                                ),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    widget.questionType == null?"${context.watch<WebsocketCubit>().state.waitingRoomInfo.gameMode}":widget.questionType!,
-                                    style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500
-                                    )
-                                ),
-
-                                SizedBox(height: 10.h,),
-                                widget.selectedGroupGame == "Time-based Mode"||widget.selectedGroupGame == "Survival Mode"?
-                                Text(
-                                    "10 minutes",
-                                    style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500
-                                    )
-                                )
-                                    :
-                                widget.selectedGroupGame == "First to X"?
-                                Text(
-                                    "${widget.noOfQuestion ?? context.read<MultiplayerBloc>().state.createGameRoomResponse.victoryCondition?.value ?? 'N/A'}",
-                                    style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500
-                                    )
-                                )
-                                    :
-                                Text(
-                                    "${widget.noOfQuestion??context.watch<WebsocketCubit>().state.waitingRoomInfo.totalQuestions}",
-                                    style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500
-                                    )
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 36.h,),
+                        _modeHeader(),
+                        SizedBox(height: 6.h,),
                         Text(
-                          'Code to join gameplay',
+                          _gameSummary(context),
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 13.sp),
-                        ),
-                        SizedBox(
-                          height: 10.h,
-                        ),
-                        Container(
-                          width: 260.w,
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                              border:
-                              Border.all(color: Color(0xFFD8B98C)),
-                              borderRadius: BorderRadius.circular(4.r)),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Spacer(),
-                                  Text(
-                                    "${widget.inviteCode}",
-                                    style: TextStyle(
-                                      fontSize: 24.sp,
-                                      fontWeight: FontWeight.w900,
-                                      color: Color(0xFF014CA3),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: (){
-                                      Clipboard.setData(ClipboardData(text: widget.inviteCode));
-                                      Flushbar(
-                                        message: 'Copied',
-                                        flushbarPosition: FlushbarPosition.TOP,
-                                        flushbarStyle: FlushbarStyle.GROUNDED,
-                                        backgroundColor: Colors.green,
-                                        duration: Duration(seconds: 3),
-                                      ).show(context);
-                                    },
-                                    icon: Icon(
-                                      Icons.copy,
-                                      color: Color(0xFF014CA3),
-                                    ),
-                                  ),
-                                  Spacer()
-                                ],
-                              ),
-                            ],
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black.withValues(alpha: 0.55),
                           ),
                         ),
-                        SizedBox(height: 36.h,),
+                        SizedBox(height: 18.h,),
+                        _ShareCodeRow(inviteCode: widget.inviteCode),
+                        SizedBox(height: 16.h,),
                       ],
+                    ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 12.h,),
@@ -455,48 +403,52 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                   children: [
                                     widget.isWaitingForHost == false
                                         ?
-                                InkWell(
-                                      child: Row(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: (){
-                                              showInviteModal(
-                                                context,
-                                                gameMode: gameModeCode(
-                                                  widget.selectedGroupGame.isNotEmpty
-                                                      ? widget.selectedGroupGame
-                                                      : state.waitingRoomInfo.gameMode,
-                                                ),
-                                              );
-                                            },
-                                            child: Container(
+                                Flexible(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () => _openInviteModal(
+                                            state.waitingRoomInfo.gameMode),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
                                               height: 31.h,
                                               width: 31.w,
                                               decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: Color(0xFFD9D9D9),
-                                                  border: Border.all(
-                                                      color: Colors.white,
-                                                      width: 1
-                                                  )
+                                                  // Was 0xFFD9D9D9 -- the grey
+                                                  // the app uses for inert
+                                                  // chrome, which read as a
+                                                  // disabled control next to
+                                                  // everything else in blue.
+                                                  color: Color(0xFF014CA3),
                                               ),
                                               child: Center(
                                                 child: Icon(
-                                                  Icons.add
+                                                  Icons.person_add_alt_1_rounded,
+                                                  size: 16.sp,
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(width: 4.w,),
-                                          Text(
-                                            'Invite',
-                                            style: TextStyle(
-                                              fontSize: 13.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xFF122F52),
+                                            SizedBox(width: 6.w,),
+                                            Text(
+                                              'Invite',
+                                              style: TextStyle(
+                                                fontSize: 13.sp,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF014CA3),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            if (_onlineCount(context) > 0) ...[
+                                              SizedBox(width: 6.w,),
+                                              Flexible(
+                                                child: _OnlineChip(
+                                                    count: _onlineCount(context)),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
                                       ),
                                     ):SizedBox.shrink(),
                                     Text(
@@ -512,19 +464,17 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                               ),
                               Expanded(
                                 child: state.waitingRoomInfo.players.length == 0?
-                                    Center(
-                                      child: Text(
-                                        'Waiting for players',
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF122F52),
-                                        ),
-                                      ),
+                                    _EmptyRoom(
+                                      isWaitingForHost: widget.isWaitingForHost,
+                                      onlineCount: _onlineCount(context),
+                                      onInvite: () => _openInviteModal(
+                                          state.waitingRoomInfo.gameMode),
                                     )
                                     :
                                 ListView.builder(
-                                  padding: EdgeInsets.zero,
+                                  // Clear of the Start Game button, which floats
+                                  // over the bottom of this panel.
+                                  padding: EdgeInsets.only(bottom: 80.h),
                                   itemCount: state.waitingRoomInfo.players.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     return PlayerWaitingCard(
@@ -552,21 +502,6 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                   ),
                 ],
               ),
-              Positioned(
-                top: 60,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                    child: Image.asset(
-                  ProductImageRoutes.glowIcon,
-                  fit: BoxFit.contain ,
-                  width: 273.w,
-                  height: 165.h,
-                )
-                ),
-              ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: BlocBuilder<WebsocketCubit, WebsocketState>(
@@ -587,6 +522,221 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The code, demoted. Sharing it is the slow path -- leave the app, pick a
+/// channel, and the other person still has to open the app, find "join with
+/// code" and type eight characters -- so it no longer outweighs the invite
+/// button, which reaches people who are already connected.
+class _ShareCodeRow extends StatelessWidget {
+  const _ShareCodeRow({required this.inviteCode});
+
+  final String inviteCode;
+
+  static const _blue = Color(0xFF014CA3);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      // The whole row copies now. The icon was the only target before, which
+      // is a 24px hit area for the one thing this row exists to do.
+      onTap: () {
+        Clipboard.setData(ClipboardData(text: inviteCode));
+        Flushbar(
+          message: 'Copied',
+          flushbarPosition: FlushbarPosition.TOP,
+          flushbarStyle: FlushbarStyle.GROUNDED,
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ).show(context);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
+        decoration: BoxDecoration(
+          border: Border.all(color: Color(0xFFD8B98C)),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Or share code',
+              style: TextStyle(
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black.withValues(alpha: 0.5),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              inviteCode,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.5,
+                color: _blue,
+              ),
+            ),
+            SizedBox(width: 6.w),
+            Icon(Icons.copy_rounded,
+                size: 15.sp, color: _blue.withValues(alpha: 0.7)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// How many people the invite list would show. A bare "Invite" promises
+/// nothing; a number is the reason to tap.
+class _OnlineChip extends StatelessWidget {
+  const _OnlineChip({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
+      decoration: BoxDecoration(
+        color: Color(0xFF1DB954).withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6.w,
+            height: 6.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF19A44B),
+            ),
+          ),
+          SizedBox(width: 4.w),
+          Flexible(
+            child: Text(
+              '$count online',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF14803A),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// An empty room is where the host actually looks, so it carries the ask
+/// rather than narrating the problem. "Waiting for players" described the
+/// situation and offered no way out of it.
+class _EmptyRoom extends StatelessWidget {
+  const _EmptyRoom({
+    required this.isWaitingForHost,
+    required this.onlineCount,
+    required this.onInvite,
+  });
+
+  final bool isWaitingForHost;
+  final int onlineCount;
+  final VoidCallback onInvite;
+
+  static const _blue = Color(0xFF014CA3);
+
+  @override
+  Widget build(BuildContext context) {
+    // A guest has no invite button, so there is nothing to ask them for.
+    if (isWaitingForHost) {
+      return Center(
+        child: Text(
+          'Waiting for players',
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF122F52),
+          ),
+        ),
+      );
+    }
+
+    return Center(
+      child: Padding(
+        // Clear of the Start Game button floating over the bottom of the panel.
+        padding: EdgeInsets.only(left: 28.w, right: 28.w, bottom: 60.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'No one here yet',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF122F52),
+              ),
+            ),
+            SizedBox(height: 6.h),
+            Text(
+              onlineCount > 0
+                  ? 'Invite someone who is online right now, or share the code above.'
+                  : 'Invite a friend by username, or share the code above.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+                color: Color(0xFF122F52).withValues(alpha: 0.6),
+              ),
+            ),
+            SizedBox(height: 18.h),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onInvite,
+              child: Container(
+                padding:
+                    EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: _blue,
+                  borderRadius: BorderRadius.circular(24.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _blue.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.person_add_alt_1_rounded,
+                        size: 16.sp, color: Colors.white),
+                    SizedBox(width: 8.w),
+                    Text(
+                      onlineCount > 0
+                          ? 'Invite  ·  $onlineCount online'
+                          : 'Invite players',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
