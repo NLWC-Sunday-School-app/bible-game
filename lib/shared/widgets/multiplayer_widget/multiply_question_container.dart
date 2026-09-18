@@ -43,6 +43,7 @@ class MultiplayerQuestionContainer extends StatelessWidget {
     this.noOfCorrectAnswers = 0,
     required this.gameMode,
     this.maxContentWidth,
+    this.feedAnchorKey,
   });
 
   final Datum gameQuestion;
@@ -67,6 +68,13 @@ class MultiplayerQuestionContainer extends StatelessWidget {
   /// width is correct; tablets pass a value so options do not stretch
   /// across the whole screen.
   final double? maxContentWidth;
+
+  /// Marks the row holding the rank flag. The in-game toasts sit in the empty
+  /// rest of it -- clear of the score above and the timer below.
+  final Key? feedAnchorKey;
+
+  /// Width of the rank flag at the start of that row.
+  static double get rankFlagWidth => 70.w;
 
   @override
   Widget build(BuildContext context) {
@@ -226,10 +234,11 @@ class MultiplayerQuestionContainer extends StatelessWidget {
               )
           ),
           Row(
+            key: feedAnchorKey,
             children: [
               Container(
                 height: 70.h,
-                width: 70.w,
+                width: rankFlagWidth,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(ProductImageRoutes.completedUser),

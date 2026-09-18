@@ -1,4 +1,5 @@
 import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
+import 'package:bible_game/features/multi_player/game_feed_toaster.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_leaderboard.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/shared/utils/custom_toast.dart';
@@ -7,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../shared/widgets/custom_toast.dart';
 import '../../../shared/widgets/quit_modal.dart';
 import '../../../shared/widgets/modal/network_modal.dart';
 
@@ -36,6 +36,9 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
   /// alone ran on both, pushing the screen twice. The first push also arrived
   /// before the result did, so the copy underneath was the emptier one.
   bool _leaderboardShown = false;
+
+  late final GameFeedToaster _feed;
+  final GlobalKey _feedAnchorKey = GlobalKey();
 
   late AnimationController _animationController;
   late int _currentPage;
@@ -87,7 +90,12 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ToastManager.init(context);
+    // Whatever message is already in state arrived before this screen -- the
+    // last join from the waiting room, say -- and is not news any more.
+    _feed = GameFeedToaster(context,
+        anchorKey: _feedAnchorKey,
+        seenUpTo:
+            context.read<WebsocketCubit>().state.feedMessage?.id ?? 0);
     _currentPage = 0;
     startTime = DateTime.now();
     durationPerQuestion =
@@ -187,6 +195,7 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
 
   @override
   void dispose() {
+    _feed.dispose();
     WidgetsBinding.instance.removeObserver(this);
     _animationController.dispose();
     super.dispose();
@@ -238,29 +247,23 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
               websocketState.gameFinishedEvent.data != null &&
               !_leaderboardShown) {
             _leaderboardShown = true;
+            _feed.finish();
             // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
             //   builder: (BuildContext context) => const GameLeaderboardModal(selectedGroupGame: 'Lightning Mode',),
             // ), (Route)=>false
             // );
             showLeaderboardModal(context, "Lightning Mode");
           }
-          if((websocketState.eventType == "POSITION_UPDATED" && websocketState.newPlayerJoined)){
-            // Was a bare null-assert: a POSITION_UPDATED frame without a
-            // message threw rather than simply showing nothing.
-            final positionMessage =
-                websocketState.positionUpdate.toastNotificationMessage;
-            if (positionMessage != null && positionMessage.trim().isNotEmpty) {
-              CustomToast.removeOverlay();
-              ToastManager.showCustomToast(context, positionMessage);
-            }
-          }else if((websocketState.eventType == "PLAYER_ANSWERED" && websocketState.newPlayerJoined)){
-            if(websocketState.userToastMessage != null && websocketState.userToastMessage!.isNotEmpty){
-              ToastManager.dismissAll();
-              CustomToast.show(
-                context,
-                websocketState.userToastMessage!,
-              );
-            }
+          // Every message the room sends, queued so none wipes another.
+          // The winner's goes up once the leaderboard is on screen: it is a
+          // pushed route, so a toast shown before it would sit underneath.
+          final feedMessage = websocketState.feedMessage;
+          if (feedMessage?.kind == GameFeedKind.victory) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _feed.add(feedMessage);
+            });
+          } else {
+            _feed.add(feedMessage);
           }
        },
         builder: (context, websocketState) {
@@ -275,6 +278,7 @@ class _LightningModeQuestionScreenState extends State<LightningModeQuestionScree
                 bottom: false,
                 child: websocketState.questionData.isNotEmpty
                     ? MultiplayerQuestionContainer(
+                        feedAnchorKey: _feedAnchorKey,
                         rank: websocketState.userRank,
                         gameQuestion: websocketState.questionData[_currentPage],
                         animationController: _animationController,

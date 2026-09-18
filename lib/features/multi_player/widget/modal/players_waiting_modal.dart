@@ -357,7 +357,13 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                   isInviteSuccessful: true
                               );
                             }
-                            if(state.newPlayerJoined == true){
+                            // Only while this sheet is on top. It stays mounted
+                            // under the game, where every answer pulses
+                            // newPlayerJoined and replayed the last join message
+                            // over the round -- the game screen shows joins and
+                            // leaves itself now.
+                            if(state.newPlayerJoined == true &&
+                                (ModalRoute.of(context)?.isCurrent ?? true)){
                               // Null for your own join -- the server writes this
                               // text for the *other* players -- and interpolating
                               // it into a string turned null into a toast reading

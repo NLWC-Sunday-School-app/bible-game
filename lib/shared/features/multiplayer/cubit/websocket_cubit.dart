@@ -46,6 +46,17 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   final Queue<Map<String, dynamic>> _messageQueue = Queue();
   String? _currentRoomId;  // Store room ID for re-subscription on reconnect
   StreamSubscription<AuthenticationState>? _authSubscription;
+  int _lastFeedId = 0;
+
+  /// Wraps a server-written message for the in-game toast queue, or null when
+  /// the frame had nothing to say. The fields are dynamic on some models, so
+  /// this takes anything and treats "null" as the absence it came from.
+  GameFeedMessage? _feed(Object? text, GameFeedKind kind, {bool? positive}) {
+    final message = text?.toString().trim();
+    if (message == null || message.isEmpty || message == 'null') return null;
+    return GameFeedMessage(
+        id: ++_lastFeedId, text: message, kind: kind, positive: positive);
+  }
 
   WebsocketCubit({
     required MultiplayerRepository multiplayerRepository,
@@ -281,7 +292,17 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                       body["type"] == "PLAYER_LEFT" ||
                       body["type"] == "GAME_STARTED")) {
                 final response = WaitingRoomModel.fromJson(body);
-                emit(state.copyWith(waitingRoomInfo: response, newPlayerJoined: true));
+                // "{username} joined/left the game". Folded into the existing
+                // emit, and never for GAME_STARTED: an extra emission there
+                // re-fires the listener that routes into the game.
+                final presence = body["type"] == "GAME_STARTED"
+                    ? null
+                    : _feed(response.toastNotificationMessage,
+                        GameFeedKind.presence);
+                emit(state.copyWith(
+                    waitingRoomInfo: response,
+                    newPlayerJoined: true,
+                    feedMessage: presence));
                 emit(state.copyWith(waitingRoomInfo: response, newPlayerJoined: false));
               }
 
@@ -333,6 +354,33 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                   emit(state.copyWith(userRank: ahead + 1));
                 }
 
+                // This frame goes to the whole room, so it used to reach the
+                // screen only when it was yours -- everyone else's answers
+                // were dropped here. Both lines ride on the same frame to
+                // everyone (EventService.sendAnswerResult on the backend):
+                // toastNotificationMessage is the answerer's own ("You got
+                // {X}pts!", "You answered too late. 0pts."), data.message the
+                // room's ("{username} answered correctly!"). So each phone has
+                // to pick its line -- showing the first to everyone told the
+                // room *they* had scored your points.
+                // Points count as good news even when the answer was not
+                // right: "You got {X}pts!" is the backend's partial credit.
+                final scored = answers.data?.isCorrect == true ||
+                    (answers.data?.pointsAwarded ?? 0) > 0;
+                final GameFeedMessage? answerFeed;
+                if (isMe) {
+                  answerFeed = _feed(answers.toastNotificationMessage,
+                      GameFeedKind.myAnswer,
+                      positive: scored);
+                } else {
+                  answerFeed = _feed(
+                      answers.data?.message, GameFeedKind.playerAnswer,
+                      positive: answers.data?.isCorrect == true);
+                }
+                if (answerFeed != null) {
+                  emit(state.copyWith(feedMessage: answerFeed));
+                }
+
                 if (isMe) {
                   // playerScore is int?, and copyWith treats null as "leave it
                   // alone" -- so a frame without a score used to look exactly
@@ -353,7 +401,15 @@ class WebsocketCubit extends Cubit<WebsocketState> {
               }
 
               if (body["type"] == "POSITION_UPDATED") {
-                emit(state.copyWith(positionUpdate: PositionUpdate.fromJson(body)));
+                final positionUpdate = PositionUpdate.fromJson(body);
+                // Its toast used to hang off finding our own row below, so a
+                // missing row meant no toast either. The message stands alone.
+                emit(state.copyWith(
+                    positionUpdate: positionUpdate,
+                    feedMessage: _feed(positionUpdate.toastNotificationMessage,
+                            GameFeedKind.position) ??
+                        _feed(positionUpdate.data?.message,
+                            GameFeedKind.position)));
                 // data! and a bare firstWhere both threw here whenever the
                 // leaderboard did not carry our playerId -- and userPlayerId is
                 // only ever set by a PLAYER_ANSWERED we recognised as ours, so
@@ -374,7 +430,27 @@ class WebsocketCubit extends Cubit<WebsocketState> {
               }
 
               if (body["type"] == "GAME_FINISHED") {
-                emit(state.copyWith(gameFinishedEvent: GameFinishedEvent.fromJson(body)));
+                final finished = GameFinishedEvent.fromJson(body);
+                // "{winner} wins the {GameMode}!" -- never shown before; the
+                // screen went straight to the leaderboard.
+                // First to X's text names the winner by playerId ("Player
+                // 3c1c6fe6-... reaches 1000 points and wins!"), so any id the
+                // leaderboard knows is swapped for the username.
+                var victoryText = finished.toastNotificationMessage?.toString();
+                if (victoryText == null || victoryText.trim().isEmpty) {
+                  victoryText = finished.data?.message;
+                }
+                for (final row in finished.data?.leaderboard ?? const []) {
+                  final id = row.playerId;
+                  final name = row.username;
+                  if (victoryText != null && id != null && name != null) {
+                    victoryText = victoryText.replaceAll('Player $id', name);
+                    victoryText = victoryText.replaceAll(id, name);
+                  }
+                }
+                emit(state.copyWith(
+                    gameFinishedEvent: finished,
+                    feedMessage: _feed(victoryText, GameFeedKind.victory)));
                 await playLog();
               }
 

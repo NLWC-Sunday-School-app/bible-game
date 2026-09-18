@@ -16,6 +16,13 @@ class CustomToast {
     }
   }
 
+  /// A toast's own timer ends by removing *itself*. It used to call
+  /// removeOverlay, which removes whatever is current -- so a toast that had
+  /// already been replaced took the newer one down with it on its way out.
+  static void _removeIfCurrent(OverlayEntry entry) {
+    if (identical(overlayEntry, entry)) removeOverlay();
+  }
+
   static void show(BuildContext context, String message,
       {Duration duration = const Duration(seconds: 2), bool? isTriggerFromWaitingRoom}) {
     // Remove any existing overlay first
@@ -24,19 +31,21 @@ class CustomToast {
     final overlay = Overlay.of(context);
     final animationDuration = const Duration(milliseconds: 300);
 
-    overlayEntry = OverlayEntry(
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
       builder: (context) {
         return _ToastWidget(
           message: message,
           duration: duration,
           animationDuration: animationDuration,
-          onDismissed: () => removeOverlay(), // ✅ Use removeOverlay instead
+          onDismissed: () => _removeIfCurrent(entry),
           isTriggerFromWaitingRoom: isTriggerFromWaitingRoom,
         );
       },
     );
 
-    overlay.insert(overlayEntry!);
+    overlayEntry = entry;
+    overlay.insert(entry);
   }
 
   /// Neutral status toast -- no success tick, no coin, no ribbon art.
@@ -50,19 +59,21 @@ class CustomToast {
     final overlay = Overlay.of(context);
     const animationDuration = Duration(milliseconds: 300);
 
-    overlayEntry = OverlayEntry(
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
       builder: (context) {
         return _ToastWidget(
           message: message,
           duration: duration,
           animationDuration: animationDuration,
-          onDismissed: () => removeOverlay(),
+          onDismissed: () => _removeIfCurrent(entry),
           isStatus: true,
         );
       },
     );
 
-    overlay.insert(overlayEntry!);
+    overlayEntry = entry;
+    overlay.insert(entry);
   }
 
   /// The app's general-purpose message banner: "Copied", "Not enough gems",
@@ -73,27 +84,49 @@ class CustomToast {
   /// cards, hard shadows and ribbon art. Same idiom as the cards now: inset
   /// from the edges, cream ground, coloured border and an offset shadow with
   /// no blur.
+  ///
+  /// [tone] overrides [isError] when given; [icon] replaces the tone's badge
+  /// glyph. [top], [left] and [right] place it somewhere other than the top of
+  /// the screen -- the multiplayer round puts it beside the rank flag, clear
+  /// of the score and the timer. [bottom] anchors it to the bottom instead.
+  /// [passThrough] lets taps reach whatever is underneath, for a banner laid
+  /// over a screen whose buttons must keep working.
   static void showBanner(BuildContext context, String message,
       {bool isError = false,
+      BannerTone? tone,
+      IconData? icon,
+      double? top,
+      double? bottom,
+      double? left,
+      double? right,
+      bool passThrough = false,
       Duration duration = const Duration(seconds: 3)}) {
     removeOverlay();
 
     final overlay = Overlay.of(context);
     const animationDuration = Duration(milliseconds: 260);
 
-    overlayEntry = OverlayEntry(
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
       builder: (context) {
         return _BannerToastWidget(
           message: message,
-          isError: isError,
+          tone: tone ?? (isError ? BannerTone.error : BannerTone.success),
+          icon: icon,
+          top: top,
+          bottom: bottom,
+          left: left,
+          right: right,
+          passThrough: passThrough,
           duration: duration,
           animationDuration: animationDuration,
-          onDismissed: () => removeOverlay(),
+          onDismissed: () => _removeIfCurrent(entry),
         );
       },
     );
 
-    overlay.insert(overlayEntry!);
+    overlayEntry = entry;
+    overlay.insert(entry);
   }
 
   static void showInviteToast(BuildContext context,
@@ -104,19 +137,21 @@ class CustomToast {
     final overlay = Overlay.of(context);
     final animationDuration = const Duration(milliseconds: 300);
 
-    overlayEntry = OverlayEntry(
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
       builder: (context) {
         return _InviteToastWidget(
           duration: duration,
           animationDuration: animationDuration,
-          onDismissed: () => removeOverlay(), // ✅ Use removeOverlay instead
+          onDismissed: () => _removeIfCurrent(entry),
           isInviteSuccessful: isInviteSuccessful,
           message: message,
         );
       },
     );
 
-    overlay.insert(overlayEntry!);
+    overlayEntry = entry;
+    overlay.insert(entry);
   }
 }
 
@@ -480,9 +515,18 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
 /// Slides down from behind the status bar and fades as it goes, rather than
 /// appearing fully formed the way the opacity-only toasts above do -- a bar
 /// that drops in reads as part of the game instead of a system notice.
+/// What a banner is saying, which picks its border, shadow and badge colour.
+enum BannerTone { success, error, neutral }
+
 class _BannerToastWidget extends StatefulWidget {
   final String message;
-  final bool isError;
+  final BannerTone tone;
+  final IconData? icon;
+  final double? top;
+  final double? bottom;
+  final double? left;
+  final double? right;
+  final bool passThrough;
   final Duration duration;
   final Duration animationDuration;
   final VoidCallback onDismissed;
@@ -490,7 +534,13 @@ class _BannerToastWidget extends StatefulWidget {
   const _BannerToastWidget({
     Key? key,
     required this.message,
-    required this.isError,
+    required this.tone,
+    this.icon,
+    this.top,
+    this.bottom,
+    this.left,
+    this.right,
+    this.passThrough = false,
     required this.duration,
     required this.animationDuration,
     required this.onDismissed,
@@ -513,6 +563,8 @@ class _BannerToastWidgetState extends State<_BannerToastWidget> {
   static const _successShadow = Color(0xFF125C32);
   static const _errorBorder = Color(0xFFDB0C34);
   static const _errorShadow = Color(0xFF94142E);
+  static const _neutralBorder = Color(0xFF2F6FB5);
+  static const _neutralShadow = Color(0xFF1B4677);
 
   @override
   void initState() {
@@ -546,21 +598,40 @@ class _BannerToastWidgetState extends State<_BannerToastWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final border = widget.isError ? _errorBorder : _successBorder;
-    final shadow = widget.isError ? _errorShadow : _successShadow;
+    final (border, shadow, glyph) = switch (widget.tone) {
+      BannerTone.success =>
+        (_successBorder, _successShadow, Icons.check_rounded),
+      BannerTone.error =>
+        (_errorBorder, _errorShadow, Icons.priority_high_rounded),
+      BannerTone.neutral =>
+        (_neutralBorder, _neutralShadow, Icons.info_outline_rounded),
+    };
 
     return Positioned(
       // Clear of the status bar and the notch, and inset from the edges: the
       // Flushbar ran the full width and butted against the top of the screen.
-      top: MediaQuery.of(context).padding.top + 12.h,
-      left: 16.w,
-      right: 16.w,
-      child: Material(
+      top: widget.bottom != null
+          ? null
+          : widget.top ?? MediaQuery.of(context).padding.top + 12.h,
+      bottom: widget.bottom,
+      left: widget.left ?? 16.w,
+      right: widget.right ?? 16.w,
+      child: IgnorePointer(
+        ignoring: widget.passThrough,
+        child: Material(
         color: Colors.transparent,
         child: AnimatedSlide(
           duration: widget.animationDuration,
           curve: Curves.easeOutBack,
-          offset: _shown ? Offset.zero : const Offset(0, -1.4),
+          // From the screen edge it drops in from off-screen; placed mid-screen
+          // it only nudges down, rather than sweeping across what is above.
+          offset: _shown
+              ? Offset.zero
+              : Offset(0, widget.bottom != null
+                  ? 0.4
+                  : widget.top == null
+                      ? -1.4
+                      : -0.4),
           child: AnimatedOpacity(
             duration: widget.animationDuration,
             opacity: _shown ? 1 : 0,
@@ -599,9 +670,7 @@ class _BannerToastWidgetState extends State<_BannerToastWidget> {
                         color: border,
                       ),
                       child: Icon(
-                        widget.isError
-                            ? Icons.priority_high_rounded
-                            : Icons.check_rounded,
+                        widget.icon ?? glyph,
                         size: 17.sp,
                         color: Colors.white,
                       ),
@@ -626,6 +695,7 @@ class _BannerToastWidgetState extends State<_BannerToastWidget> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

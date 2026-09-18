@@ -6,6 +6,33 @@ enum WebsocketConnectionStatus { disconnected, connecting, connected, error }
 /// explicitly reset to null, distinct from being omitted entirely.
 const _unset = Object();
 
+/// What an in-game message is about. Decides how the toast looks and where it
+/// goes in the queue -- your own points jump ahead, the winner clears it.
+enum GameFeedKind { myAnswer, playerAnswer, position, presence, victory }
+
+/// One message the server wrote for the room, to be shown as a toast.
+///
+/// [id] only ever goes up, so the screens can tell a new message from the
+/// same one still sitting in state while other fields change around it.
+class GameFeedMessage extends Equatable {
+  final int id;
+  final String text;
+  final GameFeedKind kind;
+
+  /// Good news (true), bad news (false) or neither (null) -- a right or wrong
+  /// answer versus a join, a leave or the winner. Colours the toast.
+  final bool? positive;
+
+  const GameFeedMessage(
+      {required this.id,
+      required this.text,
+      required this.kind,
+      this.positive});
+
+  @override
+  List<Object?> get props => [id, text, kind, positive];
+}
+
 class WebsocketState extends Equatable{
   final String eventType;
   final WaitingRoomModel waitingRoomInfo;
@@ -29,6 +56,9 @@ class WebsocketState extends Equatable{
   final int userRank;
   final WebsocketConnectionStatus connectionStatus;
 
+  /// The latest in-game message; null until the first one arrives.
+  final GameFeedMessage? feedMessage;
+
   const WebsocketState({
     required this.eventType,
     required this.waitingRoomInfo,
@@ -48,6 +78,7 @@ class WebsocketState extends Equatable{
     required this.newPlayerJoined,
     required this.userRank,
     required this.connectionStatus,
+    this.feedMessage,
   });
 
   factory WebsocketState.initial(){
@@ -91,6 +122,7 @@ class WebsocketState extends Equatable{
     int? userRank,
     int? noOfCorrectAnswers,
     WebsocketConnectionStatus? connectionStatus,
+    GameFeedMessage? feedMessage,
   }) {
     return WebsocketState(
         waitingRoomInfo: waitingRoomInfo ?? this.waitingRoomInfo,
@@ -111,6 +143,7 @@ class WebsocketState extends Equatable{
         positionUpdate: positionUpdate ?? this.positionUpdate,
       gameFinishedEvent: gameFinishedEvent ?? this.gameFinishedEvent,
       connectionStatus: connectionStatus ?? this.connectionStatus,
+      feedMessage: feedMessage ?? this.feedMessage,
     );
   }
 
@@ -135,5 +168,6 @@ class WebsocketState extends Equatable{
         userToastMessage,
         gameFinishedEvent,
         connectionStatus,
+        feedMessage,
       ];
 }
