@@ -6,11 +6,17 @@ class CustomToast {
   static OverlayEntry? overlayEntry;
 
   static void removeOverlay() {
+    // Not gated on `mounted`: an entry is only mounted once it has been built,
+    // so a toast replaced in the same frame it was shown -- "Game has started"
+    // fires twice as a round begins, connection toasts can too -- was skipped,
+    // forgotten, and left in the overlay for good. Faded to nothing but still
+    // there, it swallowed every tap on whatever sat under it; the home
+    // screen's profile chip stopped opening after a game.
+    final entry = overlayEntry;
+    overlayEntry = null;
+    if (entry == null) return;
     try {
-      if (overlayEntry?.mounted ?? false) {
-        overlayEntry?.remove();
-      }
-      overlayEntry = null;
+      entry.remove();
     } catch (e) {
       debugPrint("Overlay removal failed: $e");
     }
@@ -221,6 +227,8 @@ class _ToastWidgetState extends State<_ToastWidget> {
       top: MediaQuery.of(context).padding.top + 50.h,
       left: MediaQuery.of(context).size.width * 0.1,
       right: MediaQuery.of(context).size.width * 0.1,
+      // Nothing here to tap, so it never takes a tap from what is underneath.
+      child: IgnorePointer(
       child: AnimatedOpacity(
         opacity: _opacity,
         duration: widget.animationDuration,
@@ -318,6 +326,7 @@ class _ToastWidgetState extends State<_ToastWidget> {
           ),
         ),
       ),
+      ),
     );
   }
 }
@@ -384,6 +393,8 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
       top: MediaQuery.of(context).padding.top + 50.h,
       left: MediaQuery.of(context).size.width * 0.1,
       right: MediaQuery.of(context).size.width * 0.1,
+      // Nothing here to tap, so it never takes a tap from what is underneath.
+      child: IgnorePointer(
       child: AnimatedOpacity(
         opacity: _opacity,
         duration: widget.animationDuration,
@@ -507,6 +518,7 @@ class _InviteToastWidgetState extends State<_InviteToastWidget> {
           ),
         ),
       ),
+      ),
     );
   }
 }
@@ -617,7 +629,9 @@ class _BannerToastWidgetState extends State<_BannerToastWidget> {
       left: widget.left ?? 16.w,
       right: widget.right ?? 16.w,
       child: IgnorePointer(
-        ignoring: widget.passThrough,
+        // Also while hidden: before it slides in and once it has faded out, an
+        // invisible banner must not stand in front of a button.
+        ignoring: widget.passThrough || !_shown,
         child: Material(
         color: Colors.transparent,
         child: AnimatedSlide(

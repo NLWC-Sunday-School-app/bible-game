@@ -74,6 +74,13 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
   /// stands down rather than doubling the requests.
   bool _inviteModalOpen = false;
 
+  /// Set once this room has routed into the game. One GAME_STARTED frame
+  /// produces several emissions, all reading eventType GAME_STARTED, and each
+  /// one ran the routing below: popped the top route, pushed the loading
+  /// screen and showed "Game has started" again. Shown in the same frame, the
+  /// toasts orphaned one another and sat invisibly over the screen for good.
+  bool _routedIntoGame = false;
+
   static const _onlineRefreshInterval = Duration(seconds: 20);
 
   @override
@@ -332,7 +339,9 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                             }
                             _lastConnectionStatus = state.connectionStatus;
 
-                            if(state.eventType == "GAME_STARTED"){
+                            if(state.eventType == "GAME_STARTED" &&
+                                !_routedIntoGame){
+                              _routedIntoGame = true;
                               // questionLoadingScreen shows the multiplayer Quick
                               // Tips and then routes to the mode's own screen.
                               // It matches on the display name, so fall back to
