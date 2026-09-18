@@ -30,6 +30,11 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   StompClient? _stompClient;
   final MultiplayerBloc _multiplayerBloc;
   final AuthenticationBloc _authenticationBloc;
+
+  /// Each player's running score this round, by username, as reported on
+  /// every PLAYER_ANSWERED. The position badge is derived from it. Cleared
+  /// when a round starts, so a rematch does not rank you on last game.
+  final Map<String, int> _liveScores = {};
   final SettingsBloc _settingsBloc;
   final MultiplayerRepository _multiplayerRepository;
   final String _apiBaseUrl;
@@ -247,6 +252,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
               emit(state.copyWith(eventType: body["type"]));
 
               if (body["type"] == "GAME_STARTED") {
+                _liveScores.clear();
                 final questionList = body['data']['questions'];
                 final data = json.decode(questionList);
                 final response = (data['data'] as List).map((e) => Datum.fromJson(e)).toList();
@@ -257,13 +263,23 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                   questionData: response,
                   secondsPerQuestion: resolveSecondsPerQuestion(
                       body['data']['secondsPerQuestion']),
+                  // Everyone starts level, so joint first. Folded into this
+                  // emit rather than given its own: an extra emission while
+                  // eventType reads GAME_STARTED re-fires the listener that
+                  // routes into the game.
+                  userRank: 1,
                 ));
               }
 
+              // GAME_STARTED included: the roster used to come only from join
+              // and leave frames, so a player who never saw one listing
+              // themselves had no entry, and sendGameAnswer could not find its
+              // own playerId. If the frame carries no players this is a no-op.
               if ((body['players'] != null) &&
                   (body["type"] == "PLAYER_JOINED" ||
                       body["type"] == "PLAYER_EJECTED" ||
-                      body["type"] == "PLAYER_LEFT")) {
+                      body["type"] == "PLAYER_LEFT" ||
+                      body["type"] == "GAME_STARTED")) {
                 final response = WaitingRoomModel.fromJson(body);
                 emit(state.copyWith(waitingRoomInfo: response, newPlayerJoined: true));
                 emit(state.copyWith(waitingRoomInfo: response, newPlayerJoined: false));
@@ -288,6 +304,35 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                 final isMe = answers.userId?.toString() == myUserId ||
                     (myPlayer != null && myPlayer.id == answers.playerId);
 
+                // Position is worked out here from the scores, not read off
+                // the frame. The frame's own rank is not overall standing:
+                // with scores fixed at 150 and 100, consecutive frames told
+                // both players they were 1st, then both that they were 2nd.
+                // Every PLAYER_ANSWERED reaches every player and carries the
+                // answerer's running score, so keeping those gives a position
+                // that moves whenever *anyone* answers -- not only you, which
+                // is what left the badge stale while an opponent overtook.
+                final answeredBy = answers.data?.username;
+                final answeredScore = answers.data?.playerScore;
+                if (answeredBy != null && answeredScore != null) {
+                  // Keyed case-insensitively: the self-lookup below uses the
+                  // signed-in name, and a casing difference between that and
+                  // the frame would silently read your score as 0 -- last.
+                  _liveScores[answeredBy.toLowerCase()] = answeredScore;
+                  // Not having answered yet means a score of 0, not an
+                  // unknown one -- so an opponent scoring first moves you
+                  // down immediately rather than waiting on your own answer.
+                  final myScore =
+                      _liveScores[_authenticationBloc.state.user.name
+                              .toLowerCase()] ??
+                          0;
+                  // Ties share a place: only players strictly ahead push
+                  // you down, so 150 against 150 is joint first.
+                  final ahead =
+                      _liveScores.values.where((s) => s > myScore).length;
+                  emit(state.copyWith(userRank: ahead + 1));
+                }
+
                 if (isMe) {
                   // playerScore is int?, and copyWith treats null as "leave it
                   // alone" -- so a frame without a score used to look exactly
@@ -309,10 +354,23 @@ class WebsocketCubit extends Cubit<WebsocketState> {
 
               if (body["type"] == "POSITION_UPDATED") {
                 emit(state.copyWith(positionUpdate: PositionUpdate.fromJson(body)));
-                final userPositionUpdate = state.positionUpdate.data!.leaderboard
-                    .firstWhere((element) => element.playerId == state.userPlayerId);
-                emit(state.copyWith(userRank: userPositionUpdate.rank, newPlayerJoined: true));
-                emit(state.copyWith(userRank: userPositionUpdate.rank, newPlayerJoined: false));
+                // data! and a bare firstWhere both threw here whenever the
+                // leaderboard did not carry our playerId -- and userPlayerId is
+                // only ever set by a PLAYER_ANSWERED we recognised as ours, so
+                // one missed answer left the rank stuck for the whole round.
+                // The throw landed in the enclosing catch and said nothing.
+                final userPositionUpdate = state.positionUpdate.data?.leaderboard
+                    .firstWhereOrNull(
+                        (element) => element.playerId == state.userPlayerId);
+                if (userPositionUpdate == null) {
+                  debugPrint('⚠️ POSITION_UPDATED has no row for '
+                      'playerId ${state.userPlayerId}');
+                } else {
+                  emit(state.copyWith(
+                      userRank: userPositionUpdate.rank, newPlayerJoined: true));
+                  emit(state.copyWith(
+                      userRank: userPositionUpdate.rank, newPlayerJoined: false));
+                }
               }
 
               if (body["type"] == "GAME_FINISHED") {
@@ -321,6 +379,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
               }
 
               if (body["type"] == "GAME_RESTARTED") {
+                _liveScores.clear();
                 final response = WaitingRoomModel.fromJson(body);
                 emit(state.copyWith(
                   waitingRoomInfo: response,
@@ -389,9 +448,24 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   }
 
   void sendGameAnswer(int questionIndex, String answer, DateTime? questionStartTime) {
+    // waitingRoomInfo.players is filled only by PLAYER_JOINED/EJECTED/LEFT --
+    // GAME_STARTED does not refresh it -- so if no join frame ever listed you,
+    // this list does not contain you. firstWhere then threw StateError, which
+    // escaped onOptionSelected as a rejected Future: the answer was never sent,
+    // so no PLAYER_ANSWERED came back and the score sat at zero for the whole
+    // round. userPlayerId is the same id echoed back on a previous answer.
+    final myUserId = _authenticationBloc.state.user.id.toString();
     final playerId = state.waitingRoomInfo.players
-        .firstWhere((element) => element.userId == _authenticationBloc.state.user.id.toString())
-        .id;
+            .firstWhereOrNull((element) => element.userId == myUserId)
+            ?.id ??
+        state.userPlayerId;
+
+    if (playerId == null) {
+      debugPrint('⚠️ Cannot send answer: no playerId for user '
+          '$myUserId. room=${state.waitingRoomInfo.roomId} '
+          'players=${state.waitingRoomInfo.players.map((p) => p.userId).toList()}');
+      return;
+    }
 
     // Graceful response time handling
     final responseTimeMs =
