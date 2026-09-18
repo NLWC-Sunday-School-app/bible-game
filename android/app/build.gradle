@@ -31,7 +31,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.nlwc.bible.game"
-    compileSdk 35
+    compileSdk 36
     ndkVersion "27.0.12077973"
 
     compileOptions {
@@ -50,7 +50,10 @@ android {
     defaultConfig {
         applicationId "com.nlwc.bible.game"
         minSdk 23
-        targetSdk Math.max(flutter.targetSdkVersion, 34)
+        // Play requires API 36 from this release on. Pinned rather
+        // than derived: flutter.targetSdkVersion is 35 on this SDK,
+        // so Math.max(..., 34) resolved to 35 and Play rejected it.
+        targetSdk 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
