@@ -70,7 +70,14 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               deviceInfo['osVersion'] ?? 'Unknown',
             ),
           );
-    } catch (_) {
+    } catch (e, stack) {
+      // Logged, not swallowed. Every failure used to become the same "sign-in
+      // failed" toast, so an unregistered signing certificate (ApiException
+      // 10), a network error and a missing ID token all looked identical --
+      // which is how Android sign-in could stay broken without anyone seeing
+      // why.
+      debugPrint('⚠️ Google sign-in failed: $e');
+      debugPrint('$stack');
       if (mounted) {
         setState(() => _isBusy = false);
         _showError(context);
