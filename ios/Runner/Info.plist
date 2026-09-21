@@ -47,7 +47,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The application does not use this feature</string>
+	<string>The Bible Game does not record audio. The audio component that plays game music and sound effects declares microphone capability, so iOS requires this permission to be listed. No audio is ever recorded, stored or shared.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
