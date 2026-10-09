@@ -104,6 +104,9 @@ void main() {
     await box.erase();
     store = ActiveRoomStore(box);
     repository = MockMultiplayerRepository();
+    when(() => repository.fetchOnlinePlayers(
+            search: any(named: 'search'), size: any(named: 'size')))
+        .thenAnswer((_) async => const OnlinePlayersPage.empty());
     auth = MockAuthenticationBloc();
     // Logged out as far as the bloc's session hooks go, so it does not start
     // invite polling; the user is still read for ids and names.
@@ -302,6 +305,59 @@ void main() {
 
   group('resuming', () {
     blocTest<MultiplayerBloc, MultiplayerState>(
+      'looks up players the room details only name, for an older server',
+      setUp: () async {
+        signInAs(_guest);
+        await store.save(
+            roomId: 'room-1', inviteCode: 'ABC123', userId: '2', playerId: 'p-guest');
+        when(() => repository.getRoomDetails('room-1'))
+            .thenAnswer((_) async => _details());
+        when(() => repository.fetchOnlinePlayers(search: 'Tobi1', size: 5))
+            .thenAnswer((_) async => const OnlinePlayersPage(players: [
+                  OnlinePlayer(
+                      userId: 1,
+                      username: 'Tobi1',
+                      profileUrl: '',
+                      country: 'Nigeria'),
+                ], total: 1));
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const ResumeActiveRoom()),
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        final room = bloc.state.resumableRoom!;
+        expect(room.knownPlayers.map((p) => p.userId), [1]);
+        final host = room
+            .toWaitingRoom(_guest)
+            .players
+            .firstWhere((p) => p.id == 'p-host');
+        expect(host.isHost, isTrue);
+      },
+    );
+
+    blocTest<MultiplayerBloc, MultiplayerState>(
+      'a failed lookup still resumes, with the rows it has',
+      setUp: () async {
+        signInAs(_guest);
+        await store.save(
+            roomId: 'room-1', inviteCode: 'ABC123', userId: '2', playerId: 'p-guest');
+        when(() => repository.getRoomDetails('room-1'))
+            .thenAnswer((_) async => _details());
+        when(() => repository.fetchOnlinePlayers(
+                search: any(named: 'search'), size: any(named: 'size')))
+            .thenThrow('Connection timed out');
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const ResumeActiveRoom()),
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.createGameRoomResponse.id, 'room-1');
+        expect(bloc.state.resumableRoom?.knownPlayers, isEmpty);
+      },
+    );
+
+
+    blocTest<MultiplayerBloc, MultiplayerState>(
       'a host goes back into their waiting room under the same code',
       setUp: () async {
         await store.save(
@@ -428,6 +484,68 @@ void main() {
   });
 
   group('ResumableRoom', () {
+    test('uses the player details the server sends with the room', () {
+      final details = RoomDetailsModel.fromJson({
+        'id': 'room-1',
+        'inviteCode': 'ABC123',
+        'hostId': '1',
+        'status': 'WAITING',
+        'players': [
+          {
+            'playerId': 'p-host',
+            'playerName': 'Tobi1',
+            'userId': '1',
+            'country': 'Nigeria',
+            'level': 'elder',
+            'isHost': true,
+          },
+          {
+            'playerId': 'p-guest',
+            'playerName': 'tobilove',
+            'userId': '2',
+            'country': 'Angola',
+            'level': 'babe',
+            'isHost': false,
+          },
+        ],
+      });
+      final room =
+          ResumableRoom(details: details, isHost: false, myPlayerId: 'p-guest');
+      final waiting = room.toWaitingRoom(_guest);
+
+      final host = waiting.players.firstWhere((p) => p.id == 'p-host');
+      expect(host.isHost, isTrue);
+      expect(host.userId, '1');
+      expect(host.country, 'Nigeria');
+      expect(host.level, 'elder');
+      expect(room.unidentifiedPlayerNames, isEmpty);
+    });
+
+    test("a guest can tell who the host is once the host's user id is known",
+        () {
+      final room = ResumableRoom(
+          details: _details(), isHost: false, myPlayerId: 'p-guest');
+      expect(room.unidentifiedPlayerNames, ['Tobi1']);
+
+      final waiting = room
+          .withKnownPlayers(const [
+            OnlinePlayer(
+                userId: 1,
+                username: 'Tobi1',
+                profileUrl: '',
+                country: 'Nigeria'),
+          ])
+          .toWaitingRoom(_guest);
+
+      final host = waiting.players.firstWhere((p) => p.id == 'p-host');
+      expect(host.isHost, isTrue);
+      expect(host.userId, '1');
+      expect(host.country, 'Nigeria');
+      final me = waiting.players.firstWhere((p) => p.id == 'p-guest');
+      expect(me.isHost, isFalse);
+    });
+
+
     test('fills other players in from the online players list', () {
       final room = ResumableRoom(
           details: _details(), isHost: true, myPlayerId: 'p-host');

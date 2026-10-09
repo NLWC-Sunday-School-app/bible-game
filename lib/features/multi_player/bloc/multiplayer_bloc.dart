@@ -396,6 +396,24 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     );
   }
 
+  /// Finds players by name through the online players search, for a server
+  /// whose room details carry names only. Best effort: anyone not found, or a
+  /// failed search, just leaves that row with what it already has.
+  Future<List<OnlinePlayer>> _lookUpPlayers(Iterable<String> names) async {
+    final results = await Future.wait(names.map((name) async {
+      try {
+        final page = await _multiplayerRepository.fetchOnlinePlayers(
+            search: name, size: 5);
+        return page.players.firstWhereOrNull(
+            (p) => p.username.toLowerCase() == name.toLowerCase());
+      } catch (e) {
+        debugPrint('⚠️ looking up player "$name" failed: $e');
+        return null;
+      }
+    }));
+    return results.whereType<OnlinePlayer>().toList();
+  }
+
   Future<void> _onCheckActiveRoom(
       CheckActiveRoom event,
       Emitter<MultiplayerState> emit) async {
@@ -469,6 +487,9 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
           return;
         }
       }
+
+      resumable = resumable.withKnownPlayers(
+          await _lookUpPlayers(resumable.unidentifiedPlayerNames));
 
       emit(state.copyWith(
           createGameRoomResponse: resumable.toCreateGameRoomModel(),

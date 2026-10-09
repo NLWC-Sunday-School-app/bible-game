@@ -8,6 +8,7 @@ class ResumableRoom extends Equatable {
     required this.details,
     required this.isHost,
     required this.myPlayerId,
+    this.knownPlayers = const [],
   });
 
   final RoomDetailsModel details;
@@ -16,6 +17,25 @@ class ResumableRoom extends Equatable {
   /// Null when this user is no longer one of the room's players -- they left
   /// from another device, or were removed -- so returning means joining again.
   final String? myPlayerId;
+
+  /// Players looked up by name for a server that does not send player
+  /// details with the room, so their rows are not left blank.
+  final List<OnlinePlayer> knownPlayers;
+
+  ResumableRoom withKnownPlayers(List<OnlinePlayer> players) => ResumableRoom(
+        details: details,
+        isHost: isHost,
+        myPlayerId: myPlayerId,
+        knownPlayers: players,
+      );
+
+  /// Other players the room details say nothing about beyond a name.
+  Iterable<String> get unidentifiedPlayerNames => details.players
+      .where((p) =>
+          p.playerId != myPlayerId &&
+          p.userId == null &&
+          (p.playerName?.isNotEmpty ?? false))
+      .map((p) => p.playerName!);
 
   String get inviteCode => details.inviteCode ?? '';
 
@@ -56,6 +76,7 @@ class ResumableRoom extends Equatable {
   /// waiting-room update supplies it.
   WaitingRoomModel toWaitingRoom(User me,
       {List<OnlinePlayer> known = const []}) {
+    final lookup = [...knownPlayers, ...known];
     final players = details.players
         .where((p) => p.playerId != null)
         .map((p) {
@@ -63,13 +84,20 @@ class ResumableRoom extends Equatable {
           final name = p.playerName?.toLowerCase();
           final online = isMe || name == null
               ? null
-              : known.firstWhereOrNull((o) => o.username.toLowerCase() == name);
+              : lookup.firstWhereOrNull((o) => o.username.toLowerCase() == name);
+          final userId =
+              isMe ? me.id.toString() : p.userId ?? online?.userId.toString();
           return Player(
             id: p.playerId,
-            userId: isMe ? me.id.toString() : p.userId ?? online?.userId.toString(),
+            userId: userId,
             username: p.playerName,
             isReady: true,
-            isHost: isMe && isHost,
+            // The room names its host by user id, so anyone whose user id is
+            // known can be matched to it even when the server does not mark
+            // the row itself.
+            isHost: p.isHost ??
+                ((isMe && isHost) ||
+                    (userId != null && userId == details.hostId)),
             country: _nonEmpty(isMe ? me.country : p.country ?? online?.country),
             level: _nonEmpty(isMe ? me.rank : p.level ?? online?.level),
           );
@@ -127,5 +155,5 @@ class ResumableRoom extends Equatable {
   }
 
   @override
-  List<Object?> get props => [details, isHost, myPlayerId];
+  List<Object?> get props => [details, isHost, myPlayerId, knownPlayers];
 }
