@@ -8,6 +8,8 @@ import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/settings/sound_manager.dart';
 import 'package:bible_game_api/bible_game_api.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,11 @@ class MockAuthenticationBloc
 class MockLightningModeBloc
     extends MockBloc<LightningModeEvent, LightningModeState>
     implements LightningModeBloc {}
+
+class MockSettingsBloc extends MockBloc<SettingsEvent, SettingsState>
+    implements SettingsBloc {}
+
+class MockSoundManager extends Mock implements SoundManager {}
 
 void main() {
   setUpAll(() async {
@@ -70,12 +77,18 @@ void main() {
     final lightning = MockLightningModeBloc();
     when(() => lightning.state).thenReturn(LightningModeState.initial());
 
+    final sound = MockSoundManager();
+    when(() => sound.playClickSound()).thenAnswer((_) async {});
+    final settings = MockSettingsBloc();
+    when(() => settings.soundManager).thenReturn(sound);
+
     await tester.pumpWidget(MultiBlocProvider(
       providers: [
         BlocProvider<WebsocketCubit>.value(value: websocket),
         BlocProvider<MultiplayerBloc>.value(value: multiplayer),
         BlocProvider<AuthenticationBloc>.value(value: auth),
         BlocProvider<LightningModeBloc>.value(value: lightning),
+        BlocProvider<SettingsBloc>.value(value: settings),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
@@ -128,8 +141,9 @@ void main() {
     await tester.tap(closeIcon());
     await tester.pumpAndSettle();
 
-    expect(find.text('Leave the waiting room?'), findsOneWidget);
-    expect(find.textContaining('WACUJXDT'), findsWidgets);
+    // The outlined title is two stacked Texts, outline and fill.
+    expect(find.text('Leave the waiting room?'), findsWidgets);
+    expect(find.text('WACUJXDT'), findsWidgets);
     verifyNever(() => multiplayer.add(any(that: isA<LeaveRoom>())));
   });
 

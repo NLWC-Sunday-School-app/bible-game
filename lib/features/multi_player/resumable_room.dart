@@ -1,4 +1,5 @@
 import 'package:bible_game_api/bible_game_api.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// A room this user can go back to, as the server describes it right now.
@@ -47,21 +48,30 @@ class ResumableRoom extends Equatable {
   /// player sees who is already in -- and a returning host can press Start --
   /// without waiting for someone else to join and trigger a socket frame.
   ///
-  /// The details carry ids and names only. Our own row gets our user id, which
-  /// is how the waiting room and answer sending find their own player.
-  WaitingRoomModel toWaitingRoom(String myUserId) {
+  /// The details carry ids and names only, so the rest comes from what the
+  /// app already knows: our own row from our profile -- its user id is how the
+  /// waiting room and answer sending find their own player -- and everyone
+  /// else's from the online players list, matched by name. Anything still
+  /// unknown stays null and the row leaves it off until the server's next
+  /// waiting-room update supplies it.
+  WaitingRoomModel toWaitingRoom(User me,
+      {List<OnlinePlayer> known = const []}) {
     final players = details.players
         .where((p) => p.playerId != null)
         .map((p) {
           final isMe = p.playerId == myPlayerId;
+          final name = p.playerName?.toLowerCase();
+          final online = isMe || name == null
+              ? null
+              : known.firstWhereOrNull((o) => o.username.toLowerCase() == name);
           return Player(
             id: p.playerId,
-            userId: isMe ? myUserId : null,
+            userId: isMe ? me.id.toString() : p.userId ?? online?.userId.toString(),
             username: p.playerName,
             isReady: true,
             isHost: isMe && isHost,
-            country: null,
-            level: null,
+            country: _nonEmpty(isMe ? me.country : p.country ?? online?.country),
+            level: _nonEmpty(isMe ? me.rank : p.level ?? online?.level),
           );
         })
         .toList();
@@ -86,6 +96,9 @@ class ResumableRoom extends Equatable {
       toastNotificationMessage: null,
     );
   }
+
+  static String? _nonEmpty(String? value) =>
+      value == null || value.trim().isEmpty ? null : value;
 
   /// The shape the rest of the multiplayer flow reads the current room from.
   /// activePlayers leads with the host's own player, which is what the waiting

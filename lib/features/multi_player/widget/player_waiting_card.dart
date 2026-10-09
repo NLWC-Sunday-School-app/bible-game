@@ -124,48 +124,48 @@ class PlayerWaitingCard extends StatelessWidget {
                 //     ),
                 //   ],
                 // ),
+                // Either can be unknown for a player the roster was rebuilt
+                // for after resuming a game, until the server's next update
+                // fills them in -- so each piece only shows when it has a value.
                 Row(
                   children: [
-                    countryName != null
-                        ? SvgPicture.asset(
-                      'assets/images/flags/${countryName!.replaceAll('/', ' ').toLowerCase()}.svg',
-                      width: 16.w,
-                    )
-                        : SizedBox(
-                      width: 16.w,
-                    ),
-                    SizedBox(
-                      width: 2.w,
-                    ),
-                    Text(
-                      countryName != null
-                          ? getIso3Code(countryName!.replaceAll('/', ' '))
-                          : '-',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF082D5A)),
-                    ),
-                    SizedBox(
-                      width: 5.w,
-                    ),
-                    Image.asset(
-                      getBadgeUrl(userRank),
-                      width: 13.sp,
-                    ),
-                    SizedBox(
-                      width: 5.w,
-                    ),
-                    StrokeText(
-                      text:
-                      capitalizeText(userRank),
-                      textStyle: TextStyle(
-                        color: Color(0xFF5047C4),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w900,
+                    if (countryName.isNotEmpty) ...[
+                      SvgPicture.asset(
+                        'assets/images/flags/${countryName.replaceAll('/', ' ').toLowerCase()}.svg',
+                        width: 16.w,
                       ),
-                      strokeColor: Colors.white,
-                      strokeWidth: 2,
-                    ),
+                      SizedBox(
+                        width: 2.w,
+                      ),
+                      Text(
+                        getIso3Code(countryName.replaceAll('/', ' ')),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF082D5A)),
+                      ),
+                      SizedBox(
+                        width: 5.w,
+                      ),
+                    ],
+                    if (userRank.isNotEmpty) ...[
+                      Image.asset(
+                        getBadgeUrl(userRank),
+                        width: 13.sp,
+                      ),
+                      SizedBox(
+                        width: 5.w,
+                      ),
+                      StrokeText(
+                        text: capitalizeText(userRank),
+                        textStyle: TextStyle(
+                          color: Color(0xFF5047C4),
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w900,
+                        ),
+                        strokeColor: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    ],
                   ],
                 ),
               ],

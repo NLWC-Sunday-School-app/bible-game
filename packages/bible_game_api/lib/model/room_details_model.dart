@@ -77,18 +77,33 @@ class RoomDetailsModel extends Equatable {
 }
 
 class RoomPlayer extends Equatable {
-  const RoomPlayer({required this.playerId, required this.playerName});
+  const RoomPlayer({
+    required this.playerId,
+    required this.playerName,
+    this.userId,
+    this.country,
+    this.level,
+  });
 
   final String? playerId;
   final String? playerName;
+
+  /// Not sent by the server yet -- the room endpoint lists ids and names only
+  /// -- but read when present, so adding them server-side needs no app change.
+  final String? userId;
+  final String? country;
+  final String? level;
 
   factory RoomPlayer.fromJson(Map<String, dynamic> json) {
     return RoomPlayer(
       playerId: json['playerId'],
       playerName: json['playerName'],
+      userId: json['userId']?.toString(),
+      country: json['country'],
+      level: json['level'],
     );
   }
 
   @override
-  List<Object?> get props => [playerId, playerName];
+  List<Object?> get props => [playerId, playerName, userId, country, level];
 }

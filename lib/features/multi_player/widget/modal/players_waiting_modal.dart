@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bible_game/features/multi_player/game_mode_codes.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
+import 'package:bible_game/features/multi_player/widget/modal/game_confirm_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/invite_modal.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
@@ -141,34 +142,22 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
   /// this sheet to step away far more often than to cancel, so keeping the
   /// game open is the default and ending it has to be chosen.
   Future<void> _onHostClose() async {
-    final choice = await showDialog<_HostCloseChoice>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Leave the waiting room?'),
-        content: Text(
-            'Keep the game open and friends can still join with code '
-            '${widget.inviteCode}. Get back to it from the Multiplayer tab.'),
-        actions: [
-          TextButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext, _HostCloseChoice.end),
-            child: const Text('End game',
-                style: TextStyle(color: Color(0xFFDB0C34))),
-          ),
-          TextButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext, _HostCloseChoice.keepOpen),
-            child: const Text('Keep it open'),
-          ),
-        ],
-      ),
+    final choice = await showGameConfirmModal(
+      context,
+      badgeAsset: _modeAsset,
+      title: 'Leave the waiting room?',
+      message: 'Keep the game open and your friends can still join with this '
+          'code. Come back to it from the Multiplayer tab.',
+      code: widget.inviteCode,
+      primaryLabel: 'Keep it open',
+      secondaryLabel: 'End game',
     );
     if (choice == null || !mounted) return;
 
     final multiplayer = context.read<MultiplayerBloc>();
     final navigator = Navigator.of(context);
 
-    if (choice == _HostCloseChoice.end) {
+    if (choice == GameConfirmChoice.secondary) {
       final hostPlayerId =
           multiplayer.state.createGameRoomResponse.activePlayers[0];
       multiplayer.add(LeaveRoom(hostPlayerId));
@@ -191,6 +180,13 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
 
   /// The four modes differ only by icon and label, which a lookup says more
   /// plainly than the chain of conditionals this replaced.
+  String get _modeAsset => switch (widget.selectedGroupGame) {
+        'Lightning Mode' => ProductImageRoutes.lightningMode,
+        'Time-based Mode' => ProductImageRoutes.timeBasedMode,
+        'First to X' => ProductImageRoutes.xMode,
+        _ => ProductImageRoutes.survivalMode,
+      };
+
   Widget _modeHeader() {
     final String asset;
     final String label;
@@ -556,9 +552,10 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                             },
                                             position: index+1,
                                             userName: state.waitingRoomInfo.players[index].username??"",
-                                            countryName: state.waitingRoomInfo.players[index].country??"N",
+                                            countryName: state.waitingRoomInfo.players[index].country??"",
                                             userRank: state.waitingRoomInfo.players[index].level??"",
-                                            userId: state.waitingRoomInfo.players[index].userId??"",
+                                            userId: state.waitingRoomInfo.players[index].userId ??
+                                                state.waitingRoomInfo.players[index].username ?? "",
                                             isWaitingForHost: widget.isWaitingForHost,
                                             isHost:state.waitingRoomInfo.players[index].isHost??false,
                                           );
@@ -598,8 +595,6 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
     );
   }
 }
-
-enum _HostCloseChoice { keepOpen, end }
 
 /// The code, demoted. Sharing it is the slow path -- leave the app, pick a
 /// channel, and the other person still has to open the app, find "join with

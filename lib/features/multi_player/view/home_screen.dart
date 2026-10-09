@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:bible_game/features/multi_player/widget/game_play_card.dart';
 import 'package:bible_game/features/multi_player/widget/game_request_card.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_request_modal.dart';
+import 'package:bible_game/features/multi_player/widget/modal/game_confirm_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/join_gameplay_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/players_waiting_modal.dart';
 import 'package:bible_game/features/multi_player/widget/resume_game_card.dart';
@@ -135,10 +136,11 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
   void _openResumedRoom(BuildContext context, MultiplayerState state) {
     final room = state.resumableRoom;
     if (room == null) return;
-    final userId = context.read<AuthenticationBloc>().state.user.id.toString();
+    final me = context.read<AuthenticationBloc>().state.user;
     final websocket = context.read<WebsocketCubit>();
     websocket.connect();
-    websocket.subscribeToWaitingRoom(seed: room.toWaitingRoom(userId));
+    websocket.subscribeToWaitingRoom(
+        seed: room.toWaitingRoom(me, known: state.onlinePlayers));
 
     if (room.isHost) {
       showHostWaitingModal(
@@ -161,27 +163,23 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
   Future<void> _confirmDiscard(BuildContext context) async {
     final room = _multiplayerBloc.state.resumableRoom;
     if (room == null) return;
-    final leave = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Leave this game?'),
-        content: Text(room.isHost
-            ? 'Code ${room.inviteCode} will stop working for you. '
-                'Anyone still in the game stays in it.'
-            : "You'll need the code again to get back in."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Keep it'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Leave'),
-          ),
-        ],
-      ),
+    final choice = await showGameConfirmModal(
+      context,
+      badgeAsset: room.details.victoryType == 'FIRST_TO_X'
+          ? ProductImageRoutes.xMode
+          : ProductImageRoutes.lightningMode,
+      title: 'Leave this game?',
+      message: room.isHost
+          ? 'This code will stop working for you. Anyone still in the game '
+              'stays in it.'
+          : "You'll need the code again to get back in.",
+      code: room.inviteCode,
+      primaryLabel: 'Keep it',
+      secondaryLabel: 'Leave game',
     );
-    if (leave == true) _multiplayerBloc.add(const DiscardActiveRoom());
+    if (choice == GameConfirmChoice.secondary) {
+      _multiplayerBloc.add(const DiscardActiveRoom());
+    }
   }
 
   @override

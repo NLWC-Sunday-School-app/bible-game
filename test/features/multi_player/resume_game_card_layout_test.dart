@@ -4,8 +4,11 @@ import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/features/multi_player/resumable_room.dart';
 import 'package:bible_game/features/multi_player/view/home_screen.dart';
+import 'package:bible_game/features/multi_player/widget/player_waiting_card.dart';
 import 'package:bible_game/features/multi_player/widget/resume_game_card.dart';
 import 'package:bible_game_api/bible_game_api.dart';
+import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
+import 'package:bible_game/shared/features/settings/sound_manager.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +40,11 @@ final _room = ResumableRoom(
   myPlayerId: 'p-host',
 );
 
+class MockSettingsBloc extends MockBloc<SettingsEvent, SettingsState>
+    implements SettingsBloc {}
+
+class MockSoundManager extends Mock implements SoundManager {}
+
 void main() {
   setUpAll(() async {
     final loader = FontLoader('Mikado');
@@ -61,8 +69,16 @@ void main() {
     final bloc = MockMultiplayerBloc();
     when(() => bloc.state).thenReturn(state);
 
-    await tester.pumpWidget(BlocProvider<MultiplayerBloc>.value(
-      value: bloc,
+    final sound = MockSoundManager();
+    when(() => sound.playClickSound()).thenAnswer((_) async {});
+    final settings = MockSettingsBloc();
+    when(() => settings.soundManager).thenReturn(sound);
+
+    await tester.pumpWidget(MultiBlocProvider(
+      providers: [
+        BlocProvider<MultiplayerBloc>.value(value: bloc),
+        BlocProvider<SettingsBloc>.value(value: settings),
+      ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
         builder: (_, __) => MaterialApp(
@@ -117,7 +133,7 @@ void main() {
 
     await tester.tap(find.byTooltip('Leave this game'));
     await tester.pumpAndSettle();
-    expect(find.text('Leave this game?'), findsOneWidget);
+    expect(find.text('Leave this game?'), findsWidgets);
 
     await tester.tap(find.text('Keep it'));
     await tester.pumpAndSettle();
@@ -125,8 +141,37 @@ void main() {
 
     await tester.tap(find.byTooltip('Leave this game'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Leave'));
+    await tester.tap(find.text('Leave game'));
     await tester.pumpAndSettle();
     verify(() => bloc.add(const DiscardActiveRoom())).called(1);
+  });
+
+  testWidgets('a player row with no rank or country yet still draws',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(ScreenUtilInit(
+      designSize: const Size(375, 812),
+      builder: (_, __) => MaterialApp(
+        theme: ThemeData(fontFamily: 'Mikado'),
+        home: Scaffold(
+          body: PlayerWaitingCard(
+            position: 2,
+            userName: 'JohnO',
+            countryName: '',
+            userRank: '',
+            userId: 'JohnO',
+            isHost: false,
+            isWaitingForHost: false,
+            onTap: () {},
+          ),
+        ),
+      ),
+    ));
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('JohnO'), findsWidgets);
   });
 }

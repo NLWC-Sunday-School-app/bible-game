@@ -428,17 +428,43 @@ void main() {
   });
 
   group('ResumableRoom', () {
+    test('fills other players in from the online players list', () {
+      final room = ResumableRoom(
+          details: _details(), isHost: true, myPlayerId: 'p-host');
+      final waiting = room.toWaitingRoom(_host, known: const [
+        OnlinePlayer(
+            userId: 2,
+            username: 'TobiLove',
+            profileUrl: '',
+            country: 'Angola',
+            level: 'child'),
+      ]);
+
+      final guest = waiting.players.firstWhere((p) => p.id == 'p-guest');
+      expect(guest.userId, '2');
+      expect(guest.country, 'Angola');
+      expect(guest.level, 'child');
+    });
+
+
     test('rebuilds the waiting room roster with our own row recognisable', () {
       final room = ResumableRoom(
           details: _details(), isHost: true, myPlayerId: 'p-host');
-      final waiting = room.toWaitingRoom('1');
+      final waiting = room.toWaitingRoom(_host);
 
       expect(waiting.roomId, 'room-1');
       expect(waiting.players.map((p) => p.username), ['Tobi1', 'tobilove']);
       final me = waiting.players.firstWhere((p) => p.id == 'p-host');
       expect(me.userId, '1');
       expect(me.isHost, isTrue);
-      expect(waiting.players.firstWhere((p) => p.id == 'p-guest').userId, isNull);
+      expect(me.country, 'NG');
+      expect(me.level, 'babe');
+      // Nothing known about the guest beyond their name: left empty rather
+      // than guessed, so the row shows what it has.
+      final guest = waiting.players.firstWhere((p) => p.id == 'p-guest');
+      expect(guest.userId, isNull);
+      expect(guest.country, isNull);
+      expect(guest.level, isNull);
       expect(waiting.totalQuestions, '15');
       expect(waiting.gameMode, 'Who Is Who');
       expect(room.modeLabel, 'Lightning Mode');

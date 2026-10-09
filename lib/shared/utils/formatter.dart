@@ -22,5 +22,6 @@ formatScriptureString(text) {
   }
 }
 
-String capitalizeText(String word) => word[0].toUpperCase() + word.substring(1);
+String capitalizeText(String word) =>
+    word.isEmpty ? word : word[0].toUpperCase() + word.substring(1);
 
