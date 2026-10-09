@@ -96,7 +96,9 @@ class CustomToast {
   /// the screen -- the multiplayer round puts it beside the rank flag, clear
   /// of the score and the timer. [bottom] anchors it to the bottom instead.
   /// [passThrough] lets taps reach whatever is underneath, for a banner laid
-  /// over a screen whose buttons must keep working.
+  /// over a screen whose buttons must keep working. [overlay] is for callers
+  /// holding only the navigator's own context, which sits above the overlay
+  /// it would otherwise be looked up from.
   static void showBanner(BuildContext context, String message,
       {bool isError = false,
       BannerTone? tone,
@@ -106,10 +108,11 @@ class CustomToast {
       double? left,
       double? right,
       bool passThrough = false,
+      OverlayState? overlay,
       Duration duration = const Duration(seconds: 3)}) {
     removeOverlay();
 
-    final overlay = Overlay.of(context);
+    overlay ??= Overlay.of(context);
     const animationDuration = Duration(milliseconds: 260);
 
     late final OverlayEntry entry;

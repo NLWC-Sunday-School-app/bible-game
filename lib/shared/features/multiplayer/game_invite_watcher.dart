@@ -5,6 +5,7 @@ import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_request_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/players_waiting_modal.dart';
+import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
 import 'package:bible_game/shared/widgets/multi_avatar.dart';
 import 'package:bible_game_api/model/game_invites_model.dart';
@@ -21,11 +22,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CurrentRouteObserver extends NavigatorObserver {
   static final ValueNotifier<bool> inQuestionScreen = ValueNotifier(false);
 
+  /// Whether the home screen is in the stack -- false while the splash screen
+  /// is still deciding where to go, which is when a link that launched the
+  /// app arrives.
+  static final ValueNotifier<bool> homeInStack = ValueNotifier(false);
+
   final List<Route<dynamic>> _stack = [];
 
   void _sync() {
     inQuestionScreen.value = _stack
         .any((route) => (route.settings.name ?? '').contains('question_screen'));
+    homeInStack.value =
+        _stack.any((route) => route.settings.name == AppRoutes.home);
   }
 
   @override

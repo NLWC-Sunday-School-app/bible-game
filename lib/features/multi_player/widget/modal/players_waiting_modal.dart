@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bible_game/features/multi_player/game_mode_codes.dart';
+import 'package:bible_game/features/multi_player/invite_link.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_confirm_modal.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:bible_game/features/multi_player/widget/player_waiting_card.dart';
 import '../../../../shared/constants/app_routes.dart';
 import '../../../../shared/constants/image_routes.dart';
@@ -356,7 +358,9 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                           ),
                         ),
                         SizedBox(height: 18.h,),
-                        _ShareCodeRow(inviteCode: widget.inviteCode),
+                        _ShareCodeRow(
+                            inviteCode: widget.inviteCode,
+                            modeLabel: widget.selectedGroupGame),
                         SizedBox(height: 16.h,),
                       ],
                     ),
@@ -596,60 +600,104 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
   }
 }
 
-/// The code, demoted. Sharing it is the slow path -- leave the app, pick a
-/// channel, and the other person still has to open the app, find "join with
-/// code" and type eight characters -- so it no longer outweighs the invite
-/// button, which reaches people who are already connected.
+/// The code, and the link to it. The link is the fast path for anyone not
+/// already online -- one tap in a chat opens the app on this game -- so it
+/// gets the button; the code stays beside it for reading out loud, and copies
+/// on tap.
 class _ShareCodeRow extends StatelessWidget {
-  const _ShareCodeRow({required this.inviteCode});
+  const _ShareCodeRow({required this.inviteCode, required this.modeLabel});
 
   final String inviteCode;
+  final String modeLabel;
 
   static const _blue = Color(0xFF014CA3);
 
+  void _share(BuildContext context) {
+    // iPad presents the share sheet as a popover and needs somewhere to
+    // anchor it; without one it throws.
+    final box = context.findRenderObject() as RenderBox?;
+    Share.share(
+      InviteLink.shareMessage(code: inviteCode, modeLabel: modeLabel),
+      subject: 'Join my Bible Game match',
+      sharePositionOrigin:
+          box == null ? null : box.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      // The whole row copies now. The icon was the only target before, which
-      // is a 24px hit area for the one thing this row exists to do.
-      onTap: () {
-        Clipboard.setData(ClipboardData(text: inviteCode));
-        CustomToast.showBanner(context, 'Copied');
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
-        decoration: BoxDecoration(
-          border: Border.all(color: Color(0xFFD8B98C)),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Or share code',
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black.withValues(alpha: 0.5),
-              ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            Clipboard.setData(ClipboardData(text: inviteCode));
+            CustomToast.showBanner(context, 'Code copied');
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
+            decoration: BoxDecoration(
+              border: Border.all(color: Color(0xFFD8B98C)),
+              borderRadius: BorderRadius.circular(8.r),
             ),
-            SizedBox(width: 8.w),
-            Text(
-              inviteCode,
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  inviteCode,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: _blue,
+                  ),
+                ),
+                SizedBox(width: 6.w),
+                Icon(Icons.copy_rounded,
+                    size: 15.sp, color: _blue.withValues(alpha: 0.7)),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(width: 8.w),
+        Builder(
+          builder: (buttonContext) => GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _share(buttonContext),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
+              decoration: BoxDecoration(
                 color: _blue,
+                borderRadius: BorderRadius.circular(8.r),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0xFF002959),
+                    offset: Offset(0, 3),
+                    blurRadius: 0,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.ios_share_rounded,
+                      size: 15.sp, color: Colors.white),
+                  SizedBox(width: 6.w),
+                  Text(
+                    'Share invite',
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(width: 6.w),
-            Icon(Icons.copy_rounded,
-                size: 15.sp, color: _blue.withValues(alpha: 0.7)),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

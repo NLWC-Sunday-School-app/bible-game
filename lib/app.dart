@@ -108,6 +108,7 @@ import 'features/store/bloc/power_up_bloc.dart';
 import 'features/store/bloc/power_up_event.dart';
 import 'shared/features/localization/app_localization.dart';
 import 'shared/features/multiplayer/game_invite_watcher.dart';
+import 'shared/features/multiplayer/invite_link_handler.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -325,8 +326,9 @@ class _AppState extends State<App> {
           navigatorObservers: [currentRouteObserver],
           // Above every route, so an invite arriving while the user is on any
           // screen still surfaces.
-          builder: (context, child) =>
-              GameInviteWatcher(child: child ?? const SizedBox.shrink()),
+          builder: (context, child) => InviteLinkHandler(
+              child: GameInviteWatcher(
+                  child: child ?? const SizedBox.shrink())),
           locale: _locale,
           supportedLocales: AppLocalization.supportedLocales,
           localizationsDelegates: const [
