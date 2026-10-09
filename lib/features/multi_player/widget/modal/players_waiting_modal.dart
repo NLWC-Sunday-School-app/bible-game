@@ -19,7 +19,10 @@ import '../../../../shared/widgets/modal/network_modal.dart';
 import '../../../lightning_mode/bloc/lightning_mode_bloc.dart';
 import '../multiplayer_button.dart';
 
-void showHostWaitingModal(BuildContext context, {required selectedGroupGame, required inviteCode, required questionType, required noOfQuestion}) {
+/// [createRoomOnClose] is for the create flow, where closing drops the host
+/// back on the mode picker and that screen needs a fresh room behind it. A
+/// host who came back to a saved room has no picker under them to feed.
+void showHostWaitingModal(BuildContext context, {required selectedGroupGame, required inviteCode, required questionType, required noOfQuestion, bool createRoomOnClose = true}) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -29,6 +32,7 @@ void showHostWaitingModal(BuildContext context, {required selectedGroupGame, req
           inviteCode: inviteCode,
           questionType: questionType,
           noOfQuestion: noOfQuestion,
+          createRoomOnClose: createRoomOnClose,
         );
       });
 }
@@ -50,13 +54,14 @@ void showPlayersWaitingForHostModal(BuildContext context, {required selectedGrou
 }
 
 class PlayersWaitingModal extends StatefulWidget {
-  const PlayersWaitingModal({super.key, required this.isWaitingForHost, required this.selectedGroupGame, required this.inviteCode, required this.questionType, this.noOfQuestion});
+  const PlayersWaitingModal({super.key, required this.isWaitingForHost, required this.selectedGroupGame, required this.inviteCode, required this.questionType, this.noOfQuestion, this.createRoomOnClose = true});
 
   final bool isWaitingForHost;
   final String selectedGroupGame;
   final String? questionType;
   final String inviteCode;
   final int? noOfQuestion;
+  final bool createRoomOnClose;
 
   @override
   State<PlayersWaitingModal> createState() => _PlayersWaitingModalState();
@@ -281,7 +286,9 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                 final hostPlayerId = BlocProvider.of<MultiplayerBloc>(context).state.createGameRoomResponse.activePlayers[0];
                                 print(hostPlayerId);
                                 BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(hostPlayerId));
-                                BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
+                                if (widget.createRoomOnClose) {
+                                  BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
+                                }
                               }
                               Navigator.pop(context);
                             },

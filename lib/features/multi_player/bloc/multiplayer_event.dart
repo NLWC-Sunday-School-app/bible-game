@@ -98,6 +98,22 @@ class Reject extends MultiplayerEvent{
   List<Object> get props => [inviteId];
 }
 
+/// Looks for a room saved from an earlier session that is still open.
+class CheckActiveRoom extends MultiplayerEvent {
+  const CheckActiveRoom();
+}
+
+/// Goes back into the saved room: its waiting room for a game not yet
+/// started, or a fresh round of it -- same code -- for one already played.
+class ResumeActiveRoom extends MultiplayerEvent {
+  const ResumeActiveRoom();
+}
+
+/// Leaves the saved room and forgets it.
+class DiscardActiveRoom extends MultiplayerEvent {
+  const DiscardActiveRoom();
+}
+
 class StartPolling extends MultiplayerEvent {
   const StartPolling();
 }

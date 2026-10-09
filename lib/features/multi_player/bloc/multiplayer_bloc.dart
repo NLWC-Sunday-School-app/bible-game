@@ -5,7 +5,10 @@ import 'package:bible_game/features/multi_player/repository/multiplayer_reposito
 import 'package:bible_game_api/bible_game_api.dart';
 import 'package:bible_game_api/model/game_invites_model.dart';
 import 'package:bloc/bloc.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
+import '../active_room_store.dart';
+import '../resumable_room.dart';
 import '../../../shared/features/authentication/bloc/authentication_bloc.dart';
 import '../../../shared/features/settings/bloc/settings_bloc.dart';
 import 'multiplayer_event.dart';
@@ -15,6 +18,7 @@ part 'multiplayer_state.dart';
 class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
   final MultiplayerRepository _multiplayerRepository;
   final AuthenticationBloc _authenticationBloc;
+  final ActiveRoomStore _activeRoomStore;
   StreamSubscription? _pollSubscription;
   StreamSubscription? _authSubscription;
 
@@ -22,10 +26,12 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       {
         required MultiplayerRepository multiplayerRepository,
         required AuthenticationBloc authenticationBloc,
+        ActiveRoomStore? activeRoomStore,
       })
       :
       _multiplayerRepository = multiplayerRepository,
         _authenticationBloc = authenticationBloc,
+        _activeRoomStore = activeRoomStore ?? ActiveRoomStore(),
         super(MultiplayerState.initial()) {
     on<CreateGameRoom>(_onCreateGameRoom);
     on<JoinRoom>(_onJoinRoom);
@@ -39,6 +45,9 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     on<CountInvite>(_onCountInvite);
     on<AcceptAndJoin>(_onAcceptAndJoin);
     on<Reject>(_onReject);
+    on<CheckActiveRoom>(_onCheckActiveRoom);
+    on<ResumeActiveRoom>(_onResumeActiveRoom);
+    on<DiscardActiveRoom>(_onDiscardActiveRoom);
     on<StartPolling>(_onStartPolling);
     on<StopPolling>(_onStopPolling);
 
@@ -85,6 +94,8 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       print(response);
       emit(state.copyWith(createGameRoomResponse: response,isJoiningRoom: false, hasJoinedRoom: true));
       emit(state.copyWith(hasJoinedRoom: false));
+      await _rememberRoom(response);
+      add(const CheckActiveRoom());
     } catch (_) {
       emit(state.copyWith(
           isJoiningRoom: false, hasJoinedRoom: false));
@@ -96,6 +107,10 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       Emitter<MultiplayerState> emit) async {
     try {
       emit(state.copyWith(isLeavingRoom: true, hasLeaveRoom: false));
+      // Forgotten before the request, not after: leaving is what the player
+      // asked for, and a failed request should not bring the room back as
+      // something to resume.
+      await _forgetRoom(state.createGameRoomResponse.id, emit);
       final response =
       await _multiplayerRepository.leaveRoom(state.createGameRoomResponse.id, event.playerId);
       emit(state.copyWith(isLeavingRoom: false, hasLeaveRoom: true));
@@ -144,6 +159,13 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
       );
       emit(state.copyWith(
           isLoadingConfigureGameRoom: false, hasConfiguredGameRoom: true, hasConfigureGameRoomFailed: false));
+      // Saved once configured rather than on create: the code is only worth
+      // coming back to once there is a game behind it. The create response
+      // lists the host alone, so its one active player is the host's own.
+      final room = state.createGameRoomResponse;
+      await _rememberRoom(room,
+          playerId: room.activePlayers.firstOrNull?.toString());
+      add(const CheckActiveRoom());
     } catch (_) {
       emit(state.copyWith(
           isLoadingConfigureGameRoom: false, hasConfiguredGameRoom: false, hasConfigureGameRoomFailed: true));
@@ -274,6 +296,8 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
           isLoadingAcceptInvite: false, hasAcceptedInvite: true, createGameRoomResponse: response));
       emit(state.copyWith(
           hasAcceptedInvite: false));
+      await _rememberRoom(response);
+      add(const CheckActiveRoom());
       // add(JoinRoom(response.inviteCode!));
     } catch (_) {
       emit(state.copyWith(
@@ -294,6 +318,187 @@ class MultiplayerBloc extends Bloc<MultiplayerEvent, MultiplayerState> {
     } catch (_) {
       emit(state.copyWith(
           isLoadingRejectInvite: false, hasRejectedInvite: false));
+    }
+  }
+
+  String get _userId => _authenticationBloc.state.user.id.toString();
+
+  Future<void> _rememberRoom(CreateGameRoomModel room, {String? playerId}) async {
+    final roomId = room.id;
+    final inviteCode = room.inviteCode;
+    if (roomId == null || inviteCode == null) return;
+    try {
+      await _activeRoomStore.save(
+          roomId: roomId,
+          inviteCode: inviteCode,
+          userId: _userId,
+          playerId: playerId);
+    } catch (e) {
+      debugPrint('⚠️ could not save active room $roomId: $e');
+    }
+  }
+
+  Future<void> _forgetRoom(String? roomId, Emitter<MultiplayerState> emit) async {
+    if (roomId == null) return;
+    try {
+      await _activeRoomStore.clear(roomId);
+    } catch (e) {
+      debugPrint('⚠️ could not clear active room $roomId: $e');
+    }
+    if (state.resumableRoom?.details.id == roomId) {
+      emit(state.copyWith(clearResumableRoom: true));
+    }
+  }
+
+  /// The saved room as the server has it now, or null once it is gone for
+  /// good -- deleted, or closed to a player who is no longer in it. Throws on
+  /// anything else, network trouble included, so a dropped connection does
+  /// not wipe out the one record of a room that is still there.
+  Future<ResumableRoom?> _loadResumable(ActiveRoom saved) async {
+    final RoomDetailsModel details;
+    try {
+      details = await _multiplayerRepository.getRoomDetails(saved.roomId);
+    } catch (e) {
+      if (e.toString().contains('ApiException: 404')) {
+        await _activeRoomStore.clear(saved.roomId);
+        return null;
+      }
+      rethrow;
+    }
+
+    var myPlayerId = details.players
+        .firstWhereOrNull((p) => p.playerId != null && p.playerId == saved.playerId)
+        ?.playerId;
+    // A guest's player id only reaches us in a socket frame, which may never
+    // have arrived before they left. Names are unique accounts-wide, so the
+    // roster entry under ours is ours -- but only when no id was recorded: a
+    // recorded id that is missing means we were removed.
+    if (myPlayerId == null && saved.playerId == null) {
+      final myName = _authenticationBloc.state.user.name.toLowerCase();
+      myPlayerId = details.players
+          .firstWhereOrNull((p) => p.playerName?.toLowerCase() == myName)
+          ?.playerId;
+    }
+    if (myPlayerId != null && myPlayerId != saved.playerId) {
+      await _activeRoomStore.rememberPlayerId(saved.roomId, myPlayerId);
+    }
+
+    // Out of the room and it is no longer taking players: nothing to go back to.
+    if (myPlayerId == null && !details.isWaiting) {
+      await _activeRoomStore.clear(saved.roomId);
+      return null;
+    }
+
+    return ResumableRoom(
+      details: details,
+      isHost: details.hostId == _userId,
+      myPlayerId: myPlayerId,
+    );
+  }
+
+  Future<void> _onCheckActiveRoom(
+      CheckActiveRoom event,
+      Emitter<MultiplayerState> emit) async {
+    final saved = _activeRoomStore.read(_userId);
+    if (saved == null) {
+      if (state.resumableRoom != null) {
+        emit(state.copyWith(clearResumableRoom: true));
+      }
+      return;
+    }
+    try {
+      final resumable = await _loadResumable(saved);
+      emit(resumable == null
+          ? state.copyWith(clearResumableRoom: true)
+          : state.copyWith(resumableRoom: resumable));
+    } catch (e) {
+      // Keep whatever was shown; the next check or a tap on it will retry.
+      debugPrint('⚠️ checkActiveRoom failed for ${saved.roomId}: $e');
+    }
+  }
+
+  Future<void> _onResumeActiveRoom(
+      ResumeActiveRoom event,
+      Emitter<MultiplayerState> emit) async {
+    if (state.isResumingRoom) return;
+    emit(state.copyWith(
+        isResumingRoom: true, hasResumedRoom: false, resumeError: ''));
+
+    const gone = 'That game has ended. Create a new one to play again.';
+    try {
+      final saved = _activeRoomStore.read(_userId);
+      var resumable = saved == null ? null : await _loadResumable(saved);
+      if (resumable == null) {
+        emit(state.copyWith(
+            isResumingRoom: false, clearResumableRoom: true, resumeError: gone));
+        return;
+      }
+
+      if (!resumable.isMember) {
+        // Still open, but our player is gone: come back in by the code, as
+        // anyone with it would.
+        final joined = await _multiplayerRepository.joinRoom(
+            resumable.inviteCode, _authenticationBloc.state.user.id);
+        await _rememberRoom(joined);
+        final rejoined = _activeRoomStore.read(_userId);
+        resumable = rejoined == null ? null : await _loadResumable(rejoined);
+        if (resumable == null) {
+          emit(state.copyWith(
+              isResumingRoom: false, clearResumableRoom: true, resumeError: gone));
+          return;
+        }
+      } else if (resumable.details.isActive) {
+        // Questions are timed and dealt from the GAME_STARTED frame, which
+        // has already gone out; there is no joining a round halfway through.
+        emit(state.copyWith(
+            isResumingRoom: false,
+            resumableRoom: resumable,
+            resumeError:
+                'That round is still being played. You can rejoin when it ends.'));
+        return;
+      } else if (resumable.details.isFinished && resumable.isHost) {
+        // A finished room reopens under the same code, so the friends who
+        // already have it can come straight back in.
+        await _multiplayerRepository.restartGame(
+            resumable.details.id, _authenticationBloc.state.user.id);
+        final saved = _activeRoomStore.read(_userId);
+        resumable = saved == null ? null : await _loadResumable(saved);
+        if (resumable == null) {
+          emit(state.copyWith(
+              isResumingRoom: false, clearResumableRoom: true, resumeError: gone));
+          return;
+        }
+      }
+
+      emit(state.copyWith(
+          createGameRoomResponse: resumable.toCreateGameRoomModel(),
+          resumableRoom: resumable,
+          isResumingRoom: false,
+          hasResumedRoom: true));
+      emit(state.copyWith(hasResumedRoom: false));
+    } catch (e) {
+      debugPrint('⚠️ resumeActiveRoom failed: $e');
+      emit(state.copyWith(
+          isResumingRoom: false,
+          resumeError:
+              "Couldn't get back into your game. Check your connection and try again."));
+    }
+  }
+
+  Future<void> _onDiscardActiveRoom(
+      DiscardActiveRoom event,
+      Emitter<MultiplayerState> emit) async {
+    final resumable = state.resumableRoom;
+    await _activeRoomStore.clear(resumable?.details.id);
+    emit(state.copyWith(clearResumableRoom: true));
+
+    final roomId = resumable?.details.id;
+    final playerId = resumable?.myPlayerId;
+    if (roomId == null || playerId == null) return;
+    try {
+      await _multiplayerRepository.leaveRoom(roomId, playerId);
+    } catch (e) {
+      debugPrint('⚠️ leaving discarded room $roomId failed: $e');
     }
   }
 

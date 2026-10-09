@@ -10,6 +10,7 @@ export 'model/four_scriptures.dart';
 export 'model/waiting_room.dart';
 export 'model/create_game_room_model.dart';
 export 'model/start_game_room_model.dart';
+export 'model/room_details_model.dart';
 export 'model/position_update.dart';
 export 'model/game_finished_event.dart';
 export 'model/game_ads.dart';
