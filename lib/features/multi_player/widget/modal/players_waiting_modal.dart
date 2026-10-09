@@ -135,6 +135,60 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
     context.read<MultiplayerBloc>().add(FetchOnlinePlayers());
   }
 
+  /// The host's close button used to end the game outright: it took the host
+  /// out of the room, so friends already holding the code were left waiting
+  /// on a room nobody could start, and the host had no way back. Hosts close
+  /// this sheet to step away far more often than to cancel, so keeping the
+  /// game open is the default and ending it has to be chosen.
+  Future<void> _onHostClose() async {
+    final choice = await showDialog<_HostCloseChoice>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Leave the waiting room?'),
+        content: Text(
+            'Keep the game open and friends can still join with code '
+            '${widget.inviteCode}. Get back to it from the Multiplayer tab.'),
+        actions: [
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, _HostCloseChoice.end),
+            child: const Text('End game',
+                style: TextStyle(color: Color(0xFFDB0C34))),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, _HostCloseChoice.keepOpen),
+            child: const Text('Keep it open'),
+          ),
+        ],
+      ),
+    );
+    if (choice == null || !mounted) return;
+
+    final multiplayer = context.read<MultiplayerBloc>();
+    final navigator = Navigator.of(context);
+
+    if (choice == _HostCloseChoice.end) {
+      final hostPlayerId =
+          multiplayer.state.createGameRoomResponse.activePlayers[0];
+      multiplayer.add(LeaveRoom(hostPlayerId));
+      if (widget.createRoomOnClose) multiplayer.add(CreateGameRoom());
+      navigator.pop();
+      return;
+    }
+
+    // The room stays as it is on the server. Only the subscription goes;
+    // resuming opens a fresh one and reloads the roster from the server.
+    context.read<WebsocketCubit>().clearCurrentRoom();
+    multiplayer.add(const CheckActiveRoom());
+    navigator.pop();
+    // Out past the mode picker too, when this came from creating a game:
+    // the resume card is on the Multiplayer tab underneath it, and the
+    // picker would only offer to set up a second game.
+    navigator.popUntil(
+        (route) => route.settings.name != AppRoutes.groupGameCategory);
+  }
+
   /// The four modes differ only by icon and label, which a lookup says more
   /// plainly than the chain of conditionals this replaced.
   Widget _modeHeader() {
@@ -283,12 +337,8 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                   BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(player!.id!));
                                 }
                               }else{
-                                final hostPlayerId = BlocProvider.of<MultiplayerBloc>(context).state.createGameRoomResponse.activePlayers[0];
-                                print(hostPlayerId);
-                                BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(hostPlayerId));
-                                if (widget.createRoomOnClose) {
-                                  BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
-                                }
+                                _onHostClose();
+                                return;
                               }
                               Navigator.pop(context);
                             },
@@ -548,6 +598,8 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
     );
   }
 }
+
+enum _HostCloseChoice { keepOpen, end }
 
 /// The code, demoted. Sharing it is the slow path -- leave the app, pick a
 /// channel, and the other person still has to open the app, find "join with
