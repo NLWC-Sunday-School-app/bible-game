@@ -180,7 +180,7 @@ void main() {
     signedIn(true);
     await pumpApp(tester);
 
-    await receive(tester, 'https://api.biblegame.nlwc.church/join/P0YB07RE');
+    await receive(tester, 'https://play.biblegame.app/join/P0YB07RE');
     expect(find.byType(JoinGamePlayModal), findsNothing,
         reason: 'still on the splash screen');
 
@@ -220,7 +220,7 @@ void main() {
     await tester.tap(find.text('home'));
     await tester.pumpAndSettle();
 
-    await receive(tester, 'https://api.biblegame.nlwc.church/join/P0YB07RE');
+    await receive(tester, 'https://play.biblegame.app/join/P0YB07RE');
     expect(find.byType(JoinGamePlayModal), findsNothing);
     expect(find.text('question'), findsOneWidget);
 
@@ -238,7 +238,7 @@ void main() {
     await pumpApp(tester);
     await goHome(tester);
 
-    await receive(tester, 'https://api.biblegame.nlwc.church/join/p0yb07re');
+    await receive(tester, 'https://play.biblegame.app/join/p0yb07re');
 
     expect(find.byType(JoinGamePlayModal), findsNothing);
     verify(() => multiplayer.add(const ResumeActiveRoom())).called(1);
@@ -251,8 +251,8 @@ void main() {
     await pumpApp(tester);
     await goHome(tester);
 
-    await receive(tester, 'https://api.biblegame.nlwc.church/join/P0YB07RE');
-    await receive(tester, 'https://api.biblegame.nlwc.church/join/P0YB07RE');
+    await receive(tester, 'https://play.biblegame.app/join/P0YB07RE');
+    await receive(tester, 'https://play.biblegame.app/join/P0YB07RE');
 
     verify(() => multiplayer.add(JoinRoom('P0YB07RE'))).called(1);
     expect(find.byType(JoinGamePlayModal), findsOneWidget);
@@ -263,7 +263,7 @@ void main() {
     await pumpApp(tester);
     await goHome(tester);
 
-    await receive(tester, 'https://api.biblegame.nlwc.church/catalog');
+    await receive(tester, 'https://play.biblegame.app/catalog');
     await receive(tester, 'https://example.com/join/P0YB07RE');
 
     expect(find.byType(JoinGamePlayModal), findsNothing);

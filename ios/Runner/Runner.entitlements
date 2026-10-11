@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:api.biblegame.nlwc.church</string>
+		<string>applinks:play.biblegame.app</string>
 	</array>
 	<key>aps-environment</key>
 	<string>development</string>

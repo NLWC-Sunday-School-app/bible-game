@@ -53,7 +53,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" />
-                <data android:host="api.biblegame.nlwc.church" />
+                <data android:host="play.biblegame.app" />
                 <data android:pathPrefix="/join/" />
             </intent-filter>
             <!-- biblegame://join/CODE: opens the app without any website. -->

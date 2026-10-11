@@ -1,0 +1,21 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "78RK4YBS4Q.com.nlwc.bible.game"
+        ],
+        "components": [
+          {
+            "/": "/join/*"
+          }
+        ],
+        "appID": "78RK4YBS4Q.com.nlwc.bible.game",
+        "paths": [
+          "/join/*"
+        ]
+      }
+    ]
+  }
+}

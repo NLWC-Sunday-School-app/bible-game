@@ -12,7 +12,9 @@ import 'package:bible_game/navigation/cubit/navigation_cubit.dart';
 import 'package:bible_game/shared/constants/app_routes.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/multiplayer/game_invite_watcher.dart';
+import 'package:bible_game/shared/utils/browser_location.dart';
 import 'package:bible_game/shared/utils/custom_toast.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -90,8 +92,10 @@ class _InviteLinkHandlerState extends State<InviteLinkHandler> {
   }
 
   void _onLink(Uri uri) {
-    final code = InviteLink.codeFrom(uri);
+    final code =
+        InviteLink.codeFrom(uri, alsoHost: kIsWeb ? Uri.base.host : null);
     if (code == null) return;
+    clearInvitePathFromAddressBar();
 
     final now = DateTime.now();
     if (code == _lastCode &&

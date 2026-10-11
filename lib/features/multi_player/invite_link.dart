@@ -1,20 +1,20 @@
 /// Links that open the app straight into joining a game.
 ///
 /// `https://<host>/join/<CODE>` is the one people share: messaging apps only
-/// make web links tappable, and a phone without the app installed lands on
-/// the web page at that address instead. `biblegame://join/<CODE>` opens the
+/// make web links tappable. The host is the web version of the game, so a
+/// phone without the app opens the game in the browser and joins there. `biblegame://join/<CODE>` opens the
 /// app directly; it needs no website, which makes it the one to test with.
 class InviteLink {
   InviteLink._();
 
   /// The host in links the app hands out.
-  static const shareHost = 'api.biblegame.nlwc.church';
+  static const shareHost = 'play.biblegame.app';
 
   /// Every host whose /join links the app accepts. Each one also goes in the
   /// Android intent filter and the iOS associated domains, and must serve the
   /// well-known verification files: on Android 11 and older, one host in the
   /// filter failing verification stops all of them opening the app.
-  static const hosts = {'api.biblegame.nlwc.church'};
+  static const hosts = {'play.biblegame.app'};
 
   static const scheme = 'biblegame';
 
@@ -23,13 +23,16 @@ class InviteLink {
   static Uri forCode(String code) => Uri.https(shareHost, '/join/$code');
 
   /// The invite code a link carries, upper-cased, or null when it is not an
-  /// invite link.
-  static String? codeFrom(Uri uri) {
+  /// invite link. [alsoHost] is accepted beside [hosts]: the web build passes
+  /// its own address, since there the link is the page it was loaded from --
+  /// on a preview deployment or localhost as much as on [shareHost].
+  static String? codeFrom(Uri uri, {String? alsoHost}) {
     String? code;
     final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
 
     if ((uri.scheme == 'https' || uri.scheme == 'http') &&
-        hosts.contains(uri.host.toLowerCase()) &&
+        (hosts.contains(uri.host.toLowerCase()) ||
+            (alsoHost != null && uri.host.toLowerCase() == alsoHost.toLowerCase())) &&
         segments.length == 2 &&
         segments.first.toLowerCase() == 'join') {
       code = segments[1];

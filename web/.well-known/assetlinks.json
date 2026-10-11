@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nlwc.bible.game",
+      "sha256_cert_fingerprints": [
+        "8B:BD:30:22:E4:41:AC:1F:85:03:58:03:F0:45:38:A7:BD:69:B6:B2:20:91:C4:0E:C0:E1:B2:C0:00:9C:2A:B5"
+      ]
+    }
+  }
+]
