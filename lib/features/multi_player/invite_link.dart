@@ -10,10 +10,11 @@ class InviteLink {
   /// The host in links the app hands out.
   static const shareHost = 'api.biblegame.nlwc.church';
 
-  /// Every host whose /join links the app accepts. A link verified for one of
-  /// these on the platform side opens the app; one that is not just opens the
-  /// browser, so listing a host here costs nothing until it is set up.
-  static const hosts = {'api.biblegame.nlwc.church', 'biblegame.nlwc.church'};
+  /// Every host whose /join links the app accepts. Each one also goes in the
+  /// Android intent filter and the iOS associated domains, and must serve the
+  /// well-known verification files: on Android 11 and older, one host in the
+  /// filter failing verification stops all of them opening the app.
+  static const hosts = {'api.biblegame.nlwc.church'};
 
   static const scheme = 'biblegame';
 

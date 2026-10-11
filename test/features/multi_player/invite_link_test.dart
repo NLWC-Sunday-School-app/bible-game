@@ -10,11 +10,10 @@ void main() {
           'P0YB07RE');
     });
 
-    test('accepts the other registered host, a trailing slash and any case',
-        () {
+    test('accepts a trailing slash and any case', () {
       expect(
           InviteLink.codeFrom(
-              Uri.parse('https://BibleGame.nlwc.church/Join/p0yb07re/')),
+              Uri.parse('https://API.BibleGame.nlwc.church/Join/p0yb07re/')),
           'P0YB07RE');
     });
 
@@ -31,6 +30,7 @@ void main() {
     test('ignores links that are not invites', () {
       for (final link in [
         'https://example.com/join/P0YB07RE',
+        'https://biblegame.nlwc.church/join/P0YB07RE',
         'https://api.biblegame.nlwc.church/catalog',
         'https://api.biblegame.nlwc.church/join/P0YB07RE/extra',
         'https://api.biblegame.nlwc.church/join/AB',
