@@ -65,12 +65,15 @@ class _HomeScreenTabletViewState extends State<HomeScreenTabletView> {
   Future<void> _loadDeviceInfo() async {
     final prefs = await SharedPreferences.getInstance();
     final info = await _deviceInfoService.getDeviceInfo();
+    // Saved before the setState, not after: the game logs read these, and an
+    // invite link opening the app switches tabs straight away, so this screen
+    // can be gone by the time the device info arrives.
+    prefs.setString('deviceName', info['deviceName']!);
+    prefs.setString('deviceOs', info['osVersion']!);
+    if (!mounted) return;
     setState(() {
       _deviceInfo = info;
     });
-    prefs.setString('deviceName', _deviceInfo['deviceName']!);
-    prefs.setString('deviceOs', _deviceInfo['osVersion']!);
-
   }
 
   initializeWallet() {
