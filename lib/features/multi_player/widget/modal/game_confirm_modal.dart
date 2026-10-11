@@ -5,17 +5,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../../../shared/features/settings/bloc/settings_bloc.dart';
-import '../multiplayer_button.dart';
 
 enum GameConfirmChoice { primary, secondary }
 
-/// A two-way question in the waiting room's own look -- cream panel, red rim,
-/// hard drop shadow, outlined title, the green Start Game button -- rather
-/// than a system alert dropped over a game.
+/// A two-way question in the app's own dialog style -- the deep-blue panel of
+/// the log-out and quit dialogs -- rather than a system alert dropped over a
+/// game.
 ///
-/// The primary choice is the safe one and sits on the big green button; the
-/// secondary is the destructive one and is deliberately smaller. Resolves to
-/// null when dismissed, which callers treat as "do nothing".
+/// The primary choice is the safe one and gets the only filled button; the
+/// secondary is the destructive one and stays quiet, as Quit does in the quit
+/// dialog. One colour family throughout: a second accent on the buttons is
+/// what made the earlier cream, red and green version clash. Resolves to null
+/// when dismissed, which callers treat as "do nothing".
 Future<GameConfirmChoice?> showGameConfirmModal(
   BuildContext context, {
   required String badgeAsset,
@@ -76,11 +77,13 @@ class GameConfirmModal extends StatelessWidget {
   final String primaryLabel;
   final String secondaryLabel;
 
-  static const _cream = Color(0xFFFFEED6);
-  static const _rim = Color(0xFFDB0C34);
-  static const _rimShadow = Color(0xFF94142E);
-  static const _blue = Color(0xFF014CA3);
-  static const _ink = Color(0xFF122F52);
+  // The log-out dialog's panel, rim and glow.
+  static const _panelTop = Color(0xFF1565C0);
+  static const _panelMid = Color(0xFF0C2244);
+  static const _panelBottom = Color(0xFF071832);
+  static const _rim = Color(0xFF5AA0F0);
+  static const _glow = Color(0xFF4A9EFF);
+  static const _titleStroke = Color(0xFF042A6B);
 
   void _choose(BuildContext context, GameConfirmChoice choice) {
     context.read<SettingsBloc>().soundManager.playClickSound();
@@ -95,91 +98,115 @@ class GameConfirmModal extends StatelessWidget {
       child: Material(
         type: MaterialType.transparency,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          padding: EdgeInsets.symmetric(horizontal: 28.w),
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.topCenter,
             children: [
               Container(
                 margin: EdgeInsets.only(top: badgeSize / 2),
-                padding: EdgeInsets.fromLTRB(
-                    20.w, badgeSize / 2 + 12.h, 20.w, 20.h),
                 decoration: BoxDecoration(
-                  color: _cream,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(color: _rim, width: 2),
-                  boxShadow: const [
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(
+                      color: _rim.withValues(alpha: 0.6), width: 2),
+                  boxShadow: [
                     BoxShadow(
-                      color: _rimShadow,
-                      offset: Offset(2, 6),
-                      blurRadius: 0,
-                      spreadRadius: -1,
+                      color: _glow.withValues(alpha: 0.35),
+                      blurRadius: 28,
+                      spreadRadius: 2,
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                      spreadRadius: 4,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    StrokeText(
-                      text: title,
-                      textAlign: TextAlign.center,
-                      textStyle: TextStyle(
-                        color: _blue,
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w900,
-                      ),
-                      strokeColor: Colors.white,
-                      strokeWidth: 4,
-                    ),
-                    SizedBox(height: 10.h),
-                    Text(
-                      message,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        height: 1.4,
-                        color: _ink.withValues(alpha: 0.75),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(22.r),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.fromLTRB(
+                        22.w, badgeSize / 2 + 14.h, 22.w, 18.h),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [_panelTop, _panelMid, _panelBottom],
                       ),
                     ),
-                    if (code != null && code!.isNotEmpty) ...[
-                      SizedBox(height: 14.h),
-                      _CodeChip(code: code!),
-                    ],
-                    SizedBox(height: 22.h),
-                    MultiplayerButton(
-                      buttonText: primaryLabel,
-                      buttonIsLoading: false,
-                      width: 260.w,
-                      onTap: () => _choose(context, GameConfirmChoice.primary),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        StrokeText(
+                          text: title,
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w900,
+                          ),
+                          strokeColor: _titleStroke,
+                          strokeWidth: 4,
+                        ),
+                        SizedBox(height: 10.h),
+                        Text(
+                          message,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            height: 1.4,
+                            color: Colors.white.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        if (code != null && code!.isNotEmpty) ...[
+                          SizedBox(height: 16.h),
+                          _CodeChip(code: code!),
+                        ],
+                        SizedBox(height: 24.h),
+                        _PrimaryButton(
+                          label: primaryLabel,
+                          onTap: () =>
+                              _choose(context, GameConfirmChoice.primary),
+                        ),
+                        SizedBox(height: 10.h),
+                        _SecondaryButton(
+                          label: secondaryLabel,
+                          onTap: () =>
+                              _choose(context, GameConfirmChoice.secondary),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10.h),
-                    _SecondaryButton(
-                      label: secondaryLabel,
-                      onTap: () =>
-                          _choose(context, GameConfirmChoice.secondary),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               // The badge sits across the panel's top edge.
               Container(
                 height: badgeSize,
                 width: badgeSize,
+                padding: EdgeInsets.all(3.r),
                 decoration: BoxDecoration(
-                  color: Colors.white,
                   shape: BoxShape.circle,
+                  color: _panelTop,
                   border: Border.all(color: _rim, width: 2),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: _rimShadow,
-                      offset: Offset(0, 4),
-                      blurRadius: 0,
+                      color: _glow.withValues(alpha: 0.45),
+                      blurRadius: 14,
+                      spreadRadius: 1,
                     ),
                   ],
                 ),
-                padding: EdgeInsets.all(10.r),
-                child: Image.asset(badgeAsset, fit: BoxFit.contain),
+                child: Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _panelMid,
+                  ),
+                  child: Image.asset(badgeAsset, fit: BoxFit.contain),
+                ),
               ),
             ],
           ),
@@ -197,38 +224,37 @@ class _CodeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.6),
-        border: Border.all(color: const Color(0xFFD8B98C)),
-        borderRadius: BorderRadius.circular(8.r),
+        color: Colors.white.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Text(
         code,
         style: TextStyle(
           fontSize: 20.sp,
           fontWeight: FontWeight.w900,
-          letterSpacing: 1.5,
-          color: GameConfirmModal._blue,
+          letterSpacing: 2,
+          color: Colors.white,
         ),
       ),
     );
   }
 }
 
-/// Red and chunky like the game's close buttons, but smaller than the green
-/// one above it: the choice you can't take back should not be the easy target.
-class _SecondaryButton extends StatefulWidget {
-  const _SecondaryButton({required this.label, required this.onTap});
+/// Sinks under the finger, like the game's other buttons.
+class _Pressable extends StatefulWidget {
+  const _Pressable({required this.onTap, required this.child});
 
-  final String label;
   final VoidCallback onTap;
+  final Widget child;
 
   @override
-  State<_SecondaryButton> createState() => _SecondaryButtonState();
+  State<_Pressable> createState() => _PressableState();
 }
 
-class _SecondaryButtonState extends State<_SecondaryButton> {
+class _PressableState extends State<_Pressable> {
   bool _pressed = false;
 
   @override
@@ -242,28 +268,84 @@ class _SecondaryButtonState extends State<_SecondaryButton> {
         HapticFeedback.lightImpact();
         widget.onTap();
       },
-      child: AnimatedContainer(
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1.0,
         duration: const Duration(milliseconds: 90),
-        margin: EdgeInsets.only(top: _pressed ? 3 : 0),
-        padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 9.h),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// The quit dialog's Keep Playing button: the one filled, bright choice.
+class _PrimaryButton extends StatelessWidget {
+  const _PrimaryButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return _Pressable(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 14.h),
         decoration: BoxDecoration(
-          color: GameConfirmModal._rim,
-          borderRadius: BorderRadius.circular(22.r),
-          border: Border.all(color: Colors.white, width: 2),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4A90D9), Color(0xFF366ABC)],
+          ),
+          borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
-              color: GameConfirmModal._rimShadow,
-              offset: Offset(0, _pressed ? 0 : 3),
-              blurRadius: 0,
+              color: const Color(0xFF366ABC).withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Text(
-          widget.label,
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.3,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The quit dialog's Quit button: outlined and muted, so the choice that
+/// can't be undone is never the one that catches the eye.
+class _SecondaryButton extends StatelessWidget {
+  const _SecondaryButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return _Pressable(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 13.h),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14.sp,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            color: Colors.white.withValues(alpha: 0.6),
           ),
         ),
       ),
