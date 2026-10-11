@@ -6,7 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:bible_game/features/multi_player/widget/game_play_card.dart';
 import 'package:bible_game/features/multi_player/widget/game_request_card.dart';
 import 'package:bible_game/features/multi_player/widget/modal/game_request_modal.dart';
+import 'package:bible_game/features/multi_player/widget/modal/game_confirm_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/join_gameplay_modal.dart';
+import 'package:bible_game/features/multi_player/widget/modal/players_waiting_modal.dart';
+import 'package:bible_game/features/multi_player/widget/resume_game_card.dart';
+import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
+import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
+import 'package:bible_game/shared/utils/custom_toast.dart';
 import 'package:bible_game/shared/constants/image_routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -122,6 +128,58 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
     super.initState();
     _multiplayerBloc = context.read<MultiplayerBloc>();
     _multiplayerBloc.add(const StartPolling());
+    _multiplayerBloc.add(const CheckActiveRoom());
+  }
+
+  /// Opens the waiting room for a room the bloc has just resumed, the same
+  /// one a host sees after creating it or a guest after joining.
+  void _openResumedRoom(BuildContext context, MultiplayerState state) {
+    final room = state.resumableRoom;
+    if (room == null) return;
+    final me = context.read<AuthenticationBloc>().state.user;
+    final websocket = context.read<WebsocketCubit>();
+    websocket.connect();
+    websocket.subscribeToWaitingRoom(
+        seed: room.toWaitingRoom(me, known: state.onlinePlayers));
+
+    if (room.isHost) {
+      showHostWaitingModal(
+        context,
+        selectedGroupGame: room.modeLabel,
+        inviteCode: room.inviteCode,
+        questionType: room.questionTypeLabel,
+        noOfQuestion: room.details.victoryValue,
+        createRoomOnClose: false,
+      );
+    } else {
+      showPlayersWaitingForHostModal(
+        context,
+        selectedGroupName: room.modeLabel,
+        inviteCode: room.inviteCode,
+      );
+    }
+  }
+
+  Future<void> _confirmDiscard(BuildContext context) async {
+    final room = _multiplayerBloc.state.resumableRoom;
+    if (room == null) return;
+    final choice = await showGameConfirmModal(
+      context,
+      badgeAsset: room.details.victoryType == 'FIRST_TO_X'
+          ? ProductImageRoutes.xMode
+          : ProductImageRoutes.lightningMode,
+      title: 'Leave this game?',
+      message: room.isHost
+          ? 'This code will stop working for you. Anyone still in the game '
+              'stays in it.'
+          : "You'll need the code again to get back in.",
+      code: room.inviteCode,
+      primaryLabel: 'Keep it',
+      secondaryLabel: 'Leave game',
+    );
+    if (choice == GameConfirmChoice.secondary) {
+      _multiplayerBloc.add(const DiscardActiveRoom());
+    }
   }
 
   @override
@@ -139,6 +197,35 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
       children: [
         SizedBox(
           height: 16.h,
+        ),
+        BlocConsumer<MultiplayerBloc, MultiplayerState>(
+          listenWhen: (previous, current) =>
+              (!previous.hasResumedRoom && current.hasResumedRoom) ||
+              (current.resumeError.isNotEmpty &&
+                  previous.resumeError != current.resumeError),
+          listener: (context, state) {
+            if (state.hasResumedRoom) {
+              _openResumedRoom(context, state);
+            } else if (state.resumeError.isNotEmpty) {
+              CustomToast.showBanner(context, state.resumeError, isError: true);
+            }
+          },
+          buildWhen: (previous, current) =>
+              previous.resumableRoom != current.resumableRoom ||
+              previous.isResumingRoom != current.isResumingRoom,
+          builder: (context, state) {
+            final room = state.resumableRoom;
+            if (room == null) return const SizedBox.shrink();
+            return ResumeGameCard(
+              room: room,
+              isLoading: state.isResumingRoom,
+              onResume: () {
+                context.read<SettingsBloc>().soundManager.playClickSound();
+                _multiplayerBloc.add(const ResumeActiveRoom());
+              },
+              onDiscard: () => _confirmDiscard(context),
+            );
+          },
         ),
         GamePlayCard(
           onTap: (){
@@ -180,7 +267,19 @@ class _MultiplayerHomeBodyState extends State<MultiplayerHomeBody> {
       ],
     );
 
-    if (!isConstrained) return column;
+    if (!isConstrained) {
+      // The column spreads out with a Spacer when there is room, and scrolls
+      // when there is not -- a short phone with a resume card showing has
+      // less height than the cards need.
+      return LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(child: column),
+          ),
+        ),
+      );
+    }
     return Center(
       child: SingleChildScrollView(
         child: ConstrainedBox(

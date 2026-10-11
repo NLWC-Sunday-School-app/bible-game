@@ -9,16 +9,20 @@ import '../../../../shared/widgets/blue_button.dart';
 import '../../bloc/multiplayer_bloc.dart';
 import '../../../../shared/utils/custom_toast.dart';
 
-void showJoinGamePlayModal(BuildContext context) {
+/// [initialCode] fills the field and joins straight away -- the code came
+/// from an invite link, so there is nothing left for the player to type.
+void showJoinGamePlayModal(BuildContext context, {String? initialCode}) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
-        return JoinGamePlayModal();
+        return JoinGamePlayModal(initialCode: initialCode);
       });
 }
 
 class JoinGamePlayModal extends StatefulWidget{
-  JoinGamePlayModal({super.key});
+  JoinGamePlayModal({super.key, this.initialCode});
+
+  final String? initialCode;
 
   @override
   State<JoinGamePlayModal> createState() => _JoinGamePlayModalState();
@@ -30,9 +34,15 @@ class _JoinGamePlayModalState extends State<JoinGamePlayModal> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    context.read<WebsocketCubit>().connect();
     super.initState();
+    context.read<WebsocketCubit>().connect();
+    final code = widget.initialCode;
+    if (code != null && code.isNotEmpty) {
+      textController.text = code;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) validate(context);
+      });
+    }
   }
 
   @override
@@ -112,7 +122,23 @@ class _JoinGamePlayModalState extends State<JoinGamePlayModal> {
                   ),
                 ),
                 child: BlocConsumer<MultiplayerBloc, MultiplayerState>(
+                  // The join landing, or failing: a failed join used to just
+                  // stop the spinner, which from an invite link looked like
+                  // the link was broken.
+                  listenWhen: (previous, current) =>
+                      current.hasJoinedRoom ||
+                      (previous.isJoiningRoom &&
+                          !current.isJoiningRoom &&
+                          !current.hasJoinedRoom),
                   listener: (context, state) {
+                    if (!state.hasJoinedRoom) {
+                      CustomToast.showBanner(
+                          context,
+                          "Couldn't join that game. It may have already "
+                          'started, or the code is wrong.',
+                          isError: true);
+                      return;
+                    }
                     if(state.hasJoinedRoom){
                       Navigator.pop(context);
                       context.read<WebsocketCubit>().subscribeToWaitingRoom();

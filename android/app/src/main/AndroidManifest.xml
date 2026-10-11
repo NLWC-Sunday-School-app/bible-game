@@ -42,6 +42,27 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Invite links are handled by app_links in Dart. Flutter's own
+                 deep linking would push /join/CODE as a route name instead. -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
+            <!-- Game invite links: https://<host>/join/CODE. autoVerify makes
+                 them open the app without a chooser once the host serves
+                 /.well-known/assetlinks.json for this app. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="play.biblegame.app" />
+                <data android:pathPrefix="/join/" />
+            </intent-filter>
+            <!-- biblegame://join/CODE: opens the app without any website. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="biblegame" android:host="join" />
+            </intent-filter>
         </activity>
         <!-- Verse of the Hour home screen widget -->
         <receiver

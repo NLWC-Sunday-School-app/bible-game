@@ -58,8 +58,12 @@ class MultiplayerRepository {
     return multiplayerAPI.countInvite();
   }
 
-  Future<dynamic> getRoomDetails(roomId) async {
+  Future<RoomDetailsModel> getRoomDetails(roomId) async {
     return multiplayerAPI.roomDetails(roomId);
+  }
+
+  Future<bool> restartGame(roomId, hostId) async {
+    return multiplayerAPI.gameRestart(roomId, hostId);
   }
 
   Future<void> sendGameData(

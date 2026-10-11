@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:bible_game/features/multi_player/game_mode_codes.dart';
+import 'package:bible_game/features/multi_player/invite_link.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_event.dart';
+import 'package:bible_game/features/multi_player/widget/modal/game_confirm_modal.dart';
 import 'package:bible_game/features/multi_player/widget/modal/invite_modal.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/multiplayer/cubit/websocket_cubit.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:bible_game/features/multi_player/widget/player_waiting_card.dart';
 import '../../../../shared/constants/app_routes.dart';
 import '../../../../shared/constants/image_routes.dart';
@@ -19,7 +22,10 @@ import '../../../../shared/widgets/modal/network_modal.dart';
 import '../../../lightning_mode/bloc/lightning_mode_bloc.dart';
 import '../multiplayer_button.dart';
 
-void showHostWaitingModal(BuildContext context, {required selectedGroupGame, required inviteCode, required questionType, required noOfQuestion}) {
+/// [createRoomOnClose] is for the create flow, where closing drops the host
+/// back on the mode picker and that screen needs a fresh room behind it. A
+/// host who came back to a saved room has no picker under them to feed.
+void showHostWaitingModal(BuildContext context, {required selectedGroupGame, required inviteCode, required questionType, required noOfQuestion, bool createRoomOnClose = true}) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -29,6 +35,7 @@ void showHostWaitingModal(BuildContext context, {required selectedGroupGame, req
           inviteCode: inviteCode,
           questionType: questionType,
           noOfQuestion: noOfQuestion,
+          createRoomOnClose: createRoomOnClose,
         );
       });
 }
@@ -50,13 +57,14 @@ void showPlayersWaitingForHostModal(BuildContext context, {required selectedGrou
 }
 
 class PlayersWaitingModal extends StatefulWidget {
-  const PlayersWaitingModal({super.key, required this.isWaitingForHost, required this.selectedGroupGame, required this.inviteCode, required this.questionType, this.noOfQuestion});
+  const PlayersWaitingModal({super.key, required this.isWaitingForHost, required this.selectedGroupGame, required this.inviteCode, required this.questionType, this.noOfQuestion, this.createRoomOnClose = true});
 
   final bool isWaitingForHost;
   final String selectedGroupGame;
   final String? questionType;
   final String inviteCode;
   final int? noOfQuestion;
+  final bool createRoomOnClose;
 
   @override
   State<PlayersWaitingModal> createState() => _PlayersWaitingModalState();
@@ -130,8 +138,57 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
     context.read<MultiplayerBloc>().add(FetchOnlinePlayers());
   }
 
+  /// The host's close button used to end the game outright: it took the host
+  /// out of the room, so friends already holding the code were left waiting
+  /// on a room nobody could start, and the host had no way back. Hosts close
+  /// this sheet to step away far more often than to cancel, so keeping the
+  /// game open is the default and ending it has to be chosen.
+  Future<void> _onHostClose() async {
+    final choice = await showGameConfirmModal(
+      context,
+      badgeAsset: _modeAsset,
+      title: 'Leave the waiting room?',
+      message: 'Keep the game open and your friends can still join with this '
+          'code. Come back to it from the Multiplayer tab.',
+      code: widget.inviteCode,
+      primaryLabel: 'Keep it open',
+      secondaryLabel: 'End game',
+    );
+    if (choice == null || !mounted) return;
+
+    final multiplayer = context.read<MultiplayerBloc>();
+    final navigator = Navigator.of(context);
+
+    if (choice == GameConfirmChoice.secondary) {
+      final hostPlayerId =
+          multiplayer.state.createGameRoomResponse.activePlayers[0];
+      multiplayer.add(LeaveRoom(hostPlayerId));
+      if (widget.createRoomOnClose) multiplayer.add(CreateGameRoom());
+      navigator.pop();
+      return;
+    }
+
+    // The room stays as it is on the server. Only the subscription goes;
+    // resuming opens a fresh one and reloads the roster from the server.
+    context.read<WebsocketCubit>().clearCurrentRoom();
+    multiplayer.add(const CheckActiveRoom());
+    navigator.pop();
+    // Out past the mode picker too, when this came from creating a game:
+    // the resume card is on the Multiplayer tab underneath it, and the
+    // picker would only offer to set up a second game.
+    navigator.popUntil(
+        (route) => route.settings.name != AppRoutes.groupGameCategory);
+  }
+
   /// The four modes differ only by icon and label, which a lookup says more
   /// plainly than the chain of conditionals this replaced.
+  String get _modeAsset => switch (widget.selectedGroupGame) {
+        'Lightning Mode' => ProductImageRoutes.lightningMode,
+        'Time-based Mode' => ProductImageRoutes.timeBasedMode,
+        'First to X' => ProductImageRoutes.xMode,
+        _ => ProductImageRoutes.survivalMode,
+      };
+
   Widget _modeHeader() {
     final String asset;
     final String label;
@@ -278,10 +335,8 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                   BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(player!.id!));
                                 }
                               }else{
-                                final hostPlayerId = BlocProvider.of<MultiplayerBloc>(context).state.createGameRoomResponse.activePlayers[0];
-                                print(hostPlayerId);
-                                BlocProvider.of<MultiplayerBloc>(context).add(LeaveRoom(hostPlayerId));
-                                BlocProvider.of<MultiplayerBloc>(context).add(CreateGameRoom());
+                                _onHostClose();
+                                return;
                               }
                               Navigator.pop(context);
                             },
@@ -303,7 +358,9 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                           ),
                         ),
                         SizedBox(height: 18.h,),
-                        _ShareCodeRow(inviteCode: widget.inviteCode),
+                        _ShareCodeRow(
+                            inviteCode: widget.inviteCode,
+                            modeLabel: widget.selectedGroupGame),
                         SizedBox(height: 16.h,),
                       ],
                     ),
@@ -499,9 +556,10 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
                                             },
                                             position: index+1,
                                             userName: state.waitingRoomInfo.players[index].username??"",
-                                            countryName: state.waitingRoomInfo.players[index].country??"N",
+                                            countryName: state.waitingRoomInfo.players[index].country??"",
                                             userRank: state.waitingRoomInfo.players[index].level??"",
-                                            userId: state.waitingRoomInfo.players[index].userId??"",
+                                            userId: state.waitingRoomInfo.players[index].userId ??
+                                                state.waitingRoomInfo.players[index].username ?? "",
                                             isWaitingForHost: widget.isWaitingForHost,
                                             isHost:state.waitingRoomInfo.players[index].isHost??false,
                                           );
@@ -542,60 +600,104 @@ class _PlayersWaitingModalState extends State<PlayersWaitingModal> {
   }
 }
 
-/// The code, demoted. Sharing it is the slow path -- leave the app, pick a
-/// channel, and the other person still has to open the app, find "join with
-/// code" and type eight characters -- so it no longer outweighs the invite
-/// button, which reaches people who are already connected.
+/// The code, and the link to it. The link is the fast path for anyone not
+/// already online -- one tap in a chat opens the app on this game -- so it
+/// gets the button; the code stays beside it for reading out loud, and copies
+/// on tap.
 class _ShareCodeRow extends StatelessWidget {
-  const _ShareCodeRow({required this.inviteCode});
+  const _ShareCodeRow({required this.inviteCode, required this.modeLabel});
 
   final String inviteCode;
+  final String modeLabel;
 
   static const _blue = Color(0xFF014CA3);
 
+  void _share(BuildContext context) {
+    // iPad presents the share sheet as a popover and needs somewhere to
+    // anchor it; without one it throws.
+    final box = context.findRenderObject() as RenderBox?;
+    Share.share(
+      InviteLink.shareMessage(code: inviteCode, modeLabel: modeLabel),
+      subject: 'Join my Bible Game match',
+      sharePositionOrigin:
+          box == null ? null : box.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      // The whole row copies now. The icon was the only target before, which
-      // is a 24px hit area for the one thing this row exists to do.
-      onTap: () {
-        Clipboard.setData(ClipboardData(text: inviteCode));
-        CustomToast.showBanner(context, 'Copied');
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
-        decoration: BoxDecoration(
-          border: Border.all(color: Color(0xFFD8B98C)),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Or share code',
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black.withValues(alpha: 0.5),
-              ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            Clipboard.setData(ClipboardData(text: inviteCode));
+            CustomToast.showBanner(context, 'Code copied');
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
+            decoration: BoxDecoration(
+              border: Border.all(color: Color(0xFFD8B98C)),
+              borderRadius: BorderRadius.circular(8.r),
             ),
-            SizedBox(width: 8.w),
-            Text(
-              inviteCode,
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  inviteCode,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: _blue,
+                  ),
+                ),
+                SizedBox(width: 6.w),
+                Icon(Icons.copy_rounded,
+                    size: 15.sp, color: _blue.withValues(alpha: 0.7)),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(width: 8.w),
+        Builder(
+          builder: (buttonContext) => GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _share(buttonContext),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
+              decoration: BoxDecoration(
                 color: _blue,
+                borderRadius: BorderRadius.circular(8.r),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0xFF002959),
+                    offset: Offset(0, 3),
+                    blurRadius: 0,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.ios_share_rounded,
+                      size: 15.sp, color: Colors.white),
+                  SizedBox(width: 6.w),
+                  Text(
+                    'Share invite',
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(width: 6.w),
-            Icon(Icons.copy_rounded,
-                size: 15.sp, color: _blue.withValues(alpha: 0.7)),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

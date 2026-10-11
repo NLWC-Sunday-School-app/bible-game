@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:bible_game/features/lightning_mode/bloc/lightning_mode_bloc.dart';
+import 'package:bible_game/features/multi_player/active_room_store.dart';
 import 'package:bible_game/features/multi_player/bloc/multiplayer_bloc.dart';
 import 'package:bible_game/features/multi_player/question_timing.dart';
 import 'package:bible_game/features/multi_player/widget/modal/player_answers.dart';
@@ -38,6 +39,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   final SettingsBloc _settingsBloc;
   final MultiplayerRepository _multiplayerRepository;
   final String _apiBaseUrl;
+  final ActiveRoomStore _activeRoomStore;
   late Completer<void> _connectedCompleter;
   bool _isConnected = false;
   bool _isConnecting = false;
@@ -45,6 +47,23 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   Timer? _heartbeatTimer;
   final Queue<Map<String, dynamic>> _messageQueue = Queue();
   String? _currentRoomId;  // Store room ID for re-subscription on reconnect
+
+  /// Cancels the live /topic/room subscription. Entering a room again in the
+  /// same session -- a rematch, or coming back to one -- would otherwise add
+  /// a second subscription beside the first and handle every frame twice.
+  StompUnsubscribe? _roomUnsubscribe;
+
+  void _unsubscribeFromRoom() {
+    final unsubscribe = _roomUnsubscribe;
+    _roomUnsubscribe = null;
+    if (unsubscribe == null) return;
+    try {
+      unsubscribe();
+    } catch (e) {
+      // Already gone with a dropped connection.
+      debugPrint('⚠️ Room unsubscribe failed: $e');
+    }
+  }
   StreamSubscription<AuthenticationState>? _authSubscription;
   int _lastFeedId = 0;
 
@@ -64,7 +83,9 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     required SettingsBloc settingsBloc,
     required AuthenticationBloc authenticationBloc,
     required String apiBaseUrl,
+    ActiveRoomStore? activeRoomStore,
   })  : _multiplayerRepository = multiplayerRepository,
+        _activeRoomStore = activeRoomStore ?? ActiveRoomStore(),
         _multiplayerBloc = multiplayerBloc,
         _settingsBloc = settingsBloc,
         _authenticationBloc = authenticationBloc,
@@ -253,7 +274,8 @@ class WebsocketCubit extends Cubit<WebsocketState> {
       debugPrint('🎮 Subscribing to room: $roomId');
 
       try {
-        _stompClient!.subscribe(
+        _unsubscribeFromRoom();
+        _roomUnsubscribe = _stompClient!.subscribe(
           destination: '/topic/room/$roomId',
           callback: (StompFrame frame) async {
             debugPrint("📨 Room frame: ${frame.body}");
@@ -282,6 +304,20 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                 ));
               }
 
+              // Removed by the host: the saved room is no longer ours to go
+              // back to. Checked against the roster held before this frame,
+              // which is the last one that still listed us.
+              if (body["type"] == "PLAYER_EJECTED" && body["playerId"] != null) {
+                final myUserId = _authenticationBloc.state.user.id.toString();
+                final myPlayerId = state.waitingRoomInfo.players
+                        .firstWhereOrNull((p) => p.userId == myUserId)
+                        ?.id ??
+                    state.userPlayerId;
+                if (myPlayerId != null && body["playerId"] == myPlayerId) {
+                  await _activeRoomStore.clear(body["roomId"]?.toString());
+                }
+              }
+
               // GAME_STARTED included: the roster used to come only from join
               // and leave frames, so a player who never saw one listing
               // themselves had no entry, and sendGameAnswer could not find its
@@ -292,6 +328,15 @@ class WebsocketCubit extends Cubit<WebsocketState> {
                       body["type"] == "PLAYER_LEFT" ||
                       body["type"] == "GAME_STARTED")) {
                 final response = WaitingRoomModel.fromJson(body);
+                // A guest learns their own player id only here; the saved room
+                // needs it to find them again after the app has been closed.
+                final myUserId = _authenticationBloc.state.user.id.toString();
+                final me = response.players
+                    .firstWhereOrNull((p) => p.userId == myUserId);
+                if (me?.id != null && response.roomId != null) {
+                  await _activeRoomStore.rememberPlayerId(
+                      response.roomId!, me!.id!);
+                }
                 // "{username} joined/left the game". Folded into the existing
                 // emit, and never for GAME_STARTED: an extra emission there
                 // re-fires the listener that routes into the game.
@@ -490,7 +535,9 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     }
   }
 
-  Future<void> subscribeToWaitingRoom() async {
+  /// [seed] fills the roster for a player returning to a room, who would
+  /// otherwise see it empty until somebody else joined or left.
+  Future<void> subscribeToWaitingRoom({WaitingRoomModel? seed}) async {
     debugPrint('📋 Attempting to subscribe to waiting room...');
 
     // Wait until connected with timeout
@@ -513,7 +560,8 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     // Additional delay to ensure connection is stable
     await Future.delayed(Duration(milliseconds: 300));
 
-    emit(state.copyWith(waitingRoomInfo: WaitingRoomModel.fromJson({})));
+    emit(state.copyWith(
+        waitingRoomInfo: seed ?? WaitingRoomModel.fromJson({})));
 
     final roomId = _multiplayerBloc.state.createGameRoomResponse.id;
     _currentRoomId = roomId;  // Store room ID for re-subscription on reconnect
@@ -637,6 +685,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     _heartbeatTimer?.cancel();
     _isConnected = false;
     _isConnecting = false;
+    _roomUnsubscribe = null;  // Dies with the client below
     _currentRoomId = null;  // Clear room ID when closing
     _resetConnectedCompleter();  // Reset completer for next connection
     emit(state.copyWith(connectionStatus: WebsocketConnectionStatus.disconnected));
@@ -671,6 +720,7 @@ class WebsocketCubit extends Cubit<WebsocketState> {
   }
 
   void clearCurrentRoom() {
+    _unsubscribeFromRoom();
     _currentRoomId = null;
     debugPrint('🗑️ Cleared current room');
   }

@@ -44,6 +44,18 @@ class MultiplayerState extends Equatable{
 
   final dynamic hostVictoryCondition;
 
+  /// A room saved from an earlier session that can be gone back into. Null
+  /// when there is none, or it has closed.
+  final ResumableRoom? resumableRoom;
+  final bool isResumingRoom;
+
+  /// Pulses true once the room is ready to show; the UI opens its waiting
+  /// room on the edge.
+  final bool hasResumedRoom;
+
+  /// Why the last resume did not happen, written for players. Empty otherwise.
+  final String resumeError;
+
   const MultiplayerState(
       {
         required this.isLoadingCreateGameRoom,
@@ -78,6 +90,10 @@ class MultiplayerState extends Equatable{
         required this.hasKickedOut,
         //
         required this.hostVictoryCondition,
+        this.resumableRoom,
+        this.isResumingRoom = false,
+        this.hasResumedRoom = false,
+        this.resumeError = '',
       });
 
   factory MultiplayerState.initial(){
@@ -142,6 +158,11 @@ MultiplayerState copyWith(
         int? inviteCount,
         CreateGameRoomModel? createGameRoomResponse,
         int? hostVictoryCondition,
+        ResumableRoom? resumableRoom,
+        bool clearResumableRoom = false,
+        bool? isResumingRoom,
+        bool? hasResumedRoom,
+        String? resumeError,
       }) {
     return MultiplayerState(
         isLoadingCreateGameRoom: isLoadingCreateGameRoom ?? this.isLoadingCreateGameRoom,
@@ -175,6 +196,12 @@ MultiplayerState copyWith(
         hasKickedOut: hasKickedOut ?? this.hasKickedOut,
         inviteCount: inviteCount ?? this.inviteCount,
         hostVictoryCondition: hostVictoryCondition ?? this.hostVictoryCondition,
+        resumableRoom: clearResumableRoom
+            ? null
+            : resumableRoom ?? this.resumableRoom,
+        isResumingRoom: isResumingRoom ?? this.isResumingRoom,
+        hasResumedRoom: hasResumedRoom ?? this.hasResumedRoom,
+        resumeError: resumeError ?? this.resumeError,
     );
   }
 
@@ -211,6 +238,10 @@ MultiplayerState copyWith(
     isSearchingPlayers,
     playerSearchQuery,
     gameInviteError,
+    resumableRoom,
+    isResumingRoom,
+    hasResumedRoom,
+    resumeError,
   ];
 }
 
