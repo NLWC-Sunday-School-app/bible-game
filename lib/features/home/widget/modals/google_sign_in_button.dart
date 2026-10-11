@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:bible_game/shared/utils/registration_push_token.dart';
 import 'package:bible_game/shared/features/authentication/bloc/authentication_bloc.dart';
 import 'package:bible_game/shared/features/localization/app_localization.dart';
 import 'package:bible_game/shared/features/settings/bloc/settings_bloc.dart';
 import 'package:bible_game/shared/utils/device_info.dart';
 import 'package:bible_game/shared/utils/google_auth_service.dart';
+import 'package:bible_game/shared/utils/google_web_button.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'package:bible_game/shared/widgets/blue_button.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -45,6 +49,27 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
   // own isLoadingGoogleSignIn flag takes over.
   bool _isBusy = false;
 
+  /// Web only: sign-ins from Google's rendered button.
+  StreamSubscription<String>? _webIdTokens;
+
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      _webIdTokens = GoogleAuthService.webIdTokens.listen((idToken) {
+        if (!mounted || !GoogleAuthService.claimWebIdToken(idToken)) return;
+        setState(() => _isBusy = true);
+        _continueWith(idToken);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _webIdTokens?.cancel();
+    super.dispose();
+  }
+
   Future<void> _handleTap(BuildContext context, dynamic soundManager) async {
     soundManager.playClickSound();
     setState(() => _isBusy = true);
@@ -56,7 +81,15 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
         if (mounted) setState(() => _isBusy = false);
         return;
       }
+      await _continueWith(idToken);
+    } catch (e, stack) {
+      _reportFailure(e, stack);
+    }
+  }
 
+  /// Sends a Google ID token to the backend, however it was obtained.
+  Future<void> _continueWith(String idToken) async {
+    try {
       final fcmToken = await registrationPushToken();
       final deviceInfo = await _deviceInfoService.getDeviceInfo();
 
@@ -71,17 +104,21 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
             ),
           );
     } catch (e, stack) {
-      // Logged, not swallowed. Every failure used to become the same "sign-in
-      // failed" toast, so an unregistered signing certificate (ApiException
-      // 10), a network error and a missing ID token all looked identical --
-      // which is how Android sign-in could stay broken without anyone seeing
-      // why.
-      debugPrint('⚠️ Google sign-in failed: $e');
-      debugPrint('$stack');
-      if (mounted) {
-        setState(() => _isBusy = false);
-        _showError(context);
-      }
+      _reportFailure(e, stack);
+    }
+  }
+
+  void _reportFailure(Object e, StackTrace stack) {
+    // Logged, not swallowed. Every failure used to become the same "sign-in
+    // failed" toast, so an unregistered signing certificate (ApiException
+    // 10), a network error and a missing ID token all looked identical --
+    // which is how Android sign-in could stay broken without anyone seeing
+    // why.
+    debugPrint('⚠️ Google sign-in failed: $e');
+    debugPrint('$stack');
+    if (mounted) {
+      setState(() => _isBusy = false);
+      _showError(context);
     }
   }
 
@@ -99,6 +136,30 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
   void _showError(BuildContext context) {
     final tr = AppLocalization.tr(context);
     CustomToast.showBanner(context, tr.t('auth_google_signin_failed'), isError: true);
+  }
+
+  /// Google's own button on web: it is drawn by Google, so it cannot take the
+  /// game's styling, but it is the only button that yields an ID token there.
+  Widget _webButton(bool isLoading) {
+    return SizedBox(
+      height: 48.h,
+      child: isLoading
+          ? Center(
+              child: SizedBox(
+                height: 20.w,
+                width: 20.w,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFF4A9EFF),
+                ),
+              ),
+            )
+          : LayoutBuilder(
+              builder: (context, constraints) => Center(
+                child: googleWebSignInButton(width: constraints.maxWidth),
+              ),
+            ),
+    );
   }
 
   @override
@@ -130,6 +191,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
       },
       builder: (context, state) {
         final isLoading = _isBusy || state.isLoadingGoogleSignIn;
+        if (kIsWeb) return _webButton(isLoading);
         return BlueButton(
           width: double.infinity,
           buttonText: '',

@@ -63,6 +63,30 @@ class GoogleAuthService {
     return idToken;
   }
 
+  /// Web only: ID tokens from Google's rendered button (googleWebSignInButton).
+  ///
+  /// signIn() cannot work on web: there it goes through Google's OAuth token
+  /// client, which hands back an access token and never an ID token. The
+  /// rendered button signs in through Google Identity Services instead, and the
+  /// account it produces carries the ID token. Reading this also creates the
+  /// GoogleSignIn instance, which on web starts the plugin the button waits on.
+  static Stream<String> get webIdTokens => _googleSignIn.onCurrentUserChanged
+      .where((account) => account != null)
+      .asyncMap((account) async => (await account!.authentication).idToken)
+      .where((idToken) => idToken != null && idToken.isNotEmpty)
+      .cast<String>();
+
+  static String? _lastClaimedWebIdToken;
+
+  /// Every mounted Google button hears the same sign-in -- the login gate and
+  /// the login modal can be on screen together -- but only one of them should
+  /// send it to the backend. The first to claim a token gets it.
+  static bool claimWebIdToken(String idToken) {
+    if (idToken == _lastClaimedWebIdToken) return false;
+    _lastClaimedWebIdToken = idToken;
+    return true;
+  }
+
   /// Puts the ID token on the clipboard so the backend can develop against a
   /// real one. Debug builds only -- kDebugMode is a compile-time constant, so
   /// this and the call to it are tree-shaken out of release.
