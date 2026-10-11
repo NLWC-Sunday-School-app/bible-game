@@ -34,9 +34,7 @@ class AwesomeNotification {
 
   /// Use this method to detect when a new native token is received
   @pragma("vm:entry-point")
-  static Future<void> myNativeTokenHandle(String token) async {
-    debugPrint('Native Token:"$token"');
-  }
+  static Future<void> myNativeTokenHandle(String token) async {}
 
   // Request FCM token to Firebase
   static Future<String> getFirebaseMessagingToken() async {
@@ -56,7 +54,6 @@ class AwesomeNotification {
       try {
         firebaseAppToken =
             await AwesomeNotificationsFcm().requestFirebaseAppToken();
-        print('fb token: $firebaseAppToken');
       } catch (exception) {
         debugPrint('$exception');
       }

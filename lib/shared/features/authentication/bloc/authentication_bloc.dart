@@ -207,7 +207,6 @@ class AuthenticationBloc
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final newTokens =
           await _authenticationRepository.refreshToken(event.refreshToken);
-      print('new Tokens $newTokens');
       emit(state.copyWith(
         token: newTokens['token'],
         refreshToken: newTokens['refreshToken'],
