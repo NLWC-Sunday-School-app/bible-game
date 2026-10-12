@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/devotional_notification.dart';
 import '../../../utils/hourly_verse_notification.dart';
 import '../../../utils/verse_frequency.dart';
+import '../../../utils/verse_widget_sync.dart';
 
 import '../../user/repository/user_repository.dart';
 import '../sound_manager.dart';
@@ -53,6 +54,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(kVerseFrequencyPrefKey, hours);
     emit(state.copyWith(verseFrequencyHours: hours));
+    await VerseWidgetSync.setFrequency(hours);
 
     if (!state.isNotificationOn) return;
     try {

@@ -10,8 +10,10 @@ import org.json.JSONObject
 import java.util.Calendar
 
 /**
- * Home screen widget showing a rotating Bible verse. The verse changes every
- * hour via updatePeriodMillis-driven onUpdate calls; verses are read from the
+ * Home screen widget showing a rotating Bible verse. It redraws every hour via
+ * updatePeriodMillis-driven onUpdate calls (and straight away when the app's
+ * verse frequency changes), showing the verse for the current slot of that
+ * frequency; verses are read from the
  * same bundled JSON asset the Flutter app and iOS widget use, so no Flutter
  * engine is needed while the app is closed.
  */
@@ -41,6 +43,21 @@ class VerseWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    /**
+     * The gap between verses chosen in the app, from the preferences file
+     * Flutter's shared_preferences writes (it prefixes keys with "flutter.").
+     */
+    private fun verseFrequencyHours(context: Context): Int {
+        val supported = setOf(1, 2, 3, 4, 6, 8, 12, 24)
+        val stored = try {
+            context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+                .getLong("flutter.verseFrequencyHours", 1L).toInt()
+        } catch (e: ClassCastException) {
+            1
+        }
+        return if (stored in supported) stored else 1
+    }
+
     private fun currentVerse(context: Context): Pair<String, String> {
         return try {
             val json = context.assets
@@ -56,10 +73,15 @@ class VerseWidgetProvider : AppWidgetProvider() {
                     verses.add(v.getString("reference") to v.getString("text"))
                 }
             }
+            // Same verse as the lock screen notification for this slot: with
+            // every 4 hours, 9:30 shows the 8:00 verse. The notifications count
+            // the day of the year from 0, so DAY_OF_YEAR is taken down by one.
             val cal = Calendar.getInstance()
-            val index = (cal.get(Calendar.DAY_OF_YEAR) * 24 +
-                cal.get(Calendar.HOUR_OF_DAY)) % verses.size
-            verses[index]
+            val every = verseFrequencyHours(context)
+            val hour = cal.get(Calendar.HOUR_OF_DAY)
+            val slotHour = hour - hour % every
+            val dayOfYear = cal.get(Calendar.DAY_OF_YEAR) - 1
+            verses[(dayOfYear * 24 + slotHour) % verses.size]
         } catch (e: Exception) {
             "Psalm 119:105" to
                 "Thy word is a lamp unto my feet, and a light unto my path."

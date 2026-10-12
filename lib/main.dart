@@ -24,6 +24,7 @@ import 'package:bible_game/shared/utils/devotional_notification.dart';
 import 'package:bible_game/shared/utils/hourly_verse_notification.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'package:bible_game/shared/utils/verse_frequency.dart';
+import 'package:bible_game/shared/utils/verse_widget_sync.dart';
 import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
 import 'package:bible_game/features/lightning_mode/repository/lightning_mode_repository.dart';
 import 'app.dart';
@@ -144,6 +145,9 @@ Future<void> _scheduleLocalNotifications() async {
     // Respect the user's choice. Without this the schedules were rebuilt on
     // every launch, so turning verse notifications off lasted until restart.
     final prefs = await SharedPreferences.getInstance();
+    // The widgets follow the frequency whether or not notifications are on.
+    await VerseWidgetSync.setFrequency(
+        resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)));
     if (!(prefs.getBool('isNotificationOn') ?? true)) {
       await DevotionalNotification.cancelDailyReminder();
       await HourlyVerseNotification.cancelHourlyVerses();

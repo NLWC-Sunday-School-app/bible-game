@@ -37,12 +37,43 @@ enum VerseStore {
         return verses.isEmpty ? [.fallback] : verses
     }
 
-    /// Deterministic verse for a given hour so all widget families agree.
+    /// The verse for the slot starting at `date`. Same formula as the app's
+    /// lock screen verses (HourlyVerseNotification), which count the day of the
+    /// year from 0 -- `ordinality` counts from 1, so it is taken down by one.
     static func verse(for date: Date, in verses: [Verse]) -> Verse {
         let calendar = Calendar.current
-        let dayOfYear = calendar.ordinality(of: .day, in: .year, for: date) ?? 1
+        let dayOfYear = (calendar.ordinality(of: .day, in: .year, for: date) ?? 1) - 1
         let hour = calendar.component(.hour, from: date)
         return verses[(dayOfYear * 24 + hour) % verses.count]
+    }
+}
+
+/// How often the verse changes, as chosen in the app. Written by the app's
+/// AppDelegate into the App Group both targets share.
+enum VerseFrequency {
+    static let supported = [1, 2, 3, 4, 6, 8, 12, 24]
+
+    static var hours: Int {
+        let stored = UserDefaults(suiteName: "group.78RK4YBS4Q.com.nlwc.bible.game")?
+            .integer(forKey: "verseFrequencyHours") ?? 0
+        return supported.contains(stored) ? stored : 1
+    }
+
+    /// The start of the slot `date` falls in: with every 4 hours, 9:30 is in
+    /// the 8:00 slot. Matches the times the lock screen verses arrive.
+    static func slotStart(containing date: Date, every hours: Int) -> Date {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
+        let startOfDay = calendar.startOfDay(for: date)
+        return calendar.date(byAdding: .hour, value: hour - hour % hours, to: startOfDay) ?? date
+    }
+
+    static func label(every hours: Int) -> String {
+        switch hours {
+        case 1: return "VERSE OF THE HOUR"
+        case 24: return "VERSE OF THE DAY"
+        default: return "BIBLE VERSE"
+        }
     }
 }
 
@@ -51,6 +82,7 @@ enum VerseStore {
 struct VerseEntry: TimelineEntry {
     let date: Date
     let verse: Verse
+    var label: String = VerseFrequency.label(every: 1)
 }
 
 struct VerseTimelineProvider: TimelineProvider {
@@ -60,24 +92,32 @@ struct VerseTimelineProvider: TimelineProvider {
 
     func getSnapshot(in context: Context, completion: @escaping (VerseEntry) -> Void) {
         let verses = VerseStore.loadVerses()
-        completion(VerseEntry(date: Date(), verse: VerseStore.verse(for: Date(), in: verses)))
+        let hours = VerseFrequency.hours
+        let slot = VerseFrequency.slotStart(containing: Date(), every: hours)
+        completion(VerseEntry(
+            date: Date(),
+            verse: VerseStore.verse(for: slot, in: verses),
+            label: VerseFrequency.label(every: hours)
+        ))
     }
 
+    /// One entry per slot for the next 24 hours: hourly gives 24, every 4 hours
+    /// gives 6. The app reloads the timeline whenever the setting changes.
     func getTimeline(in context: Context, completion: @escaping (Timeline<VerseEntry>) -> Void) {
         let verses = VerseStore.loadVerses()
         let calendar = Calendar.current
-        let now = Date()
+        let hours = VerseFrequency.hours
+        let label = VerseFrequency.label(every: hours)
+        let firstSlot = VerseFrequency.slotStart(containing: Date(), every: hours)
 
-        // One entry at the top of each of the next 24 hours.
-        let currentHour = calendar.date(
-            from: calendar.dateComponents([.year, .month, .day, .hour], from: now)
-        ) ?? now
         var entries: [VerseEntry] = []
-        for offset in 0..<24 {
-            if let entryDate = calendar.date(byAdding: .hour, value: offset, to: currentHour) {
-                entries.append(
-                    VerseEntry(date: entryDate, verse: VerseStore.verse(for: entryDate, in: verses))
-                )
+        for slot in 0..<(24 / hours) {
+            if let entryDate = calendar.date(byAdding: .hour, value: slot * hours, to: firstSlot) {
+                entries.append(VerseEntry(
+                    date: entryDate,
+                    verse: VerseStore.verse(for: entryDate, in: verses),
+                    label: label
+                ))
             }
         }
         completion(Timeline(entries: entries, policy: .atEnd))
@@ -109,7 +149,7 @@ struct VerseWidgetEntryView: View {
 
     var homeScreenView: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("VERSE OF THE HOUR")
+            Text(entry.label)
                 .font(.system(size: 10, weight: .semibold))
                 .tracking(1.2)
                 .foregroundColor(Color(red: 0.85, green: 0.81, blue: 0.92))
@@ -151,7 +191,7 @@ struct VerseWidget: Widget {
             VerseWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Verse of the Hour")
-        .description("A new Bible verse every hour on your home and lock screen.")
+        .description("A Bible verse on your home and lock screen, as often as you choose in the app.")
         .supportedFamilies([
             .systemSmall,
             .systemMedium,
