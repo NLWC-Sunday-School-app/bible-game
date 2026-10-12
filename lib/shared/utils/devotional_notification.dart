@@ -16,43 +16,57 @@ class DevotionalNotification {
         defaultColor: const Color(0xFF6B4C9A),
       );
 
-  /// Schedule a repeating daily notification at 8:00 AM local time.
+  /// How many days ahead are scheduled. Each day is its own notification
+  /// carrying that day's passage; a single repeating one carried whatever
+  /// passage was current when it was scheduled, every day, until the app was
+  /// next opened. Rescheduled on every launch, so this only runs out for
+  /// someone who leaves the app closed for longer than this. Kept well inside
+  /// iOS's 64 pending notifications, which the hourly verses share (up to 24).
+  static const int _daysAhead = 14;
+
+  /// Schedules the 8:00 AM Daily Reading reminder for each of the next
+  /// [_daysAhead] days, each naming the passage the app will show that day.
   static Future<void> scheduleDailyReminder() async {
-    // Cancel any existing devotional notification first
-    await AwesomeNotifications().cancel(_notificationId);
+    await cancelDailyReminder();
 
-    // Pick today's devotional for the preview text
     final now = DateTime.now();
-    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
-    final devotional = DailyDevotionals
-        .devotionals[dayOfYear % DailyDevotionals.devotionals.length];
-    final passage = devotional['passage'] as String;
+    for (var day = 0; day < _daysAhead; day++) {
+      final date = DateTime(now.year, now.month, now.day + day, 8);
+      if (!date.isAfter(now)) continue; // today's 8 AM has already passed
+      final passage = DailyDevotionals.forDate(date)['passage'] as String;
 
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: _notificationId,
-        channelKey: _channelKey,
-        title: '\u{1F4D6} Daily Reading',
-        body: 'Today\'s passage: $passage — Tap to read and reflect!',
-        notificationLayout: NotificationLayout.Default,
-        category: NotificationCategory.Reminder,
-        badge: 0,
-      ),
-      schedule: NotificationCalendar(
-        hour: 8,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-        repeats: true,
-        preciseAlarm: true,
-        allowWhileIdle: true,
-      ),
-    );
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: _notificationId + day,
+          channelKey: _channelKey,
+          title: '\u{1F4D6} Daily Reading',
+          body: 'Today\'s passage: $passage — Tap to read and reflect!',
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Reminder,
+          badge: 0,
+        ),
+        schedule: NotificationCalendar(
+          year: date.year,
+          month: date.month,
+          day: date.day,
+          hour: 8,
+          minute: 0,
+          second: 0,
+          millisecond: 0,
+          repeats: false,
+          preciseAlarm: true,
+          allowWhileIdle: true,
+        ),
+      );
+    }
   }
 
-  /// Cancel the daily devotional notification.
+  /// Cancels every scheduled Daily Reading reminder, including the single
+  /// repeating one earlier versions scheduled under [_notificationId].
   static Future<void> cancelDailyReminder() async {
-    await AwesomeNotifications().cancel(_notificationId);
+    for (var day = 0; day < _daysAhead; day++) {
+      await AwesomeNotifications().cancel(_notificationId + day);
+    }
   }
 
 }

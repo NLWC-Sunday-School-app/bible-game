@@ -1,4 +1,25 @@
 class DailyDevotionals {
+  /// The devotional for a calendar date. The Daily Reading screen and its 8 AM
+  /// notification both go through here: they used to pick with different
+  /// formulas, so the notification named a different passage from the one the
+  /// app then showed.
+  static Map<String, dynamic> forDate(DateTime date) =>
+      devotionals[indexForDate(date)];
+
+  /// Scattered rather than sequential, so adjacent days land on devotionals
+  /// far apart in the list (different books).
+  static int indexForDate(DateTime date) {
+    const prime = 137;
+    return (dayOfYear(date) * prime) % devotionals.length;
+  }
+
+  /// 0 for 1 January. Counted on calendar dates, not elapsed time, so a
+  /// daylight-saving change cannot shift it by a day.
+  static int dayOfYear(DateTime date) =>
+      DateTime.utc(date.year, date.month, date.day)
+          .difference(DateTime.utc(date.year, 1, 1))
+          .inDays;
+
   static const List<Map<String, dynamic>> devotionals = [
     {
       'passage': 'John 3:16',

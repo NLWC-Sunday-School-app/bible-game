@@ -31,12 +31,7 @@ class DailyDevotionalBloc
     final lastCompleted = prefs.getString('devotional_last_completed') ?? '';
     final hasCompletedToday = lastCompleted == today;
 
-    // Pick today's devotional using a deterministic scatter so consecutive
-    // days pull from different books instead of sequential entries.
-    final now = DateTime.now();
-    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
-    final index = _scatteredIndex(dayOfYear, DailyDevotionals.devotionals.length);
-    final data = DailyDevotionals.devotionals[index];
+    final data = DailyDevotionals.forDate(DateTime.now());
 
     emit(state.copyWith(
       passage: data['passage'] as String,
@@ -90,13 +85,6 @@ class DailyDevotionalBloc
     };
 
     await _connectivityBloc.submitOrEnqueue(playLog);
-  }
-
-  /// Maps a sequential day number to a scattered index so that adjacent days
-  /// land on devotionals far apart in the list (different books).
-  int _scatteredIndex(int dayOfYear, int length) {
-    const prime = 137;
-    return (dayOfYear * prime) % length;
   }
 
   String _todayStr() {
