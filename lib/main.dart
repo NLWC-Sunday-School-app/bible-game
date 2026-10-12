@@ -24,6 +24,7 @@ import 'package:bible_game/shared/utils/devotional_notification.dart';
 import 'package:bible_game/shared/utils/hourly_verse_notification.dart';
 import 'package:bible_game/shared/utils/token_notifier.dart';
 import 'package:bible_game/shared/utils/verse_frequency.dart';
+import 'package:bible_game/shared/utils/verse_topics.dart';
 import 'package:bible_game/shared/utils/verse_widget_sync.dart';
 import 'package:bible_game/features/multi_player/repository/multiplayer_repository.dart';
 import 'package:bible_game/features/lightning_mode/repository/lightning_mode_repository.dart';
@@ -145,9 +146,10 @@ Future<void> _scheduleLocalNotifications() async {
     // Respect the user's choice. Without this the schedules were rebuilt on
     // every launch, so turning verse notifications off lasted until restart.
     final prefs = await SharedPreferences.getInstance();
-    // The widgets follow the frequency whether or not notifications are on.
-    await VerseWidgetSync.setFrequency(
-        resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)));
+    final hours = resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey));
+    final topics = await loadVerseTopicIds();
+    // The widgets follow these settings whether or not notifications are on.
+    await VerseWidgetSync.update(hours: hours, topics: topics);
     if (!(prefs.getBool('isNotificationOn') ?? true)) {
       await DevotionalNotification.cancelDailyReminder();
       await HourlyVerseNotification.cancelHourlyVerses();
@@ -157,7 +159,7 @@ Future<void> _scheduleLocalNotifications() async {
     // Daily devotional at 8 AM, plus the hourly lock screen verses.
     await DevotionalNotification.scheduleDailyReminder();
     await HourlyVerseNotification.scheduleHourlyVerses(
-        everyHours: resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)));
+        everyHours: hours, topics: topics);
 
     // Debug builds fire one verse 10s after launch so the lock screen can be
     // checked without waiting for the top of the hour. Stripped from release.

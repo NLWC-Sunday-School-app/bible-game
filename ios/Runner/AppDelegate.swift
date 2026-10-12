@@ -26,21 +26,23 @@ didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: An
          return super.application(application, didFinishLaunchingWithOptions: launchOptions)
 }
 
-  /// The verse widget cannot read the app's preferences, so the frequency the
-  /// user picks is copied into the App Group both share, and the widget is
-  /// asked to rebuild its timeline straight away.
+  /// The verse widget cannot read the app's preferences, so the frequency and
+  /// topics the user picks are copied into the App Group both share, and the
+  /// widget is asked to rebuild its timeline straight away.
   private func registerVerseWidgetChannel(messenger: FlutterBinaryMessenger) {
     let channel = FlutterMethodChannel(name: "bible_game/verse_widget", binaryMessenger: messenger)
     channel.setMethodCallHandler { call, result in
-      guard call.method == "setFrequency",
+      guard call.method == "update",
             let args = call.arguments as? [String: Any],
-            let hours = args["hours"] as? Int
+            let hours = args["hours"] as? Int,
+            let topics = args["topics"] as? [String]
       else {
         result(FlutterMethodNotImplemented)
         return
       }
-      UserDefaults(suiteName: "group.78RK4YBS4Q.com.nlwc.bible.game")?
-        .set(hours, forKey: "verseFrequencyHours")
+      let shared = UserDefaults(suiteName: "group.78RK4YBS4Q.com.nlwc.bible.game")
+      shared?.set(hours, forKey: "verseFrequencyHours")
+      shared?.set(topics, forKey: "verseTopics")
       if #available(iOS 14.0, *) {
         WidgetCenter.shared.reloadTimelines(ofKind: "VerseWidget")
       }

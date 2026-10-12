@@ -3,6 +3,9 @@ import SwiftUI
 
 // MARK: - Verse data
 
+/// Shared with the app, which writes the user's verse settings here.
+let appGroup = "group.78RK4YBS4Q.com.nlwc.bible.game"
+
 struct Verse {
     let reference: String
     let text: String
@@ -14,15 +17,22 @@ struct Verse {
 }
 
 enum VerseStore {
-    /// Loads all verses from memory_verses.json bundled into this extension.
-    /// The file is the same asset the Flutter app and Android widget use.
+    /// Loads the verses of the topics chosen in the app from memory_verses.json
+    /// bundled into this extension -- the same asset the Flutter app and
+    /// Android widget use -- topic by topic in file order, as the app does.
     static func loadVerses() -> [Verse] {
         guard
             let url = Bundle.main.url(forResource: "memory_verses", withExtension: "json"),
             let data = try? Data(contentsOf: url),
             let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let topics = root["topics"] as? [[String: Any]]
+            let allTopics = root["topics"] as? [[String: Any]]
         else { return [.fallback] }
+
+        let chosen = Set(UserDefaults(suiteName: appGroup)?
+            .stringArray(forKey: "verseTopics") ?? [])
+        let chosenTopics = allTopics.filter { chosen.contains($0["id"] as? String ?? "") }
+        // Nothing chosen yet, or only topics that no longer exist: every topic.
+        let topics = chosenTopics.isEmpty ? allTopics : chosenTopics
 
         var verses: [Verse] = []
         for topic in topics {
@@ -54,7 +64,7 @@ enum VerseFrequency {
     static let supported = [1, 2, 3, 4, 6, 8, 12, 24]
 
     static var hours: Int {
-        let stored = UserDefaults(suiteName: "group.78RK4YBS4Q.com.nlwc.bible.game")?
+        let stored = UserDefaults(suiteName: appGroup)?
             .integer(forKey: "verseFrequencyHours") ?? 0
         return supported.contains(stored) ? stored : 1
     }

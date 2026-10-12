@@ -24,6 +24,14 @@ class SetVerseFrequency extends SettingsEvent {
   List<Object> get props => [hours];
 }
 
+/// Sets the topics lock screen verses and the widgets draw from.
+class SetVerseTopics extends SettingsEvent {
+  final List<String> topicIds;
+  SetVerseTopics(this.topicIds);
+  @override
+  List<Object> get props => [topicIds];
+}
+
 class UpdateSoundState extends SettingsEvent {
   final bool isMusicOn;
   final bool isSoundOn;

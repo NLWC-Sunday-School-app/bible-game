@@ -7,6 +7,9 @@ class SettingsState extends Equatable {
 
   /// Hours between lock screen verses -- see kVerseFrequencyOptions.
   final int verseFrequencyHours;
+
+  /// Topic ids the verses come from, in file order. Empty until loaded.
+  final List<String> verseTopics;
   final dynamic gamePlaySettings;
   final List<GameAds>? adContent;
   final bool isLoadingAds;
@@ -17,6 +20,7 @@ class SettingsState extends Equatable {
     required this.isMusicOn,
     required this.isNotificationOn,
     this.verseFrequencyHours = kDefaultVerseFrequencyHours,
+    this.verseTopics = const [],
     this.gamePlaySettings,
     this.adContent,
     this.isLoadingAds = false,
@@ -39,6 +43,7 @@ class SettingsState extends Equatable {
     bool? isMusicOn,
     bool? isNotificationOn,
     int? verseFrequencyHours,
+    List<String>? verseTopics,
     dynamic gamePlaySettings,
     bool? isLoadingAds,
     List<GameAds>? adContent,
@@ -49,6 +54,7 @@ class SettingsState extends Equatable {
       isMusicOn: isMusicOn ?? this.isMusicOn,
       isNotificationOn: isNotificationOn ?? this.isNotificationOn,
       verseFrequencyHours: verseFrequencyHours ?? this.verseFrequencyHours,
+      verseTopics: verseTopics ?? this.verseTopics,
       gamePlaySettings: gamePlaySettings ?? this.gamePlaySettings,
       isLoadingAds: isLoadingAds ?? this.isLoadingAds,
       adContent: adContent ?? this.adContent,
@@ -58,5 +64,5 @@ class SettingsState extends Equatable {
 
   @override
   List<Object> get props => [isSoundOn, isMusicOn, isNotificationOn,
-      verseFrequencyHours, gamePlaySettings, isLoadingAds];
+      verseFrequencyHours, verseTopics, gamePlaySettings, isLoadingAds];
 }

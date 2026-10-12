@@ -19,6 +19,12 @@ import java.util.Calendar
  */
 class VerseWidgetProvider : AppWidgetProvider() {
 
+    companion object {
+        /** Written by MainActivity whenever the app's verse settings change. */
+        const val PREFS = "verse_widget"
+        const val TOPICS_KEY = "topics"
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -58,16 +64,30 @@ class VerseWidgetProvider : AppWidgetProvider() {
         return if (stored in supported) stored else 1
     }
 
+    private fun chosenTopics(context: Context): Set<String> =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(TOPICS_KEY, "")
+            .orEmpty()
+            .split(",")
+            .filter { it.isNotBlank() }
+            .toSet()
+
     private fun currentVerse(context: Context): Pair<String, String> {
         return try {
             val json = context.assets
                 .open("flutter_assets/assets/data/memory_verses.json")
                 .bufferedReader()
                 .use { it.readText() }
-            val topics = JSONObject(json).getJSONArray("topics")
+            val allTopics = JSONObject(json).getJSONArray("topics")
+            val topics = (0 until allTopics.length()).map { allTopics.getJSONObject(it) }
+            // The topics chosen in the app, in file order as the app takes
+            // them; nothing chosen, or only topics that no longer exist, means
+            // every topic.
+            val chosen = chosenTopics(context)
+            val picked = topics.filter { it.getString("id") in chosen }
             val verses = mutableListOf<Pair<String, String>>()
-            for (i in 0 until topics.length()) {
-                val topicVerses = topics.getJSONObject(i).getJSONArray("verses")
+            for (topic in picked.ifEmpty { topics }) {
+                val topicVerses = topic.getJSONArray("verses")
                 for (j in 0 until topicVerses.length()) {
                     val v = topicVerses.getJSONObject(j)
                     verses.add(v.getString("reference") to v.getString("text"))

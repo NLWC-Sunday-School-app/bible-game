@@ -129,5 +129,12 @@
   "profile_verse_frequency": "Versets bibliques",
   "profile_preferences": "PRÉFÉRENCES",
   "profile_account": "COMPTE",
-  "profile_verse_frequency_hint": "Sur l'écran de verrouillage"
+  "profile_verse_frequency_hint": "Sur l'écran de verrouillage",
+  "profile_verse_topics": "Thèmes des versets",
+  "profile_verse_topics_hint_all": "Tous les thèmes",
+  "profile_verse_topics_hint_count": "{count} thèmes",
+  "verse_topics_message": "Les versets de votre écran de verrouillage et du widget viendront des thèmes choisis.",
+  "verse_topics_select_all": "Tout sélectionner",
+  "verse_topics_save": "Enregistrer",
+  "verse_topics_cancel": "Annuler"
 }

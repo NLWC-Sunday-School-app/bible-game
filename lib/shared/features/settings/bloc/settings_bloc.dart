@@ -1,3 +1,4 @@
+import 'package:bible_game/features/memory_verses/model/memory_verse.dart';
 import 'package:bible_game_api/model/game_ads.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -7,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/devotional_notification.dart';
 import '../../../utils/hourly_verse_notification.dart';
 import '../../../utils/verse_frequency.dart';
+import '../../../utils/verse_topics.dart';
 import '../../../utils/verse_widget_sync.dart';
 
 import '../../user/repository/user_repository.dart';
@@ -31,6 +33,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdateSoundState>(_onUpdateSoundState);
     on<LoadNotificationSetting>(_onLoadNotificationSetting);
     on<SetVerseFrequency>(_onSetVerseFrequency);
+    on<SetVerseTopics>(_onSetVerseTopics);
 
     // Restore the stored preference so the toggle reflects reality on launch.
     add(LoadNotificationSetting());
@@ -44,6 +47,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       verseFrequencyHours:
           resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)),
     ));
+    try {
+      emit(state.copyWith(verseTopics: await loadVerseTopicIds()));
+    } catch (e) {
+      debugPrint('\u26A0\uFE0F Could not load verse topics: $e');
+    }
   }
 
   /// Changing the frequency reschedules immediately, so the choice takes
@@ -54,11 +62,33 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(kVerseFrequencyPrefKey, hours);
     emit(state.copyWith(verseFrequencyHours: hours));
-    await VerseWidgetSync.setFrequency(hours);
+    await _applyVerseSettings();
+  }
+
+  /// Same as the frequency: the widgets and the lock screen verses switch to
+  /// the new topics now.
+  Future<void> _onSetVerseTopics(
+      SetVerseTopics event, Emitter<SettingsState> emit) async {
+    final topics = await MemoryVerseData.loadTopics();
+    final ids =
+        resolveVerseTopics(event.topicIds, [for (final t in topics) t.id]);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(kVerseTopicsPrefKey, ids);
+    emit(state.copyWith(verseTopics: ids));
+    await _applyVerseSettings();
+  }
+
+  Future<void> _applyVerseSettings() async {
+    final topics = state.verseTopics.isEmpty
+        ? await loadVerseTopicIds()
+        : state.verseTopics;
+    await VerseWidgetSync.update(
+        hours: state.verseFrequencyHours, topics: topics);
 
     if (!state.isNotificationOn) return;
     try {
-      await HourlyVerseNotification.scheduleHourlyVerses(everyHours: hours);
+      await HourlyVerseNotification.scheduleHourlyVerses(
+          everyHours: state.verseFrequencyHours, topics: topics);
     } catch (e) {
       debugPrint('\u26A0\uFE0F Could not reschedule verses: $e');
     }

@@ -1,3 +1,4 @@
+import 'package:bible_game/features/memory_verses/model/memory_verse.dart';
 import 'package:bible_game/shared/utils/verse_frequency.dart';
 import 'package:bible_game/shared/widgets/modal/delete_account_modal.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ import '../../../shared/widgets/screen_app_bar.dart';
 import '../widget/modals/bg_streak_modal.dart';
 import '../widget/modals/edit_profile.dart';
 import '../widget/modals/reset_password_modal.dart';
+import '../widget/modals/verse_topics_modal.dart';
 import '../widget/score_info.dart';
 import '../../../shared/widgets/login_gate_widget.dart';
 
@@ -154,6 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: 16.h),
                           _VerseFrequencySetting(),
+                          _VerseTopicsSetting(),
                           SizedBox(height: 24.h),
                           _SectionDivider(label: tr.t('profile_preferences')),
                           SizedBox(height: 16.h),
@@ -765,6 +768,117 @@ class _VerseFrequencySetting extends StatelessWidget {
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+/// The topics verses come from, under the frequency and shown with it.
+class _VerseTopicsSetting extends StatelessWidget {
+  const _VerseTopicsSetting();
+
+  static final Future<List<VerseTopic>> _topics = MemoryVerseData.loadTopics();
+
+  String _summary(BuildContext context, List<VerseTopic> topics,
+      List<String> chosen) {
+    final tr = AppLocalization.tr(context);
+    if (chosen.isEmpty || chosen.length == topics.length) {
+      return tr.t('profile_verse_topics_hint_all');
+    }
+    if (chosen.length <= 2) {
+      return topics
+          .where((t) => chosen.contains(t.id))
+          .map((t) => t.name)
+          .join(', ');
+    }
+    return tr.t('profile_verse_topics_hint_count',
+        {'count': '${chosen.length}'});
+  }
+
+  Future<void> _pick(BuildContext context, List<VerseTopic> topics,
+      List<String> chosen) async {
+    final bloc = context.read<SettingsBloc>();
+    bloc.soundManager.playClickSound();
+    final picked =
+        await showVerseTopicsModal(context, topics: topics, selected: chosen);
+    if (picked == null || picked.isEmpty) return;
+    bloc.add(SetVerseTopics(picked));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      buildWhen: (prev, curr) =>
+          prev.isNotificationOn != curr.isNotificationOn ||
+          prev.verseTopics != curr.verseTopics,
+      builder: (context, state) {
+        if (!state.isNotificationOn) return const SizedBox.shrink();
+
+        return FutureBuilder<List<VerseTopic>>(
+          future: _topics,
+          builder: (context, snapshot) {
+            final topics = snapshot.data;
+            if (topics == null || topics.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            return Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 0),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _pick(context, topics, state.verseTopics),
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14.r),
+                    color: const Color(0xFF0D2550).withOpacity(0.6),
+                    border: Border.all(
+                      color: const Color(0xFF4A8AD4).withOpacity(0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.style_rounded,
+                          color: Colors.white.withOpacity(0.6), size: 20.sp),
+                      SizedBox(width: 10.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppLocalization.tr(context)
+                                  .t('profile_verse_topics'),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              _summary(context, topics, state.verseTopics),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.chevron_right_rounded,
+                          color: Colors.white.withOpacity(0.6), size: 22.sp),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );

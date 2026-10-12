@@ -140,5 +140,12 @@
   "profile_verse_frequency": "Bible verses",
   "profile_preferences": "PREFERENCES",
   "profile_account": "ACCOUNT",
-  "profile_verse_frequency_hint": "On your lock screen"
+  "profile_verse_frequency_hint": "On your lock screen",
+  "profile_verse_topics": "Verse topics",
+  "profile_verse_topics_hint_all": "All topics",
+  "profile_verse_topics_hint_count": "{count} topics",
+  "verse_topics_message": "Your lock screen verses and verse widget will come from the topics you pick.",
+  "verse_topics_select_all": "Select all",
+  "verse_topics_save": "Save",
+  "verse_topics_cancel": "Cancel"
 }

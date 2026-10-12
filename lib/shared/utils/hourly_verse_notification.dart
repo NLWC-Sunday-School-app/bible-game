@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bible_game/features/memory_verses/model/memory_verse.dart';
 import 'package:bible_game/shared/utils/verse_frequency.dart';
+import 'package:bible_game/shared/utils/verse_topics.dart';
 
 /// Shows a Bible verse on the lock screen by pre-scheduling one silent
 /// repeating notification per delivery hour. Rescheduled on every app launch
@@ -30,12 +31,16 @@ class HourlyVerseNotification {
   /// [everyHours] is the gap between verses: 1 delivers on every hour, 3 on
   /// 0:00, 3:00, 6:00 and so on. Anything outside the supported set falls back
   /// to the default rather than scheduling something unexpected.
-  static Future<void> scheduleHourlyVerses({int? everyHours}) async {
+  ///
+  /// [topics] are the topic ids to draw from; left out, the stored choice is
+  /// used.
+  static Future<void> scheduleHourlyVerses(
+      {int? everyHours, List<String>? topics}) async {
     final step = kVerseFrequencyOptions.containsKey(everyHours)
         ? everyHours!
         : kDefaultVerseFrequencyHours;
 
-    final verses = await MemoryVerseData.loadAllVerses();
+    final verses = await _verses(topics);
     if (verses.isEmpty) return;
 
     // Always clear the whole channel first: dropping from hourly to twice a
@@ -44,10 +49,9 @@ class HourlyVerseNotification {
     await AwesomeNotifications().cancelSchedulesByChannelKey(_channelKey);
 
     final now = DateTime.now();
-    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
 
     for (var hour = 0; hour < 24; hour += step) {
-      final verse = verses[(dayOfYear * 24 + hour) % verses.length];
+      final verse = verseForSlot(verses, now, hour);
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: _baseId + hour,
@@ -71,6 +75,11 @@ class HourlyVerseNotification {
     }
   }
 
+  static Future<List<MemoryVerse>> _verses(List<String>? topics) async {
+    final all = await MemoryVerseData.loadTopics();
+    return versesForTopics(all, topics ?? await loadVerseTopicIds());
+  }
+
   static Future<void> cancelHourlyVerses() async {
     await AwesomeNotifications().cancelSchedulesByChannelKey(_channelKey);
   }
@@ -83,12 +92,11 @@ class HourlyVerseNotification {
       await AwesomeNotifications().requestPermissionToSendNotifications();
     }
 
-    final verses = await MemoryVerseData.loadAllVerses();
+    final verses = await _verses(null);
     if (verses.isEmpty) return;
 
     final now = DateTime.now();
-    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
-    final verse = verses[(dayOfYear * 24 + now.hour) % verses.length];
+    final verse = verseForSlot(verses, now, now.hour);
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
