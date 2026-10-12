@@ -497,50 +497,73 @@ class _SettingsTogglesRow extends StatelessWidget {
       builder: (context, state) {
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w),
+          // Equal shares, so five icons fit when logged in; each one only
+          // shrinks below its full size when the row is too narrow for it.
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _ToggleItem(
-                label: tr.t('profile_music'),
-                iconPath: state.isMusicOn
-                    ? IconImageRoutes.musicOn
-                    : IconImageRoutes.musicOff,
-                onTap: () {
-                  soundManager.playClickSound();
-                  context.read<SettingsBloc>().add(ToggleMusic());
-                },
-              ),
-              _ToggleItem(
-                label: tr.t('profile_sound'),
-                iconPath: state.isSoundOn
-                    ? IconImageRoutes.soundOn
-                    : IconImageRoutes.soundOff,
-                onTap: () {
-                  soundManager.playClickSound();
-                  context.read<SettingsBloc>().add(ToggleSound());
-                },
-              ),
-              // The only way to switch the hourly verse and daily devotional
-              // notifications off: showGameSettingsModal, which held the
-              // original toggle, is commented out at both of its call sites.
-              _ToggleItem(
-                label: tr.t('profile_verse_notifications'),
-                iconPath: state.isNotificationOn
-                    ? IconImageRoutes.versesOn
-                    : IconImageRoutes.versesOff,
-                onTap: () {
-                  soundManager.playClickSound();
-                  context.read<SettingsBloc>().add(ToggleNotification());
-                },
-              ),
-              if (isLoggedIn)
-                _ToggleItem(
-                  label: tr.t('auth_logout'),
-                  iconPath: IconImageRoutes.logOut,
+              Expanded(
+                child: _ToggleItem(
+                  label: tr.t('profile_music'),
+                  iconPath: state.isMusicOn
+                      ? IconImageRoutes.musicOn
+                      : IconImageRoutes.musicOff,
                   onTap: () {
                     soundManager.playClickSound();
-                    showLogoutModal(context);
+                    context.read<SettingsBloc>().add(ToggleMusic());
                   },
+                ),
+              ),
+              Expanded(
+                child: _ToggleItem(
+                  label: tr.t('profile_sound'),
+                  iconPath: state.isSoundOn
+                      ? IconImageRoutes.soundOn
+                      : IconImageRoutes.soundOff,
+                  onTap: () {
+                    soundManager.playClickSound();
+                    context.read<SettingsBloc>().add(ToggleSound());
+                  },
+                ),
+              ),
+              // The lock screen verses and the 8 AM daily reading reminder,
+              // each switched on its own. showGameSettingsModal, which held
+              // the original single toggle, is commented out at both of its
+              // call sites.
+              Expanded(
+                child: _ToggleItem(
+                  label: tr.t('profile_verse_notifications'),
+                  iconPath: state.isNotificationOn
+                      ? IconImageRoutes.versesOn
+                      : IconImageRoutes.versesOff,
+                  onTap: () {
+                    soundManager.playClickSound();
+                    context.read<SettingsBloc>().add(ToggleNotification());
+                  },
+                ),
+              ),
+              Expanded(
+                child: _ToggleItem(
+                  label: tr.t('profile_daily_reading'),
+                  iconPath: state.isDailyReadingOn
+                      ? IconImageRoutes.readingOn
+                      : IconImageRoutes.readingOff,
+                  onTap: () {
+                    soundManager.playClickSound();
+                    context.read<SettingsBloc>().add(ToggleDailyReading());
+                  },
+                ),
+              ),
+              if (isLoggedIn)
+                Expanded(
+                  child: _ToggleItem(
+                    label: tr.t('auth_logout'),
+                    iconPath: IconImageRoutes.logOut,
+                    onTap: () {
+                      soundManager.playClickSound();
+                      showLogoutModal(context);
+                    },
+                  ),
                 ),
             ],
           ),
@@ -563,24 +586,33 @@ class _ToggleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.all(8.w),
-          child: GestureDetector(
-            onTap: onTap,
-            child: Image.asset(iconPath, width: 64.w),
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final iconSize = (constraints.maxWidth - 8.w).clamp(0.0, 64.w);
+        return Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.w),
+              child: GestureDetector(
+                onTap: onTap,
+                child: Image.asset(iconPath, width: iconSize),
+              ),
+            ),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

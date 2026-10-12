@@ -183,6 +183,9 @@ class IconImageRoutes{
   // bare glyphs at a different size and read as a foreign element there.
   static const String versesOn = 'assets/images/icons/user/verses_on.png';
   static const String versesOff = 'assets/images/icons/user/verses_off.png';
+  // The verses icons with an open book in place of the bell.
+  static const String readingOn = 'assets/images/icons/user/reading_on.png';
+  static const String readingOff = 'assets/images/icons/user/reading_off.png';
   static const String soundOn = 'assets/images/icons/user/sound_on.png';
   static const String soundOff = 'assets/images/icons/user/sound_off.png';
   static const String musicOn = 'assets/images/icons/user/music_on.png';

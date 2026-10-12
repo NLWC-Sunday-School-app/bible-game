@@ -150,14 +150,19 @@ Future<void> _scheduleLocalNotifications() async {
     final topics = await loadVerseTopicIds();
     // The widgets follow these settings whether or not notifications are on.
     await VerseWidgetSync.update(hours: hours, topics: topics);
-    if (!(prefs.getBool('isNotificationOn') ?? true)) {
+
+    // The 8 AM daily reading reminder and the lock screen verses each have
+    // their own switch.
+    if (await DevotionalNotification.isEnabled(prefs)) {
+      await DevotionalNotification.scheduleDailyReminder();
+    } else {
       await DevotionalNotification.cancelDailyReminder();
+    }
+
+    if (!(prefs.getBool('isNotificationOn') ?? true)) {
       await HourlyVerseNotification.cancelHourlyVerses();
       return;
     }
-
-    // Daily devotional at 8 AM, plus the hourly lock screen verses.
-    await DevotionalNotification.scheduleDailyReminder();
     await HourlyVerseNotification.scheduleHourlyVerses(
         everyHours: hours, topics: topics);
 

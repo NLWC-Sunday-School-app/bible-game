@@ -28,6 +28,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ToggleSound>(_onToggleSound);
     on<ToggleMusic>(_onToggleMusic);
     on<ToggleNotification>(_onToggleNotification);
+    on<ToggleDailyReading>(_onToggleDailyReading);
     on<FetchGamePlaySettings>(_onFetchGamePlaySettings);
     on<FetchAds>(_onFetchAds);
     on<UpdateSoundState>(_onUpdateSoundState);
@@ -44,6 +45,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final prefs = await SharedPreferences.getInstance();
     emit(state.copyWith(
       isNotificationOn: prefs.getBool('isNotificationOn') ?? true,
+      isDailyReadingOn: await DevotionalNotification.isEnabled(prefs),
       verseFrequencyHours:
           resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)),
     ));
@@ -111,9 +113,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     soundManager.updateSettings(newState);
   }
 
-  /// The toggle used to flip a flag in memory and nothing else -- it neither
-  /// persisted nor touched the schedules, so verses kept arriving after it was
-  /// switched off and it reset on every launch.
+  /// The lock screen verses switch. Saved, and the verses scheduled or
+  /// cancelled straight away, so the choice holds now and after a restart.
   Future<void> _onToggleNotification(
       ToggleNotification event, Emitter<SettingsState> emit) async {
     final enabled = !state.isNotificationOn;
@@ -123,16 +124,33 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     try {
       if (enabled) {
-        await DevotionalNotification.scheduleDailyReminder();
         await HourlyVerseNotification.scheduleHourlyVerses(
             everyHours: state.verseFrequencyHours);
       } else {
-        await DevotionalNotification.cancelDailyReminder();
         await HourlyVerseNotification.cancelHourlyVerses();
       }
     } catch (e) {
       // Scheduling throws if the notification permission was never granted.
       debugPrint('\u26A0\uFE0F Notification toggle: $e');
+    }
+  }
+
+  /// The 8 AM daily reading reminder switch, independent of the verses.
+  Future<void> _onToggleDailyReading(
+      ToggleDailyReading event, Emitter<SettingsState> emit) async {
+    final enabled = !state.isDailyReadingOn;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(DevotionalNotification.prefKey, enabled);
+    emit(state.copyWith(isDailyReadingOn: enabled));
+
+    try {
+      if (enabled) {
+        await DevotionalNotification.scheduleDailyReminder();
+      } else {
+        await DevotionalNotification.cancelDailyReminder();
+      }
+    } catch (e) {
+      debugPrint('\u26A0\uFE0F Daily reading toggle: $e');
     }
   }
 
