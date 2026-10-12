@@ -210,10 +210,10 @@ class _GameSettingsModalState extends State<GameSettingsModal> {
                                 soundManager.playClickSound();
                                 context
                                     .read<SettingsBloc>()
-                                    .add(ToggleNotification());
+                                    .add(TogglePushNotifications());
                               },
                               child: Image.asset(
-                                state.isNotificationOn
+                                state.isPushOn
                                     ? IconImageRoutes.notificationOn
                                     : IconImageRoutes.notificationOff,
                                 width: 50.w,

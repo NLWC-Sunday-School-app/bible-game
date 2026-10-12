@@ -143,26 +143,15 @@ void main() async {
 /// logged an unhandled PlatformException.
 Future<void> _scheduleLocalNotifications() async {
   try {
-    // Respect the user's choice. Without this the schedules were rebuilt on
-    // every launch, so turning verse notifications off lasted until restart.
     final prefs = await SharedPreferences.getInstance();
+    await retireVerseOffSwitch(prefs);
     final hours = resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey));
     final topics = await loadVerseTopicIds();
-    // The widgets follow these settings whether or not notifications are on.
     await VerseWidgetSync.update(hours: hours, topics: topics);
 
-    // The 8 AM daily reading reminder and the lock screen verses each have
-    // their own switch.
-    if (await DevotionalNotification.isEnabled(prefs)) {
-      await DevotionalNotification.scheduleDailyReminder();
-    } else {
-      await DevotionalNotification.cancelDailyReminder();
-    }
-
-    if (!(prefs.getBool('isNotificationOn') ?? true)) {
-      await HourlyVerseNotification.cancelHourlyVerses();
-      return;
-    }
+    // Neither has an off switch: the notifications switch on the Profile
+    // screen is for push from the backend. Verses have a frequency instead.
+    await DevotionalNotification.scheduleDailyReminder();
     await HourlyVerseNotification.scheduleHourlyVerses(
         everyHours: hours, topics: topics);
 

@@ -281,9 +281,9 @@ void showAuthModal(BuildContext context) {
                                   soundManager.playClickSound();
                                   context
                                       .read<SettingsBloc>()
-                                      .add(ToggleNotification());
+                                      .add(TogglePushNotifications());
                                 },
-                                asset: state.isNotificationOn
+                                asset: state.isPushOn
                                     ? IconImageRoutes.notificationOn
                                     : IconImageRoutes.notificationOff,
                               ),

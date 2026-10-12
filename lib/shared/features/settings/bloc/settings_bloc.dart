@@ -2,10 +2,11 @@ import 'package:bible_game/features/memory_verses/model/memory_verse.dart';
 import 'package:bible_game_api/model/game_ads.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../utils/devotional_notification.dart';
+import '../../../utils/awesome_notification.dart';
 import '../../../utils/hourly_verse_notification.dart';
 import '../../../utils/verse_frequency.dart';
 import '../../../utils/verse_topics.dart';
@@ -27,8 +28,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         super(SettingsState.initial()) {
     on<ToggleSound>(_onToggleSound);
     on<ToggleMusic>(_onToggleMusic);
-    on<ToggleNotification>(_onToggleNotification);
-    on<ToggleDailyReading>(_onToggleDailyReading);
+    on<TogglePushNotifications>(_onTogglePushNotifications);
     on<FetchGamePlaySettings>(_onFetchGamePlaySettings);
     on<FetchAds>(_onFetchAds);
     on<UpdateSoundState>(_onUpdateSoundState);
@@ -43,9 +43,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   Future<void> _onLoadNotificationSetting(
       LoadNotificationSetting event, Emitter<SettingsState> emit) async {
     final prefs = await SharedPreferences.getInstance();
+    await retireVerseOffSwitch(prefs);
     emit(state.copyWith(
-      isNotificationOn: prefs.getBool('isNotificationOn') ?? true,
-      isDailyReadingOn: await DevotionalNotification.isEnabled(prefs),
+      isPushOn: prefs.getBool(AwesomeNotification.pushPrefKey) ?? true,
       verseFrequencyHours:
           resolveVerseFrequency(prefs.getInt(kVerseFrequencyPrefKey)),
     ));
@@ -87,7 +87,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     await VerseWidgetSync.update(
         hours: state.verseFrequencyHours, topics: topics);
 
-    if (!state.isNotificationOn) return;
     try {
       await HourlyVerseNotification.scheduleHourlyVerses(
           everyHours: state.verseFrequencyHours, topics: topics);
@@ -113,44 +112,31 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     soundManager.updateSettings(newState);
   }
 
-  /// The lock screen verses switch. Saved, and the verses scheduled or
-  /// cancelled straight away, so the choice holds now and after a restart.
-  Future<void> _onToggleNotification(
-      ToggleNotification event, Emitter<SettingsState> emit) async {
-    final enabled = !state.isNotificationOn;
+  /// Off deletes this device's push token and, for a signed-in user, clears
+  /// the one the backend sends to; on registers a fresh one. The app's own
+  /// scheduled notifications are untouched either way.
+  Future<void> _onTogglePushNotifications(
+      TogglePushNotifications event, Emitter<SettingsState> emit) async {
+    final enabled = !state.isPushOn;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isNotificationOn', enabled);
-    emit(state.copyWith(isNotificationOn: enabled));
+    await prefs.setBool(AwesomeNotification.pushPrefKey, enabled);
+    emit(state.copyWith(isPushOn: enabled));
 
     try {
+      final signedIn =
+          (GetStorage().read('user_token') as String?)?.isNotEmpty ?? false;
       if (enabled) {
-        await HourlyVerseNotification.scheduleHourlyVerses(
-            everyHours: state.verseFrequencyHours);
+        final token = await AwesomeNotification.getFirebaseMessagingToken();
+        if (token.isEmpty) return;
+        await prefs.setString('fcmToken', token);
+        if (signedIn) await _userRepository.updateUserFCMToken(token);
       } else {
-        await HourlyVerseNotification.cancelHourlyVerses();
+        await AwesomeNotification.deleteFirebaseMessagingToken();
+        await prefs.remove('fcmToken');
+        if (signedIn) await _userRepository.updateUserFCMToken('');
       }
     } catch (e) {
-      // Scheduling throws if the notification permission was never granted.
-      debugPrint('\u26A0\uFE0F Notification toggle: $e');
-    }
-  }
-
-  /// The 8 AM daily reading reminder switch, independent of the verses.
-  Future<void> _onToggleDailyReading(
-      ToggleDailyReading event, Emitter<SettingsState> emit) async {
-    final enabled = !state.isDailyReadingOn;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(DevotionalNotification.prefKey, enabled);
-    emit(state.copyWith(isDailyReadingOn: enabled));
-
-    try {
-      if (enabled) {
-        await DevotionalNotification.scheduleDailyReminder();
-      } else {
-        await DevotionalNotification.cancelDailyReminder();
-      }
-    } catch (e) {
-      debugPrint('\u26A0\uFE0F Daily reading toggle: $e');
+      debugPrint('\u26A0\uFE0F Push notification toggle: $e');
     }
   }
 

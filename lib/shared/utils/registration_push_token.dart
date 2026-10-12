@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'awesome_notification.dart';
 import 'platform_info.dart';
 
 /// The push token to send when registering an account.
@@ -14,8 +15,13 @@ import 'platform_info.dart';
 /// Sends an explicit placeholder rather than a blank, so the server can tell a
 /// client that cannot receive push from one whose token simply is not ready.
 /// UpdateFCMToken replaces it with the real token once FCM comes up.
+///
+/// With push switched off it says so, for the same reason.
 Future<String> registrationPushToken() async {
   final prefs = await SharedPreferences.getInstance();
+  if (!(prefs.getBool(AwesomeNotification.pushPrefKey) ?? true)) {
+    return 'push-switched-off';
+  }
   final token = prefs.getString('fcmToken') ?? '';
   if (token.isNotEmpty) return token;
   return PlatformInfo.isWeb ? 'web-no-push-token' : 'pending-fcm-token';

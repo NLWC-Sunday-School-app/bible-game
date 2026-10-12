@@ -433,11 +433,8 @@ class _ProfileScreenTabletViewState extends State<ProfileScreenTabletView> {
                                   )
                                 ],
                               ),
-                              // Matches the phone layout: verses and the daily
-                              // reading reminder each have a switch. The
-                              // original single toggle lived in
-                              // showGameSettingsModal, which is commented out
-                              // at both of its call sites.
+                              // Matches the phone layout: the switch covers
+                              // push from the backend only.
                               Column(
                                 children: [
                                   Padding(
@@ -447,46 +444,18 @@ class _ProfileScreenTabletViewState extends State<ProfileScreenTabletView> {
                                         soundManager.playClickSound();
                                         context
                                             .read<SettingsBloc>()
-                                            .add(ToggleNotification());
+                                            .add(TogglePushNotifications());
                                       },
                                       child: Image.asset(
-                                        state.isNotificationOn
-                                            ? IconImageRoutes.versesOn
-                                            : IconImageRoutes.versesOff,
+                                        state.isPushOn
+                                            ? IconImageRoutes.bellOn
+                                            : IconImageRoutes.bellOff,
                                         width: 64.w,
                                       ),
                                     ),
                                   ),
                                   Text(
-                                    'Verses',
-                                    style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white),
-                                  )
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(8.w),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        soundManager.playClickSound();
-                                        context
-                                            .read<SettingsBloc>()
-                                            .add(ToggleDailyReading());
-                                      },
-                                      child: Image.asset(
-                                        state.isDailyReadingOn
-                                            ? IconImageRoutes.readingOn
-                                            : IconImageRoutes.readingOff,
-                                        width: 64.w,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    'Reading',
+                                    'Notifications',
                                     style: TextStyle(
                                         fontSize: 13.sp,
                                         fontWeight: FontWeight.w700,

@@ -1,26 +1,10 @@
 import 'dart:ui';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bible_game/shared/data/daily_devotionals.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DevotionalNotification {
   static const String _channelKey = 'daily_devotional';
   static const int _notificationId = 100;
-
-  static const String prefKey = 'isDailyReadingOn';
-
-  /// Whether the reminder is switched on. Until it had its own switch, the
-  /// verses switch covered it too, so anyone who turned that off keeps the
-  /// reminder off rather than having it come back after an update. That is
-  /// saved the first time it is read: falling back every time would let
-  /// switching verses off later take the reminder with it.
-  static Future<bool> isEnabled(SharedPreferences prefs) async {
-    final stored = prefs.getBool(prefKey);
-    if (stored != null) return stored;
-    final enabled = prefs.getBool('isNotificationOn') ?? true;
-    await prefs.setBool(prefKey, enabled);
-    return enabled;
-  }
 
   /// Register the notification channel (call once in main.dart).
   static NotificationChannel get channel => NotificationChannel(

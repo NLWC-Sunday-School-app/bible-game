@@ -3,12 +3,9 @@ part of 'settings_bloc.dart';
 class SettingsState extends Equatable {
   final bool isSoundOn;
   final bool isMusicOn;
-  /// Lock screen verses. Named before the daily reading reminder had a
-  /// switch of its own, when this one covered both.
-  final bool isNotificationOn;
-
-  /// The 8 AM daily reading reminder.
-  final bool isDailyReadingOn;
+  /// Push from the backend through Firebase. Lock screen verses have no
+  /// switch, only a frequency.
+  final bool isPushOn;
 
   /// Hours between lock screen verses -- see kVerseFrequencyOptions.
   final int verseFrequencyHours;
@@ -23,8 +20,7 @@ class SettingsState extends Equatable {
   const SettingsState({
     required this.isSoundOn,
     required this.isMusicOn,
-    required this.isNotificationOn,
-    this.isDailyReadingOn = true,
+    required this.isPushOn,
     this.verseFrequencyHours = kDefaultVerseFrequencyHours,
     this.verseTopics = const [],
     this.gamePlaySettings,
@@ -37,7 +33,7 @@ class SettingsState extends Equatable {
     return SettingsState(
       isSoundOn: true,
       isMusicOn: true,
-      isNotificationOn: true,
+      isPushOn: true,
       gamePlaySettings: {},
       isLoadingAds: false,
 
@@ -47,8 +43,7 @@ class SettingsState extends Equatable {
   SettingsState copyWith({
     bool? isSoundOn,
     bool? isMusicOn,
-    bool? isNotificationOn,
-    bool? isDailyReadingOn,
+    bool? isPushOn,
     int? verseFrequencyHours,
     List<String>? verseTopics,
     dynamic gamePlaySettings,
@@ -59,8 +54,7 @@ class SettingsState extends Equatable {
     return SettingsState(
       isSoundOn: isSoundOn ?? this.isSoundOn,
       isMusicOn: isMusicOn ?? this.isMusicOn,
-      isNotificationOn: isNotificationOn ?? this.isNotificationOn,
-      isDailyReadingOn: isDailyReadingOn ?? this.isDailyReadingOn,
+      isPushOn: isPushOn ?? this.isPushOn,
       verseFrequencyHours: verseFrequencyHours ?? this.verseFrequencyHours,
       verseTopics: verseTopics ?? this.verseTopics,
       gamePlaySettings: gamePlaySettings ?? this.gamePlaySettings,
@@ -71,7 +65,6 @@ class SettingsState extends Equatable {
   }
 
   @override
-  List<Object> get props => [isSoundOn, isMusicOn, isNotificationOn,
-      isDailyReadingOn,
+  List<Object> get props => [isSoundOn, isMusicOn, isPushOn,
       verseFrequencyHours, verseTopics, gamePlaySettings, isLoadingAds];
 }

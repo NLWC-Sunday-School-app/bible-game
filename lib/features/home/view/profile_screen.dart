@@ -497,8 +497,8 @@ class _SettingsTogglesRow extends StatelessWidget {
       builder: (context, state) {
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w),
-          // Equal shares, so five icons fit when logged in; each one only
-          // shrinks below its full size when the row is too narrow for it.
+          // Equal shares; each icon only shrinks below its full size when
+          // the row is too narrow for it.
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -526,31 +526,20 @@ class _SettingsTogglesRow extends StatelessWidget {
                   },
                 ),
               ),
-              // The lock screen verses and the 8 AM daily reading reminder,
-              // each switched on its own. showGameSettingsModal, which held
-              // the original single toggle, is commented out at both of its
-              // call sites.
+              // Push from the backend only. The app's own notifications --
+              // lock screen verses and the daily reading reminder -- have no
+              // switch; the verses have the frequency below.
               Expanded(
                 child: _ToggleItem(
-                  label: tr.t('profile_verse_notifications'),
-                  iconPath: state.isNotificationOn
-                      ? IconImageRoutes.versesOn
-                      : IconImageRoutes.versesOff,
+                  label: tr.t('profile_push_notifications'),
+                  iconPath: state.isPushOn
+                      ? IconImageRoutes.bellOn
+                      : IconImageRoutes.bellOff,
                   onTap: () {
                     soundManager.playClickSound();
-                    context.read<SettingsBloc>().add(ToggleNotification());
-                  },
-                ),
-              ),
-              Expanded(
-                child: _ToggleItem(
-                  label: tr.t('profile_daily_reading'),
-                  iconPath: state.isDailyReadingOn
-                      ? IconImageRoutes.readingOn
-                      : IconImageRoutes.readingOff,
-                  onTap: () {
-                    soundManager.playClickSound();
-                    context.read<SettingsBloc>().add(ToggleDailyReading());
+                    context
+                        .read<SettingsBloc>()
+                        .add(TogglePushNotifications());
                   },
                 ),
               ),
@@ -693,8 +682,8 @@ class _CollaboratorButton extends StatelessWidget {
   }
 }
 
-/// Only shown when verse notifications are on -- a frequency for something
-/// switched off is a setting with no effect.
+/// How often lock screen verses come. There is no off switch: once a day is
+/// the quietest it gets.
 class _VerseFrequencySetting extends StatelessWidget {
   const _VerseFrequencySetting();
 
@@ -702,11 +691,8 @@ class _VerseFrequencySetting extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsBloc, SettingsState>(
       buildWhen: (prev, curr) =>
-          prev.isNotificationOn != curr.isNotificationOn ||
           prev.verseFrequencyHours != curr.verseFrequencyHours,
       builder: (context, state) {
-        if (!state.isNotificationOn) return const SizedBox.shrink();
-
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Container(
@@ -841,12 +827,8 @@ class _VerseTopicsSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsBloc, SettingsState>(
-      buildWhen: (prev, curr) =>
-          prev.isNotificationOn != curr.isNotificationOn ||
-          prev.verseTopics != curr.verseTopics,
+      buildWhen: (prev, curr) => prev.verseTopics != curr.verseTopics,
       builder: (context, state) {
-        if (!state.isNotificationOn) return const SizedBox.shrink();
-
         return FutureBuilder<List<VerseTopic>>(
           future: _topics,
           builder: (context, snapshot) {

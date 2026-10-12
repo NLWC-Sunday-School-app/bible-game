@@ -179,13 +179,11 @@ class IconImageRoutes{
   static const String notificationOff = 'assets/images/icons/user/notification_off.png';
 
   // Bell on the same gold-ringed button chrome as musicOn/soundOn, so the
-  // Verses toggle matches the row it sits in. The notificationOn/Off pair are
-  // bare glyphs at a different size and read as a foreign element there.
-  static const String versesOn = 'assets/images/icons/user/verses_on.png';
-  static const String versesOff = 'assets/images/icons/user/verses_off.png';
-  // The verses icons with an open book in place of the bell.
-  static const String readingOn = 'assets/images/icons/user/reading_on.png';
-  static const String readingOff = 'assets/images/icons/user/reading_off.png';
+  // notifications toggle matches the row it sits in. The notificationOn/Off
+  // pair are bare glyphs at a different size and read as a foreign element
+  // there. (The files are named for the verses toggle they were made for.)
+  static const String bellOn = 'assets/images/icons/user/verses_on.png';
+  static const String bellOff = 'assets/images/icons/user/verses_off.png';
   static const String soundOn = 'assets/images/icons/user/sound_on.png';
   static const String soundOff = 'assets/images/icons/user/sound_off.png';
   static const String musicOn = 'assets/images/icons/user/music_on.png';

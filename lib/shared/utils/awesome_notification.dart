@@ -1,6 +1,7 @@
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AwesomeNotification {
   static Future<void>? _remoteInit;
@@ -36,9 +37,33 @@ class AwesomeNotification {
   @pragma("vm:entry-point")
   static Future<void> myNativeTokenHandle(String token) async {}
 
-  // Request FCM token to Firebase
+  /// The Profile screen's notifications switch: push sent through Firebase
+  /// by the backend. The app's own scheduled notifications -- lock screen
+  /// verses and the daily reading reminder -- are not affected by it.
+  static const String pushPrefKey = 'isPushOn';
+
+  static Future<bool> isPushEnabled() async =>
+      (await SharedPreferences.getInstance()).getBool(pushPrefKey) ?? true;
+
+  /// Invalidates this device's FCM token, so pushes already addressed to it
+  /// stop arriving. Firebase may hand the app a fresh token later, but with
+  /// push switched off that one is never sent to the backend.
+  static Future<void> deleteFirebaseMessagingToken() async {
+    try {
+      await _remoteInit?.timeout(const Duration(seconds: 20));
+      if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
+        await AwesomeNotificationsFcm().deleteToken();
+      }
+    } catch (exception) {
+      debugPrint('Could not delete the FCM token: $exception');
+    }
+  }
+
+  /// Request FCM token to Firebase. Empty when push is switched off, so no
+  /// caller registers a token the user asked not to receive pushes on.
   static Future<String> getFirebaseMessagingToken() async {
     String firebaseAppToken = '';
+    if (!await isPushEnabled()) return firebaseAppToken;
 
     // Startup no longer blocks on Firebase, so it may still be coming up.
     // Bounded, because a wedged FCM registration must not hang login -- the

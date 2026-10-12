@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 /// How often lock screen verses arrive, as hours between them.
 ///
 /// Keys are the gap in hours; values are what the user sees. Only these values
@@ -28,4 +30,16 @@ int resolveVerseFrequency(dynamic value) {
     return kDefaultVerseFrequencyHours;
   }
   return hours;
+}
+
+/// Lock screen verses used to have an off switch. They are always on now, and
+/// how often is the only control, so anyone who had switched them off gets the
+/// quietest setting, once a day, rather than the hourly default. Runs once.
+Future<void> retireVerseOffSwitch(SharedPreferences prefs) async {
+  const doneKey = 'verseOffSwitchRetired';
+  if (prefs.getBool(doneKey) ?? false) return;
+  if (prefs.getBool('isNotificationOn') == false) {
+    await prefs.setInt(kVerseFrequencyPrefKey, 24);
+  }
+  await prefs.setBool(doneKey, true);
 }

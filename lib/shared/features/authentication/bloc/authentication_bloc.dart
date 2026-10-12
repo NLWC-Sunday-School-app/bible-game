@@ -191,6 +191,12 @@ class AuthenticationBloc
   Future<void> _onUpdateFCMToken(
       UpdateFCMToken event, Emitter<AuthenticationState> emit) async {
     try {
+      // Push switched off on this device: an empty token is how the backend
+      // marks a user with nothing to send to.
+      if (!await AwesomeNotification.isPushEnabled()) {
+        await _userRepository.updateUserFCMToken('');
+        return;
+      }
       final fcmToken = await AwesomeNotification.getFirebaseMessagingToken();
       // An empty token means FCM was not ready, not that push was revoked.
       // Sending it would clear a perfectly good token on the server.

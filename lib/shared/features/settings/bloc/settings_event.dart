@@ -11,11 +11,8 @@ class ToggleSound extends SettingsEvent {}
 
 class ToggleMusic extends SettingsEvent {}
 
-/// Switches the lock screen verses on or off.
-class ToggleNotification extends SettingsEvent {}
-
-/// Switches the 8 AM daily reading reminder on or off.
-class ToggleDailyReading extends SettingsEvent {}
+/// Switches push from the backend on or off.
+class TogglePushNotifications extends SettingsEvent {}
 
 /// Restores the persisted notification preference on launch.
 class LoadNotificationSetting extends SettingsEvent {}
